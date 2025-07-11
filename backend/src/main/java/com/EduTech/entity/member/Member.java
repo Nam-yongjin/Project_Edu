@@ -1,5 +1,6 @@
 package com.EduTech.entity.member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Member {
 
-	
+	@ID
+	@Column(name = 'memId', nullable = false)
+	pri
 }
