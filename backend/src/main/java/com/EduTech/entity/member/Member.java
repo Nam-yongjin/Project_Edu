@@ -26,12 +26,12 @@ public class Member extends BaseEntity{
 	@Id
 	@Column(length = 16, nullable = false)
 	@Size(min = 6, max = 16, message = "6자 이상 16자 이하로 입력해주세요.")
-    @Pattern(regexp = "^[A-Za-z0-9]{6,16}$", message = "영문 대소문자 또는 숫자만 입력 가능합니다.")
+	@Pattern(regexp = "^[A-Za-z0-9]{6,16}$", message = "영문 대소문자 또는 숫자만 입력 가능합니다.")
 	private String memId;
 	
 	@Column(length = 16, nullable = false)
 	@Size(min = 6, max = 16, message = "6자 이상 16자 이하로 입력해주세요.")
-    @Pattern(regexp = "^[A-Za-z0-9!@#$.]{6,16}$", message = "영문 대소문자, 숫자, 특수문자(!@#$.)만 사용 가능합니다.")
+	@Pattern(regexp = "^[A-Za-z0-9!@#$.]{6,16}$", message = "영문 대소문자, 숫자, 특수문자(!@#$.)만 사용 가능합니다.")
 	private String pw;
 	
 	@Column(length = 6, nullable = false)
