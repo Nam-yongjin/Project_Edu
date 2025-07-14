@@ -32,6 +32,5 @@ public class News extends BaseEntity{
 	@ManyToOne //여러 개의 언론보도 게시글을 한 명의 Admin이 작성 가능
 	@JoinColumn(name = "memId", nullable = false)
 	private Member member;
-
 	
 }

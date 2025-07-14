@@ -29,4 +29,5 @@ public class NoticeFile {
 	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 파일을 하나의 공지사항에 첨부
 	@JoinColumn(name = "noticeNum", nullable = false) //공지사항번호
 	private Notice notice;
+	
 }

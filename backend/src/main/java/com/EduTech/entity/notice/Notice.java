@@ -32,4 +32,5 @@ public class Notice extends BaseEntity{
 	@ManyToOne //여러 개의 공지사항 게시글을 한 명의 Admin이 작성 가능
 	@JoinColumn(name = "memId", nullable = false) //회원아이디
 	private Member member;
+	
 }
