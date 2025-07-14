@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Project_Edu/client/static/css/main.4c04d906.css",
+    "main.js": "/Project_Edu/client/static/js/main.efce54d2.js",
+    "index.html": "/Project_Edu/client/index.html",
+    "main.4c04d906.css.map": "/Project_Edu/client/static/css/main.4c04d906.css.map",
+    "main.efce54d2.js.map": "/Project_Edu/client/static/js/main.efce54d2.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4c04d906.css",
+    "static/js/main.efce54d2.js"
+  ]
+}
