@@ -1,4 +1,4 @@
-package com.EduTech.entity.event;
+package com.EduTech.entity.demonstration;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,14 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "se_event")
+@Table(name = "demonstration_time")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Event {
+public class DemonstrationTime {
 
 	@Id
 	@Column(nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long eventNum;
+	private Long demTimeNum;
 }
