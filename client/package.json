@@ -21,7 +21,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage":"https://Nam-yongjin.github.io/Project_Edu/client/public",
+  "homepage":"https://Nam-yongjin.github.io/Project_Edu/",
   "eslintConfig": {
     "extends": [
       "react-app",
