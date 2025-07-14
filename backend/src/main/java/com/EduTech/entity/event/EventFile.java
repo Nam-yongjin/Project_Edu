@@ -27,7 +27,7 @@ public class EventFile {
 	private String fileType;
 	
 	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 파일을 하나의 행사에 첨부
-	@JoinColumn(name = "event_num", nullable = false) //행사아이디
+	@JoinColumn(name = "eventNum", nullable = false) //행사아이디
 	private Event event;
 }
 
