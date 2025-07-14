@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/Project_Edu/client/public/static/css/main.4c04d906.css",
-    "main.js": "/Project_Edu/client/public/static/js/main.efce54d2.js",
-    "index.html": "/Project_Edu/client/public/index.html",
-    "main.4c04d906.css.map": "/Project_Edu/client/public/static/css/main.4c04d906.css.map",
-    "main.efce54d2.js.map": "/Project_Edu/client/public/static/js/main.efce54d2.js.map"
+    "main.css": "/Project_Edu/static/css/main.4c04d906.css",
+    "main.js": "/Project_Edu/static/js/main.efce54d2.js",
+    "index.html": "/Project_Edu/index.html",
+    "main.4c04d906.css.map": "/Project_Edu/static/css/main.4c04d906.css.map",
+    "main.efce54d2.js.map": "/Project_Edu/static/js/main.efce54d2.js.map"
   },
   "entrypoints": [
     "static/css/main.4c04d906.css",
