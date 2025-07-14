@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "event_reserve", uniqueConstraints = {
-@UniqueConstraint(columnNames = {"memId", "event_num"})
+@UniqueConstraint(columnNames = {"memId", "eventNum"})
 }) //한 사용자가 같은 행사에 신청 불가
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,7 +35,7 @@ public class EventReserve {
 	private Member member;
 	
 	@ManyToOne(fetch = FetchType.LAZY) //여러명이 하나의 프로그램에 신청 가능
-	@JoinColumn(name = "event_num", nullable = false) //행사아이디
+	@JoinColumn(name = "eventNum", nullable = false) //행사아이디
 	private Event event;
 	
 }

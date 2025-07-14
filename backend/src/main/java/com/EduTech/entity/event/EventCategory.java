@@ -1,5 +1,5 @@
 package com.EduTech.entity.event;
 
 public enum EventCategory {
-	STUDENT, FROPESSOR;
+	STUDENT, FROPESSOR; //학생, 교수
 }
