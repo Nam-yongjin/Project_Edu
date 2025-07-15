@@ -1,5 +1,7 @@
 package com.EduTech.entity.demonstration;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -10,12 +12,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "demonstration_time")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class DemonstrationTime {
 
@@ -25,13 +31,13 @@ public class DemonstrationTime {
 	private Long demTimeNum; // 시간번호
 	
 	@Column(nullable = false)
-	private Date demDate; // 날짜
+	private LocalDate demDate; // 날짜
 	
 	@Column(nullable = false)
-	private Date startTime; // 시작시간
+	private LocalTime startTime; // 시작시간
 	
 	@Column(nullable = false)
-	private Date endTime; // 종료시간
+	private LocalTime endTime; // 종료시간
 	
 	@Column(nullable = false)
 	private boolean state; // 예약상태

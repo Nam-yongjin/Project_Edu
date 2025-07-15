@@ -14,12 +14,16 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "demonstration")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Demonstration { //  엔티티에 유효성 검사는 db에 데이터 삽입 시점에 검사하므로 프론트 쪽에서 1차적으로 유효성 검사가 한번 더 필요하다.
 

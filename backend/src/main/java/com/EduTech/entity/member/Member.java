@@ -12,12 +12,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "member")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Member extends BaseEntity{
 
@@ -41,7 +45,7 @@ public class Member extends BaseEntity{
 	private String email;
 	
 	@Column(nullable = false)
-	private LocalDate brithDate;
+	private LocalDate birthDate;
 	
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
