@@ -18,7 +18,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.EduTech.security.CustomAccessDeniedHandler;
 import com.EduTech.security.LoginFailHandler;
 import com.EduTech.security.LoginSuccessHandler;
-import com.EduTech.security.jwt.JWTFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -43,12 +42,12 @@ public class SecurityConfig {
 		// api서버 로그인
         http.formLogin(config -> {
             config.loginPage(("/api/member/login"));
-            config.successHandler(new LoginSuccessHandler());
-            config.failureHandler(new LoginFailHandler());
+//            config.successHandler(new LoginSuccessHandler());
+//            config.failureHandler(new LoginFailHandler());
         });
         
         // JWT 체크
-        http.addFilterBefore(new JWTFilter(), UsernamePasswordAuthenticationFilter.class); 
+//        http.addFilterBefore(new JWTFilter(), UsernamePasswordAuthenticationFilter.class); 
         
         // CustomSecurityConfig에 접근제한시 CustomAccessDeniedHandler를 이용하도록 설정
         http.exceptionHandling(config -> {
