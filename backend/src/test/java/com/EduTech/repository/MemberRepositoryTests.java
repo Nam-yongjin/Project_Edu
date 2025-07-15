@@ -27,10 +27,10 @@ public class MemberRepositoryTests {
 		for(int i=0; i<10; i++) {
 			Member member = Member.builder()
 					.memId("user"+i)
-					.pw(passwordEncoder.encode("aaa"+i))
+					.pw(passwordEncoder.encode("a"+i))
 					.name("USER"+i)
 					.email("aaa"+i+"@test.com")
-					.birthDate(LocalDate.now())
+					.birthDate(LocalDate.of(2025, 7, 15))
 					.gender(MemberGender.MAN)
 					.phone("0101234321"+i)
 					.addr("테스트주소"+i)
