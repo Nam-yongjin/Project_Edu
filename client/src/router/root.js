@@ -1,9 +1,9 @@
 import { Suspense, lazy } from "react";
-const { createBrowserRouter } = require("react-router-dom");
+import Loading from "./Loading";
 
-const Loading = <div>Loading....</div>;
+const { createBrowserRouter } = require("react-router-dom")
 
-const Main = lazy(() => import("../pages/MainPage"));
+const Main = lazy(() => import("../pages/MainPage"))
 
 const root = createBrowserRouter([
     {
@@ -12,4 +12,4 @@ const root = createBrowserRouter([
     },
 ])
 
-export default root;
+export default root
