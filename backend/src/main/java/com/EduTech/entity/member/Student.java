@@ -9,6 +9,6 @@ public class Student {
 	
 	@OneToOne
 	@MapsId
-	@JoinColumn(name = "memId") //회원아이디
+	@JoinColumn(name = "memId", nullable = false) //회원아이디
 	private Member member;
 }
