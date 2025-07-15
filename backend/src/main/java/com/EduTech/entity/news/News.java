@@ -1,6 +1,10 @@
 package com.EduTech.entity.news;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.EduTech.entity.BaseEntity;
+import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.member.Member;
 
 import jakarta.persistence.*;
@@ -32,5 +36,8 @@ public class News extends BaseEntity{
 	@ManyToOne //여러 개의 언론보도 게시글을 한 명의 Admin이 작성 가능
 	@JoinColumn(name = "memId", nullable = false)
 	private Member member;
+	
+	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL) //하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
+	private List<NewsFile> newsFile = new ArrayList<>();
 	
 }

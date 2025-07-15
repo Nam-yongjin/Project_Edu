@@ -26,10 +26,10 @@ public class NewsFile {
 	private Long newsFileNum;
 	
 	@Column(nullable = false) //원본파일명
-	private String title;
+	private String originalName;
 	
 	@Column(nullable = false) //파일저장경로
-	private String content;
+	private String filePath;
 	
 	@Column(nullable = false) //파일종류
 	private String fileType;
