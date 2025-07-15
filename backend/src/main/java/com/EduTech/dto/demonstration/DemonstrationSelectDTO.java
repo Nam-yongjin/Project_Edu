@@ -5,9 +5,9 @@ import java.util.List;
 
 import lombok.Data;
 
-@Data // @Data 어노테이션 사용해서 getter, setter 메소드 생략
-
-public class DemonstrationInsertDTO { // 기업이 실증 물품 dto
+@Data
+public class DemonstrationSelectDTO {
+	private long demNum; // 실증번호 (demonstration의 기본키)
 	private String demName; // 물품명
 	private String demInfo; // 믈품소개
 	private String demMfr; // 제조사

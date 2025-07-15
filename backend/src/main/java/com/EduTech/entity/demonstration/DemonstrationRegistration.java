@@ -1,5 +1,6 @@
 package com.EduTech.entity.demonstration;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.EduTech.entity.member.Member;
@@ -32,6 +33,10 @@ public class DemonstrationRegistration {
 	
 	@Column(nullable = false)
 	private Date regDate; // 등록일
+	
+	
+	@Column(nullable=false)
+	private LocalDateTime expDate;
 	
 	@Enumerated(EnumType.STRING)
 	private DemonstrationState state; // 상태
