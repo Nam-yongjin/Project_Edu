@@ -1,6 +1,6 @@
 package com.EduTech.entity.demonstration;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.EduTech.entity.member.Member;
 
@@ -14,12 +14,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "demonstration_reserve")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class DemonstrationReserve {
 
@@ -29,13 +33,13 @@ public class DemonstrationReserve {
 	private Long demRevNum; // 실증 신청 번호
 
 	@Column(nullable = false)
-	private Date applyAt; // 신청일
+	private LocalDateTime applyAt; // 신청일
 	
 	@Column(nullable = false)
-	private Date startDate; // 사용시작일
+	private LocalDateTime startDate; // 사용시작일
 	
 	@Column(nullable = false)
-	private Date endDate; // 사용종료일
+	private LocalDateTime endDate; // 사용종료일
 	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

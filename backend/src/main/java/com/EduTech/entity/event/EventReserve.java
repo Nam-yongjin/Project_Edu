@@ -16,14 +16,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "event_reserve", uniqueConstraints = {
 @UniqueConstraint(columnNames = {"memId", "eventNum"})
 }) //한 사용자가 같은 행사에 신청 불가
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class EventReserve {
 

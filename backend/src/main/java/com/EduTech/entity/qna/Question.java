@@ -9,8 +9,6 @@ import com.EduTech.entity.member.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,12 +16,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "question")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Question extends BaseEntity{
 
@@ -37,10 +39,9 @@ public class Question extends BaseEntity{
 	
 	@Column(nullable = false) //내용
 	private String content;
-	
-	@Enumerated(EnumType.STRING) //공개여부
-	@Column(nullable = false)
-	private QnaState state;
+	 
+	@Column(nullable = false) //공개여부
+	private boolean state;
 	
 	@Column(nullable = false) //조회수
 	private Long view;	

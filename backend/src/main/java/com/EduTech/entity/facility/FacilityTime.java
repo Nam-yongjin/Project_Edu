@@ -1,6 +1,7 @@
 package com.EduTech.entity.facility;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,12 +14,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "facility_time")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class FacilityTime {
 
@@ -28,13 +33,13 @@ public class FacilityTime {
 	private Long facTimeNum;
 	
 	@Column(nullable = false) //날짜
-	private LocalDateTime facDate;
+	private LocalDate facDate;
 	
 	@Column(nullable = false) //시작시간
-	private LocalDateTime startTime;
+	private LocalTime startTime;
 	
 	@Column(nullable = false) //종료시간
-	private LocalDateTime endTime;
+	private LocalTime endTime;
 	
 	@Enumerated(EnumType.STRING) //예약상태
 	@Column(nullable = false)

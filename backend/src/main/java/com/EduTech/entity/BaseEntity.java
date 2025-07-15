@@ -1,6 +1,6 @@
 package com.EduTech.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -18,8 +18,8 @@ public class BaseEntity {
 	
 	@CreatedBy
 	@Column(updatable = false)
-	private LocalDate createdAt;
+	private LocalDateTime createdAt;
 	
 	@LastModifiedBy
-	private LocalDate updatedAt;
+	private LocalDateTime updatedAt;
 }
