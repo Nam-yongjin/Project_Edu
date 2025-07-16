@@ -51,7 +51,6 @@ public class RegMemberDTO {
 	@Pattern(regexp = "^01[016789][0-9]{7,8}$", message = "유효한 전화번호 형식이 아닙니다. (예: 01012345678)")
 	private String phone;
 	
-    @NotBlank(message = "주소는 필수입니다.")
 	private String addr;
 	
     @NotNull(message = "SMS 수신 동의 여부는 필수입니다.")

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const REST_API_KEY = `#####` // REST API키 
+const REST_API_KEY = `fbf268dc767dba61bf7f2f19ebdb0178` // REST API키 
 const REDIRECT_URI = `http://localhost:3000/member/kakao`
 const AUTH_CODE_PATH = `https://kauth.kakao.com/oauth/authorize`
 const ACCESS_TOKEN_URL = `https://kauth.kakao.com/oauth/token`
