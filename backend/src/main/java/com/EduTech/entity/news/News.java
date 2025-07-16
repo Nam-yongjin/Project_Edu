@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +25,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "news")
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Data
 public class News extends BaseEntity{
 
@@ -40,8 +41,9 @@ public class News extends BaseEntity{
 	@Column(nullable = false) //내용
 	private String content;
 	
+	@Builder.Default
 	@Column(nullable = false) //조회수
-	private Long view;	
+	private Long view = 0L;	//0으로 초기화 해서 Null값 방지	
 	
 	@ManyToOne //여러 개의 언론보도 게시글을 한 명의 Admin이 작성 가능
 	@JoinColumn(name = "memId", nullable = false)
