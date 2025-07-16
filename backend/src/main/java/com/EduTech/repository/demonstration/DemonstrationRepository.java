@@ -5,65 +5,45 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.EduTech.dto.demonstration.DemonstrationSelectRegistrationDTO;
-import com.EduTech.dto.demonstration.DemonstrationSelectReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationSelectDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 
-public interface DemonstrationRepository extends JpaRepository<Demonstration, Long>{
+public interface DemonstrationRepository extends JpaRepository<Demonstration, Long>{ // 실증 상품 관련 레포지토리
 		
-		 
-		@Transactional // 트랜잭션 처리 (실행중 오류가 발생했을때, rollback 처리를 하여 db 무결성을 해치지 않도록 함.)
-		@Query("DELETE FROM demonstration_reserve WHERE demRevNum=:demRevNum")
-		void deleteOneDemRes(@Param("demRevNum") long demRevNum); // 회원이 신청한 실증 신청 삭제
-		
-		@Transactional
-		@Query("DELETE FROM demonstration_reserve WHERE demRevNum IN :demRevNum")
-		void deleteMembersDemRes(@Param("demRevNum") List<Long> demRevNum); // 회원이 신청한 실증 신청 삭제(다수)
-
-		@Transactional
-		@Query("DELETE FROM demonstration_registration WHERE demRegNum=:demRegNum")
-		void deleteOneDemReg(@Param("demRegNum") long demRegNum); // 기업이 신청한 실증 등록 삭제 
-		
-		@Transactional
-		@Query("DELETE FROM demonstration_registration WHERE demRegNum IN:demRegNum")
-		void deleteMembersDemReg(@Param("demRegNum") List<Long> demRegNum); // 기업이 신청한 실증 등록 삭제 (다수)
-		
+		@Modifying
 		@Transactional
 		@Query("DELETE FROM demonstration WHERE demNum=:demNum")
-		void deleteProductDem(@Param("demNum") long demNum); // 실증 신청 삭제 
+		void deleteProductDem(long demNum); // 실증 신청 삭제 
 		
+		@Modifying
 		@Transactional
 		@Query("DELETE FROM demonstration WHERE demNum IN:demNum")
-		void deleteProductsDem(@Param("demNum") List<Long> demNum); // 실증 신청 삭제(다수)
+		void deleteProductsDem(List<Long> demNum); // 실증 신청 삭제(다수)
 		
-		// 이미지 삭제와 실증 예약 시간 삭제같은 경우는 고아 처리를해 실증 신청을 삭제하면 전부 삭제되게 구현해 놓았기 때문에 하지않았음.
+		@Query("SELECT demNum,demName, demMfr,itemNum FROM demonstration")
+		Page<DemonstrationSelectDTO> selectPageDem(Pageable pageable); // 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 목록 페이지) 
 		
+		@Query("SELECT d.demNum,d.demName,d.demMfr,d.itemNum,reg.expDate FROM demonstration d, demonstration_registration reg WHERE d.demNum=reg.demNum")
+		Page<DemonstrationSelectDTO> selectPageDetailDem(Pageable pageable); // 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지) 
 		
-		@Transactional
-		@Query("SELECT res.applyAt, res.state, res.memid, t.schoolName FROM demonstration_reserve res, teacher t")
-		Page<DemonstrationSelectReserveDTO> selectPageDemRes(Pageable pageable); // (관리자 실증교사 신청 페이지) 받아올 dto 조정 필요함. (조인 추가해서)
-		/* 
-		 @Query("SELECT new com.EduTech.dto.demonstration.DemonstrationSelectRegistrationDTO(d.applyAt, d.state, d.memid) " +
-       	"FROM DemonstrationReserve d")
-		Page<DemonstrationSelectRegistrationDTO> selectAllDemRes(Pageable pageable);
-		  오류 날 경우 이걸로 대체 */ 
+		@Query("SELECT d.demNum,d.demName,d.demMfr,d.itemNum,res.startDate, res.endDate, res.applyAt FROM demonstration d, demonstration_reserve res WHERE d.demNum=res.demNum")
+		Page<DemonstrationSelectDTO> selectPageViewDem(Pageable pageable); // 대여한 실증 상품들을 페이지 별로 가져오는 쿼리문 (물품 대여 조회 페이지) 
 		
-		@Transactional
-		@Query("SELECT reg.regDate, reg.state, reg.memId, dem.demName FROM demonstration_registration reg, demonstration dem, company c,  WHERE reg.demNum=dem.demNum AND reg.memId=c.memId")
-		Page<DemonstrationSelectRegistrationDTO> selectPageDemReg(Pageable pageable); //  (관리자 실증기업 신청목록 페이지) 받아올 dto 조정 필요함 (조인추가해서)
+		 @Modifying // JPQL에서 업데이트하는 방식 (기업의 실증 등록내용을 수정시켜주는 쿼리문)
+		    @Query("UPDATE Demonstration d SET d.demName = :demName, d.demMfr = :demMfr, d.itemNum = :itemNum, d.demInfo = :demInfo WHERE d.demNum = :demNum")
+		    int updateDem(
+		         String demName,
+		         String demMfr,
+		         Long itemNum,
+		         String demInfo,
+		         Long demNum
+		    );
 		
-		
-		@Transactional
-		@Query("SELECT demName, demMfr,itemNum FROM demonstration")
-		Page<DemonstrationSelectRegistrationDTO> selectPageDem(Pageable pageable); // 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 상품 목록 페이지)
-		
-		
-		
-		
-		/* @Query("SELECT e FROM Email e WHERE e.sentTime BETWEEN :startDate AND :endDate")
-	    List<Email> findEmailsSentBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);  예시 작성 코드*/
+		// 검색 같은 부분은 백단에서 구현함.
 }
+

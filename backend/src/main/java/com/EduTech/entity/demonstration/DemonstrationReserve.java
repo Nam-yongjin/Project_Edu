@@ -1,5 +1,6 @@
 package com.EduTech.entity.demonstration;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.EduTech.entity.member.Member;
@@ -33,13 +34,13 @@ public class DemonstrationReserve {
 	private Long demRevNum; // 실증 신청 번호
 
 	@Column(nullable = false)
-	private LocalDateTime applyAt; // 신청일
+	private LocalDate applyAt; // 신청일
 	
 	@Column(nullable = false)
-	private LocalDateTime startDate; // 사용시작일
+	private LocalDate startDate; // 사용시작일
 	
 	@Column(nullable = false)
-	private LocalDateTime endDate; // 사용종료일
+	private LocalDate endDate; // 사용종료일
 	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
