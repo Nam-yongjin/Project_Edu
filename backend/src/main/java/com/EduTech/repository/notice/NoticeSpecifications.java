@@ -38,4 +38,4 @@ public class NoticeSpecifications { //NoticeEntity에 대한 정적 Specificatio
 	}
 				
 
-}//날짜 검색, 관리자용 필터, 숨기기 필요한지
+}//관리자 필터 (작성일, 조회수, 공지 고정, 작성자 아이디)
