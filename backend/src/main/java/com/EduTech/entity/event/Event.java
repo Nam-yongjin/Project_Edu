@@ -68,10 +68,10 @@ public class Event {
 	@Column(nullable = false)
 	private EventState state;
 	
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL) //하나의 행사 여러 명이 신청 가능, 행사 삭제되면 신청도 같이 삭제
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 행사 여러 명이 신청 가능, 행사 삭제되면 신청도 같이 삭제
 	private List<EventReserve> eventReserves = new ArrayList<>(); //null방지 초기화	
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL) //하나의 행사 여러 개의 파일 첨부 가능, 행사 삭제되면 파일도 같이 삭제
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 행사 여러 개의 파일 첨부 가능, 행사 삭제되면 파일도 같이 삭제
 	private List<EventFile> eventFiles = new ArrayList<>();
 	
 }

@@ -4,11 +4,13 @@ import java.time.LocalDate;
 
 import com.EduTech.entity.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,4 +74,14 @@ public class Member extends BaseEntity{
 	private MemberRole role;
 	
 	private String kakao;
+	
+	// 회원 삭제시 연결된 추가정보 자동 삭제
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Student student;
+	
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Teacher teacher;
+	
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Company company;
 }

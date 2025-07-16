@@ -50,6 +50,6 @@ public class Question extends BaseEntity{
 	@JoinColumn(name = "memId", nullable = false) //회원아이디
 	private Member member;
 	
-	@OneToMany(mappedBy = "question", cascade = CascadeType.ALL) //하나의 질문에 여러 개의 답변 가능, 질문 삭제되면 답변도 같이 삭제
+	@OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 질문에 여러 개의 답변 가능, 질문 삭제되면 답변도 같이 삭제
 	private List<Answer> answer = new ArrayList<>();
 }

@@ -47,7 +47,7 @@ public class News extends BaseEntity{
 	@JoinColumn(name = "memId", nullable = false)
 	private Member member;
 	
-	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL) //하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
+	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
 	private List<NewsFile> newsFile = new ArrayList<>();
 	
 }
