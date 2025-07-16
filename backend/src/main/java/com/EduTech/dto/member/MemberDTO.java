@@ -35,7 +35,6 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 	public Map<String, Object> getClaims() {
 		Map<String, Object> dataMap = new HashMap<>();
 		dataMap.put("memId", memId);
-		dataMap.put("pw", pw);
 		dataMap.put("name", name);
 		dataMap.put("role", role);
 
