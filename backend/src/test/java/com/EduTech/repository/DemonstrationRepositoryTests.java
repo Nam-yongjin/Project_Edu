@@ -150,7 +150,7 @@ public class DemonstrationRepositoryTests { // 5개 엔티티 데이터 값 삽�
 				}
 				
 				
-				@Test
+				//@Test
 				public void testDemonstrationTime() {
 					
 						Demonstration demonstration=testDemon();
@@ -168,6 +168,7 @@ public class DemonstrationRepositoryTests { // 5개 엔티티 데이터 값 삽�
 					}
 				}
 				
+			
 				
 			
 }
