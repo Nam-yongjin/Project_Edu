@@ -22,5 +22,4 @@ public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecif
 	@Transactional
 	void deleteBynoticeNumIn(List<Long> ids); //일괄삭제(noticeNum값들의 목록)
 		
-}//쿼리문으로 바꾸기??
-
+}
