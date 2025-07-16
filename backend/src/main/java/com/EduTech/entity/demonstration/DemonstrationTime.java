@@ -34,13 +34,7 @@ public class DemonstrationTime {
 	private LocalDate demDate; // 날짜
 	
 	@Column(nullable = false)
-	private LocalTime startTime; // 시작시간
-	
-	@Column(nullable = false)
-	private LocalTime endTime; // 종료시간
-	
-	@Column(nullable = false)
-	private boolean state; // 예약상태
+	private Boolean state; // 예약상태
 	
 	@ManyToOne 
 	@JoinColumn(name = "demNum") 

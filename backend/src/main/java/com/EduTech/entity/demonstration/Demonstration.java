@@ -47,7 +47,7 @@ public class Demonstration { //  엔티티에 유효성 검사는 db에 데이�
 	
 	@Column(nullable = false)
 	@Min(0) // 최소값을 0으로 지정해서 음수값 방지 (null값은 방지x)
-	private long itemNum; // 개수
+	private Long itemNum; // 개수
 	
 	 @OneToMany(mappedBy = "demonstration", cascade = CascadeType.ALL, orphanRemoval = true) // cascade.All: 저장하면 이미지도 저장, 삭제하면 이미도 삭제됨.
 	 																						// orpahnRemoval: demonstrate에서 이미지 리스트 하나를 빼면 그 이미지를 db에서 제거함
