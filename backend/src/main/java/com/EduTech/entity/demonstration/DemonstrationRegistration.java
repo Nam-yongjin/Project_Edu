@@ -1,10 +1,6 @@
 package com.EduTech.entity.demonstration;
 
-import java.time.LocalDateTime;
-<<<<<<< HEAD
-=======
-import java.util.Date;
->>>>>>> refs/heads/demonstration
+import java.time.LocalDate;
 
 import com.EduTech.entity.member.Member;
 
@@ -37,11 +33,11 @@ public class DemonstrationRegistration {
 	private Long demRegNum; // 실증 등록 번호
 	
 	@Column(nullable = false)
-	private LocalDateTime regDate; // 등록일
+	private LocalDate regDate; // 등록일
 	
 	
 	@Column(nullable=false)
-	private LocalDateTime expDate;
+	private LocalDate expDate; // 대여 가능한 날짜
 	
 	@Enumerated(EnumType.STRING)
 	private DemonstrationState state; // 상태
