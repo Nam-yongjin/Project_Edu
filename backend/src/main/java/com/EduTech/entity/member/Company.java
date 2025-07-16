@@ -23,10 +23,8 @@ public class Company {
 	@Id
     private String memId;  // Member의 PK와 동일하게 사용
 	
-	@Column(nullable = false) //기업명
 	private String companyName;
 	
-	@Column(nullable = false) //직급
 	private String position;
 	
 	@OneToOne
