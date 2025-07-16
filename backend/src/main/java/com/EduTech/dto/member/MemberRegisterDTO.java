@@ -3,12 +3,7 @@ package com.EduTech.dto.member;
 import java.time.LocalDate;
 
 import com.EduTech.entity.member.MemberGender;
-import com.EduTech.entity.member.MemberRole;
-import com.EduTech.entity.member.MemberState;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RegMemberDTO {
+public class MemberRegisterDTO {
 
 	@NotBlank(message = "아이디는 필수입니다.")
 	@Size(min = 6, max = 16, message = "6자 이상 16자 이하로 입력해주세요.")

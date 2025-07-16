@@ -3,13 +3,11 @@ package com.EduTech.dto.member;
 import java.time.LocalDate;
 
 import com.EduTech.entity.member.MemberGender;
-import com.EduTech.entity.member.MemberRole;
-import com.EduTech.entity.member.MemberState;
 
 import lombok.Data;
 
 @Data
-public class ModMemberDTO {
+public class MemberModifyDTO {
 
 	private String memId;
 	private String pw;

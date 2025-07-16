@@ -22,8 +22,7 @@ public class Student {
 	
 	@Id
     private String memId;  // Member의 PK와 동일하게 사용
-	
-	@Column(nullable = false) //학교
+
 	private String schoolName;
 	
 	@OneToOne
