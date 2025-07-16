@@ -50,12 +50,12 @@ public class Facility {
 	@Column //기타유의사항
 	private String etc;
 	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) //하나의 시설에 여러 개 이미지 가능, 시설 삭제되면 이미지도 같이 삭제
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 시설에 여러 개 이미지 가능, 시설 삭제되면 이미지도 같이 삭제
 	private List<FacilityImage> facilityImage = new ArrayList<>(); //null방지 초기화	
 
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) //하나의 시설에 여러 명 예약 가능, 시설 삭제되면 신청도 같이 삭제
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 시설에 여러 명 예약 가능, 시설 삭제되면 신청도 같이 삭제
 	private List<FacilityReserve> facilityReserve = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) //하나의 시설에 여러 시간 예약 가능, 시설 삭제되면 시간도 같이 삭제
+	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 시설에 여러 시간 예약 가능, 시설 삭제되면 시간도 같이 삭제
 	private List<FacilityTime> facilityTime = new ArrayList<>();
 }
