@@ -45,6 +45,8 @@ public class Member extends BaseEntity{
 	
 	private String addr;
 	
+	private String addrDetail;
+	
 	private boolean	checkSms;
 	
 	private boolean checkEmail;
