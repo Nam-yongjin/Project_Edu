@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { getAccessToken } from "../../api/kakaoApi";
+import { getAccessToken } from "../api/KakaoApi";
 
 // 인가 코드의 페이지 처리
 const KakaoRedirectPage = () => {
