@@ -48,6 +48,8 @@ public class MemberRegisterDTO {
 	
 	private String addr;
 	
+	private String addrDetail;
+	
     @NotNull(message = "SMS 수신 동의 여부는 필수입니다.")
 	private boolean	checkSms;
 	
