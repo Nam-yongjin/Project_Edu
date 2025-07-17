@@ -28,20 +28,24 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 	void deleteMembersDemRes(@Param("demRevNum") List<Long> demRevNum); // 회원이 신청한 실증 신청 삭제(다수)
 
 	// (관리자 실증교사 신청 조회 페이지) 받아올 dto 추가 필요함. (조인 추가해서)
-	@Query("SELECT res.demRevNum,res.applyAt, res.state, res.member.memId, t.schoolName FROM DemonstrationReserve res, Teacher t")
-	Page<DemonstrationListReserveDTO> selectPageDemRes(@Param("pageable") Pageable pageable);
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListReserveDTO(res.demRevNum,res.applyAt, res.state, res.member.memId, t.schoolName) FROM DemonstrationReserve res, Teacher t WHERE res.member.memId=t.memId")
+	Page<DemonstrationListReserveDTO> selectPageDemRes(Pageable pageable);
 
-	@Modifying // 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문 (실증 예약 가능 시간도 업데이터 해줘야함)
+	@Modifying // 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문 (실증 예약 가능 시간도 업데이트 해줘야함) -
+				// demonstrationReserve 테이블의 값을 수정하니 해당 리포지토리에 작성함.
+	@Transactional
 	@Query("UPDATE DemonstrationReserve dr SET startDate=:startDate, endDate=:endDate WHERE dr.demonstration.demNum = :demNum AND dr.member.memId=:memId")
-	int updateDemResChangeAll(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,
+	int updateDemResChangeDateAll(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,
 			@Param("demNum") Long demNum, @Param("memId") String memId);
 
 	@Modifying // 물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate를 변경하는 쿼리문
 	@Query("UPDATE DemonstrationReserve dr SET endDate=:changeDate WHERE dr.demonstration.demNum = :demNum AND dr.member.memId=:memId")
+	@Transactional
 	int updateDemResChangeDate(@Param("changeDate") LocalDate changeDate, @Param("demNum") Long demNum,
 			@Param("memId") String memId);
 
 	@Modifying // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
+	@Transactional
 	@Query("UPDATE DemonstrationReserve dr SET state=:state WHERE member.memId=:memId")
 	int updateDemResChangeState(@Param("state") DemonstrationState state, @Param("memId") String memId);
 

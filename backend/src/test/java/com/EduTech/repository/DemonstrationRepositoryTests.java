@@ -14,9 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
+import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationTimeDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationImage;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
@@ -91,7 +91,7 @@ public class DemonstrationRepositoryTests {
 
 	public Member testMember() {
 		Member member = Member.builder().memId("user").pw(passwordEncoder.encode("a")).name("USER")
-				.email("aaa@test.com").birthDate(LocalDate.of(2025, 7, 15)).gender(MemberGender.MAN).phone("0101234321")
+				.email("aaa@test.com").birthDate(LocalDate.of(2025, 7, 15)).gender(MemberGender.MAN).phone("0101234321") // MALE 로 할것
 				.addr("테스트주소").checkSms(true).checkEmail(false).state(MemberState.NORMAL).role(MemberRole.USER).build();
 
 		return memberRepository.save(member);
@@ -301,7 +301,7 @@ public class DemonstrationRepositoryTests {
 		}
 	}
 
-	 @Test // 물품 대여 조회 페이지 (정상)
+	// @Test // 물품 대여 조회 페이지 (정상)
 	public void demonstrationListProductViewTest() {
 		List<Page<DemonstrationListDTO>> allData = new ArrayList<>();
 		Page<DemonstrationListDTO> firstPage = demonstrationRepository
@@ -318,25 +318,24 @@ public class DemonstrationRepositoryTests {
 			System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
 		}
 	}
-	
-	
-	 //@Test // 물품 대여 조회 페이지 (정상)
-		public void demonstrationListProductViewSearchTest() {
-			List<Page<DemonstrationListDTO>> allData = new ArrayList<>();
-			Page<DemonstrationListDTO> firstPage = demonstrationRepository
-					.selectPageViewDem(PageRequest.of(0, 5, Sort.by("demNum").descending()));
-			int totalPageCount = firstPage.getTotalPages();
 
-			for (int i = 0; i < totalPageCount; i++) {
-				Page<DemonstrationListDTO> totalPage = demonstrationRepository
-						.selectPageViewDemSearch(PageRequest.of(i, 5, Sort.by("demNum").descending()),"드");
-				allData.add(totalPage);
-			}
+	// @Test // 물품 대여 조회 페이지 - 검색 테스트 (정상)
+	public void demonstrationListProductViewSearchTest() {
+		List<Page<DemonstrationListDTO>> allData = new ArrayList<>();
+		Page<DemonstrationListDTO> firstPage = demonstrationRepository
+				.selectPageViewDem(PageRequest.of(0, 5, Sort.by("demNum").descending()));
+		int totalPageCount = firstPage.getTotalPages();
 
-			for (int i = 0; i < totalPageCount; i++) {
-				System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
-			}
+		for (int i = 0; i < totalPageCount; i++) {
+			Page<DemonstrationListDTO> totalPage = demonstrationRepository
+					.selectPageViewDemSearch(PageRequest.of(i, 5, Sort.by("demNum").descending()), "드");
+			allData.add(totalPage);
 		}
+
+		for (int i = 0; i < totalPageCount; i++) {
+			System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
+		}
+	}
 
 	// @Test // 기업이 상품 등록 정보를 수정하는 페이지 (정상)
 	public void demonstrationUpdateProductTest() {
@@ -345,21 +344,71 @@ public class DemonstrationRepositoryTests {
 				Long.valueOf(1));
 
 	}
-	
-	
+
 	// --------------------------- demonstration 테스트
+
+	// @Test // 실증 교사 신청 하나 삭제하는 테스트 (정상)
+	public void demonstrationReserveDeleteOneTest() {
+
+		demonstrationReserveRepository.deleteOneDemRes(Long.valueOf(11));
+	}
+
+	// @Test // 실증 교사 신청 선택한 항목에 대해 삭제하는 테스트 (정상)
+	public void demonstrationReserveDeleteSelectedTest() {
+		List<Long> lists = new ArrayList<Long>();
+		for (int i = 12; i < 22; i++) {
+			lists.add(Long.valueOf(i));
+		}
+		demonstrationReserveRepository.deleteMembersDemRes(lists);
+	}
+
+	// @Test // 교사 실증 신청 조회 페이지 (정상)
+	public void demonstrationListReserveViewTest() {
+		List<Page<DemonstrationListReserveDTO>> allData = new ArrayList<>();
+		Page<DemonstrationListReserveDTO> firstPage = demonstrationReserveRepository
+				.selectPageDemRes(PageRequest.of(0, 5, Sort.by("demRevNum").descending()));
+		int totalPageCount = firstPage.getTotalPages();
+
+		for (int i = 0; i < totalPageCount; i++) {
+			Page<DemonstrationListReserveDTO> totalPage = demonstrationReserveRepository
+					.selectPageDemRes(PageRequest.of(i, 5, Sort.by("demRevNum").descending()));
+			allData.add(totalPage);
+		}
+
+		for (int i = 0; i < totalPageCount; i++) {
+			System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
+		}
+	}
+
 	
+	
+	// @Test // 실증 물품 상세 정보 페이지에서 id와 번호를 가져와 예약 변경 시간을 선택 후, 날짜 변경하는 테스트 (정상)
+	public void demonstrationResUpdateTest() {
+		demonstrationReserveRepository.updateDemResChangeDateAll(LocalDate.parse("2020-12-20"),LocalDate.parse("2050-12-20"),Long.valueOf(10),"user5");
+	}
 
-	// @Test // 기업이 상품 등록 정보를 수정하는 페이지 (정상)
-	public void demonstrationUpdateProd1uctTest() {
-		Demonstration demon = testDemon();
-		demonstrationRepository.updateDem(demon.getDemName(), demon.getDemMfr(), demon.getItemNum(), demon.getDemInfo(),
-				Long.valueOf(1));
-
+	
+	//@Test //  물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate가 수정되는 테스트 (정상)
+	public void demonstrationResUpdate2Test() {
+		demonstrationReserveRepository.updateDemResChangeDate(LocalDate.parse("2222-12-22"),Long.valueOf(10),"user5");
 	}
 	
-	
-	
-	
-
+	//@Test // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, 상태를 변경하는 테스트  (정상)
+		public void demonstrationResUpdate3Test() {
+			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT,"user1");
+	}
+		
+		
+	// --------------------------------- demonstrationReserve 테스트
+		
+		// @Test // 데이터 리스트 배열 가져와서 해당 날짜가 예약 되있는지 안되있는지 확인하는 데이터를 select하는 테스트 (정상)
+		public void demonstrationTimeTest() {
+			List<DemonstrationTimeDTO> demonstrationTimedto=new ArrayList<>();
+			List<LocalDate> dates=new ArrayList<LocalDate>();
+			dates.add(LocalDate.parse("2025-07-16"));
+			dates.add(LocalDate.parse("2025-10-24"));
+			demonstrationTimedto=demonstrationTimeRepository.selectDemTime(dates,Long.valueOf(10));
+			System.out.println(demonstrationTimedto);
+		}	
+		
 }
