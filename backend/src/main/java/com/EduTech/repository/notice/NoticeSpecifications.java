@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.EduTech.dto.admin.BoardSearchDTO;
 import com.EduTech.dto.notice.NoticeSearchDTO;
 import com.EduTech.entity.notice.Notice;
 
@@ -54,7 +55,7 @@ public class NoticeSpecifications {
 			//빈 리스트 생성
 			List<Predicate> predicates = new ArrayList<>();
 			//키워드가 null이나 empty가 아닐 경우 조건 추가
-			if(dto.getSearchKeyword() != null && !dto.SearchKeyword().trim().isEmpty()) {
+			if(dto.getSearchKeyword() != null && !dto.getSearchKeyword().trim().isEmpty()) {
 				
 				switch (dto.getOption()) {
 					case "제목":
