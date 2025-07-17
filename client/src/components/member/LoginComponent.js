@@ -21,7 +21,6 @@ const LoginComponent = () => {
     const handleClickLogin = (e) => {
         doLogin(loginParam)
             .then(data => {
-                console.log(data)
 
                 if (data.error) {
                     alert("아이디와 패스워드를 다시 확인하세요")
