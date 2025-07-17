@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "member")
@@ -61,12 +62,15 @@ public class Member extends BaseEntity{
 	private String kakao;
 	
 	// 회원 삭제시 연결된 추가정보 자동 삭제
+	@ToString.Exclude
 	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Student student;
 	
+	@ToString.Exclude
 	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Teacher teacher;
 	
+	@ToString.Exclude
 	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Company company;
 }

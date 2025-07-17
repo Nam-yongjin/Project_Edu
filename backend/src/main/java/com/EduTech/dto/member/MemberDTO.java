@@ -14,6 +14,7 @@ import lombok.Data;
 @Data
 public class MemberDTO extends User { // User은 인증된 사용자 정보 담는 객체이므로 MemberDTO에서만 사용
 
+	// 인증 및 권한에 필요한 최소한의 정보
 	private String memId;
 
 	private String pw;
