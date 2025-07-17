@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.EduTech.dto.member.CompanyDetailDTO;
 import com.EduTech.dto.member.StudentDetailDTO;
+import com.EduTech.dto.member.StudentRegisterDTO;
 import com.EduTech.dto.member.TeacherDetailDTO;
 import com.EduTech.entity.member.MemberGender;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
@@ -40,27 +41,27 @@ public class MemberDTOTests {
 //	@Test
     public void testStudentDetailDTO() {
 
-        StudentDetailDTO student = new StudentDetailDTO();
-        student.setMemId("user10");
-        student.setPw("pw123");
-        student.setName("홍길동");
-        student.setEmail("hong@test.com");
-        student.setBirthDate(LocalDate.of(2000, 1, 15));
-        student.setGender(MemberGender.MALE);
-        student.setPhone("01012345678");
-        student.setAddr("서울특별시 강남구");
-        student.setAddrDetail("101동 202호");
-        student.setCheckSms(true);
-        student.setCheckEmail(false);
-        student.setSchoolName("서울고등학교");
+        StudentDetailDTO studentDetailDTO = new StudentDetailDTO();
+        studentDetailDTO.setMemId("user10");
+        studentDetailDTO.setPw("pw123");
+        studentDetailDTO.setName("홍길동");
+        studentDetailDTO.setEmail("hong@test.com");
+        studentDetailDTO.setBirthDate(LocalDate.of(2000, 1, 15));
+        studentDetailDTO.setGender(MemberGender.MALE);
+        studentDetailDTO.setPhone("01012345678");
+        studentDetailDTO.setAddr("서울특별시 강남구");
+        studentDetailDTO.setAddrDetail("101동 202호");
+        studentDetailDTO.setCheckSms(true);
+        studentDetailDTO.setCheckEmail(false);
+        studentDetailDTO.setSchoolName("서울고등학교");
 
-        assertEquals("user10", student.getMemId());
-        assertEquals("홍길동", student.getName());
-        assertEquals(LocalDate.of(2000, 1, 15), student.getBirthDate());
-        assertEquals(MemberGender.MALE, student.getGender());
-        assertEquals("서울고등학교", student.getSchoolName());
-        assertTrue(student.isCheckSms());
-        assertFalse(student.isCheckEmail());
+        assertEquals("user10", studentDetailDTO.getMemId());
+        assertEquals("홍길동", studentDetailDTO.getName());
+        assertEquals(LocalDate.of(2000, 1, 15), studentDetailDTO.getBirthDate());
+        assertEquals(MemberGender.MALE, studentDetailDTO.getGender());
+        assertEquals("서울고등학교", studentDetailDTO.getSchoolName());
+        assertTrue(studentDetailDTO.isCheckSms());
+        assertFalse(studentDetailDTO.isCheckEmail());
     }
 	
 //	@Test
@@ -89,7 +90,7 @@ public class MemberDTOTests {
         assertFalse(teacherDetailDTO.isCheckEmail());
     }
 	
-	@Test
+//	@Test
     public void testCompanyDetailDTO() {
 
         CompanyDetailDTO companyDetailDTO = new CompanyDetailDTO();
@@ -115,5 +116,31 @@ public class MemberDTOTests {
         assertEquals("과장", companyDetailDTO.getPosition());
         assertTrue(companyDetailDTO.isCheckSms());
         assertFalse(companyDetailDTO.isCheckEmail());
+    }
+    
+    @Test
+    public void testStudentRegisterDTO() {
+
+    	StudentRegisterDTO studentRegisterDTO = new StudentRegisterDTO();
+    	studentRegisterDTO.setMemId("user10");
+    	studentRegisterDTO.setPw("pw123");
+    	studentRegisterDTO.setName("홍길동");
+    	studentRegisterDTO.setEmail("hong@test.com");
+    	studentRegisterDTO.setBirthDate(LocalDate.of(2000, 1, 15));
+    	studentRegisterDTO.setGender(MemberGender.MALE);
+    	studentRegisterDTO.setPhone("01012345678");
+    	studentRegisterDTO.setAddr("서울특별시 강남구");
+    	studentRegisterDTO.setAddrDetail("101동 202호");
+    	studentRegisterDTO.setCheckSms(true);
+    	studentRegisterDTO.setCheckEmail(false);
+    	studentRegisterDTO.setSchoolName("서울고등학교");
+
+        assertEquals("user10", studentRegisterDTO.getMemId());
+        assertEquals("홍길동", studentRegisterDTO.getName());
+        assertEquals(LocalDate.of(2000, 1, 15), studentRegisterDTO.getBirthDate());
+        assertEquals(MemberGender.MALE, studentRegisterDTO.getGender());
+        assertEquals("서울고등학교", studentRegisterDTO.getSchoolName());
+        assertTrue(studentRegisterDTO.isCheckSms());
+        assertFalse(studentRegisterDTO.isCheckEmail());
     }
 }
