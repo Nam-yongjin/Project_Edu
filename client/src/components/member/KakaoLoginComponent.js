@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { getKakaoLoginLink } from "../../api/kakaoApi";
+import { getKakaoLoginLink } from "../api/KakaoApi";
 
 const KakaoLoginComponent = () => {
     const link = getKakaoLoginLink()

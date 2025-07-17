@@ -29,7 +29,7 @@ public class FileUtil {	// 파일 데이터의 입출력
 	@Value("${file.upload.path}")
 	private String uploadPath;
 	
-	@Value("${dafault.file.path}")
+	@Value("${default.file.path}")
 	private String defaltImage;
 
 	@PostConstruct
