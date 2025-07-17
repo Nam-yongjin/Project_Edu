@@ -18,12 +18,12 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 
 	//  (관리자 실증기업 신청 조회 페이지) 받아올 dto 추가 필요함 (조인추가해서)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(reg.demRegNum,reg.regDate, reg.expDate, reg.state, reg.member.memId, c.companyName, c.position )FROM DemonstrationRegistration reg, Demonstration dem, Company c  WHERE reg.demonstration.demNum=dem.demNum AND reg.member.memId=c.memId")
-	Page<DemonstrationListRegistrationDTO> selectPageDemReg(@Param("pageable") Pageable pageable); 
+	Page<DemonstrationListRegistrationDTO> selectPageDemReg( Pageable pageable); 
 
 	
 	 //  (관리자 실증기업 신청 조회 페이지) 받아올 dto 추가 필요함 (조인추가해서)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(reg.demRegNum,reg.regDate, reg.expDate, reg.state, reg.member.memId, c.companyName, c.position )FROM DemonstrationRegistration reg, Demonstration dem, Company c  WHERE reg.demonstration.demNum=dem.demNum AND reg.member.memId=c.memId AND c.companyName LIKE %:search%")
-	Page<DemonstrationListRegistrationDTO> selectPageDemRegSearch(@Param("pageable") Pageable pageable,@Param("search") String search);
+	Page<DemonstrationListRegistrationDTO> selectPageDemRegSearch( Pageable pageable,@Param("search") String search);
 	
 	// 실증 기업 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Modifying 
