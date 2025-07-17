@@ -31,24 +31,21 @@ public class DemonstrationRegistration {
 	@Column(nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long demRegNum; // 실증 등록 번호
-	
+
 	@Column(nullable = false)
 	private LocalDate regDate; // 등록일
-	
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private LocalDate expDate; // 대여 가능한 날짜
-	
+
 	@Enumerated(EnumType.STRING)
 	private DemonstrationState state; // 상태
-	
-	
+
 	@ManyToOne // demonstration엔티티의 demNum 외래키
-	@JoinColumn(name = "demNum") 
+	@JoinColumn(name = "demNum")
 	private Demonstration demonstration;
-	
-	
+
 	@ManyToOne // member엔티티의 memId 외래키
-	@JoinColumn(name = "memId") 
+	@JoinColumn(name = "memId")
 	private Member member;
 }
