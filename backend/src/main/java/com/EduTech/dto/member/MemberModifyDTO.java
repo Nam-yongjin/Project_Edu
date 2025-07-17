@@ -17,6 +17,7 @@ public class MemberModifyDTO {
 	private MemberGender gender;
 	private String phone;
 	private String addr;
+	private String addrDetail;
 	private boolean	checkSms;
 	private boolean checkEmail;
 }
