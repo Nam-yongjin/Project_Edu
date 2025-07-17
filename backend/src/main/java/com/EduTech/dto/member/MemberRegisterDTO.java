@@ -38,7 +38,6 @@ public class MemberRegisterDTO {
 	private LocalDate birthDate;
 	
 	@NotNull(message = "성별은 필수입니다.")
-	// @Enumerated(EnumType.STRING) // DTO에서는 필요 없음
 	private MemberGender gender;
 
     @NotBlank(message = "전화번호는 필수입니다.")

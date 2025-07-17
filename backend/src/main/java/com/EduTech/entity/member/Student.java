@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "student")
@@ -24,6 +25,7 @@ public class Student {
 
 	private String schoolName;
 	
+	@ToString.Exclude
 	@OneToOne
 	@MapsId
 	@JoinColumn(name = "memId", nullable = false) //회원아이디
