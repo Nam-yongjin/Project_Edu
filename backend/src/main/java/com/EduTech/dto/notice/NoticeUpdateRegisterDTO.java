@@ -2,6 +2,8 @@ package com.EduTech.dto.notice;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -16,8 +18,8 @@ public class NoticeUpdateRegisterDTO {
 	
 	private boolean isPinned; //게시판 고정
 	
-	private List<String> urlList; //새 파일
+	private List<String> oldFiles; //기존 파일목록
 	
-	private List<String> oldFiles; //남길 파일 목록
+	private List<MultipartFile> newFiles; //새로 업로드 할 파일
 
 }
