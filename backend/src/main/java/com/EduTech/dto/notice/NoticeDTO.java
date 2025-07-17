@@ -28,4 +28,4 @@ public class NoticeDTO { //조회용
 	private List<String> urlList; //첨부된 파일 URL목록
 	
 
-} // 상단 고정여부 넣을 것인지??
+}
