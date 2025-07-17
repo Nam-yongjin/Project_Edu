@@ -3,15 +3,8 @@ package com.EduTech.entity.notice;
 import com.EduTech.entity.BaseEntity;
 import com.EduTech.entity.member.Member;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,23 +20,17 @@ import lombok.NoArgsConstructor;
 public class Notice extends BaseEntity{
 
 	@Id
-	@Column(nullable = false) //공지사항번호(PK)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long noticeNum;
+	private Long noticeNum; //공지사항번호(PK)
 	
-	@Column(nullable = false) //제목
-	private String title;
+	private String title; //제목
 	
-	@Column(nullable = false) //내용
-	private String content;
+	private String content; //내용
 	
 	@Builder.Default //Builder 사용할 때 기본 값 유지(false)
-	@Column(nullable = false)
 	private boolean isPinned = false; //고정여부
 	
 	@Builder.Default
-	@Column(nullable = false) //조회수
-	private Long view = 0L;	//0으로 초기화 해서 Null값 방지
+	private Long view = 0L;	//조회수, 0으로 초기화 해서 Null값 방지
 	
 	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 공지사항 게시글을 한 명의 Admin이 작성 가능, 지연로딩
 	@JoinColumn(name = "memId", nullable = false) //회원아이디
