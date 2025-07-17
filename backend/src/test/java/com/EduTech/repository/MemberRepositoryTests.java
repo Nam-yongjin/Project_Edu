@@ -1,6 +1,7 @@
 package com.EduTech.repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,7 @@ public class MemberRepositoryTests {
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
 
+//	등록 테스트
 //	@Test
 	public void testInsertMember() {
 		for (int i = 0; i < 10; i++) {
@@ -78,9 +80,10 @@ public class MemberRepositoryTests {
 					.name("USER" + i)
 					.email("aaa" + i + "@test.com")
 					.birthDate(LocalDate.of(2025, 7, 15))
-					.gender(MemberGender.MAN)
+					.gender(MemberGender.MALE)
 					.phone("0101234321" + i)
 					.addr("테스트주소" + i)
+					.addrDetail("테스트 상세주소"+i)
 					.checkSms(true)
 					.checkEmail(false)
 					.state(MemberState.NORMAL)
@@ -101,9 +104,10 @@ public class MemberRepositoryTests {
 					.name("USER" + i)
 					.email("aaa" + i + "@test.com")
 					.birthDate(LocalDate.of(2025, 7, 15))
-					.gender(MemberGender.WOMAN)
+					.gender(MemberGender.FEMALE)
 					.phone("0101234321" + i)
 					.addr("테스트주소" + i)
+					.addrDetail("테스트 상세주소"+i)
 					.checkSms(true)
 					.checkEmail(false)
 					.state(MemberState.NORMAL)
@@ -133,9 +137,10 @@ public class MemberRepositoryTests {
 					.name("USER" + i)
 					.email("aaa" + i + "@test.com")
 					.birthDate(LocalDate.of(2025, 7, 15))
-					.gender(MemberGender.MAN)
+					.gender(MemberGender.MALE)
 					.phone("0101234321" + i)
 					.addr("테스트주소" + i)
+					.addrDetail("테스트 상세주소"+i)
 					.checkSms(true)
 					.checkEmail(false)
 					.state(MemberState.NORMAL)
@@ -154,7 +159,7 @@ public class MemberRepositoryTests {
 		}
 	}
 	
-	@Test
+//	@Test
 	@Transactional
 	@Commit
 	public void testInsertCompany() {
@@ -165,9 +170,10 @@ public class MemberRepositoryTests {
 					.name("USER" + i)
 					.email("aaa" + i + "@test.com")
 					.birthDate(LocalDate.of(2025, 7, 15))
-					.gender(MemberGender.WOMAN)
+					.gender(MemberGender.FEMALE)
 					.phone("0101234321" + i)
 					.addr("테스트주소" + i)
+					.addrDetail("테스트 상세주소"+i)
 					.checkSms(true)
 					.checkEmail(false)
 					.state(MemberState.NORMAL)
@@ -187,4 +193,37 @@ public class MemberRepositoryTests {
 		}
 	}
 	
+	
+	// 조회 테스트
+	@Test
+	@Transactional
+	@Commit
+	public void testFindMember() {
+		 for (int i = 0; i < 10; i++) {
+		        Member member = Member.builder()
+		            .memId("user" + i)
+		            .pw(passwordEncoder.encode("a" + i))
+		            .name("USER" + i)
+		            .email("aaa" + i + "@test.com")
+		            .birthDate(LocalDate.of(2025, 7, 15))
+		            .gender(MemberGender.FEMALE)
+		            .phone("0101234321" + i)
+		            .addr("테스트주소" + i)
+		            .addrDetail("테스트 상세주소" + i)
+		            .checkSms(true)
+		            .checkEmail(false)
+		            .state(MemberState.NORMAL)
+		            .role(MemberRole.USER)
+		            .build();
+
+		    member = memberRepository.save(member); 
+		    memberRepository.flush();  
+		}
+
+	    Optional<Member> result = memberRepository.findById("user5");
+	    
+	    Member user5 = result.get();
+	    
+		System.out.println(user5.toString());
+	}
 }
