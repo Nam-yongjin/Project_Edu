@@ -3,7 +3,6 @@ package com.EduTech.repository;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 
+import com.EduTech.dto.member.MemberDTO;
+import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
@@ -28,6 +29,7 @@ import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.StudentRepository;
 import com.EduTech.repository.member.TeacherRepository;
 import com.EduTech.repository.notice.NoticeFileRepository;
+import com.EduTech.util.RandomPwUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -49,13 +51,13 @@ public class MemberRepositoryTests {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	@BeforeEach	// 테스트 실행전
-    public void setup() {
-        studentRepository.deleteAll();	// 순서 중요
-        teacherRepository.deleteAll();
-        companyRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
+//	@BeforeEach	// 테스트 실행전
+//    public void setup() {
+//        studentRepository.deleteAll();	// 순서 중요
+//        teacherRepository.deleteAll();
+//        companyRepository.deleteAll();
+//        memberRepository.deleteAll();
+//    }
 
 	@MockBean	// 오류나는것 제외하고 실행
 	private DemonstrationReserveRepository demonstrationReserveRepository;
@@ -195,7 +197,7 @@ public class MemberRepositoryTests {
 	
 	
 	// 조회 테스트
-	@Test
+//	@Test
 	@Transactional
 	@Commit
 	public void testFindMember() {
@@ -225,5 +227,43 @@ public class MemberRepositoryTests {
 	    Member user5 = result.get();
 	    
 		System.out.println(user5.toString());
+	}
+	
+//	@Test
+	@Transactional
+	@Commit
+	public void testFindStudent() {
+		 
+	    Optional<Student> result = studentRepository.findByIdWithMember("user5");
+	    
+	    Student user5 = result.get();
+	    
+		System.out.println(user5.getMember());
+	}
+	
+	// 아이디찾기
+//	@Test
+	public void testMemberFindId() {
+		
+		Optional<String> result = memberRepository.findMemIdByNameAndPhone("USER5", "01012343215");
+		System.out.println(result);
+		
+	}
+	
+	// 비밀번호 찾기(비밀번호 변경창으로 이동)
+	@Test
+	public void testMemberFindPw() {
+		
+//		사용자정보 불러오기
+		Optional<Member> oldPw = memberRepository.findByMemIdAndPhone("user5", "01012343215");
+		System.out.println("oldPw: "+oldPw);
+		
+		// 새로운 비밀번호 입력받은거로 가정
+		Member member = oldPw.get();
+		String newPw = passwordEncoder.encode("new password");
+		member.setPw(passwordEncoder.encode(newPw));
+		memberRepository.save(member);
+		System.out.println("newPw: "+newPw);
+		
 	}
 }
