@@ -33,7 +33,7 @@ public class EventReserve {
 
 	@Id
 	@Column(nullable = false) //행사신청번호
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)	//IDENTITY 가 있을경우 자동적으로 생성되지만 이 코드가 없을시 사용자가 일일이 지정을 해줘야함
 	private Long evtRevNum;
 	
 	@Column(nullable = false) //신청일
