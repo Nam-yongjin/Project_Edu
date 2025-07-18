@@ -15,7 +15,6 @@ public class EventUseDTO {
 	private Long evRevNum;					// 행사신청번호
 	private LocalDateTime applyAt;			// 행사신청일
 	private String eventName;				// 행사명
-	
 	private LocalDateTime applyStartyPeriod;// 신청시작기간
 	private LocalDateTime applyEndPeriod;	// 신청종료기간
 	
