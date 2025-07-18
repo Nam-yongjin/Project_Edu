@@ -17,26 +17,33 @@ public class DemonstrationListDTO { // 실증 장비 목록 페이지 데이터 
 	private LocalDate startDate; // 사용시작일
 	private LocalDate endDate; // 사용종료일
 	private LocalDate applyAt; // 실증 신청일
-
+	private String imageName; // 이미지 이름
+	private String imageUrl; // 파일 경로
+	// 이미지 이름 + 파일 경로가 전체 경로
+	
 	// 실증 장비 신청 목록 페이지용 생성자
-	public DemonstrationListDTO(long demNum, String demName, String demMfr, Long itemNum) {
+	public DemonstrationListDTO(Long demNum, String demName, String demMfr, Long itemNum,String imageName,String imageUrl) {
 		this.demNum = demNum;
 		this.demName = demName;
 		this.demMfr = demMfr;
 		this.itemNum = itemNum;
+		this.imageName=imageName;
+		this.imageUrl=imageUrl;
 	}
 
 	// 실증 장비 신청 상세 페이지용 생성자
-	public DemonstrationListDTO(long demNum, String demName, String demInfo, Long itemNum, LocalDate expDate) {
+	public DemonstrationListDTO(Long demNum, String demName, String demInfo, Long itemNum, LocalDate expDate,String imageName,String imageUrl) {
 		this.demNum = demNum;
 		this.demName = demName;
 		this.demInfo = demInfo;
 		this.itemNum = itemNum;
 		this.expDate = expDate;
+		this.imageName=imageName;
+		this.imageUrl=imageUrl;
 	}
 
 	// 물품 대여 조회 페이지용 생성자
-	public DemonstrationListDTO(long demNum, String demName, String demMfr, Long itemNum, LocalDate startDate,
+	public DemonstrationListDTO(Long demNum, String demName, String demMfr, Long itemNum, LocalDate startDate,
 			LocalDate endDate, LocalDate applyAt) {
 		this.demNum = demNum;
 		this.demName = demName;
