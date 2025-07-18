@@ -91,7 +91,7 @@ public class DemonstrationRepositoryTests {
 
 	public Member testMember() {
 		Member member = Member.builder().memId("user").pw(passwordEncoder.encode("a")).name("USER")
-				.email("aaa@test.com").birthDate(LocalDate.of(2025, 7, 15)).gender(MemberGender.MAN).phone("0101234321") // MALE 로 할것
+				.email("aaa@test.com").birthDate(LocalDate.of(2025, 7, 15)).gender(MemberGender.MALE).phone("0101234321") // MALE 로 할것
 				.addr("테스트주소").checkSms(true).checkEmail(false).state(MemberState.NORMAL).role(MemberRole.USER).build();
 
 		return memberRepository.save(member);
