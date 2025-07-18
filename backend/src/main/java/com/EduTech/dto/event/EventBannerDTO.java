@@ -12,6 +12,7 @@ public class EventBannerDTO {
 	private Long evtFileName;		// 첨부파일 번호
 	private String originalName;	// 원본파일명
 	private String filePath;		// 파일저장경로
+	
 	private String thumbnailPath;	// 썸네일
 	
 	private String progName;		// 행사명
