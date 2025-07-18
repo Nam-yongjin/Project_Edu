@@ -46,11 +46,17 @@ public class Event {
 	@Column(nullable = false)
 	private Category category;
 	
-	@Column(nullable = false) //신청기간
-	private LocalDateTime applyPeriod;
+	@Column(nullable = false) //신청시작기간
+	private LocalDateTime applyStartPeriod;
 	
-	@Column(nullable = false) //진행기간
-	private LocalDateTime progressPeriod;
+	@Column(nullable = false) //신청종료기간
+	private LocalDateTime applyEndPeriod;
+	
+	@Column(nullable = false) //진행시작기간
+	private LocalDateTime progressStartPeriod;
+	
+	@Column(nullable = false) //진행종료기간
+	private LocalDateTime progressEndPeriod;
 	
 	@Column(nullable = false) //모집대상
 	private String target;
