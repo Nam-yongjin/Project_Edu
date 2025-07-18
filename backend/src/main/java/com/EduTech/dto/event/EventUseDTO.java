@@ -15,8 +15,13 @@ public class EventUseDTO {
 	private Long evRevNum;					// 행사신청번호
 	private LocalDateTime applyAt;			// 행사신청일
 	private String eventName;				// 행사명
-	private LocalDateTime applyPeriod;		// 신청기간
-	private LocalDateTime progressPeriod;	// 진행기간
+	
+	private LocalDateTime applyStartyPeriod;// 신청기간
+	private LocalDateTime applyEndPeriod;	// 신청기간
+	
+	private LocalDateTime progressStartPeriod;	// 진행기간
+	private LocalDateTime progressEndPeriod;	// 진행기간
+	
 	private String place;					// 장소
 	private int totCapacity;				// 모집인원
 	private int currCapacity;				// 현재인원
