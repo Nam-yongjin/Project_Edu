@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class eventApplyRequestDTO {
+public class EventApplyRequestDTO {
 	private Long eventNum;
 	private String memId;
 }
