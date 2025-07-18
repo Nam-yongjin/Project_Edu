@@ -23,8 +23,8 @@ public class EventUseDTO {
 	private boolean state;					// 신청상태
 	
 	private Long eventNum;	// 행사 아이디
-	private String memid;	// 회원 아이디
-	private String naem;	// 회원 이름
+	private String memId;	// 회원 아이디
+	private String name;	// 회원 이름
 	private String email;	// 회원 이메일
 	private String phone;	// 회원 전화번호
 }
