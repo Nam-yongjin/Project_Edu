@@ -2,8 +2,8 @@ package com.EduTech.repository.event;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.EduTech.entity.event.Event;
+import com.EduTech.entity.event.EventReserve;
 
-public interface EventUseRepository extends JpaRepository<Event, Long>{
+public interface EventUseRepository extends JpaRepository<EventReserve, Long>{
 
 }
