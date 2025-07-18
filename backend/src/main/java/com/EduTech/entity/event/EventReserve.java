@@ -37,7 +37,7 @@ public class EventReserve {
 	private Long evtRevNum;
 	
 	@Column(nullable = false) //신청일
-	private LocalDateTime fileType;
+	private LocalDateTime applyAt;
 	
 	@Enumerated(EnumType.STRING) //상태
 	@Column(nullable = false)
