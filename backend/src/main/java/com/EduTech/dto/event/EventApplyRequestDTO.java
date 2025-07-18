@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class EventApplyRequestDTO {
-	private Long eventNum;
-	private String memId;
+	private Long eventNum;	// 행사 아이디
+	private String memId;	// 회원 아이디
 }
