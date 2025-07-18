@@ -31,6 +31,10 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListReserveDTO(res.demRevNum,res.applyAt, res.state, res.member.memId, t.schoolName) FROM DemonstrationReserve res, Teacher t WHERE res.member.memId=t.memId")
 	Page<DemonstrationListReserveDTO> selectPageDemRes(Pageable pageable);
 
+	// (관리자 실증교사 신청 조회 페이지) 받아올 dto 추가 필요함. 검색 추가(조인 추가해서)
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListReserveDTO(res.demRevNum,res.applyAt, res.state, res.member.memId, t.schoolName) FROM DemonstrationReserve res, Teacher t WHERE res.member.memId=t.memId AND t.schoolName LIKE %:search%")
+	Page<DemonstrationListReserveDTO> selectPageDemResSearch(Pageable pageable, @Param("search") String search);
+
 	@Modifying // 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문 (실증 예약 가능 시간도 업데이트 해줘야함) -
 				// demonstrationReserve 테이블의 값을 수정하니 해당 리포지토리에 작성함.
 	@Transactional
