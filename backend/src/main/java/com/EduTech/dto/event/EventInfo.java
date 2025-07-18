@@ -13,10 +13,10 @@ public class EventInfo {
 	private Long eventNum;		// 행사 아이디
 	private String eventName;	// 행사명
 	private String eventInfo;	// 소개
-	private boolean state;		// 상태
+	private Boolean state;		// 상태
 	private String target;		// 모집대상
-	private int totCapacity;	// 모집인원
-	private int currCapacity;	// 현재인원
+	private Integer totCapacity;	// 모집인원
+	private Integer currCapacity;	// 현재인원
 	private String place;		// 장소
 	private String etc;			// 기타 유의상황
 	

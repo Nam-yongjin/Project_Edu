@@ -22,5 +22,5 @@ public class EventBannerDTO {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime applyEndPeriod; // 신청종료기간
 	
-	private int totCapacity;	// 모집인원
+	private Integer totCapacity;	// 모집인원
 }
