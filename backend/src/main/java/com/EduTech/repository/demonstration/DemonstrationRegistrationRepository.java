@@ -21,7 +21,7 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	Page<DemonstrationListRegistrationDTO> selectPageDemReg( Pageable pageable); 
 
 	
-	 //  (관리자 실증기업 신청 조회 페이지) 받아올 dto 추가 필요함 (조인추가해서)
+	 //  (관리자 실증기업 신청 조회 페이지 검색 추가 ) 받아올 dto 추가 필요함 (조인추가해서)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(reg.demRegNum,reg.regDate, reg.expDate, reg.state, reg.member.memId, c.companyName, c.position )FROM DemonstrationRegistration reg, Demonstration dem, Company c  WHERE reg.demonstration.demNum=dem.demNum AND reg.member.memId=c.memId AND c.companyName LIKE %:search%")
 	Page<DemonstrationListRegistrationDTO> selectPageDemRegSearch( Pageable pageable,@Param("search") String search);
 	
