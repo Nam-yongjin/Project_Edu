@@ -23,8 +23,8 @@ public class EventUseDTO {
 	private LocalDateTime progressEndPeriod;	// 진행종료기간
 	
 	private String place;					// 장소
-	private Integer totCapacity;				// 모집인원
-	private Integer currCapacity;				// 현재인원
+	private Integer totCapacity;			// 모집인원
+	private Integer currCapacity;			// 현재인원
 	private Boolean state;					// 신청상태
 	
 	private Long eventNum;	// 행사 아이디

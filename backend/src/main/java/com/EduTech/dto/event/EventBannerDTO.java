@@ -14,13 +14,13 @@ public class EventBannerDTO {
 	private String filePath;		// 파일저장경로
 	private String thumbnailPath;	// 썸네일
 	
-	private String progName;	// 행사명
+	private String progName;		// 행사명
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime applyStartyPeriod; // 신청시작기간
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	private LocalDateTime applyEndPeriod; // 신청종료기간
+	private LocalDateTime applyEndPeriod; 	// 신청종료기간
 	
 	private Integer totCapacity;	// 모집인원
 }
