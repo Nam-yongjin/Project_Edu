@@ -16,11 +16,11 @@ public class EventUseDTO {
 	private LocalDateTime applyAt;			// 행사신청일
 	private String eventName;				// 행사명
 	
-	private LocalDateTime applyStartyPeriod;// 신청기간
-	private LocalDateTime applyEndPeriod;	// 신청기간
+	private LocalDateTime applyStartyPeriod;// 신청시작기간
+	private LocalDateTime applyEndPeriod;	// 신청종료기간
 	
-	private LocalDateTime progressStartPeriod;	// 진행기간
-	private LocalDateTime progressEndPeriod;	// 진행기간
+	private LocalDateTime progressStartPeriod;	// 진행시작기간
+	private LocalDateTime progressEndPeriod;	// 진행종료기간
 	
 	private String place;					// 장소
 	private int totCapacity;				// 모집인원
