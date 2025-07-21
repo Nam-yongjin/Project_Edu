@@ -1,17 +1,23 @@
 package com.EduTech.controller.member;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EduTech.dto.member.CompanyRegisterDTO;
+import com.EduTech.dto.member.MemberDetailDTO;
+import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
+import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
+import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.member.MemberService;
 
 import jakarta.validation.Valid;
@@ -58,4 +64,39 @@ public class MemberController {
 		boolean isDuplicated = memberService.isDuplicatedId(memId);
 		return ResponseEntity.ok(isDuplicated);
 	}
+
+	// 일반회원 상세정보
+	@GetMapping("/member/myInfo")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<MemberDetailDTO> memberInfo(@RequestParam String memId) {
+		MemberDetailDTO memberDetailDTO = memberService.readMemberInfo(memId);
+		return ResponseEntity.ok(memberDetailDTO);
+	}
+
+	// 학생회원 상세정보
+	// 교사회원 상세정보
+	// 기업회원 상세정보
+
+	// 일반회원 정보수정
+	@PutMapping("/modify/member")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<String> modifyMember(@RequestBody @Valid MemberModifyDTO memberModifyDTO) {
+		String memId = JWTFilter.getMemId();
+		memberService.modifyMemberInfo(memId, memberModifyDTO);
+		return ResponseEntity.ok("회원정보가 수정되었습니다.");
+	}
+
+	// 학생회원 정보수정
+	@PutMapping("/modify/student")
+	@PreAuthorize("hasRole('STUDENT')")
+	public ResponseEntity<String> modifyStudent(@RequestBody @Valid StudentModifyDTO studentModifyDTO) {
+		String memId = JWTFilter.getMemId();
+		memberService.modifyStudentInfo(memId, studentModifyDTO);
+		return ResponseEntity.ok("회원정보가 수정되었습니다.");
+	}
+
+	// 교사회원 정보수정
+	// 기업회원 정보수정
+
+	// 회원 탈퇴
 }
