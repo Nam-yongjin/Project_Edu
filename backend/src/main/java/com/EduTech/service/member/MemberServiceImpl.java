@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.dto.member.CompanyRegisterDTO;
+import com.EduTech.dto.member.MemberDetailDTO;
+import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
@@ -98,6 +100,34 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public boolean isDuplicatedId(String memId) {
-		return memberRepository.existsByMemId(memId);
+		return memberRepository.existsById(memId);
 	}
+	
+	// 회원정보 가져오기
+	@Override
+	@Transactional(readOnly = true)
+	public MemberDetailDTO readMemberInfo(String memId) {
+		Member member = memberRepository.findById(memId)
+				.orElseThrow();
+		
+		return MemberDetailDTO;
+	}
+	
+	@Override
+	public void modifyMemberInfo(String memId, MemberModifyDTO memberModifyDTO) {
+		Member member = memberRepository.findById(memId)
+				.orElseThrow();
+		member.setPw(passwordEncoder.encode(memberModifyDTO.getPw()));
+		member.setName(memberModifyDTO.getName());
+		member.setEmail(memberModifyDTO.getEmail());
+		member.setPhone(memberModifyDTO.getPhone());
+		member.setAddr(memberModifyDTO.getAddr());
+		member.setAddrDetail(memberModifyDTO.getAddrDetail());
+		member.setCheckSms(memberModifyDTO.isCheckSms());
+		member.setCheckEmail(memberModifyDTO.isCheckEmail());
+		
+		memberRepository.save(member);
+	}
+	
+	// 회원정보 수정
 }
