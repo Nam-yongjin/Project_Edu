@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
-public class EventInfo {
+public class EventInfoDTO {
 	
 	private Long eventNum;			// 행사 아이디
 	private String eventName;		// 행사명
