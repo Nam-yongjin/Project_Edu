@@ -1,6 +1,7 @@
 package com.EduTech.dto.event;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -17,11 +18,17 @@ public class EventBannerDTO {
 	
 	private String progName;		// 행사명
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	private LocalDateTime applyStartyPeriod; // 신청시작기간
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private LocalDateTime applyStartyPeriod; // 신청시작기간(년 일 월)
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDateTime applyEndPeriod; 	// 신청종료기간
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+	private LocalTime startTime; // 수강시작시간(시 분)
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+	private LocalTime endTime; // 수강종료시간
 	
 	private Integer totCapacity;	// 모집인원
 }
