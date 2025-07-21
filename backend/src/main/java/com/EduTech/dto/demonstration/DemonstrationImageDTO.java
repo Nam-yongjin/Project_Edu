@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor // 리포지토리 자체에서 객체 생성 후, 리스트에 담을 예정이라 생성자 설정을 하였음.
+@AllArgsConstructor // 리포지토리 자체에서 객체 생성 후, 리스트에 담을 예정이라 생성자 설정을 하였음. (프론트->백)
 @NoArgsConstructor
 public class DemonstrationImageDTO { // 실증 이미지 등록 DTO
 	@NotBlank
