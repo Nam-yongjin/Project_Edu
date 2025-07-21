@@ -9,15 +9,15 @@ import lombok.Data;
 @Data
 public class MemberDetailDTO {
 
-	private String memId;
-	private String pw;
-	private String name;
-	private String email;
-	private LocalDate birthDate;
-	private MemberGender gender;
-	private String phone;
-	private String addr;
-	private String addrDetail;
-	private boolean	checkSms;
-	private boolean checkEmail;
+	private String memId;	// 아이디
+	private String pw;		// 비밀번호
+	private String name;	// 이름
+	private String email;	// 이메일
+	private LocalDate birthDate;	// 생년월일
+	private MemberGender gender;	// 성별
+	private String phone;	// 휴대폰번호
+	private String addr;	// 주소
+	private String addrDetail;	// 상세주소
+	private boolean	checkSms;	// SMS수신동의
+	private boolean checkEmail;	// 이메일수신동의
 }
