@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class NoticeFile {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long notFileNum; //첨부파일번호
 
 	private String originalName; //원본파일명

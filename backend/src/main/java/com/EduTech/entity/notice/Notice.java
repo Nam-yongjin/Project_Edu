@@ -6,11 +6,12 @@ import java.util.List;
 
 import com.EduTech.entity.BaseEntity;
 import com.EduTech.entity.member.Member;
-import com.EduTech.entity.news.NewsFile;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -33,6 +34,7 @@ import lombok.NoArgsConstructor;
 public class Notice extends BaseEntity{
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long noticeNum; //공지사항번호(PK)
 	
 	private String title; //제목
@@ -54,6 +56,7 @@ public class Notice extends BaseEntity{
 	private Member member;
 	
 	//하나의 공지글에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
+	@Builder.Default
 	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
 	private List<NoticeFile> noticeFile = new ArrayList<>();
 	
