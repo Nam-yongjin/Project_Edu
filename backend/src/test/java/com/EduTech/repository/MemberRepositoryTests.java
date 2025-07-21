@@ -29,7 +29,6 @@ import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.StudentRepository;
 import com.EduTech.repository.member.TeacherRepository;
 import com.EduTech.repository.notice.NoticeFileRepository;
-import com.EduTech.util.RandomPwUtil;
 
 import jakarta.transaction.Transactional;
 
