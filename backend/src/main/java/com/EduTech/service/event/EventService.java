@@ -11,6 +11,7 @@ import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventUseDTO;
+import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.member.Member;
 
 public interface EventService {
@@ -29,7 +30,7 @@ public interface EventService {
 	
 	void registerEvent(EventInfoDTO dto, MultipartFile file); // 행사 등록(파일 1개 포함)
 
-	void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file); // 행사 수정
+	void updateEvent(Long eventNum, EventInfoDTO dto,  MultipartFile file); // 행사 수정
 
 	void deleteEvent(Long eventNum); // 행사 삭제
 
@@ -68,5 +69,5 @@ public interface EventService {
 		
 	//강의 기간이 끝나지않은 모든 프로그램
 	public List<EventInfoDTO> searchNotEndEventList();
-	
+
 }
