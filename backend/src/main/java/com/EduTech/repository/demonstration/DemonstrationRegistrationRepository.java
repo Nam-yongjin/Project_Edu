@@ -1,6 +1,6 @@
 package com.EduTech.repository.demonstration;
 
-import java.util.List;
+import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,11 +28,20 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	// 실증 기업 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Modifying 
 	@Transactional
-    @Query("UPDATE DemonstrationRegistration dr SET state=:state WHERE member.memId=:memId AND demRegNum=:demRegNum")
+    @Query("UPDATE DemonstrationRegistration SET state=:state WHERE member.memId=:memId AND demRegNum=:demRegNum")
     int updateDemResChangeState(
      @Param("state") DemonstrationState state,
      @Param("memId") String memId,
      @Param("demRegNum") Long demRegNum
+    ); 
+	
+	@Modifying 
+	@Transactional
+    @Query("UPDATE DemonstrationRegistration SET expDate=:expDate WHERE member.memId=:memId AND demonstration.demNum=:demNum")
+    int updateDemResChangeExpDate(
+     @Param("expDate") LocalDate expDate,
+     @Param("demNum") Long demNum,
+     @Param("memId") String memId
     ); 
 }
 

@@ -35,6 +35,9 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 	@Query("UPDATE Demonstration d SET d.demName = :demName, d.demMfr = :demMfr, d.itemNum = :itemNum, d.demInfo = :demInfo WHERE d.demNum = :demNum")
 	int updateDem(@Param("demName") String demName, @Param("demMfr") String demMfr, @Param("itemNum") Long itemNum,
 			@Param("demInfo") String demInfo, @Param("demNum") Long demNum);
-
-	// 검색 같은 부분은 백단에서 구현함.
+	
+	@Modifying // 실증 번호를 받아 실증 장비를 삭제하는 쿼리문
+	@Transactional
+	@Query("DELETE FROM Demonstration WHERE demNum=:demNum")
+	int deleteDelete(@Param("demNum") Long demNum);
 }
