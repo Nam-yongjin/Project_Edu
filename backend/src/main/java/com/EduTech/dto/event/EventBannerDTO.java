@@ -3,6 +3,7 @@ package com.EduTech.dto.event;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.EduTech.entity.event.EventState;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -13,7 +14,7 @@ public class EventBannerDTO {
 	private Long evtFileName;		// 첨부파일 번호
 	private String originalName;	// 원본파일명
 	private String filePath;		// 파일저장경로
-	
+	private EventState state;		// 현재 신청 가능 여부
 	private String thumbnailPath;	// 썸네일
 	
 	private String progName;		// 행사명
