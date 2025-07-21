@@ -69,6 +69,8 @@ public class DemonstrationRepositoryTests {
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
 
+	@MockBean
+	MemberRepositoryTests memberRepositoryTests;
 	@Autowired
 	private FileUtil fileutil;
 
@@ -201,7 +203,7 @@ public class DemonstrationRepositoryTests {
 
 	// ---------------------------------------------------------파일 테스트
 
-	// @Test // 실증 기업 조회 전체 페이지 불러와서 잘 불러오는지 확인 (정상)
+	 //@Test // 실증 기업 조회 전체 페이지 불러와서 잘 불러오는지 확인 (정상)
 	public void demonstrationRegistrationListTest() {
 		// 전체 페이지를 가져오기 위해서는 처음 페이지를 무조건 호출해야 한다.
 		List<Page<DemonstrationListRegistrationDTO>> allData = new ArrayList<>();
@@ -238,10 +240,10 @@ public class DemonstrationRepositoryTests {
 		}
 	}
 
-	// @Test
+	/* @Test
 	public void demonstrationRegistrationUpdateStateTest() { // 실증 기업 신청 페이지 승인 / 거부 버튼 클릭 시 상태 변경이 잘되나 테스트 (정상)
 		demonstrationRegistrationRepository.updateDemResChangeState(DemonstrationState.ACCEPT, "user14");
-	}
+	} */
 
 	// --------------------------------- demonstrationRegistration테스트
 	// @Test // 실증 제품 삭제 해당 데이터가 삭제되면 해당 번호의 기본키가 비게 되지만 문제 없음. (정상)
@@ -301,7 +303,7 @@ public class DemonstrationRepositoryTests {
 		}
 	}
 
-	// @Test // 물품 대여 조회 페이지 (정상)
+	/* @Test // 물품 대여 조회 페이지 (정상)
 	public void demonstrationListProductViewTest() {
 		List<Page<DemonstrationListDTO>> allData = new ArrayList<>();
 		Page<DemonstrationListDTO> firstPage = demonstrationRepository
@@ -336,7 +338,7 @@ public class DemonstrationRepositoryTests {
 			System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
 		}
 	}
-
+*/
 	// @Test // 기업이 상품 등록 정보를 수정하는 페이지 (정상)
 	public void demonstrationUpdateProductTest() {
 		Demonstration demon = testDemon();
@@ -395,7 +397,7 @@ public class DemonstrationRepositoryTests {
 	
 	//@Test // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, 상태를 변경하는 테스트  (정상)
 		public void demonstrationResUpdate3Test() {
-			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT,"user1");
+			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT,"user1",Long.valueOf(10));
 	}
 		
 		
