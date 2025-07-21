@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.EduTech.entity.event.RevState;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -15,7 +16,7 @@ public class EventInfoDTO {
 	private Long eventNum;			// 행사 아이디
 	private String eventName;		// 행사명
 	private String eventInfo;		// 소개
-	private Boolean state;			// 상태
+	private RevState revState;		// 상태(대기, 수락, 거절)
 	private String target;			// 모집대상
 	private Integer totCapacity;	// 모집인원
 	private Integer currCapacity;	// 현재인원
