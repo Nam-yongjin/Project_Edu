@@ -1,6 +1,7 @@
 package com.EduTech.dto.event;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,8 @@ public class EventUseDTO {
 	
 	private LocalDateTime progressStartPeriod;	// 진행시작기간
 	private LocalDateTime progressEndPeriod;	// 진행종료기간
+	
+	private List<Integer> daysOfWeek;		// 주일 표시
 	
 	private String place;					// 장소
 	private Integer totCapacity;			// 모집인원
