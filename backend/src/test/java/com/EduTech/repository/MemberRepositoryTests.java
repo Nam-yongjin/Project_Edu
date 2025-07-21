@@ -10,8 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 
-import com.EduTech.dto.member.MemberDTO;
-import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
