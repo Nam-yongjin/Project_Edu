@@ -16,4 +16,7 @@ public interface DemonstrationImageRepository extends JpaRepository<Demonstratio
 	// 리포지토리에서 생성자 호출해서 객체를 리스트에 담음.
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demNum) FROM DemonstrationImage di WHERE di.demonstration.demNum IN :demNum")
 	List<DemonstrationImageDTO> selectDemImageIn(@Param("demNum") List<Long> demNum); // 실증 상품 번호를 가져와 해당 하는 이미지들을 리스트 형태로 받음.
+	
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demNum) FROM DemonstrationImage di WHERE di.demonstration.demNum IN:demNum")
+	List<DemonstrationImageDTO> selectDemImage(@Param("demNum") Long demNum); // 실증 상품 번호를 가져와 해당 하는 이미지들을 리스트 형태로 받음.
 }

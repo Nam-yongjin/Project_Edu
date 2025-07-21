@@ -11,12 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormUpdateDTO;
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
@@ -309,6 +311,55 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
+	@Override
+	public void updateDemonstration(DemonstrationFormUpdateDTO demonstrationFormUpdateDTO, List<Object> files) {
+		demonstrationRepository.updateDem(demonstrationFormUpdateDTO.getDemName(),demonstrationFormUpdateDTO.getDemMfr(),demonstrationFormUpdateDTO.getItemNum(),demonstrationFormUpdateDTO.getDemInfo(),demonstrationFormUpdateDTO.getDemNum());
+		
+		demonstrationRegistrationRepository.updateDemResChangeExpDate(demonstrationFormUpdateDTO.getExpDate(),demonstrationFormUpdateDTO.getDemNum(),demonstrationFormUpdateDTO.getMemId());
+		
+		List<DemonstrationImageDTO> existingImages = demonstrationImageRepository.selectDemImage(demonstrationFormUpdateDTO.getDemNum());
+		
+		// 이미지 파일 등록
+		for (Object obj : files) {
+		    if (obj instanceof Map) {
+		        Map<String, String> map = (Map<String, String>) obj;
+		        String newName = map.get("originalName");
+		        String newPath = map.get("filePath");
+
+		        boolean exists = false;
+
+		        // 기존 이미지와 이름/경로가 모두 같은 경우 존재 여부 확인
+		        for (DemonstrationImageDTO existing :  existingImages) {
+		            if (existing.getImageName().equals(newName) && existing.getImageUrl().equals(newPath)) {
+		                exists = true;
+		                break;
+		            }
+		        }
+
+		        // 중복 아니면 저장
+		        if (!exists) {
+		            DemonstrationImage image = DemonstrationImage.builder()
+		                .imageName(newName)
+		                .imageUrl(newPath)
+		                .demonstration(Demonstration.builder().demNum(demonstrationFormUpdateDTO.getDemNum()).build())
+		                .build();
+
+		            demonstrationImageRepository.save(image);
+		        }
+		    }
+		}
+		// 만약, 사진이 없을경우, DB에 이미지를 빈경로로 대체,
+		// 그리고 해당 경로에 있는 디렉토리도 삭제해 줘야함.
+		
+	}
+	
+	// 실증 번호를 받아서 실증 상품을 삭제하는 기능
+	@Override
+	public void deleteDemonstration(Long demNum) {
+		demonstrationRepository.deleteDelete(demNum);
+	}
+	
+	
 	// 함수형 인터페이스 Function을 사용해서 리포지토리 호출을 메소드 바깥에서 함수로 만들어 넘길수 있음.
 	// Function<입력값, 출력값> apply의 매개변수: 입력값, 반환값: 출력값
 	// 이런느낌

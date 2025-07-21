@@ -5,6 +5,7 @@ import java.util.List;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormUpdateDTO;
 import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
@@ -30,5 +31,6 @@ public interface DemonstrationService {
 		void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO); // 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 		void demonstrationReservationCancel(DemonstrationReservationCancelDTO demonstrationReservationCancelDTO); // 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 		void addDemonstration(DemonstrationFormDTO demonstrationFormDTO,List<Object> files); // 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
-		
+		void updateDemonstration(DemonstrationFormUpdateDTO demonstrationFormUpdateDTO,List<Object> files); // 실증 상품 수정하는 기능
+		void deleteDemonstration(Long demNum); // 실증 번호를 받아 실증 상품을 삭제하는 기능
 }
