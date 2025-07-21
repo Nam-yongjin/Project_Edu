@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data // @Data 어노테이션 사용해서 getter, setter 메소드 생략
 
-public class DemonstrationFormDTO { // 기업이 실증 물품 dto
+public class DemonstrationFormDTO { // 기업이 실증 물품 dto (프론트->백)
 
 	@NotBlank(message = "물품명은 필수입니다.")
 	@Size(max = 100, message = "물품명은 100자 이내여야 합니다.")

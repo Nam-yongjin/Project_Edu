@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class DemonstrationListRegistrationDTO { // 기업 실증 조회에 사용하는 dto
+public class DemonstrationListRegistrationDTO { // 기업 실증 조회에 사용하는 dto (백->프톤트)
 
 	private Long demRegNum; // demonstration_registration의 기본키
 	private LocalDate regDate; // 등록 일자를 현재 시간으로 설정
@@ -28,5 +28,7 @@ public class DemonstrationListRegistrationDTO { // 기업 실증 조회에 사�
 		this.companyName = companyName;
 		this.position = position;
 	}
+	
+	
 
 }
