@@ -1,6 +1,7 @@
 package com.EduTech.entity.event;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale.Category;
@@ -46,17 +47,23 @@ public class Event {
 	@Column(nullable = false)
 	private Category category;
 	
-	@Column(nullable = false) //신청시작기간
+	@Column(nullable = false) //신청 시작기간
 	private LocalDateTime applyStartPeriod;
 	
-	@Column(nullable = false) //신청종료기간
+	@Column(nullable = false) //신청 종료기간
 	private LocalDateTime applyEndPeriod;
 	
-	@Column(nullable = false) //진행시작기간
+	@Column(nullable = false) //진행 시작기간
 	private LocalDateTime progressStartPeriod;
 	
-	@Column(nullable = false) //진행종료기간
+	@Column(nullable = false) //진행 종료기간
 	private LocalDateTime progressEndPeriod;
+	
+	@Column(nullable = false)	// 진행 시작시간
+	private LocalTime startTime;
+
+	@Column(nullable = false)	// 진행 종료시간
+	private LocalTime endTime; 
 	
 	@Column(nullable = false) //모집대상
 	private String target;
