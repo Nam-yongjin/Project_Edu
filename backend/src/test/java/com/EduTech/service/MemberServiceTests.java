@@ -48,10 +48,7 @@ public class MemberServiceTests {
 	private DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
-	@MockBean
-	private EventReserveRepository eventReserveRepository; 
-	
-	
+
 //	@Test
 	public void testCheckId() {
 		boolean result = memberService.isDuplicatedId("user5");
