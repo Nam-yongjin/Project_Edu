@@ -7,14 +7,18 @@ import java.util.List;
 import java.util.Locale.Category;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +47,10 @@ public class Event {
 	@Column(nullable = false) //소개
 	private String eventInfo;
 	
+	@Builder.Default
+	@Column(nullable = false)
+	private LocalDateTime applyAt = LocalDateTime.now(); // 동록일
+	
 	@Enumerated(EnumType.STRING) //분류
 	@Column(nullable = false)
 	private Category category;
@@ -65,6 +73,12 @@ public class Event {
 	@Column(nullable = false)	// 진행 종료시간
 	private LocalTime endTime; 
 	
+	@Builder.Default
+	@ElementCollection
+	@CollectionTable(name = "event_days", joinColumns = @JoinColumn(name = "eventNum"))
+	@Column(nullable = false)
+	private List<Integer> daysOfWeek  = new ArrayList<>();
+	
 	@Column(nullable = false) //모집대상
 	private String target;
 	
@@ -77,7 +91,7 @@ public class Event {
 	@Column //기타유의사항
 	private String etc;
 	
-	@Enumerated(EnumType.STRING) //상태
+	@Enumerated(EnumType.STRING) //상태(신청전, 신청중, 신청만료)
 	@Column(nullable = false)
 	private EventState state;
 	
@@ -86,6 +100,13 @@ public class Event {
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 행사 여러 개의 파일 첨부 가능, 행사 삭제되면 파일도 같이 삭제
 	private List<EventFile> eventFiles = new ArrayList<>();
+	
+	@PrePersist
+	public void prePersist() {
+	    if (this.applyAt == null) {
+	        this.applyAt = LocalDateTime.now();
+	    }
+	}
 	
 }
 
