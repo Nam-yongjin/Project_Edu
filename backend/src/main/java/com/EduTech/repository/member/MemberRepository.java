@@ -12,7 +12,7 @@ import com.EduTech.entity.member.Member;
 public interface MemberRepository extends JpaRepository<Member, String>{
 
 	// 아이디 중복 체크
-	boolean existsByMemId(String memId);
+	boolean existsById(String memId);
 	
 	// 회원정보 수정
 	
