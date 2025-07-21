@@ -24,7 +24,7 @@ public class EventInfoDTO {
 	private String etc;				// 기타 유의상황
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	private LocalDateTime applyStartyPeriod; // 신청시작기간(년 일 월 시 분)
+	private LocalDateTime applyStartPeriod; // 신청시작기간(년 일 월 시 분)
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime applyEndPeriod; // 신청종료기간
@@ -41,8 +41,8 @@ public class EventInfoDTO {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
 	private LocalTime endTime; // 수강종료시간
 	
-	private String originalName;	// 원본파일명
-	private String filePath;		// 파일저장경로
+	private String originalName;	// 대표 원본 파일명
+	private String filePath;		// 대표 파일 저장경로
 	
 	private List<Integer> daysOfWeek; // 요일 (숫자)
 	private List<String> dayNames;
