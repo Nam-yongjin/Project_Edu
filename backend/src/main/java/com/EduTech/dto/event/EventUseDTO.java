@@ -3,7 +3,8 @@ package com.EduTech.dto.event;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.EduTech.entity.event.EventRevState;
+import com.EduTech.entity.event.EventState;
+import com.EduTech.entity.event.RevState;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class EventUseDTO {
 	private String place;					// 장소
 	private Integer totCapacity;			// 모집인원
 	private Integer currCapacity;			// 현재인원
-	private EventRevState revState;			// 신청상태(WAIT,ACCEPT,REJECT)
+	private RevState revState;				// 상태(대기, 수락, 거절)
 	
 	private Long eventNum;	// 행사 아이디
 	private String memId;	// 회원 아이디
