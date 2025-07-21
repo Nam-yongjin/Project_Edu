@@ -23,7 +23,7 @@ import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
-import com.EduTech.dto.demonstration.DemonstrationTimeDTO;
+import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationImage;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
@@ -193,14 +193,14 @@ public class DemonstrationRepositoryTests {
 		demonstrationImageRepository.saveAll(saveImage);
 
 	}
-
+/*
 	// @Test 저장된 이미지의 이름, 경로명이 잘 저장되있는지 확인하는 테스트 (정상)
 	public void testDemonstrationGetUrlTest() {
 		List<DemonstrationImageDTO> saveImage = new ArrayList<>();
 		saveImage = demonstrationImageRepository.selectDemImage(Long.valueOf(15));
 		System.out.println(saveImage);
 	}
-
+*/
 	// ---------------------------------------------------------파일 테스트
 
 	 //@Test // 실증 기업 조회 전체 페이지 불러와서 잘 불러오는지 확인 (정상)
@@ -285,6 +285,7 @@ public class DemonstrationRepositoryTests {
 		}
 	}
 
+	/*
 	// @Test // 상품 상세 정보 페이지 (정상)
 	public void demonstrationListProductDetailTest() {
 		List<Page<DemonstrationListDTO>> allData = new ArrayList<>();
@@ -301,7 +302,7 @@ public class DemonstrationRepositoryTests {
 		for (int i = 0; i < totalPageCount; i++) {
 			System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
 		}
-	}
+	}*/
 
 	/* @Test // 물품 대여 조회 페이지 (정상)
 	public void demonstrationListProductViewTest() {
@@ -392,7 +393,7 @@ public class DemonstrationRepositoryTests {
 	
 	//@Test //  물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate가 수정되는 테스트 (정상)
 	public void demonstrationResUpdate2Test() {
-		demonstrationReserveRepository.updateDemResChangeDate(LocalDate.parse("2222-12-22"),Long.valueOf(10),"user5");
+		demonstrationReserveRepository.updateDemResChangeDate(LocalDate.parse("2222-12-22"),Long.valueOf(0));
 	}
 	
 	//@Test // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, 상태를 변경하는 테스트  (정상)
@@ -403,14 +404,14 @@ public class DemonstrationRepositoryTests {
 		
 	// --------------------------------- demonstrationReserve 테스트
 		
-		// @Test // 데이터 리스트 배열 가져와서 해당 날짜가 예약 되있는지 안되있는지 확인하는 데이터를 select하는 테스트 (정상)
+	/*	// @Test // 데이터 리스트 배열 가져와서 해당 날짜가 예약 되있는지 안되있는지 확인하는 데이터를 select하는 테스트 (정상)
 		public void demonstrationTimeTest() {
-			List<DemonstrationTimeDTO> demonstrationTimedto=new ArrayList<>();
+			List<DemonstrationTimeResDTO> demonstrationTimedto=new ArrayList<>();
 			List<LocalDate> dates=new ArrayList<LocalDate>();
 			dates.add(LocalDate.parse("2025-07-16"));
 			dates.add(LocalDate.parse("2025-10-24"));
 			demonstrationTimedto=demonstrationTimeRepository.selectDemTime(dates,Long.valueOf(10));
 			System.out.println(demonstrationTimedto);
 		}	
-		
+		*/
 }
