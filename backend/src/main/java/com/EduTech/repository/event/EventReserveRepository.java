@@ -32,8 +32,8 @@ public interface EventReserveRepository extends JpaRepository<EventReserve, Long
 	
 	// ---------- 탈퇴 회원 행사 신청 내역 삭제 ----------
 	
-	void deleteByMember_Mid(String mid);
+	void deleteByMember_Mid(String mid); // 특정 회원 행사 신청 내역 모두 삭제(DB상에서 바로 DELETE쿼리 실행)
 	
-	List<EventReserve> findAllByMember_Mid(String mid);
+	List<EventReserve> findAllByMember_Mid(String mid);	// 특정 회원 행사 신청 내역을 모두 조회(필요시 사용하면 됨, 현재는 필요 없음)
 	
 }
