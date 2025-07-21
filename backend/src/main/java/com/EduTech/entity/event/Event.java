@@ -108,5 +108,12 @@ public class Event {
 	    }
 	}
 	
+	@Column(nullable = true) //원본파일명 true로 해야 파일이 없을떄 에러 발생 안함
+	private String originalName;
+	
+	@Column(nullable = true) //파일저장경로
+	private String filePath;
+
+	
 }
 
