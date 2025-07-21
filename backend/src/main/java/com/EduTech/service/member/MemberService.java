@@ -1,10 +1,16 @@
 package com.EduTech.service.member;
 
+import com.EduTech.dto.member.CompanyDetailDTO;
+import com.EduTech.dto.member.CompanyModifyDTO;
 import com.EduTech.dto.member.CompanyRegisterDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
+import com.EduTech.dto.member.StudentDetailDTO;
+import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
+import com.EduTech.dto.member.TeacherDetailDTO;
+import com.EduTech.dto.member.TeacherModifyDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
 
 public interface MemberService {
@@ -21,5 +27,19 @@ public interface MemberService {
 	
 	MemberDetailDTO readMemberInfo(String memId);
 	
+	StudentDetailDTO readStudentInfo(String memId);
+	
+	TeacherDetailDTO readTeacherInfo(String memId);
+	
+	CompanyDetailDTO readCompanyInfo(String memId);
+	
 	void modifyMemberInfo(String memId, MemberModifyDTO memberModifyDTO);
+	
+	void modifyStudentInfo(String memId, StudentModifyDTO studentModifyDTO);
+	
+	void modifyTeacherInfo(String memId, TeacherModifyDTO teacherModifyDTO);
+	
+	void modifyCompanyInfo(String memId, CompanyModifyDTO companyModifyDTO);
+	
+	void leaveMember(String memId);
 }

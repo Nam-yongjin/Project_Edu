@@ -10,17 +10,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.EduTech.security.CustomAccessDeniedHandler;
-import com.EduTech.security.LoginFailHandler;
-import com.EduTech.security.LoginSuccessHandler;
 
 @Configuration
-@EnableMethodSecurity
+// prePostEnabled: 메서드가 실행되기 전에 권한을 검사,  @PreAuthorize를 사용
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
 	@Bean
