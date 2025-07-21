@@ -1,7 +1,10 @@
 package com.EduTech.dto.demonstration;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -30,8 +33,10 @@ public class DemonstrationFormDTO { // 기업이 실증 물품 dto (프론트->�
 	@Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
 	private Long itemNum; // 개수
 
+	@NotBlank(message="반납 예정일은 필수입니다.")
+	private LocalDate expDate; // 반납 예정일
+	
+	private String memId; // 회원 아이디
 	@Size(max = 10, message = "이미지는 최대 10개까지 가능합니다.")
-	private List<DemonstrationImageDTO> imageList = new ArrayList<>(); // 저장할 이미지 리스트
-
-	private List<DemonstrationTimeDTO> demonstrationTimedDtoList = new ArrayList<>(); // 대여 가능한 날짜 dto
+	private List<MultipartFile> imageList = new ArrayList<>(); // 저장할 이미지 리스트
 }

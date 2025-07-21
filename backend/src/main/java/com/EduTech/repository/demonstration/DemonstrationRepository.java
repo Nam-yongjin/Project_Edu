@@ -1,5 +1,7 @@
 package com.EduTech.repository.demonstration;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +20,7 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListDTO(d.demNum, d.demName, d.demInfo, d.itemNum, reg.expDate) FROM Demonstration d, DemonstrationRegistration reg WHERE d.demNum = reg.demonstration.demNum")
-	Page<DemonstrationListDTO> selectPageDetailDem(Pageable pageable);
+	DemonstrationListDTO selectPageDetailDem(@Param("demNum") Long demNum);
 
 	// 대여한 실증 상품들을 페이지 별로 가져오는 쿼리문 (물품 대여 조회 페이지)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListDTO(d.demNum, d.demName, c.companyName, d.itemNum, res.startDate, res.endDate, res.applyAt) FROM Demonstration d, DemonstrationReserve res, Company c WHERE d.demNum = res.demonstration.demNum AND res.member.memId=c.memId AND res.member.memId=:memId")

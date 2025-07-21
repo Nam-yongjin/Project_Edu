@@ -2,6 +2,7 @@ package com.EduTech.repository.demonstration;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,11 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListReserveDTO(res.demRevNum,res.applyAt, res.state, res.member.memId, t.schoolName) FROM DemonstrationReserve res, Teacher t WHERE res.member.memId=t.memId AND t.schoolName LIKE %:search%")
 	Page<DemonstrationListReserveDTO> selectPageDemResSearch(Pageable pageable, @Param("search") String search);
 
-	 // 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문 (실증 예약 가능 시간도 업데이트 해줘야함) -
+	// 백쪽에서만 사용할거면 dto대신 엔티티로 받아도 문제없다.
+	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.member.memId = :memId AND dr.demonstration.demNum = :demNum")
+	DemonstrationReserve findDemRevNum(@Param("memId") String memId, @Param("demNum") Long demNum);
+
+	// 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문 (실증 예약 가능 시간도 업데이트 해줘야함) -
 	// demonstrationReserve 테이블의 값을 수정하니 해당 리포지토리에 작성함.
 	@Modifying
 	@Transactional
@@ -44,10 +49,9 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 			@Param("demNum") Long demNum, @Param("memId") String memId);
 
 	@Modifying // 물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate를 변경하는 쿼리문
-	@Query("UPDATE DemonstrationReserve dr SET endDate=:changeDate WHERE dr.demonstration.demNum = :demNum AND dr.member.memId=:memId")
+	@Query("UPDATE DemonstrationReserve dr SET endDate=:changeDate WHERE demRevNum=:demRevNum")
 	@Transactional
-	int updateDemResChangeDate(@Param("changeDate") LocalDate changeDate, @Param("demNum") Long demNum,
-			@Param("memId") String memId);
+	int updateDemResChangeDate(@Param("changeDate") LocalDate changeDate, @Param("demRevNum") Long demRevNum);
 
 	@Modifying // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Transactional
