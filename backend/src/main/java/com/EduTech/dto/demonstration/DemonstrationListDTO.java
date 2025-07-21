@@ -1,10 +1,13 @@
 package com.EduTech.dto.demonstration;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class DemonstrationListDTO { // 실증 장비 목록 페이지 데이터 받는 dto (상세아님)
 
 	private Long demNum; // 실증번호 (demonstration의 기본키)
@@ -17,8 +20,7 @@ public class DemonstrationListDTO { // 실증 장비 목록 페이지 데이터 
 	private LocalDate startDate; // 사용시작일
 	private LocalDate endDate; // 사용종료일
 	private LocalDate applyAt; // 실증 신청일
-	private String imageName; // 이미지 이름
-	private String imageUrl; // 파일 경로
+	private List<DemonstrationImageDTO> imageList;
 	// 이미지 이름 + 파일 경로가 전체 경로
 
 	// 물품 대여 조회 페이지용 생성자
