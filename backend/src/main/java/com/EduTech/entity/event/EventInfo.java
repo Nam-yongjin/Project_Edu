@@ -63,6 +63,9 @@ public class EventInfo {
 
 	@Column(nullable = false)
 	private int maxCapacity; // 모집인원
+	
+	@Column(nullable = false)
+	private int currCapacity; // 현재인원
 
 	@Column(length = 100)
 	private String originalName; // 파일명
