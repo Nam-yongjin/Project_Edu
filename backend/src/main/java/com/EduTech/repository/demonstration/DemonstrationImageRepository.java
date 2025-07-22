@@ -16,11 +16,11 @@ import com.EduTech.entity.demonstration.DemonstrationImage;
 public interface DemonstrationImageRepository extends JpaRepository<DemonstrationImage, Long> { // 실증 상품 이미지 관련 페포지토리
 
 	// 실증 상품 번호들을 가져와 해당 하는 이미지들을 리스트 형태로 받음.
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demNum) FROM DemonstrationImage di WHERE di.demonstration.demNum IN :demNum")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demonstration.demNum) FROM DemonstrationImage di WHERE di.demonstration.demNum IN :demNum")
 	List<DemonstrationImageDTO> selectDemImageIn(@Param("demNum") List<Long> demNum); 
 	
 	// 실증 상품 번호를 가져와 해당 하는 이미지들을 리스트 형태로 받음.
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demNum) FROM DemonstrationImage di WHERE di.demonstration.demNum=:demNum")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demonstration.demNum) FROM DemonstrationImage di WHERE di.demonstration.demNum=:demNum")
 	List<DemonstrationImageDTO> selectDemImage(@Param("demNum") Long demNum); 
 	
 	

@@ -33,4 +33,5 @@ public interface DemonstrationService {
 		void addDemonstration(DemonstrationFormDTO demonstrationFormDTO); // 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 		void updateDemonstration(DemonstrationFormUpdateDTO demonstrationFormUpdateDTO); // 실증 상품 수정하는 기능
 		void deleteDemonstration(Long demNum); // 실증 번호를 받아 실증 상품을 삭제하는 기능
+		
 }
