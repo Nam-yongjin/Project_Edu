@@ -16,19 +16,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventUseDTO {
+	
 	private Long evtRevNum;					// 행사신청번호
 	private LocalDateTime applyAt;			// 행사신청일
 	private String eventName;				// 행사명
-	private LocalDateTime applyStartPeriod;// 신청시작기간
-	private LocalDateTime applyEndPeriod;	// 신청종료기간
 	
-	private LocalDateTime progressStartPeriod;	// 진행시작기간
-	private LocalDateTime progressEndPeriod;	// 진행종료기간
-	
-	private List<Integer> daysOfWeek;		// 주일 표시
+	private LocalDateTime progressStartPeriod;	// 행사시작기간
+	private LocalDateTime progressEndPeriod;	// 행사종료기간
 	
 	private String place;					// 장소
-	private Integer totCapacity;			// 모집인원
+	private Integer maxCapacity;			// 모집인원
 	private Integer currCapacity;			// 현재인원
 	private RevState revState;				// 상태(대기, 수락, 거절)
 	

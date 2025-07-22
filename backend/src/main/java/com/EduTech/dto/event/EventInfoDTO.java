@@ -2,11 +2,8 @@ package com.EduTech.dto.event;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 
-import com.EduTech.entity.event.EventState;
-import com.EduTech.entity.event.RevState;
+import com.EduTech.entity.event.EventCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -19,7 +16,8 @@ public class EventInfoDTO {
 	private String eventInfo;		// 소개
 	private String revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
 	private String target;			// 모집대상
-	private Integer totCapacity;	// 모집인원
+	private EventCategory category; // 모집대상 분류 (일반인, 학생, 선생)
+	private Integer maxCapacity;	// 모집인원
 	private Integer currCapacity;	// 현재인원
 	private String place;			// 장소
 	private String etc;				// 기타 유의상황
@@ -31,20 +29,12 @@ public class EventInfoDTO {
 	private LocalDateTime applyEndPeriod; // 신청종료기간
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDate progressStartPeriod; // 수강시작날짜(년 일 월)
+	private LocalDate eventStartPeriod; // 행사시작날짜(년 일 월)
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDate progressEndPeriod; // 수강종료날짜
-	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	private LocalTime startTime; // 수강시작시간(시 분)
-
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-	private LocalTime endTime; // 수강종료시간
+	private LocalDate eventEndPeriod; // 행사종료날짜
 	
 	private String originalName;	// 대표 원본 파일명
 	private String filePath;		// 대표 파일 저장경로
-	
-	private List<Integer> daysOfWeek; // 요일 (숫자)
 	
 }
