@@ -1,5 +1,6 @@
 package com.EduTech.entity.news;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,18 @@ import lombok.NoArgsConstructor;
 public class News extends BaseEntity{
 
 	@Id
+	//식별자값 자동 생성
+	//ALTER TABLE news MODIFY COLUMN news_num BIGINT AUTO_INCREMENT; --> 뒤늦게 추가했다면 DB에 적기
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long newsNum; //뉴스번호(PK)
 	
 	private String title; //제목
 	
 	private String content; //내용
+	
+	private LocalDateTime createdAt; //작성일
+	
+	private LocalDateTime updatedAt; //수정일
 	
 	@Builder.Default
 	private Long view = 0L;	//0으로 초기화 해서 Null값 방지
@@ -36,6 +44,7 @@ public class News extends BaseEntity{
 	private Member member;
 	
 	//하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
+	@Builder.Default
 	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<NewsFile> newsFile = new ArrayList<>();
 	
