@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
 import com.EduTech.dto.event.EventApplyRequestDTO;
-import com.EduTech.entity.event.Event;
+import com.EduTech.entity.event.Eventold;
 import com.EduTech.entity.event.EventReserve;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.repository.event.EventBannerRepository;
@@ -56,7 +56,7 @@ public class EventServiceImplTest {
         dto.setEventNum(eventId);
         dto.setMemId(memId);
 
-        Event event = Event.builder()
+        Eventold event = Eventold.builder()
                 .eventNum(eventId)
                 .eventName("테스트 행사")
                 .currCapacity(1)
@@ -108,7 +108,7 @@ public class EventServiceImplTest {
     void testIsAvailable_true() {
         // given
         Long eventId = 4L;
-        Event event = Event.builder()
+        Eventold event = Eventold.builder()
                 .eventNum(eventId)
                 .eventName("진행중 행사")
                 .currCapacity(5)
@@ -131,7 +131,7 @@ public class EventServiceImplTest {
     void testIsAvailable_false_dueToDate() {
         // given
         Long eventId = 5L;
-        Event event = Event.builder()
+        Eventold event = Eventold.builder()
                 .eventNum(eventId)
                 .currCapacity(1)
                 .totCapacity(10)
@@ -153,7 +153,7 @@ public class EventServiceImplTest {
     void testIsAvailable_false_dueToCapacity() {
         // given
         Long eventId = 6L;
-        Event event = Event.builder()
+        Eventold event = Eventold.builder()
                 .eventNum(eventId)
                 .currCapacity(10)
                 .totCapacity(10)

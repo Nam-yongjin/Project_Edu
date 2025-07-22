@@ -22,11 +22,13 @@ public interface EventService {
 
     List<EventInfoDTO> getAllEvents(); // 전체 이벤트 조회
     
-    Page<EventInfoDTO> getEventList(Pageable pageable, String title, String content, RevState status); // 관리자/운영자용
+    Page<EventInfoDTO> getEventList(Pageable pageable, String title, String content, String state); // 관리자/운영자용
     
-    Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, RevState status); // 사용자 검색
+    Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, String state); // 사용자 검색
     
     Page<EventInfoDTO> getUserEventList(Member member, Pageable pageable); // 사용자의 이벤트 목록
+    
+    Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String option, String query, String state); // 관리자 검색 목록
     
     EventInfoDTO getEvent(Long eventNo); // 이벤트 상세 조회
     
