@@ -2,6 +2,7 @@ package com.EduTech.dto.event;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.RevState;
@@ -15,7 +16,8 @@ public class EventInfoDTO {
 	private Long eventNum;			// 행사 아이디
 	private String eventName;		// 행사명
 	private String eventInfo;		// 소개
-	private RevState revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
+	private String state; 			// 신청전, 신청중, 신청마감
+	private String revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
 	private String target;			// 모집대상
 	private EventCategory category; // 모집대상 분류 (일반인, 학생, 선생)
 	private Integer maxCapacity;	// 모집인원
@@ -37,5 +39,8 @@ public class EventInfoDTO {
 	
 	private String originalName;	// 대표 원본 파일명
 	private String filePath;		// 대표 파일 저장경로
+	
+	private List<Integer> daysOfWeek; // 요일 (숫자)
+	private List<String> dayNames;    // 요일 한글명 (월, 화, 수...)
 	
 }

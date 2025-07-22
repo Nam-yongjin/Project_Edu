@@ -39,7 +39,7 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 				AND (:eventEndPeriod IS NULL OR p.applyEndPeriod <= :eventEndPeriod)
 			""")
 	Page<EventInfo> searchEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
-							@Param("state") EventState state, @Param("eventStartPeriod") LocalDateTime eventStartPeriod,
+							@Param("state") String state, @Param("eventStartPeriod") LocalDateTime eventStartPeriod,
 							@Param("eventEndPeriod") LocalDateTime eventEndPeriod, Pageable pageable);
 										// state 오류시 EventState 가 아니라 String 로 변경
 	// 관리자 조건 검색
@@ -55,7 +55,7 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 				 	AND (:eventEndPeriod IS NULL OR p.applyEndPeriod <= :eventEndPeriod)
 			""")
 	Page<EventInfo> searchAdminEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
-								 @Param("state") EventState state, @Param("eventStartPeriod") java.time.LocalDateTime eventStartPeriod,
+								 @Param("state") String state, @Param("eventStartPeriod") java.time.LocalDateTime eventStartPeriod,
 								 @Param("eventEndPeriod") java.time.LocalDateTime eventEndPeriod, Pageable pageable);
 	
 	// 관리자 복합 검색

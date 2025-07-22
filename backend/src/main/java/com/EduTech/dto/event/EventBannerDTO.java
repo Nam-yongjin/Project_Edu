@@ -1,6 +1,7 @@
 package com.EduTech.dto.event;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -13,7 +14,7 @@ public class EventBannerDTO {
 	private String originalName;	// 원본파일명
 	private String filePath;		// 파일저장경로
 	private String fileType;		// 파일 종류
-	private Long eventInfoId;	
+	private Long eventInfoId;		// 
 	
 	private String eventName;		// 행사명
 	private String target;			// 모집 대상
@@ -24,4 +25,6 @@ public class EventBannerDTO {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDateTime eventEndPeriod; 	// 행사종료기간
 	
+	private List<Integer> daysOfWeek; // 요일 (숫자)
+	private List<String> dayNames;    // 요일 한글명 (월, 화, 수...)
 }
