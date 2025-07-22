@@ -16,7 +16,7 @@ public interface EventReserveRepository extends JpaRepository<EventReserve, Long
 	boolean existsByEvent_eventNumAndMember_memId(Long eventNum, String memId);	// 중복신청 여부 확인
 	
 	@Query("SELECT COUNT(p) FROM EventReserve p WHERE p.event.eventNum = :eventNum")	// 신청자 수 카운트
-	int countByEvent(@Param("eventNum") Long progNo);
+	int countByEvent(@Param("eventNum") Long eventNum);
 	
 	List<EventReserve> findByMember_MemId(String memId);	// 회원별 신청목록 조회(리스트 형태)
 	
