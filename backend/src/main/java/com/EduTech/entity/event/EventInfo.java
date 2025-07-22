@@ -1,6 +1,5 @@
 package com.EduTech.entity.event;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -27,10 +26,10 @@ public class EventInfo {
 	private Long eventNum; // 프로그램번호
 
 	@Column(nullable = false, length = 200)
-	private String eventName; // 프로그램명
+	private String eventName; // 행사 이름
 
 	@Column(nullable = false, columnDefinition = "TEXT")
-	private String eventInfo; // 프로그램 상세 내용
+	private String eventInfo; // 행사 상세 내용
 	
 	@Column(nullable = false)
 	private LocalDateTime applyStartPeriod; // 신청시작기간
@@ -53,10 +52,10 @@ public class EventInfo {
 	private String place; // 장소
 
 	@Column(nullable = false)
-	private LocalDate eventStartPeriod; // 행사시작기간
+	private LocalDateTime eventStartPeriod; // 행사시작기간
 
 	@Column(nullable = false)
-	private LocalDate eventEndPeriod; // 행사종료기간
+	private LocalDateTime eventEndPeriod; // 행사종료기간
 
 	@Column(nullable = false, length = 20)
 	private String target; // 수강대상

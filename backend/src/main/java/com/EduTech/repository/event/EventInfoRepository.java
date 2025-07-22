@@ -11,11 +11,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.EduTech.entity.event.Event;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 
-public interface EventInfoRepository extends JpaRepository<Event, Long> {
+public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 	
 	// 사용자 검색
 	@Query("""
@@ -66,9 +65,9 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 					(:eventName IS NULL OR p.eventName LIKE %:eventName%)
 					AND (:eventInfo IS NULL OR p.eventInfo LIKE %:eventInfo%)
 			""")
-	Page<Event> searchEvent(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
+	Page<EventInfo> searchEvent(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
-	List<Event> findByEventEndPeriodGreaterThanEqual(LocalDate eventEndPeriod, Sort sort); 
+	List<EventInfo> findByEventEndPeriodGreaterThanEqual(LocalDate eventEndPeriod, Sort sort); 
 	
 }
