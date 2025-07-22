@@ -40,35 +40,34 @@ public class MemberController {
 	@PostMapping("/register/member")
 	public ResponseEntity<String> registerMember(@RequestBody @Valid MemberRegisterDTO memberRegisterDTO) {
 		memberService.registerMember(memberRegisterDTO);
-		return ResponseEntity.ok("일반 회원가입이 완료되었습니다.");
+		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
 
 	// 학생회원 회원가입
 	@PostMapping("/register/student")
 	public ResponseEntity<String> registerStudent(@RequestBody @Valid StudentRegisterDTO studentRegisterDTO) {
 		memberService.registerStudent(studentRegisterDTO);
-		return ResponseEntity.ok("학생 회원가입이 완료되었습니다.");
+		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
 
 	// 교사회원 회원가입
 	@PostMapping("/register/teacher")
 	public ResponseEntity<String> registerTeacher(@RequestBody @Valid TeacherRegisterDTO teacherRegisterDTO) {
 		memberService.registerTeacher(teacherRegisterDTO);
-		return ResponseEntity.ok("교사 회원가입이 완료되었습니다.");
+		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
 
 	// 기업회원 회원가입
 	@PostMapping("/register/company")
 	public ResponseEntity<String> registerCompany(@RequestBody @Valid CompanyRegisterDTO companyRegisterDTO) {
 		memberService.registerCompany(companyRegisterDTO);
-		return ResponseEntity.ok("기업 회원가입이 완료되었습니다.");
+		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
 
 	// 아이디 중복 체크
 	@GetMapping("/checkId")
 	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String memId) {
-		boolean isDuplicated = memberService.isDuplicatedId(memId);
-		return ResponseEntity.ok(isDuplicated);
+		return ResponseEntity.ok(memberService.isDuplicatedId(memId));
 	}
 
 	// 일반회원 상세정보
@@ -76,8 +75,7 @@ public class MemberController {
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<MemberDetailDTO> memberInfo() {
 		String memId = JWTFilter.getMemId();
-		MemberDetailDTO memberDetailDTO = memberService.readMemberInfo(memId);
-		return ResponseEntity.ok(memberDetailDTO);
+		return ResponseEntity.ok(memberService.readMemberInfo(memId));
 	}
 
 	// 학생회원 상세정보
@@ -85,8 +83,7 @@ public class MemberController {
 	@PreAuthorize("hasRole('STUDENT')")
 	public ResponseEntity<StudentDetailDTO> studentInfo() {
 		String memId = JWTFilter.getMemId();
-		StudentDetailDTO studentDetailDTO = memberService.readStudentInfo(memId);
-		return ResponseEntity.ok(studentDetailDTO);
+		return ResponseEntity.ok(memberService.readStudentInfo(memId));
 	}
 
 	// 교사회원 상세정보
@@ -94,8 +91,7 @@ public class MemberController {
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<TeacherDetailDTO> teacherInfo() {
 		String memId = JWTFilter.getMemId();
-		TeacherDetailDTO teacherDetailDTO = memberService.readTeacherInfo(memId);
-		return ResponseEntity.ok(teacherDetailDTO);
+		return ResponseEntity.ok(memberService.readTeacherInfo(memId));
 	}
 
 	// 기업회원 상세정보
@@ -103,12 +99,11 @@ public class MemberController {
 	@PreAuthorize("hasRole('COMPANY')")
 	public ResponseEntity<CompanyDetailDTO> companyInfo() {
 		String memId = JWTFilter.getMemId();
-		CompanyDetailDTO companyDetailDTO = memberService.readCompanyInfo(memId);
-		return ResponseEntity.ok(companyDetailDTO);
+		return ResponseEntity.ok(memberService.readCompanyInfo(memId));
 	}
 
 	// 일반회원 정보수정
-	@PutMapping("/modify/member")
+	@PutMapping("/member/modify")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<String> modifyMember(@RequestBody @Valid MemberModifyDTO memberModifyDTO) {
 		String memId = JWTFilter.getMemId();
@@ -117,7 +112,7 @@ public class MemberController {
 	}
 
 	// 학생회원 정보수정
-	@PutMapping("/modify/student")
+	@PutMapping("/student/modify")
 	@PreAuthorize("hasRole('STUDENT')")
 	public ResponseEntity<String> modifyStudent(@RequestBody @Valid StudentModifyDTO studentModifyDTO) {
 		String memId = JWTFilter.getMemId();
@@ -126,7 +121,7 @@ public class MemberController {
 	}
 
 	// 교사회원 정보수정
-	@PutMapping("/modify/teacher")
+	@PutMapping("/teacher/modify")
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<String> modifyTeacher(@RequestBody @Valid TeacherModifyDTO teacherModifyDTO) {
 		String memId = JWTFilter.getMemId();
@@ -135,7 +130,7 @@ public class MemberController {
 	}
 
 	// 기업회원 정보수정
-	@PutMapping("/modify/company")
+	@PutMapping("/company/modify")
 	@PreAuthorize("hasRole('COMPANY')")
 	public ResponseEntity<String> modifyCompany(@RequestBody @Valid CompanyModifyDTO companyModifyDTO) {
 		String memId = JWTFilter.getMemId();
@@ -144,10 +139,16 @@ public class MemberController {
 	}
 
 	// 회원 탈퇴
-	@DeleteMapping("/leave")
+	@DeleteMapping("/member/leave")
 	public ResponseEntity<String> leaveMember() {
 		String memId = JWTFilter.getMemId();
 		memberService.leaveMember(memId);
 		return ResponseEntity.ok("회원탈퇴가 완료되었습니다. 일주일뒤 재가입 가능합니다.");
 	}
+	
+	// 아이디 찾기
+	
+	// 비밀번호 찾기
+	
+	// 카카오톡 로그인
 }

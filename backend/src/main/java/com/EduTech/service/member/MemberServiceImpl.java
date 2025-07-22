@@ -284,8 +284,38 @@ public class MemberServiceImpl implements MemberService {
 		Member member = memberRepository.findById(memId).orElseThrow();
 		
 		// 현재 예약중인 시설, 행사, 실증대여 있을시 탈퇴불가 처리
+	    // 역할별 탈퇴 제약 조건 예시
+//	    if (member.getRole().equals("COMPANY")) {
+//	        if (jobPostRepository.existsByCompanyId(memId)) {
+//	            throw new IllegalStateException("등록된 채용공고가 있는 기업은 탈퇴할 수 없습니다.");
+//	        }
+//	    }
+		
+//		if (member.getRole().equals("USER")) {
+//
+//		}
+//		if (member.getRole().equals("STUDENT")) {
+//
+//		}
+//		if (member.getRole().equals("TEACHER")) {
+//
+//		}
+//		if (member.getRole().equals("COMPANY")) {
+//
+//		}
+		
+		// 블랙리스트 회원일시 탈퇴불가
+		if (member.getState().equals("BEN")) {
+			throw new IllegalStateException("블랙리스트 회원은 탈퇴할 수 없습니다.");
+		}
 		
 		member.setState(MemberState.LEAVE);
 		memberRepository.save(member);
 	}
+	
+	// 휴대폰 본인인증
+	
+	// 아이디 찾기
+		
+	// 비밀번호 찾기
 }

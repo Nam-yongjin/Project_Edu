@@ -1,6 +1,7 @@
 import { useState } from "react";
-import useCustomLogin from "../../hooks/useCustomLogin";
+import useLogin from "../../hooks/useLogin";
 import KakaoLoginComponent from "./KakaoLoginComponent";
+import useMove from "../../hooks/useMove";
 
 const initState = {
     memId: '',
@@ -10,7 +11,8 @@ const initState = {
 const LoginComponent = () => {
     const [loginParam, setLoginParam] = useState({ ...initState })
 
-    const { doLogin, moveToPath } = useCustomLogin()
+    const { doLogin } = useLogin()
+    const { moveToPath } = useMove()
 
     const handleChange = (e) => {
         loginParam[e.target.name] = e.target.value
@@ -21,7 +23,6 @@ const LoginComponent = () => {
     const handleClickLogin = (e) => {
         doLogin(loginParam)
             .then(data => {
-
                 if (data.error) {
                     alert("아이디와 패스워드를 다시 확인하세요")
                 } else {
@@ -41,11 +42,11 @@ const LoginComponent = () => {
                 <div className="relative mb-4 flex w-full flex-wrap items-center">
                     <div className="w-full p-3 text-left font-bold">ID</div>
                     <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
-                        name="email" type={'text'} value={loginParam.memId} onChange={handleChange} /> </div>
+                        name="memId" type={'text'} value={loginParam.memId} onChange={handleChange} /> </div>
             </div>
             <div className="flex justify-center">
                 <div className="relative mb-4 flex w-full flex-wrap items-center">
-                    <div className="w-full p-3 text-right font-bold">Password</div>
+                    <div className="w-full p-3 text-left font-bold">Password</div>
                     <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
                         name="pw" type={'password'} value={loginParam.pw} onChange={handleChange} /> </div>
             </div>

@@ -30,15 +30,15 @@ public interface MemberRepository extends JpaRepository<Member, String>{
 	Optional<Company> findCompanyById(@Param("memId") String memId);
 	
 	// 이름과 전화번호로 아이디 찾기
-	@Query("SELECT m.memId FROM Member m  WHERE m.name = :name AND m.phone = :phone")
-	Optional<String> findMemIdByNameAndPhone(@Param("name") String name, @Param("phone") String phone);
+//	@Query("SELECT m.memId FROM Member m  WHERE m.name = :name AND m.phone = :phone")
+//	Optional<String> findByNameAndPhone(@Param("name") String name, @Param("phone") String phone);
 	
 	// 아이디와 전화번호로 인증 후 비밀번호 찾기(비빌먼호 변경창 이동)
-	@Query("SELECT m FROM Member m  WHERE m.memId = :memId AND m.phone = :phone")
-	Optional<Member> findByMemIdAndPhone(@Param("memId") String memId, @Param("phone") String phone);
+//	@Query("SELECT m FROM Member m  WHERE m.memId = :memId AND m.phone = :phone")
+//	Optional<Member> findByMemIdAndPhone(@Param("memId") String memId, @Param("phone") String phone);
 	
-	// 회원탈퇴 신청한지 일주일지난 회원정보 자동삭제
+	// 회원탈퇴 신청한지 일주일지난 회원정보 자동삭제(LEAVE로 업데이트한 시각과의 차이를 매일 0시에 비교하고 삭제)
 	@Modifying
 	@Query(value = "DELETE FROM member WHERE role = 'LEAVE' AND updatedAt <= DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
-	void deleteMembersAfterOneMonthLeave();
+	void deleteMembersAfterOneWeekLeave();
 }
