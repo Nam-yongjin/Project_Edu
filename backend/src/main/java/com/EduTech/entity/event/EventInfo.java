@@ -1,12 +1,17 @@
 package com.EduTech.entity.event;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,15 +43,13 @@ public class EventInfo {
 	private LocalDateTime applyEndPeriod; // 신청종료기간
 
 	@Column(nullable = false, length = 20) // 신청전 / 신청중 / 신청마감 등
-	private String status;
+	private String stats;
 
-/*		필요 없을것으로 예상중
 	@Builder.Default
 	@ElementCollection
 	@CollectionTable(name = "event_days", joinColumns = @JoinColumn(name = "eventNum"))
 	@Column(nullable = false)
 	private List<Integer> daysOfWeek  = new ArrayList<>();
-*/
 	
 	@Column(nullable = false, length = 20)
 	private String place; // 장소

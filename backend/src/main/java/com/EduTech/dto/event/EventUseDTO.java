@@ -25,10 +25,12 @@ public class EventUseDTO {
 	private LocalDateTime eventStartPeriod;	// 행사시작기간
 	private LocalDateTime eventEndPeriod;	// 행사종료기간
 	
+	private List<Integer> daysOfWeek;		// 요일 (숫자)
+	
 	private String place;					// 장소
 	private Integer maxCapacity;			// 모집인원
 	private Integer currCapacity;			// 현재인원
-	private RevState revState;				// 상태(대기, 수락, 거절)
+	private String revState;				// 상태(대기, 수락, 거절)
 	
 	private Long eventNum;	// 행사 아이디
 	private String memId;	// 회원 아이디
