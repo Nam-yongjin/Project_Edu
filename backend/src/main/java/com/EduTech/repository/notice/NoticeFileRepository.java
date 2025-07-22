@@ -11,6 +11,6 @@ public interface NoticeFileRepository extends JpaRepository<NoticeFile, Long>{ /
 	
 	List<NoticeFile> findByNotice(Notice notice); //상세 페이지에서 첨부파일 보여줄 때
 	
-	List<NoticeFile> findByNoticeNum(Long noticeNum); //공지사항번호로 첨부파일 조회
+	List<NoticeFile> findByNotice_NoticeNum(Long noticeNum); //공지사항번호로 첨부파일 조회
 
 }

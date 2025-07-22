@@ -5,6 +5,7 @@ import java.util.List;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormUpdateDTO;
 import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
@@ -18,17 +19,19 @@ import com.EduTech.dto.demonstration.PageResponseDTO;
 
 public interface DemonstrationService {
 	
-		List<DemonstrationListReserveDTO> findAllDemRes(String searchText); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
-		List<DemonstrationListRegistrationDTO> findAllDemReg(String searachText); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search,int pageCount); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search,int pageCount); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationListDTO> getAllDemRental(String memId, String search,int pageCount); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationListDTO> getAllDemList(int pageCount); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
+		DemonstrationListDTO getDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지
+		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태인지 확인 가능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
 		void approveOrRejectDemRes(DemonstrationApprovalResDTO demonstrationApprovalResDTO); // 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 		void approveOrRejectDemReg(DemonstrationApprovalRegDTO demonstrationApprovalRegDTO); // 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-		PageResponseDTO<DemonstrationListDTO> findAllDemRental(String memId, int pageCount,String search); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 		void rentalDateChange(DemonstrationResRentalDTO demonstrationResRentalDTO); // 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
-		PageResponseDTO<DemonstrationListDTO> findAllDemList(int pageCount); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
-		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태인지 확인 가능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
-		DemonstrationListDTO findDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지
 		void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO); // 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 		void demonstrationReservationCancel(DemonstrationReservationCancelDTO demonstrationReservationCancelDTO); // 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
-		void addDemonstration(DemonstrationFormDTO demonstrationFormDTO,List<Object> files); // 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
+		void addDemonstration(DemonstrationFormDTO demonstrationFormDTO); // 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
+		void updateDemonstration(DemonstrationFormUpdateDTO demonstrationFormUpdateDTO); // 실증 상품 수정하는 기능
+		void deleteDemonstration(Long demNum); // 실증 번호를 받아 실증 상품을 삭제하는 기능
 		
 }
