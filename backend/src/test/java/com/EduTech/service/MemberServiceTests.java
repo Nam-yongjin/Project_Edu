@@ -49,7 +49,7 @@ public class MemberServiceTests {
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
 
-//	@Test
+	@Test
 	public void testCheckId() {
 		boolean result = memberService.isDuplicatedId("user5");
 		System.out.println(result);
