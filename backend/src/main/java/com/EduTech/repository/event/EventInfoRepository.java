@@ -12,13 +12,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.EduTech.entity.event.Event;
+import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 
 public interface EventInfoRepository extends JpaRepository<Event, Long> {
 	
 	// 사용자 검색
 	@Query("""
-			SELECT p FROM Event p
+			SELECT p FROM EventInfo p
 			WHERE
 				(
 					(:keyword IS NULL OR :keyword = '')
@@ -36,15 +37,15 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 					)
 				)
 			 	AND (:state IS NULL OR p.state = :state)
-				AND (:progressEndPeriod IS NULL OR p.applyEndPeriod <= :progressEndPeriod)
+				AND (:eventEndPeriod IS NULL OR p.applyEndPeriod <= :eventEndPeriod)
 			""")
-	Page<Event> searchEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
-							@Param("state") EventState state, @Param("progressStartPeriod") LocalDateTime progressStartPeriod,
-							@Param("progressEndPeriod") LocalDateTime progressEndPeriod, Pageable pageable);
-
+	Page<EventInfo> searchEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
+							@Param("state") EventState state, @Param("eventStartPeriod") LocalDateTime eventStartPeriod,
+							@Param("eventEndPeriod") LocalDateTime eventEndPeriod, Pageable pageable);
+										// state 오류시 EventState 가 아니라 String 로 변경
 	// 관리자 조건 검색
 	@Query("""
-				SELECT p FROM Event p
+				SELECT p FROM EventInfo p
 				WHERE
 					(
 				    	(:searchType IS NULL OR :searchType = '' OR :keyword IS NULL OR :keyword = '')
@@ -52,15 +53,15 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 				        (:searchType = 'eventName' AND p.eventName LIKE %:keyword%)
 				   	)
 					AND (:state IS NULL OR p.state = :state)
-				 	AND (:progressEndPeriod IS NULL OR p.applyEndPeriod <= :progressEndPeriod)
+				 	AND (:eventEndPeriod IS NULL OR p.applyEndPeriod <= :eventEndPeriod)
 			""")
-	Page<Event> searchAdminEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
-								 @Param("state") EventState state, @Param("progressStartPeriod") java.time.LocalDateTime progressStartPeriod,
-								 @Param("progressEndPeriod") java.time.LocalDateTime progressEndPeriod, Pageable pageable);
+	Page<EventInfo> searchAdminEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
+								 @Param("state") EventState state, @Param("eventStartPeriod") java.time.LocalDateTime eventStartPeriod,
+								 @Param("eventEndPeriod") java.time.LocalDateTime eventEndPeriod, Pageable pageable);
 	
 	// 관리자 복합 검색
 	@Query("""
-				SELECT p FROM Event p
+				SELECT p FROM EventInfo p
 				WHERE
 					(:eventName IS NULL OR p.eventName LIKE %:eventName%)
 					AND (:eventInfo IS NULL OR p.eventInfo LIKE %:eventInfo%)
@@ -68,6 +69,6 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 	Page<Event> searchEvent(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
-	List<Event> findByProgressEndPeriodGreaterThanEqual(LocalDate progressEndPeriod, Sort sort); 
+	List<Event> findByEventEndPeriodGreaterThanEqual(LocalDate eventEndPeriod, Sort sort); 
 	
 }
