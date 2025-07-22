@@ -17,7 +17,7 @@ public interface DemonstrationTimeRepository extends JpaRepository<Demonstration
 	
 	// 클라이언트로부터 시작 날짜와 끝 날짜, 실증 제품 번호를 가져와
 	// 해당 날짜가 예약 되있는지 아닌지 상태값 받는 쿼리
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeDTO(dt.demDate,dt.state,dt.demonstration.demNum) FROM DemonstrationTime dt WHERE dt.demDate BETWEEN :startDate AND :endDate AND dt.demonstration.demNum = :demNum")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeResDTO(dt.demDate,dt.state,dt.demonstration.demNum) FROM DemonstrationTime dt WHERE dt.demDate BETWEEN :startDate AND :endDate AND dt.demonstration.demNum = :demNum")
 	List<DemonstrationTimeResDTO> findReservedDates(
 	    @Param("startDate") LocalDate startDate,
 	    @Param("endDate") LocalDate endDate,

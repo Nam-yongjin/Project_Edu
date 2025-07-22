@@ -26,6 +26,7 @@ import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.dto.demonstration.PageResponseDTO;
+import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.demonstration.DemonstrationService;
 import com.EduTech.util.FileUtil;
 
@@ -61,10 +62,9 @@ public class DemonstrationController {
 	// 신청한 물품 대여 조회
 	// memId는 나중에 서버 인증 토큰으로 꺼내 처리할것(보안 이슈)
 	@GetMapping("/demRental")
-	public PageResponseDTO<DemonstrationListDTO> getAllDemRentalPage(@RequestParam("memId") String memId,
-			@RequestParam(value = "search", required = false, defaultValue = "") String search,
+	public PageResponseDTO<DemonstrationListDTO> getAllDemRentalPage(@RequestParam(value = "search", required = false, defaultValue = "") String search,
 			@RequestParam("pageCount") int pageCount) {
-		PageResponseDTO<DemonstrationListDTO> AllDemRental = demonstrationService.getAllDemRental(memId, search,
+		PageResponseDTO<DemonstrationListDTO> AllDemRental = demonstrationService.getAllDemRental(JWTFilter.getMemId(), search,
 				pageCount);
 		return AllDemRental;
 	}
