@@ -65,7 +65,7 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 					(:eventName IS NULL OR p.eventName LIKE %:eventName%)
 					AND (:eventInfo IS NULL OR p.eventInfo LIKE %:eventInfo%)
 			""")
-	Page<Event> searchProgram(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
+	Page<Event> searchEvent(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
 	List<Event> findByProgressEndPeriodGreaterThanEqual(LocalDate progressEndPeriod, Sort sort); 

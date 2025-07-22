@@ -16,8 +16,8 @@ public class EventBannerDTO {
 	private String filePath;		// 파일저장경로
 	private EventState state;		// 현재 신청 가능 여부
 	private String thumbnailPath;	// 썸네일
-	
-	private String progName;		// 행사명
+	private Long eventNum;			// 행사 아이디
+	private String eventName;		// 행사명
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDateTime applyStartPeriod; // 신청시작기간(년 일 월)

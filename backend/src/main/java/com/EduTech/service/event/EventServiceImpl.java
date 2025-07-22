@@ -10,13 +10,20 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.Event;
+import com.EduTech.entity.event.EventFile;
+import com.EduTech.entity.event.EventReserve;
 import com.EduTech.entity.event.EventState;
+import com.EduTech.entity.member.Member;
 import com.EduTech.repository.event.EventBannerRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.event.EventReserveRepository;
@@ -118,8 +125,113 @@ public class EventServiceImpl implements EventService {
 
         infoRepository.save(origin);
     }
-		
-		
+    
+    // 행사 삭제 처리
+    @Override
+    public void deleteEvent(Long eventNum) {
+        Event event = infoRepository.findById(eventNum)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 행사입니다."));
+
+        // 신청자 정보 삭제
+        List<EventReserve> reserves = reserveRepository.findByEvent_eventNum(eventNum);
+        reserveRepository.deleteAll(reserves);
+
+        // 배너 삭제
+        EventFile banner = bannerRepository.findByEvent_eventNum(eventNum).orElse(null);
+        if (banner != null) {
+            List<String> files = new ArrayList<>();
+            files.add(banner.getFilePath());
+            fileUtil.deleteFiles(files);
+            bannerRepository.delete(banner);
+        }
+
+        // 첨부파일 삭제
+        List<EventFile> files = event.getEventFiles();
+        List<String> filePaths = new ArrayList<>();
+        for (EventFile ef : files) {
+            filePaths.add(ef.getFilePath());
+        }
+        fileUtil.deleteFiles(filePaths);
+
+        // 행사 삭제
+        infoRepository.delete(event);
+    }
+    
+    // 관리자 일반 목록 (복합 필터 포함)
+    @Override
+    public Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String name, String content, String status) {
+        Page<Event> result;
+        if (name == null && content == null) {
+            result = infoRepository.findAll(pageable);
+        } else {
+            result = infoRepository.searchEvent(name, content, pageable);
+        }
+
+        List<EventInfoDTO> list = new ArrayList<>();
+        for (Event event : result.getContent()) {
+            EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
+            dto.setCurrCapacity(event.getCurrCapacity());
+            dto.setRevState(event.getState().name());
+            list.add(dto);
+        }
+
+        return new PageImpl<>(list, pageable, result.getTotalElements());
+    }   
+    
+    // 사용자 검색용 행사 리스트
+    @Override
+    public Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String keyword, String status) {
+        Page<Event> events = infoRepository.searchEvent(option, keyword, pageable);
+        List<EventInfoDTO> result = new ArrayList<>();
+
+        for (Event event : events.getContent()) {
+            EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
+            dto.setCurrCapacity(event.getCurrCapacity());
+            dto.setRevState(event.getState().name());
+            result.add(dto);
+        }
+
+        return new PageImpl<>(result, pageable, events.getTotalElements());
+    }    
+    
+    // 페이징 형태로 조회
+    @Override
+	public Page<EventInfoDTO> getUserEventList(Member member, Pageable pageable) {
+		// 회원이 신청한 EventReserveRepository 목록을 기준으로 EventInfoDTO 가져오기
+		Page<EventReserveRepository> uses = useRepository.findByMember(member, pageable);
+		Page<EventInfoDTO> dtoPage = uses.map(use -> modelMapper.map(use.getEventInfoDTO(), EventInfoDTO.class));
+
+		return dtoPage;
+	}
+    
+    
+    
+    
+    
+    // ------------------------ 공통 메서드 ------------------------------
+    
+    // ProgramUse → ProgramUseDTO 변환 메서드
+ 	private EventUseDTO toDTO(EventReserve use) {
+ 		Event info = use.getEvent();
+ 		Member member = use.getMember();
+
+ 		String status = info.getApplyEndPeriod().isBefore(LocalDateTime.now()) ? "신청마감" : "신청완료";
+ 		List<Integer> dayOfWeekIntList = info.getDaysOfWeek();
+
+ 		String startTime = info.getStartTime() != null ? info.getStartTime().toString() : "";
+ 		String endTime = info.getEndTime() != null ? info.getEndTime().toString() : "";
+
+ 		return EventUseDTO.builder().evtRevNum(use.getEvtRevNum()).applyAt(use.getApplyAt()).eventNum(info.getEventNum())
+ 				.eventName(info.getEventName()).progressStartPeriod(info.getProgressStartPeriod())
+ 				.progressEndPeriod(info.getProgressEndPeriod()).LocalTime(startTime).LocalTime(endTime).daysOfWeek(dayOfWeekIntList)
+ 				.room(info.getPlace()).capacity(info.getCurrCapacity())
+ 				.current(reserveRepository.countByEvent(info.getEventNum())).status(status)
+ 				.mid(member != null ? member.getMemId() : null).name(member != null ? member.getName() : null)
+ 				.email(member != null ? member.getEmail() : null).phone(member != null ? member.getPhone() : null)
+ 				.build();
+ 	}
+    
+    
 		
     // 파일 저장 및 유효성 검사
     private void setFileInfo(Event info, MultipartFile file) {
@@ -134,7 +246,7 @@ public class EventServiceImpl implements EventService {
         }
 
         String lowerCaseFilename = originalFilename.toLowerCase();
-        boolean isAllowed = lowerCaseFilename.endsWith(".hwp") || lowerCaseFilename.endsWith(".pdf");
+        boolean isAllowed = lowerCaseFilename.endsWith(".hwp") || lowerCaseFilename.endsWith(".pdf") || lowerCaseFilename.endsWith(".jpg");
         if (!isAllowed) {
             throw new IllegalArgumentException("hwp 또는 pdf 파일만 업로드 가능합니다.");
         }
