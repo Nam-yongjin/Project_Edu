@@ -4,16 +4,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
@@ -41,6 +39,7 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
+import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,62 +57,47 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	DemonstrationTimeRepository demonstrationTimeRepository;
 	@Autowired
 	DemonstrationImageRepository demonstrationImageRepository;
-	
+	@Autowired
+	FileUtil fileUtil;
 	
 	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public List<DemonstrationListReserveDTO> findAllDemRes(String search) {
+	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search,int pageCount) {
 
 		// getAllPagedResults 의 매개변수로 익명클래스, 정렬한 칼럼 이름, 페이지 전달
 		// Function<Pageable>은, apply에 필요한 매개값
 		// function<Page<DemonstrationListReserveDTO>는 반환값 이라생각
-		if (search.equals("")) { // 검색어 입력이 없을 경우,
-			List<DemonstrationListReserveDTO> allResults = getAllPagedResults(
-					new Function<Pageable, Page<DemonstrationListReserveDTO>>() {
-						@Override
-						public Page<DemonstrationListReserveDTO> apply(Pageable pageable) {
-							return demonstrationReserveRepository.selectPageDemRes(pageable);
-						}
-					}, "demRevNum", 10);
-			return allResults;
+		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
+			Page<DemonstrationListReserveDTO> currentPage = demonstrationReserveRepository
+					.selectPageDemRes(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()));
+
+			return new PageResponseDTO<DemonstrationListReserveDTO>(currentPage); // 페이지 DTO 객체 리턴
 		}
 
 		else { // 검색어를 입력 했을 경우,
-			List<DemonstrationListReserveDTO> allResults = getAllPagedResults(
-					new Function<Pageable, Page<DemonstrationListReserveDTO>>() {
-						@Override
-						public Page<DemonstrationListReserveDTO> apply(Pageable pageable) {
-							return demonstrationReserveRepository.selectPageDemResSearch(pageable, search);
-						}
-					}, "demRevNum", 10);
-			return allResults;
+			Page<DemonstrationListReserveDTO> currentPage = demonstrationReserveRepository
+					.selectPageDemResSearch(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()),search);
+
+			return new PageResponseDTO<DemonstrationListReserveDTO>(currentPage); // 페이지 DTO 객체 리턴
 		}
 	}
 
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public List<DemonstrationListRegistrationDTO> findAllDemReg(String search) {
+	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search,int pageCount) {
 
-		if (search.equals("")) { // 검색어 입력이 없을 경우,
-			List<DemonstrationListRegistrationDTO> allResults = getAllPagedResults(
-					new Function<Pageable, Page<DemonstrationListRegistrationDTO>>() {
-						@Override
-						public Page<DemonstrationListRegistrationDTO> apply(Pageable pageable) {
-							return demonstrationRegistrationRepository.selectPageDemReg(pageable);
-						}
-					}, "demRegNum", 10);
-			return allResults;
+		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
+			Page<DemonstrationListRegistrationDTO> currentPage = demonstrationRegistrationRepository
+					.selectPageDemReg(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()));
+
+			return new PageResponseDTO<DemonstrationListRegistrationDTO>(currentPage); // 페이지 DTO 객체 리턴
 		}
 
 		else { // 검색어를 입력 했을 경우,
-			List<DemonstrationListRegistrationDTO> allResults = getAllPagedResults(
-					new Function<Pageable, Page<DemonstrationListRegistrationDTO>>() {
-						@Override
-						public Page<DemonstrationListRegistrationDTO> apply(Pageable pageable) {
-							return demonstrationRegistrationRepository.selectPageDemRegSearch(pageable, search);
-						}
-					}, "demRegNum", 10);
-			return allResults;
+			Page<DemonstrationListRegistrationDTO> currentPage = demonstrationRegistrationRepository
+					.selectPageDemRegSearch(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()),search);
+
+			return new PageResponseDTO<DemonstrationListRegistrationDTO>(currentPage); // 페이지 DTO 객체 리턴
 		}
 	}
 
@@ -134,9 +118,9 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public PageResponseDTO<DemonstrationListDTO> findAllDemRental(String memId, int pageCount, String search) {
+	public PageResponseDTO<DemonstrationListDTO> getAllDemRental(String memId, String search,int pageCount) {
 
-		if (search.equals("")) { // 검색어 입력이 없을 경우,
+		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
 			Page<DemonstrationListDTO> currentPage = demonstrationRepository
 					.selectPageViewDem(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId);
 
@@ -182,11 +166,12 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 				// time 리스트를 저장
 			demonstrationTimeRepository.deleteDemTimes(deleteTimeList);
 		}
+		
 	}
 
 	// 실증 장비신청 페이지 (실증 물품 리스트 목록) - 이미지도 가져와야함
 	@Override
-	public PageResponseDTO<DemonstrationListDTO> findAllDemList(int pageCount) {
+	public PageResponseDTO<DemonstrationListDTO> getAllDemList(int pageCount) {
 		Page<DemonstrationListDTO> currentPage = demonstrationRepository
 				.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()));
 		
@@ -229,7 +214,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 장비 신청 상세 페이지
 	@Override
-	public DemonstrationListDTO findDemDetailList(Long demNum) {
+	public DemonstrationListDTO getDemDetailList(Long demNum) {
 		// 실증 장비 번호로 장비 상세 정보를 받아와 리턴
 	DemonstrationListDTO detailDem=new DemonstrationListDTO();
 		detailDem=demonstrationRepository.selectPageDetailDem(demNum);
@@ -267,9 +252,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	public void demonstrationReservationCancel(DemonstrationReservationCancelDTO demonstrationReservationCancelDTO) {
 		// 불러온 아이디와 실증 번호를 통해 신청 번호를 받아온 후,
 		DemonstrationReserve demonstrationReserve=demonstrationReserveRepository.findDemRevNum(demonstrationReservationCancelDTO.getMemId(),demonstrationReservationCancelDTO.getDemNum());
+	
+		if (demonstrationReserve == null) {
+			System.out.println("예약 정보가 없습니다.");
+			return;
+		}
+		
 		// 신청 번호를 통해 삭제
 		demonstrationReserveRepository.deleteOneDemRes(demonstrationReserve.getDemRevNum());
-		
 		// demonstartionTime테이블에 있는 예약 정보도 삭제
 		List<LocalDate> deleteTimeList = new ArrayList<>();
 		for (LocalDate date = demonstrationReserve.getStartDate(); !date
@@ -285,7 +275,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	
 	@Override
-	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO,List<Object> files) {
+	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName()).demInfo(demonstrationFormDTO.getDemInfo())
 				.demMfr(demonstrationFormDTO.getDemMfr()).itemNum(demonstrationFormDTO.getItemNum()).build();
 		
@@ -299,6 +289,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		// 실증 등록
 		demonstrationRegistrationRepository.save( demonstrationRegistration);
 		
+		// 폴더에 이미지 저장 (demImages라는 폴더에)
+		 List<Object> files=fileUtil.saveFiles(demonstrationFormDTO.getImageList(),"demImages");
 		
 		// 이미지 파일 등록
 		for (Object obj : files) {
@@ -312,72 +304,45 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	}
 
 	@Override
-	public void updateDemonstration(DemonstrationFormUpdateDTO demonstrationFormUpdateDTO, List<Object> files) {
+	public void updateDemonstration(DemonstrationFormUpdateDTO demonstrationFormUpdateDTO) {
+		// 실증 상품 정보 업데이트
 		demonstrationRepository.updateDem(demonstrationFormUpdateDTO.getDemName(),demonstrationFormUpdateDTO.getDemMfr(),demonstrationFormUpdateDTO.getItemNum(),demonstrationFormUpdateDTO.getDemInfo(),demonstrationFormUpdateDTO.getDemNum());
 		
+		// 반납 예정일 수정
 		demonstrationRegistrationRepository.updateDemResChangeExpDate(demonstrationFormUpdateDTO.getExpDate(),demonstrationFormUpdateDTO.getDemNum(),demonstrationFormUpdateDTO.getMemId());
 		
-		List<DemonstrationImageDTO> existingImages = demonstrationImageRepository.selectDemImage(demonstrationFormUpdateDTO.getDemNum());
-		
-		// 이미지 파일 등록
-		for (Object obj : files) {
-		    if (obj instanceof Map) {
-		        Map<String, String> map = (Map<String, String>) obj;
-		        String newName = map.get("originalName");
-		        String newPath = map.get("filePath");
-
-		        boolean exists = false;
-
-		        // 기존 이미지와 이름/경로가 모두 같은 경우 존재 여부 확인
-		        for (DemonstrationImageDTO existing :  existingImages) {
-		            if (existing.getImageName().equals(newName) && existing.getImageUrl().equals(newPath)) {
-		                exists = true;
-		                break;
-		            }
-		        }
-
-		        // 중복 아니면 저장
-		        if (!exists) {
-		            DemonstrationImage image = DemonstrationImage.builder()
-		                .imageName(newName)
-		                .imageUrl(newPath)
-		                .demonstration(Demonstration.builder().demNum(demonstrationFormUpdateDTO.getDemNum()).build())
-		                .build();
-
-		            demonstrationImageRepository.save(image);
-		        }
-		    }
+		// 기존 상품 이미지 불러옴(폴더에서 이미지 삭제 위해)
+		List<DemonstrationImageDTO> deleteImageList=demonstrationImageRepository.selectDemImage(demonstrationFormUpdateDTO.getDemNum());
+		List<String> filePaths=new ArrayList<>();
+		for(DemonstrationImageDTO dto:deleteImageList)
+		{
+			String path=dto.getImageUrl()+"/"+dto.getImageName();
+			filePaths.add(path);
 		}
-		// 만약, 사진이 없을경우, DB에 이미지를 빈경로로 대체,
-		// 그리고 해당 경로에 있는 디렉토리도 삭제해 줘야함.
-		
-	}
+				
+		// 기존 상품 이미지 삭제 후, 
+		 demonstrationImageRepository.deleteDemNumImage(demonstrationFormUpdateDTO.getDemNum());
+	
+		 // 폴더에서 이미지 삭제
+		 fileUtil.deleteFiles(filePaths);
+		 
+		 List<Object> files=fileUtil.saveFiles(demonstrationFormUpdateDTO.getImageList(),"demImages");
+		 
+		 // 수정된 이미지로 추가
+		 // 안전성을 위해서 이미지 동기화 작업 필요할듯?
+		 for (Object obj : files) {
+				if (obj instanceof Map) {
+					Map<String, String> map = (Map<String, String>) obj;
+					DemonstrationImage demonstrationimage = DemonstrationImage.builder().imageName(map.get("originalName")).imageUrl(map.get("filePath"))
+					.demonstration(Demonstration.builder().demNum(demonstrationFormUpdateDTO.getDemNum()).build()).build();
+					demonstrationImageRepository.save(demonstrationimage);
+				}
+			}
+		}
 	
 	// 실증 번호를 받아서 실증 상품을 삭제하는 기능
 	@Override
 	public void deleteDemonstration(Long demNum) {
 		demonstrationRepository.deleteDelete(demNum);
 	}
-	
-	
-	// 함수형 인터페이스 Function을 사용해서 리포지토리 호출을 메소드 바깥에서 함수로 만들어 넘길수 있음.
-	// Function<입력값, 출력값> apply의 매개변수: 입력값, 반환값: 출력값
-	// 이런느낌
-	public <T> List<T> getAllPagedResults(Function<Pageable, Page<T>> pageFetcher, String sortColumn, int pageSize) {
-		List<Page<T>> allData = new ArrayList<>();
-		Page<T> firstPage = pageFetcher.apply(PageRequest.of(0, pageSize, Sort.by(sortColumn).descending()));
-		int totalPageCount = firstPage.getTotalPages();
-
-		for (int i = 0; i < totalPageCount; i++) {
-			Page<T> page = pageFetcher.apply(PageRequest.of(i, pageSize, Sort.by(sortColumn).descending()));
-			allData.add(page);
-		}
-
-		List<T> result = new ArrayList<>();
-		for (Page<T> page : allData) {
-			result.addAll(page.getContent());
-		}
-		return result;
-	}
-
 }
