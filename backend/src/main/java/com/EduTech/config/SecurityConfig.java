@@ -39,7 +39,7 @@ public class SecurityConfig {
 		
 		// api서버 로그인
         http.formLogin(config -> {
-            config.loginPage(("/api/member/login"));
+            config.loginPage(("/api/login"));
 //            config.successHandler(new LoginSuccessHandler());
 //            config.failureHandler(new LoginFailHandler());
         });

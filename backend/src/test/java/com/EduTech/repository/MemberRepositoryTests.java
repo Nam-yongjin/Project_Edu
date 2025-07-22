@@ -241,26 +241,15 @@ public class MemberRepositoryTests {
 	// 아이디찾기
 //	@Test
 	public void testMemberFindId() {
-		
-		Optional<String> result = memberRepository.findMemIdByNameAndPhone("USER5", "01012343215");
-		System.out.println(result);
+
 		
 	}
 	
 	// 비밀번호 찾기(비밀번호 변경창으로 이동)
-	@Test
+//	@Test
 	public void testMemberFindPw() {
 		
-//		사용자정보 불러오기
-		Optional<Member> oldPw = memberRepository.findByMemIdAndPhone("user5", "01012343215");
-		System.out.println("oldPw: "+oldPw);
-		
-		// 새로운 비밀번호 입력받은거로 가정
-		Member member = oldPw.get();
-		String newPw = passwordEncoder.encode("new password");
-		member.setPw(passwordEncoder.encode(newPw));
-		memberRepository.save(member);
-		System.out.println("newPw: "+newPw);
+
 		
 	}
 }
