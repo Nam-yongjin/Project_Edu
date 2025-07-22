@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.EduTech.entity.event.Event;
+import com.EduTech.entity.event.EventState;
 
 public interface EventInfoRepository extends JpaRepository<Event, Long> {
 	
@@ -34,11 +35,11 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 						:searchType = 'all' AND (p.eventName LIKE %:keyword% OR p.eventInfo LIKE %:keyword%)
 					)
 				)
-			 	AND (:state IS NULL OR :state = '' OR p.state = :state)
+			 	AND (:state IS NULL OR p.state = :state)
 				AND (:progressEndPeriod IS NULL OR p.applyEndPeriod <= :progressEndPeriod)
 			""")
 	Page<Event> searchEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
-							@Param("state") String state, @Param("progressStartPeriod") LocalDateTime progressStartPeriod,
+							@Param("state") EventState state, @Param("progressStartPeriod") LocalDateTime progressStartPeriod,
 							@Param("progressEndPeriod") LocalDateTime progressEndPeriod, Pageable pageable);
 
 	// 관리자 조건 검색
@@ -50,11 +51,11 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 				       	OR
 				        (:searchType = 'eventName' AND p.eventName LIKE %:keyword%)
 				   	)
-					AND (:state IS NULL OR :state = '' OR p.state = :state)
+					AND (:state IS NULL OR p.state = :state)
 				 	AND (:progressEndPeriod IS NULL OR p.applyEndPeriod <= :progressEndPeriod)
 			""")
 	Page<Event> searchAdminEvent(@Param("searchType") String searchType, @Param("keyword") String keyword,
-								 @Param("state") String state, @Param("progressStartPeriod") java.time.LocalDateTime progressStartPeriod,
+								 @Param("state") EventState state, @Param("progressStartPeriod") java.time.LocalDateTime progressStartPeriod,
 								 @Param("progressEndPeriod") java.time.LocalDateTime progressEndPeriod, Pageable pageable);
 	
 	// 관리자 복합 검색
@@ -67,6 +68,6 @@ public interface EventInfoRepository extends JpaRepository<Event, Long> {
 	Page<Event> searchProgram(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
-	List<Event> findByprogressEndPeriodGreaterThanEqual(LocalDate progressEndPeriod, Sort sort); 
+	List<Event> findByProgressEndPeriodGreaterThanEqual(LocalDate progressEndPeriod, Sort sort); 
 	
 }

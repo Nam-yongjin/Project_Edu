@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale.Category;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -53,7 +52,7 @@ public class Event {
 	
 	@Enumerated(EnumType.STRING) //분류
 	@Column(nullable = false)
-	private Category category;
+	private EventCategory category;
 	
 	@Column(nullable = false) //신청 시작기간
 	private LocalDateTime applyStartPeriod;
