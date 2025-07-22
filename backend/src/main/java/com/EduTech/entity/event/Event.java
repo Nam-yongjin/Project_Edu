@@ -100,6 +100,7 @@ public class Event {
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true) //하나의 행사 여러 개의 파일 첨부 가능, 행사 삭제되면 파일도 같이 삭제
 	private List<EventFile> eventFiles = new ArrayList<>();
 	
+	// 해당코드 선택적으로 제거 가능 나중에 코드 작업 완료 후 제거후 시도
 	@PrePersist
 	public void prePersist() {
 	    if (this.applyAt == null) {

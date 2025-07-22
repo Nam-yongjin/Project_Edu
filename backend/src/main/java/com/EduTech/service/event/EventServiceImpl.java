@@ -58,15 +58,16 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	// 수업 날짜 생성 메서드 (요일 포함된 실제 수업일 계산)
-		private List<LocalDate> generateClassDates(LocalDate start, LocalDate end, List<Integer> daysOfWeek) {
-			List<LocalDate> dates = new ArrayList<>();
-			for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
-				if (daysOfWeek.contains(date.getDayOfWeek().getValue())) {
-					dates.add(date);
-				}
-			}
-			return dates;
-		}
+	private List<LocalDate> generateClassDates(LocalDate start, LocalDate end, List<Integer> daysOfWeek) {
+	    List<LocalDate> dates = new ArrayList<>();
+	    for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+	        int day = date.getDayOfWeek().getValue() % 7;
+	        if (daysOfWeek.contains(day)) {
+	            dates.add(date);
+	        }
+	    }
+	    return dates;
+	}
 	
 	
 	// 프로그램 등록
