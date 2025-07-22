@@ -1,5 +1,6 @@
 package com.EduTech.controller.member;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -16,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 public class RefreshTokenController {
 
 	// Access Token 재발급
-	@RequestMapping("/api/member/refresh")
-	public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {	
+	@RequestMapping("/api/refresh")
+	public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
 
 		// 유효성 검사
 		if (refreshToken == null) {
@@ -52,7 +53,7 @@ public class RefreshTokenController {
 	private boolean checkTime(Integer exp) {
 
 		// JWT exp를 날짜로 변환
-		java.util.Date expDate = new java.util.Date((long) exp * (1000));
+		Date expDate = new Date((long) exp * (1000));
 
 		// 현재 시간과의 차이 계산 - 밀리세컨즈
 		long gap = expDate.getTime() - System.currentTimeMillis();
