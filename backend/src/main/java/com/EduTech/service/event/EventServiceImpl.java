@@ -43,12 +43,12 @@ public class EventServiceImpl implements EventService {
 		return days.stream().map(num -> WEEK_KO[num % 7]).collect(Collectors.toList());
 	}
 	
-	private String calculateStatus(LocalDateTime applyStartyPeriod, LocalDateTime applyEndPeriod) {
+	private String calculateStatus(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
 		LocalDateTime now = LocalDateTime.now();
-		LocalDate applyStartDate = applyStartyPeriod.toLocalDate();
+		LocalDate applyStartDate = applyStartPeriod.toLocalDate();
 		LocalDate applyEndDate = applyEndPeriod.toLocalDate();
 
-		if (now.isBefore(applyStartyPeriod)) {
+		if (now.isBefore(applyStartPeriod)) {
 			return "신청전";
 		} else if (now.isAfter(applyEndPeriod)) {
 			return "신청마감";

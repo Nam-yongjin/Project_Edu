@@ -20,7 +20,7 @@ public class EventBannerDTO {
 	private String progName;		// 행사명
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDateTime applyStartyPeriod; // 신청시작기간(년 일 월)
+	private LocalDateTime applyStartPeriod; // 신청시작기간(년 일 월)
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDateTime applyEndPeriod; 	// 신청종료기간
