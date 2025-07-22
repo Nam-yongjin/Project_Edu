@@ -39,143 +39,120 @@ public class EventServiceImpl implements EventService {
 	
 	private static final String[] WEEK_KO = { "일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일" };
 	
+	// 요일 숫자를 한글 요일명으로 변경
 	private List<String> convertToDayNames(List<Integer> days) {
 		return days.stream().map(num -> WEEK_KO[num % 7]).collect(Collectors.toList());
 	}
 	
-	private String calculateStatus(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
-		LocalDateTime now = LocalDateTime.now();
-		LocalDate applyStartDate = applyStartPeriod.toLocalDate();
-		LocalDate applyEndDate = applyEndPeriod.toLocalDate();
-
-		if (now.isBefore(applyStartPeriod)) {
-			return "신청전";
-		} else if (now.isAfter(applyEndPeriod)) {
-			return "신청마감";
-		} else {
-			return "신청중";
-		}
-	}
+	// 현재 시간 기준으로 신청 상태 판단
+    private EventState calculateStatus(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(applyStartPeriod)) {
+            return EventState.신청전;
+        } else if (now.isAfter(applyEndPeriod)) {
+            return EventState.신청마감;
+        } else {
+            return EventState.신청중;
+        }
+    }
 	
-	// 수업 날짜 생성 메서드 (요일 포함된 실제 수업일 계산)
-	private List<LocalDate> generateClassDates(LocalDate start, LocalDate end, List<Integer> daysOfWeek) {
-	    List<LocalDate> dates = new ArrayList<>();
-	    for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
-	        int day = date.getDayOfWeek().getValue() % 7;
-	        if (daysOfWeek.contains(day)) {
-	            dates.add(date);
-	        }
-	    }
-	    return dates;
-	}
-	
-	
-	// 프로그램 등록
-	@Override
-	public void registerEvent(EventInfoDTO dto, MultipartFile file) {
-		if (dto.getDaysOfWeek() == null || dto.getDaysOfWeek().isEmpty()) {
-			throw new IllegalArgumentException("요일 정보가 누락되었습니다.");
-		}
-
-		Event info = modelMapper.map(dto, Event.class);
-		info.setApplyAt(LocalDateTime.now());
-		info.setState(EventState.valueOf(calculateStatus(dto.getApplyStartPeriod(), dto.getApplyEndPeriod())));
-		info.setDaysOfWeek(dto.getDaysOfWeek());
-
-		setFileInfo(info, file);	// 현재 코드 구현안해서 에러 뜨는 상태
-		infoRepository.save(info);
-
-	}
-	
-	// 프로그램 수정
-		@Override
-		public void updateEvent(Long eventNum, EventInfoDTO dto,  MultipartFile file) {
-
-			Event origin = infoRepository.findById(eventNum)
-					.orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
-
-			// 기존 파일 경로, 이름 백업
-			String originalFilePath = origin.getFilePath();
-			String originalFileName = origin.getOriginalName();
-
-			// DTO → 엔티티 매핑
-			LocalDateTime originalApplyAt = origin.getApplyAt();
-			modelMapper.map(dto, origin);
-			origin.setApplyAt(originalApplyAt);
-
-			// 파일이 비어있지 않다면 기존 파일 삭제 후 새 파일 저장
-			if (file != null && !file.isEmpty()) {
-				if (originalFilePath != null && !originalFilePath.isEmpty()) {
-					fileUtil.deleteFiles(List.of(originalFilePath));
-				}
-				setFileInfo(origin, file);
-
-			} else {
-				origin.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : originalFilePath);
-				origin.setOriginalName(dto.getOriginalName() != null ? dto.getOriginalName() : originalFileName);
-			}
-
-			infoRepository.save(origin);
-		}
+	// 행사 날짜 생성 메서드 (요일 포함된 실제 수업일 계산)
+    private List<LocalDate> generateClassDates(LocalDate start, LocalDate end, List<Integer> daysOfWeek) {
+        List<LocalDate> dates = new ArrayList<>();
+        for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+            int day = date.getDayOfWeek().getValue() % 7;
+            if (daysOfWeek.contains(day)) {
+                dates.add(date);
+            }
+        }
+        return dates;
+    }
+    
+    // 필수 입력값 검증
+    private void validateDto(EventInfoDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("행사 정보가 존재하지 않습니다.");
+        }
+        if (dto.getDaysOfWeek() == null || dto.getDaysOfWeek().isEmpty()) {
+            throw new IllegalArgumentException("요일 정보가 누락되었습니다.");
+        }
+    }
 	
 	
+ // 행사 등록
+    @Override
+    public void registerEvent(EventInfoDTO dto, MultipartFile file) {
+        validateDto(dto);
+        Event info = modelMapper.map(dto, Event.class);
+        info.setApplyAt(LocalDateTime.now());
+        info.setState(calculateStatus(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
+        info.setDaysOfWeek(dto.getDaysOfWeek());
+        setFileInfo(info, file);
+        infoRepository.save(info);
+    }
+	
+    // 행사 수정
+    @Override
+    public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
+        validateDto(dto);
+
+        Event origin = infoRepository.findById(eventNum)
+            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+
+        String originalFilePath = origin.getFilePath();
+        String originalFileName = origin.getOriginalName();
+        LocalDateTime originalApplyAt = origin.getApplyAt();
+
+        modelMapper.map(dto, origin);
+        origin.setApplyAt(originalApplyAt);
+
+        if (file != null && !file.isEmpty()) {
+            if (originalFilePath != null && !originalFilePath.isEmpty()) {
+                fileUtil.deleteFiles(List.of(originalFilePath));
+            }
+            setFileInfo(origin, file);
+        } else {
+            origin.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : originalFilePath);
+            origin.setOriginalName(dto.getOriginalName() != null ? dto.getOriginalName() : originalFileName);
+        }
+
+        infoRepository.save(origin);
+    }
 		
 		
 		
-	
-		// 파일 처리 공통 메서드
-		private void setFileInfo(Event info, MultipartFile file) {
-			log.info("setFileInfo called. file is null: {}, file is empty: {}", (file == null),
-					(file != null && file.isEmpty()));
+    // 파일 저장 및 유효성 검사
+    private void setFileInfo(Event info, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            log.info("파일이 전달되지 않음 → 기존 파일 유지");
+            return;
+        }
 
-			// 파일이 넘어온 경우 (새 파일이 업로드 되었거나 기존 파일을 변경하는 경우)
-			if (file != null && !file.isEmpty()) {
-				String originalFilename = file.getOriginalFilename();
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isEmpty()) {
+            throw new IllegalArgumentException("파일 이름이 존재하지 않습니다.");
+        }
 
-				if (originalFilename == null || originalFilename.isEmpty()) {
-					throw new IllegalArgumentException("파일 이름이 존재하지 않습니다.");
-				}
+        String lowerCaseFilename = originalFilename.toLowerCase();
+        boolean isAllowed = lowerCaseFilename.endsWith(".hwp") || lowerCaseFilename.endsWith(".pdf");
+        if (!isAllowed) {
+            throw new IllegalArgumentException("hwp 또는 pdf 파일만 업로드 가능합니다.");
+        }
 
-				// 파일 확장자 검사: .hwp 또는 .pdf 파일만 허용
-				String lowerCaseFilename = originalFilename.toLowerCase();
-				boolean isAllowedDocument = lowerCaseFilename.endsWith(".hwp") || lowerCaseFilename.endsWith(".pdf");
+        String oldPath = info.getFilePath();
+        if (oldPath != null && !oldPath.isEmpty()) {
+            fileUtil.deleteFiles(List.of(oldPath));
+        }
 
-				if (!isAllowedDocument) { // .hwp 또는 .pdf 파일이 아닌 경우
-					throw new IllegalArgumentException("hwp 또는 pdf 파일만 업로드 가능합니다.");
-				}
-
-				// 기존 파일 삭제 (있으면)
-				String oldPath = info.getFilePath();
-				if (oldPath != null && !oldPath.isEmpty()) {
-					try {
-						fileUtil.deleteFiles(List.of(oldPath));
-						log.info("기존 파일 삭제 완료: {}", oldPath);
-					} catch (RuntimeException e) {
-						log.warn("기존 파일 삭제 실패: {}", oldPath, e);
-						throw e;
-					}
-				}
-
-				// 새 파일 저장
-				List<Object> uploaded = fileUtil.saveFiles(List.of(file), "program");
-				if (!uploaded.isEmpty()) {
-					@SuppressWarnings("unchecked")
-					Map<String, String> fileInfoMap = (Map<String, String>) uploaded.get(0);
-					info.setOriginalName(fileInfoMap.get("originalName"));
-					info.setFilePath(fileInfoMap.get("filePath"));
-					log.info("New file saved. OriginalName: {}, FilePath: {}", fileInfoMap.get("originalName"),
-							fileInfoMap.get("filePath"));
-				}
-
-			}
-			// 파일이 전달되지 않은 경우 (file == null || file.isEmpty()) -> 기존 파일 유지
-			else {
-				log.info("파일이 전달되지 않음 → 기존 파일 유지");
-			}
-		}
-	
-	
-	
+        List<Object> uploaded = fileUtil.saveFiles(List.of(file), "program");
+        if (!uploaded.isEmpty()) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> fileInfoMap = (Map<String, String>) uploaded.get(0);
+            info.setOriginalName(fileInfoMap.get("originalName"));
+            info.setFilePath(fileInfoMap.get("filePath"));
+            log.info("파일 저장 완료 - 이름: {}, 경로: {}", fileInfoMap.get("originalName"), fileInfoMap.get("filePath"));
+        }
+    }
 	
 	
 }
