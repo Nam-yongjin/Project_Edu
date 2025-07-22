@@ -34,7 +34,8 @@ import lombok.NoArgsConstructor;
 public class Notice extends BaseEntity{
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//식별자값 자도 생성, DB에서도 수정해줘야 함
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	private Long noticeNum; //공지사항번호(PK)
 	
 	private String title; //제목
@@ -55,9 +56,9 @@ public class Notice extends BaseEntity{
 	@JoinColumn(name = "memId", nullable = false) //회원아이디
 	private Member member;
 	
-	//하나의 공지글에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
+	//하나의 공지글에 여러 개의 파일 첨부 가능, 공지글이 삭제되면 파일도 같이 삭제
 	@Builder.Default
-	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<NoticeFile> noticeFile = new ArrayList<>();
 	
 }
