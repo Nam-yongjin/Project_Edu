@@ -70,10 +70,10 @@ public class EventServiceImpl implements EventService {
     }
 	
 	// ========================================
-    // 3. 프로그램 등록/수정/삭제
+    // 3. 행사 등록/수정/삭제
     // ========================================
 	
-	// 프로그램 등록
+	// 행사 등록
 	@Override
     public void registerEvent(EventInfoDTO dto, MultipartFile file) {
         EventInfo info = modelMapper.map(dto, EventInfo.class);
@@ -82,6 +82,35 @@ public class EventServiceImpl implements EventService {
         setFileInfo(info, file);
         infoRepository.save(info);
     }
+	
+	// 행사 수정
+	@Override
+    public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
+        EventInfo origin = infoRepository.findById(eventNum)
+        		.orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+
+        String originalFilePath = origin.getFilePath();
+        String originalFileName = origin.getOriginalName();
+
+        modelMapper.map(dto, origin);
+
+        if (file != null && !file.isEmpty()) {
+            if (originalFilePath != null && !originalFilePath.isEmpty()) {
+                fileUtil.deleteFiles(List.of(originalFilePath));
+            }
+            setFileInfo(origin, file);
+        } else {
+            origin.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : originalFilePath);
+            origin.setOriginalName(dto.getOriginalName() != null ? dto.getOriginalName() : originalFileName);
+        }
+
+        infoRepository.save(origin);
+    }
+	
+	
+	
+	
+	
 	
 	
 	
@@ -92,7 +121,7 @@ public class EventServiceImpl implements EventService {
 	    EventInfo info = use.getEventInfo();
 	    Member member = use.getMember();
 
-	    String state = info.getEventEndPeriod().isBefore(LocalDate.now()) ? "강의종료" : "신청완료";
+	    String state = info.getEventEndPeriod().isBefore(LocalDate.now()) ? "행사종료" : "신청완료";
 
 	    String eventStartPeriod = info.getEventStartPeriod() != null ? info.getEventStartPeriod().toString() : "";
 	    String eventEndPeriod = info.getEventEndPeriod() != null ? info.getEventEndPeriod().toString() : "";
@@ -104,20 +133,21 @@ public class EventServiceImpl implements EventService {
 	            .eventName(info.getEventName())
 	            .eventStartPeriod(info.getEventStartPeriod())
 	            .eventEndPeriod(info.getEventEndPeriod())
-	            .place(info.getRoom())
-	            .capacity(info.getCapacity())
-	            .current(useRepository.countByProgram(info.getProgNo()))
-	            .state(state)
-	            .mid(member != null ? member.getMid() : null)
+	            .place(info.getPlace())
+	            .maxCapacity(info.getMaxCapacity())
+	            .currCapacity(useRepository.countByEvent(info.getCurrCapacity()))
+	            .revState(state)
+	            .memId(member != null ? member.getMemId() : null)
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
 	            .phone(member != null ? member.getPhone() : null)
 	            .build();
 	}
 
-	private void setFileInfo(ProgramInfo info, MultipartFile file) {
+	private void setFileInfo(EventInfo info, MultipartFile file) {
 	    if (file != null && !file.isEmpty()) {
 	        String originalFilename = file.getOriginalFilename();
+	        
 	        if (originalFilename == null || originalFilename.isEmpty()) {
 	            throw new IllegalArgumentException("파일 이름이 존재하지 않습니다.");
 	        }
@@ -142,5 +172,5 @@ public class EventServiceImpl implements EventService {
 	            info.setFilePath(fileInfoMap.get("filePath"));
 	        }
 	    }
-	
+	}
 }
