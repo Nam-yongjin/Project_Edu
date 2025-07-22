@@ -279,8 +279,12 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	// 회원 탈퇴
+	@Override
 	public void leaveMember(String memId) {
 		Member member = memberRepository.findById(memId).orElseThrow();
+		
+		// 현재 예약중인 시설, 행사, 실증대여 있을시 탈퇴불가 처리
+		
 		member.setState(MemberState.LEAVE);
 		memberRepository.save(member);
 	}
