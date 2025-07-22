@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EduTech.dto.event.EventApplyRequestDTO;
+import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.Event;
@@ -36,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class EventServiceImplold implements EventServiceold {
 	
-	private static final Logger log = LoggerFactory.getLogger(EventServiceImplold.class);
+	private static final Logger logㄴ = LoggerFactory.getLogger(EventServiceImplold.class);
 	
 	private final EventBannerRepository bannerRepository;
 	private final EventInfoRepository infoRepository;
@@ -265,6 +267,108 @@ public class EventServiceImplold implements EventServiceold {
             log.info("파일 저장 완료 - 이름: {}, 경로: {}", fileInfoMap.get("originalName"), fileInfoMap.get("filePath"));
         }
     }
+
+	@Override
+	public List<EventBannerDTO> getAllBanners() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<EventInfoDTO> getAllEvent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public EventInfoDTO getEvent(Long eventNum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public EventInfoDTO getEventEntity(Long eventNum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerBanner(EventBannerDTO dto, MultipartFile file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteBanner(Long evtFileNum) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void applyEvent(EventApplyRequestDTO dto) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cancelEvent(Long evtRevNum) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isAlreadyApplied(Long eventNum, String memId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAvailable(Long eventNum) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isAllEventOccupied(EventInfoDTO request) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEventAvailable(EventInfoDTO request) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Map<String, Boolean> getEventAvailabilityStatus(EventInfoDTO dto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Page<EventInfoDTO> getEventList(Pageable pageable, String title, String eventInfo, String state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<EventInfoDTO> searchNotEndEventList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 }

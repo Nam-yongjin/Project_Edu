@@ -21,8 +21,8 @@ public class EventUseDTO {
 	private LocalDateTime applyAt;			// 행사신청일
 	private String eventName;				// 행사명
 	
-	private LocalDateTime progressStartPeriod;	// 행사시작기간
-	private LocalDateTime progressEndPeriod;	// 행사종료기간
+	private LocalDateTime eventStartPeriod;	// 행사시작기간
+	private LocalDateTime eventEndPeriod;	// 행사종료기간
 	
 	private String place;					// 장소
 	private Integer maxCapacity;			// 모집인원

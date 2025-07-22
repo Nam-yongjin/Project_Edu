@@ -38,8 +38,8 @@ public class EventInfo {
 	@Column(nullable = false)
 	private LocalDateTime applyEndPeriod; // 신청종료기간
 
-	@Column(nullable = false, length = 20)
-	private EventState status; // 신청전 / 신청중 / 신청마감 등
+	@Column(nullable = false, length = 20) // 신청전 / 신청중 / 신청마감 등
+	private String status;
 
 /*		필요 없을것으로 예상중
 	@Builder.Default
