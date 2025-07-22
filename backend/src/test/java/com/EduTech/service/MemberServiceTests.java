@@ -4,21 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
+import com.EduTech.repository.demonstration.DemonstrationImageRepository;
+import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
+import com.EduTech.repository.demonstration.DemonstrationRepository;
+import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
+import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.notice.NoticeFileRepository;
 import com.EduTech.service.member.MemberService;
@@ -40,6 +43,16 @@ public class MemberServiceTests {
 	
 	@MockBean	// 오류나는것 제외하고 실행
 	private NoticeFileRepository noticeFileRepository;
+	@MockBean
+	private DemonstrationReserveRepository demonstrationReserveRepository;
+	@MockBean
+	private DemonstrationRepository demonstrationRepository;
+	@MockBean
+	private DemonstrationImageRepository demonstrationImageRepository;
+	@MockBean
+	private DemonstrationTimeRepository demonstrationTimeRepository;
+	@MockBean
+	private DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 
 //	@Test
 	public void testCheckId() {
@@ -102,5 +115,12 @@ public class MemberServiceTests {
 	    assertFalse(updatedMember.isCheckSms());
 	    assertTrue(updatedMember.isCheckEmail());
 	    assertEquals("둔산중학교", updatedStudent.getSchoolName());
+	}
+	
+	@Test
+	public void testLeaveMember() {
+		Member member = memberRepository.findById("user9").orElseThrow();
+		memberService.leaveMember("user9");
+		assertEquals(MemberState.LEAVE, member.getState());
 	}
 }
