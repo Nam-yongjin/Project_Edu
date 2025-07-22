@@ -37,7 +37,7 @@ public class EventUse {
 	
 	@Enumerated(EnumType.STRING) //상태
 	@Column(nullable = false)
-	private RevState state;
+	private String state;
 
 	// FK 프로그램 정보 id
 	@ManyToOne(fetch = FetchType.LAZY)
