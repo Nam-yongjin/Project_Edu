@@ -1,7 +1,6 @@
 package com.EduTech.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,12 +29,11 @@ import com.EduTech.repository.notice.NoticeFileRepository;
 import com.EduTech.repository.notice.NoticeRepository;
 import com.EduTech.util.FileUtil;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 
 @SpringBootTest
-public class NoticeRepositoryTest {
+public class NoticeRepositoryTests {
 	
 	@Autowired
 	private NoticeRepository noticeRepository;
@@ -97,7 +95,7 @@ public class NoticeRepositoryTest {
 				.build();
 				
 		NoticeFile file = NoticeFile.builder()
-                .originalName("flower.png")
+                .originalName("create.png")
                 .filePath("/files/create.png")
                 .fileType("png")
                 .notice(notice)
@@ -220,22 +218,14 @@ public class NoticeRepositoryTest {
         noticeRepository.deleteById(noticeNum);
         noticeRepository.flush();
         
-//        assertThatThrownBy(() -> {
-//            noticeRepository.findById(noticeNum).orElseThrow(() -> new EntityNotFoundException("공지사항 없음"));
-//        }).isInstanceOf(EntityNotFoundException.class);
-//
-//        assertThat(noticeFileRepository.findById(noticeNum)).isEmpty(); // 이건 Optional로 처리
-        
         boolean noticeExists = noticeRepository.findById(noticeNum).isPresent();
         boolean fileExists = noticeFileRepository.findById(noticeNum).isPresent();
-        System.out.println("삭제 후 공지사항 존재 여부: " + noticeExists);
-        System.out.println("삭제 후 첨부파일 존재 여부: " + fileExists);
+        //false가 나와야 삭제된 것(양방향 매핑 확인, cascade = CascadeType.ALL 확인)
+        System.out.println("공지사항 삭제 여부 확인: " + noticeExists);
+        System.out.println("첨부파일 삭제 여부 확인: " + fileExists);
         
         assertThat(noticeExists).isFalse();
 	}
-	
-	 
-	
 	
 }
 	
