@@ -45,6 +45,5 @@ public class EventInfoDTO {
 	private String filePath;		// 대표 파일 저장경로
 	
 	private List<Integer> daysOfWeek; // 요일 (숫자)
-	private List<String> dayNames;
 	
 }

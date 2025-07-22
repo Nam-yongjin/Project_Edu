@@ -41,7 +41,7 @@ public class EventReserve {
 	
 	@Enumerated(EnumType.STRING) //상태
 	@Column(nullable = false)
-	private EventState state;
+	private RevState state;
 		
 	@ManyToOne(fetch = FetchType.LAZY) //한 명의 회원이 여러 개의 신청 가능
 	@JoinColumn(name = "memId") //회원아이디
