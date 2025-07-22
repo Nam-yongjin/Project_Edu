@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.EduTech.entity.event.EventCategory;
+import com.EduTech.entity.event.RevState;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -14,7 +15,7 @@ public class EventInfoDTO {
 	private Long eventNum;			// 행사 아이디
 	private String eventName;		// 행사명
 	private String eventInfo;		// 소개
-	private String revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
+	private RevState revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
 	private String target;			// 모집대상
 	private EventCategory category; // 모집대상 분류 (일반인, 학생, 선생)
 	private Integer maxCapacity;	// 모집인원

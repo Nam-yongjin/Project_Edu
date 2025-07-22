@@ -17,7 +17,7 @@ import com.EduTech.entity.event.EventState;
 import com.EduTech.repository.event.EventBannerRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.event.EventReserveRepository;
-import com.EduTech.service.event.EventServiceImpl;
+import com.EduTech.service.event.EventServiceImplold;
 import com.EduTech.util.FileUtil;
 
 public class EventServiceImplTest {
@@ -28,7 +28,7 @@ public class EventServiceImplTest {
     private FileUtil fileUtil;
     private ModelMapper modelMapper;
 
-    private EventServiceImpl eventService;
+    private EventServiceImplold eventService;
 
     @BeforeEach
     void setUp() {
@@ -38,7 +38,7 @@ public class EventServiceImplTest {
         fileUtil = mock(FileUtil.class);
         modelMapper = new ModelMapper();
 
-        eventService = new EventServiceImpl(
+        eventService = new EventServiceImplold(
                 bannerRepository,
                 infoRepository,
                 reserveRepository,
