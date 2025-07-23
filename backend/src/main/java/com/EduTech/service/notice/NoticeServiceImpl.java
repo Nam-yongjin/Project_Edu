@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,7 +167,7 @@ public class NoticeServiceImpl implements NoticeService {
 		
 	//공지사항 상세 조회
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true) //읽기 전용
 	public NoticeDetailDTO getNoticeDetail(Long noticeNum) {
 		Notice notice = noticeRepository.findById(noticeNum).get();
 		
@@ -213,13 +214,28 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<NoticeListDTO> findPinned(){
+		Sort sort = Sort.by("createdAt").descending(); //작성일 기준으로 내림차순
+		List<Notice> noticeList = noticeRepository.findAllByIsPinned(true, sort); //고정된 공지 -> 작성일 기준 내림차순으로 리스트
 		
+		List<NoticeListDTO> dtoList = noticeList.stream()
+				.map(notice -> {
+					NoticeListDTO noticeListDTO = modelMapper.map(notice, NoticeListDTO.class); //엔티티를 DTO로 매핑
+		            if (notice.getMember() != null) { //member가 null이 아닐 때
+		                noticeListDTO.setName(notice.getMember().getName()); //작성자 설정
+		            }
+		            return noticeListDTO; //noticeListDTO로 반환
+		        })	
+				.collect(Collectors.toList()); //리스트로 수집
 		
+		return dtoList; //dtoList로 반환
+			
 	}
 		
 	//상세 공지 조회 시 조회수 증가
 	@Override
 	public void increaseView(Long noticeNum) {
+		Notice notice = noticeRepository.findById(noticeNum).get();
+		notice.setView(notice.getView() + 1);
 		
 	}
 
