@@ -22,6 +22,9 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
+import com.EduTech.repository.event.EventBannerRepository;
+import com.EduTech.repository.event.EventInfoRepository;
+import com.EduTech.repository.event.EventUseRepository;
 import com.EduTech.repository.member.CompanyRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.StudentRepository;
@@ -68,28 +71,37 @@ public class MemberRepositoryTests {
 	private DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
+	@MockBean
+	private EventBannerRepository eventBannerRepository;
+	@MockBean
+	private EventInfoRepository eventInfoRepository;
+	@MockBean
+	private EventUseRepository eventUseRepository;
 
 //	등록 테스트
-//	@Test
+	@Test
+	@Transactional
+	@Commit
 	public void testInsertMember() {
-		for (int i = 0; i < 10; i++) {
-			Member member = Member.builder()
-					.memId("user" + i)
-					.pw(passwordEncoder.encode("a" + i))
-					.name("USER" + i)
-					.email("aaa" + i + "@test.com")
-					.birthDate(LocalDate.of(2025, 7, 15))
-					.gender(MemberGender.MALE)
-					.phone("0101234321" + i)
-					.addr("테스트주소" + i)
-					.addrDetail("테스트 상세주소"+i)
-					.checkSms(true)
-					.checkEmail(false)
-					.state(MemberState.NORMAL)
-					.role(MemberRole.USER)
-					.build();
-			memberRepository.save(member);
-		}
+
+		Member member = Member.builder()
+				.memId("oj4263")
+				.pw(passwordEncoder.encode("qwer1234!@#$"))
+				.name("남용진")
+				.email("oj4263@test.com")
+				.birthDate(LocalDate.of(2000, 7, 5))
+				.gender(MemberGender.MALE)
+				.phone("01012345678")
+				.addr("테스트주소")
+				.addrDetail("테스트 상세주소")
+				.checkSms(true)
+				.checkEmail(false)
+				.state(MemberState.NORMAL)
+				.role(MemberRole.USER)
+				.build();
+		memberRepository.save(member);
+		memberRepository.flush();;
+		
 	}
 	
 //	@Test

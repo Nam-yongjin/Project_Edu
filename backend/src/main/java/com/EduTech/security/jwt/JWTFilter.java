@@ -28,7 +28,14 @@ public class JWTFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String authHeader = request.getHeader("Authorization");
-
+			if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			    response.setContentType("application/json;charset=UTF-8");
+			    Gson gson = new Gson();
+			    String json = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+			    response.getWriter().println(json);
+			    return; // 더 이상 처리 안 함
+			}
 			String accessToken = authHeader.substring(7);
 
 			Map<String, Object> claims = JWTProvider.validateToken(accessToken);
@@ -48,7 +55,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		} catch (Exception e) {
 			Gson gson = new Gson();
-			String json = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+			String json = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN", "message", e.getMessage()));
 
 			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().println(json);
