@@ -255,7 +255,7 @@ public class DemonstrationServiceTests {
 		DemonstrationDetailDTO demonstrationDetailDTO=demonstrationService.getDemDetailList(demNum);
 		System.out.println(demonstrationDetailDTO);
 	}
-	/*
+	
 	@Test
 	@DisplayName("예약 테스트")
 	void reservationDem() {
@@ -270,7 +270,7 @@ public class DemonstrationServiceTests {
 		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
 	}
 
-*/
+
 	
 	//@Test
 	@DisplayName("예약 취소")
@@ -378,7 +378,7 @@ public class DemonstrationServiceTests {
 		
 		demonstrationService.deleteDemonstration(demNum);
 	}
-	@Test
+	//@Test
 	public void test1() {
 		System.out.println("hello!");
 	}
