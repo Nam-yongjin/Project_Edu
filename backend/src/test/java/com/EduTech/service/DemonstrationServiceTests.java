@@ -12,13 +12,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
-import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
@@ -32,7 +30,6 @@ import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.dto.demonstration.PageResponseDTO;
 import com.EduTech.entity.demonstration.DemonstrationState;
-import com.EduTech.entity.member.Member;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
@@ -40,6 +37,7 @@ import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.demonstration.DemonstrationService;
+import com.EduTech.service.event.EventServiceImpl;
 import com.EduTech.util.FileUtil;
 
 @SpringBootTest
@@ -62,6 +60,9 @@ public class DemonstrationServiceTests {
 	MemberRepository memberRepository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@MockBean
+	EventServiceImpl eventServiceImpl;
+
 	// @Test
 	@DisplayName("검색어 없는 실증 교사 조회 테스트")
 	void getAllDemResWithoutSearch() {
@@ -147,7 +148,7 @@ public class DemonstrationServiceTests {
 			System.out.println(item);
 		});
 	}
-
+/* Admin으로 뺏음
 	// @Test
 	@DisplayName("실증 교사 신청 조회 승인 / 거부 상태 변화 테스트")
 	void changeResState() {
@@ -167,7 +168,7 @@ public class DemonstrationServiceTests {
 		demonstrationApprovalRegDTO.setMemId(Member.builder().memId("user").build().getMemId());
 		demonstrationService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
 	}
-
+*/
 	// @Test
 	@DisplayName("실증 신청 물품 대여 현황 조회 테스트")
 	void getDemRental() {
@@ -247,8 +248,8 @@ public class DemonstrationServiceTests {
 		System.out.println(demonstrationDetailDTO);
 	}
 	
-	//@Test
-	@DisplayName("예약 확인")
+	@Test
+	@DisplayName("예약 테스트")
 	void reservationDem() {
 		DemonstrationReservationDTO demonstrationReservationDTO=new DemonstrationReservationDTO();
 		demonstrationReservationDTO.setMemId("user2");
