@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 
+import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.repository.event.EventInfoRepository;
@@ -41,7 +42,7 @@ public class EventInfoRepositoryTest {
                 .place("장소")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 1, 14, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 8, 18, 0))
-                .target("누구나")
+                .category(EventCategory.USER) 
                 .state(EventState.OPEN)
                 .currCapacity(0) // 👉 추가 권장
                 .maxCapacity(10)
@@ -72,7 +73,7 @@ public class EventInfoRepositoryTest {
                 .place("강의실 2")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 2, 10, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 9, 12, 0))
-                .target("성인")
+                .category(EventCategory.USER) 
                 .state(EventState.BEFORE) // ✅ 상태 필수
                 .currCapacity(0)          // ✅ 현재 인원 필수
                 .maxCapacity(20)
@@ -110,7 +111,7 @@ public class EventInfoRepositoryTest {
                 .place("로비")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 3, 9, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 10, 11, 0))
-                .target("아동")
+                .category(EventCategory.USER) 
                 .state(EventState.OPEN)
                 .maxCapacity(25)
                 .originalName("수정계획서.docx")
@@ -148,7 +149,7 @@ public class EventInfoRepositoryTest {
                 .place("강의실 1")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 4, 10, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 11, 10, 0))
-                .target("성인")
+                .category(EventCategory.USER) 
                 .state(EventState.BEFORE)        // ✅ 필수
                 .currCapacity(0)                 // ✅ 필수
                 .eventInfo("삭제 테스트용 설명입니다") // ✅ 필수
