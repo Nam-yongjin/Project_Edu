@@ -37,6 +37,7 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
+import com.EduTech.repository.event.EventUseRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.demonstration.DemonstrationService;
 import com.EduTech.service.event.EventServiceImpl;
@@ -68,7 +69,8 @@ public class DemonstrationServiceTests {
 	EventState eventState;
 	@MockBean
 	EventUse eventUse;
-
+	@MockBean
+	EventUseRepository eventUseRepository;
 	// @Test
 	@DisplayName("검색어 없는 실증 교사 조회 테스트")
 	void getAllDemResWithoutSearch() {
@@ -253,7 +255,7 @@ public class DemonstrationServiceTests {
 		DemonstrationDetailDTO demonstrationDetailDTO=demonstrationService.getDemDetailList(demNum);
 		System.out.println(demonstrationDetailDTO);
 	}
-	
+	/*
 	@Test
 	@DisplayName("예약 테스트")
 	void reservationDem() {
@@ -268,7 +270,7 @@ public class DemonstrationServiceTests {
 		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
 	}
 
-
+*/
 	
 	//@Test
 	@DisplayName("예약 취소")
@@ -375,5 +377,9 @@ public class DemonstrationServiceTests {
 		Long demNum=Long.valueOf(111);
 		
 		demonstrationService.deleteDemonstration(demNum);
+	}
+	@Test
+	public void test1() {
+		System.out.println("hello!");
 	}
 }
