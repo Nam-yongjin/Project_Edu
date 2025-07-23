@@ -17,6 +17,6 @@ public interface NewsRepository extends JpaRepository<News, Long>, JpaSpecificat
 	Page<News> findAll(Specification<News> spec, Pageable pageable); //Specification 조건에 맞는 공지사항을 페이징 처리해서 가져옴
 
 	@Transactional
-	void deleteBynewsNumIn(List<Long> ids); //일괄삭제(newsNum값들의 목록){
+	void deleteBynewsNumIn(List<Long> ids); //일괄삭제(newsNum값들의 목록)
 
 }

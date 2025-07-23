@@ -17,8 +17,6 @@ public class NewsCreateDTO {
 	
 	private String memId; //아이디
 	
-	private List<String> fileUrls; //첨부할 Url
-	
 	private List<MultipartFile> files; //첨부할 파일
 
 }
