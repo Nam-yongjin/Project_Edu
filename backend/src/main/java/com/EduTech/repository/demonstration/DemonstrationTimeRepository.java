@@ -17,6 +17,7 @@ public interface DemonstrationTimeRepository extends JpaRepository<Demonstration
 	
 	// 클라이언트로부터 시작 날짜와 끝 날짜, 실증 제품 번호를 가져와
 	// 해당 날짜가 예약 되있는지 아닌지 상태값 받는 쿼리
+	// 해당 달의 시작 일과 끝일을 받는것!
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeResDTO(dt.demDate,dt.state,dt.demonstration.demNum) FROM DemonstrationTime dt WHERE dt.demDate BETWEEN :startDate AND :endDate AND dt.demonstration.demNum = :demNum")
 	List<DemonstrationTimeResDTO> findReservedDates(
 	    @Param("startDate") LocalDate startDate,
@@ -24,10 +25,15 @@ public interface DemonstrationTimeRepository extends JpaRepository<Demonstration
 	    @Param("demNum") Long demNum
 	);
 
-	// 수정된 데이터가 기존 데이터 보다 더 짧은 날짜일 경우,
-	// 그 사이의 날짜에 대하여 삭제하는 쿼리문
+	// 기존 날짜 정보를 가져와 삭제하는 쿼리문
 	@Modifying
 	@Transactional
-	@Query("DELETE FROM DemonstrationTime WHERE demDate IN:demDates")
-	void deleteDemTimes(@Param("demDates") List<LocalDate> demDates);
+	@Query("DELETE FROM DemonstrationTime WHERE demDate BETWEEN :startDate AND :endDate")
+	void deleteDemTimes(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+	
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM DemonstrationTime WHERE demDate IN :demDate")
+	void deleteDemTimeList(@Param("demDate") List<LocalDate> demDate);
+
 }

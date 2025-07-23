@@ -1,0 +1,28 @@
+package com.EduTech.dto.demonstration;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+// 실증 장비 신청 상세 페이지용 dto (백->클라이언트)
+@Data
+@NoArgsConstructor
+public class DemonstrationDetailDTO {
+
+	private Long demNum;
+	private String demName;
+	private String demInfo;
+	private Long itemNum;
+	private LocalDate expDate;
+	private List<DemonstrationImageDTO> imageList;
+	// 실증 장비 신청 상세 페이지용 생성자
+	public DemonstrationDetailDTO(Long demNum, String demName, String demInfo, Long itemNum, LocalDate expDate) {
+		this.demNum = demNum;
+		this.demName = demName;
+		this.demInfo = demInfo;
+		this.itemNum = itemNum;
+		this.expDate = expDate;
+	}
+}

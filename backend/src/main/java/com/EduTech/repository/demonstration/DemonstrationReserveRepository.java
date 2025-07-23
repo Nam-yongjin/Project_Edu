@@ -49,13 +49,16 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 			@Param("demNum") Long demNum, @Param("memId") String memId);
 
 	@Modifying // 물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate를 변경하는 쿼리문
-	@Query("UPDATE DemonstrationReserve dr SET endDate=:changeDate WHERE demRevNum=:demRevNum")
+	@Query("UPDATE DemonstrationReserve SET endDate=:endDate, startDate=:startDate WHERE demRevNum=:demRevNum AND member.memId=:memId")
 	@Transactional
-	int updateDemResChangeDate(@Param("changeDate") LocalDate changeDate, @Param("demRevNum") Long demRevNum);
+	int updateDemResChangeDate(@Param("startDate") LocalDate startDate,@Param("endDate") LocalDate endDate, @Param("demRevNum") Long demRevNum,@Param("memId") String memId);
 
 	@Modifying // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Transactional
 	@Query("UPDATE DemonstrationReserve dr SET state=:state WHERE member.memId=:memId AND demRevNum=:demRevNum")
 	int updateDemResChangeState(@Param("state") DemonstrationState state, @Param("memId") String memId,@Param("demRevNum") Long demRevNum);
 
+	// 나중에 회원 탈퇴할때, 실증 신청 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
+	@Query("SELECT state FROM DemonstrationReserve WHERE member.memId=:memId")
+	DemonstrationState findByState(@Param("memId") String memId);
 }
