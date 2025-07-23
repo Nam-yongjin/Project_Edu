@@ -16,7 +16,7 @@ public interface EventUseRepository extends JpaRepository<EventUse, Long>{
 
 	boolean existsByEventInfo_eventNumAndMember_memId(Long eventNum, String memId);	// 중복신청 여부 확인
 
-	@Query("SELECT COUNT(p) FROM EventBanner p WHERE p.event.eventNum = :eventNum")	// 신청자 수 카운트
+	@Query("SELECT COUNT(p) FROM EventBanner p WHERE p.eventInfo.eventNum = :eventNum")	// 신청자 수 카운트
 	int countByEvent(@Param("eventNum") Long eventNum);	// eventNum 앞이 int 인지 Long인지 모르겠다
 
 	List<EventUse> findByMember_MemId(String memId);	// 회원별 신청목록 조회(리스트 형태)
@@ -28,7 +28,7 @@ public interface EventUseRepository extends JpaRepository<EventUse, Long>{
 	Page<EventUse> findByMember(Member member, Pageable pageable);	// Member기준으로 예약내역 조회
 
 	// member 함께 로딩해서 DTO 변환시 NPE(널포인터예외) 방지
-		@Query("SELECT pu FROM EventBanner pu JOIN FETCH pu.member WHERE pu.event.eventNum = :eventNum")
+		@Query("SELECT pu FROM EventBanner pu JOIN FETCH pu.member WHERE pu.eventInfo.eventNum = :eventNum")
 		List<EventUse> findWithMemberByEvent_EventNum(@Param("eventNum") Long eventNum);
 	// ---------- 탈퇴 회원 프로그램 신청 내역 삭제 ----------
 
