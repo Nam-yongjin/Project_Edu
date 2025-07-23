@@ -216,19 +216,12 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeReqDTO.setStartDate(demonstrationReservationDTO.getStartDate());
 		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
 		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
-		LocalDate existingStart = ResState.get(0).getDemDate(); // 기존 시작 날짜
-		LocalDate existingEnd = ResState.get(ResState.size() - 1).getDemDate(); // 기존 끝 날짜
-		LocalDate newStart = demonstrationReservationDTO.getStartDate(); // 새로운 시작 날짜
-		LocalDate newEnd = demonstrationReservationDTO.getEndDate(); // 새로운 끝 날짜
-		
-		// 새 시작날짜가 기존 끝날짜보다 클 경우,
-		// 또는 기존 시작날짜보다 새 끝 날짜가 작을경우,
-		// 조건문 걸어서 예약 안겹치게 예외처리
-		if (newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd)) { 
-			// 클라이언트로부터 받아온 정보로 demRes 테이블에 추가
+
+		if(ResState==null||ResState.isEmpty())
+		{
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
-					.startDate(demonstrationReservationDTO.getStartDate()).endDate(demonstrationReservationDTO.getEndDate())
-					.state(DemonstrationState.WAIT)
+					.startDate(demonstrationReservationDTO.getStartDate())
+					.endDate(demonstrationReservationDTO.getEndDate()).state(DemonstrationState.WAIT)
 					.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
 					.member(Member.builder().memId(demonstrationReservationDTO.getMemId()).build()).build();
 			demonstrationReserveRepository.save(demonstrationReserve);
@@ -239,7 +232,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			for (LocalDate date = demonstrationReservationDTO.getStartDate(); !date
 					.isAfter(demonstrationReservationDTO.getEndDate()); date = date.plusDays(1)) {
 				DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date).state(true)
-						.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
+						.demonstration(
+								Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
 						.build();
 				demonstrationTimeList.add(demonstrationTime);
 			} // 변경 전 날짜로 부터 변경 후 까지의 날짜의 예약 상태 추가
@@ -247,10 +241,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			demonstrationTimeRepository.saveAll(demonstrationTimeList);
 		}
 		else {
-			System.out.println("겹치는 예약이 존재합니다.");
+			System.out.println("예약된 날짜가 겹쳐 있습니다.");
 		}
-		
-
 	}
 
 	// 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
@@ -278,20 +270,18 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
 	}
 
-	
 	// 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@Override
 	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO) {
-		 // 기존 예약 취소
-	    DemonstrationReservationCancelDTO demonstrationReservationcancelDTO = new DemonstrationReservationCancelDTO();
-	    demonstrationReservationcancelDTO.setMemId(demonstrationReservationDTO.getMemId());
-	    demonstrationReservationcancelDTO.setDemNum(demonstrationReservationDTO.getDemNum());
-	    demonstrationReservationCancel(demonstrationReservationcancelDTO);
-	    // 새로운 예약 추가
-	    demonstrationReservation(demonstrationReservationDTO);
+		// 기존 예약 취소
+		DemonstrationReservationCancelDTO demonstrationReservationcancelDTO = new DemonstrationReservationCancelDTO();
+		demonstrationReservationcancelDTO.setMemId(demonstrationReservationDTO.getMemId());
+		demonstrationReservationcancelDTO.setDemNum(demonstrationReservationDTO.getDemNum());
+		demonstrationReservationCancel(demonstrationReservationcancelDTO);
+		// 새로운 예약 추가
+		demonstrationReservation(demonstrationReservationDTO);
 	}
-	
-	
+
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
 	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
