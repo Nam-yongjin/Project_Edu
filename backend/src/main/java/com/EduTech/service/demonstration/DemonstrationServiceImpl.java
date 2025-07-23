@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,11 +63,11 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search, int pageCount) {
+	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search, Integer pageCount) {
+		if (pageCount == null || pageCount < 0) {
+			pageCount = 0;
+		}
 
-		// getAllPagedResults 의 매개변수로 익명클래스, 정렬한 칼럼 이름, 페이지 전달
-		// Function<Pageable>은, apply에 필요한 매개값
-		// function<Page<DemonstrationListReserveDTO>는 반환값 이라생각
 		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
 			Page<DemonstrationListReserveDTO> currentPage = demonstrationReserveRepository
 					.selectPageDemRes(PageRequest.of(pageCount, 10, Sort.by("demRevNum").descending()));
@@ -86,7 +85,10 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search, int pageCount) {
+	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search, Integer pageCount) {
+		if (pageCount == null || pageCount < 0) {
+			pageCount = 0;
+		}
 
 		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
 			Page<DemonstrationListRegistrationDTO> currentPage = demonstrationRegistrationRepository
@@ -103,24 +105,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
-	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-	// String memId = JWTFilter.getMemId(); 나중에 로그인 구현되면 추가
-	@Override
-	public void approveOrRejectDemRes(DemonstrationApprovalResDTO demonstrationApprovalResDTO) {
-		demonstrationReserveRepository.updateDemResChangeState(demonstrationApprovalResDTO.getDemonstrationState(),
-				demonstrationApprovalResDTO.getMemId(), demonstrationApprovalResDTO.getDemRevNum());
-	}
-
-	// 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-	@Override
-	public void approveOrRejectDemReg(DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {
-		demonstrationRegistrationRepository.updateDemResChangeState(demonstrationApprovalRegDTO.getDemonstrationState(),
-				demonstrationApprovalRegDTO.getMemId(), demonstrationApprovalRegDTO.getDemRegNum());
-	}
-
 	// 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search, int pageCount) {
+	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search, Integer pageCount) {
+
+		if (pageCount == null || pageCount < 0) {
+			pageCount = 0;
+		}
 
 		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
 			Page<DemonstrationRentalListDTO> currentPage = demonstrationRepository
@@ -160,7 +151,11 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 장비신청 페이지 (실증 물품 리스트 목록) - 이미지도 가져와야함
 	@Override
-	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(int pageCount) {
+	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount) {
+		if (pageCount == null || pageCount < 0) {
+			pageCount = 0;
+		}
+
 		Page<DemonstrationPageListDTO> currentPage = demonstrationRepository
 				.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()));
 
@@ -215,27 +210,46 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 	@Override
 	public void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO) {
-
-		// 클라이언트로부터 받아온 정보로 demRes 테이블에 추가
-		DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
-				.startDate(demonstrationReservationDTO.getStartDate()).endDate(demonstrationReservationDTO.getEndDate())
-				.state(DemonstrationState.WAIT)
-				.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
-				.member(Member.builder().memId(demonstrationReservationDTO.getMemId()).build()).build();
-		demonstrationReserveRepository.save(demonstrationReserve);
-
-		// 실증 신청 시 예약된 날짜도 추가되야 하므로
-		// demTime 테이블에 예약된 시간 추가
-		List<DemonstrationTime> demonstrationTimeList = new ArrayList<>();
-		for (LocalDate date = demonstrationReservationDTO.getStartDate(); !date
-				.isAfter(demonstrationReservationDTO.getEndDate()); date = date.plusDays(1)) {
-			DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date).state(true)
+		// 선택한 실증 상품의 예약된 상태를 불러오기 위해 사용한 dto
+		DemonstrationTimeReqDTO demonstrationTimeReqDTO = new DemonstrationTimeReqDTO();
+		demonstrationTimeReqDTO.setDemNum(demonstrationReservationDTO.getDemNum());
+		demonstrationTimeReqDTO.setStartDate(demonstrationReservationDTO.getStartDate());
+		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
+		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
+		LocalDate existingStart = ResState.get(0).getDemDate(); // 기존 시작 날짜
+		LocalDate existingEnd = ResState.get(ResState.size() - 1).getDemDate(); // 기존 끝 날짜
+		LocalDate newStart = demonstrationReservationDTO.getStartDate(); // 새로운 시작 날짜
+		LocalDate newEnd = demonstrationReservationDTO.getEndDate(); // 새로운 끝 날짜
+		
+		// 새 시작날짜가 기존 끝날짜보다 클 경우,
+		// 또는 기존 시작날짜보다 새 끝 날짜가 작을경우,
+		// 조건문 걸어서 예약 안겹치게 예외처리
+		if (newEnd.isBefore(existingStart) || newStart.isAfter(existingEnd)) { 
+			// 클라이언트로부터 받아온 정보로 demRes 테이블에 추가
+			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
+					.startDate(demonstrationReservationDTO.getStartDate()).endDate(demonstrationReservationDTO.getEndDate())
+					.state(DemonstrationState.WAIT)
 					.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
-					.build();
-			demonstrationTimeList.add(demonstrationTime);
-		} // 변경 전 날짜로 부터 변경 후 까지의 날짜의 예약 상태 추가
-			// time 리스트를 저장
-		demonstrationTimeRepository.saveAll(demonstrationTimeList);
+					.member(Member.builder().memId(demonstrationReservationDTO.getMemId()).build()).build();
+			demonstrationReserveRepository.save(demonstrationReserve);
+
+			// 실증 신청 시 예약된 날짜도 추가되야 하므로
+			// demTime 테이블에 예약된 시간 추가
+			List<DemonstrationTime> demonstrationTimeList = new ArrayList<>();
+			for (LocalDate date = demonstrationReservationDTO.getStartDate(); !date
+					.isAfter(demonstrationReservationDTO.getEndDate()); date = date.plusDays(1)) {
+				DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date).state(true)
+						.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
+						.build();
+				demonstrationTimeList.add(demonstrationTime);
+			} // 변경 전 날짜로 부터 변경 후 까지의 날짜의 예약 상태 추가
+				// time 리스트를 저장
+			demonstrationTimeRepository.saveAll(demonstrationTimeList);
+		}
+		else {
+			System.out.println("겹치는 예약이 존재합니다.");
+		}
+		
 
 	}
 
@@ -264,8 +278,21 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
 	}
 
+	
+	// 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
+	@Override
+	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO) {
+		 // 기존 예약 취소
+	    DemonstrationReservationCancelDTO demonstrationReservationcancelDTO = new DemonstrationReservationCancelDTO();
+	    demonstrationReservationcancelDTO.setMemId(demonstrationReservationDTO.getMemId());
+	    demonstrationReservationcancelDTO.setDemNum(demonstrationReservationDTO.getDemNum());
+	    demonstrationReservationCancel(demonstrationReservationcancelDTO);
+	    // 새로운 예약 추가
+	    demonstrationReservation(demonstrationReservationDTO);
+	}
+	
+	
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
-
 	@Override
 	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
@@ -329,7 +356,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		if (demonstrationFormDTO.getImageList() != null && !demonstrationFormDTO.getImageList().isEmpty()) {
 			List<Object> files = fileUtil.saveFiles(demonstrationFormDTO.getImageList(), "demImages");
 			// 수정된 이미지로 추가
-			// 안전성을 위해서 이미지 동기화 작업 필요할듯?
+			// 안전성을 위해서 이미지 동기화 작업 고려?
 			for (Object obj : files) {
 				if (obj instanceof Map) {
 					Map<String, String> map = (Map<String, String>) obj;
