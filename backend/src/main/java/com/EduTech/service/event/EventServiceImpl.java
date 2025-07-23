@@ -406,10 +406,15 @@ public class EventServiceImpl implements EventService {
 	    if (!isEligible(event.getCategory(), member)) {
 	        throw new IllegalStateException("신청 대상이 아닙니다.");
 	    }
+	    
+	    if (dto.getRevState() == null) {
+	        dto.setRevState(RevState.WAITING); // 기본 상태로 보완
+	    }
 
 	    EventUse eventUse = EventUse.builder()
 	            .eventInfo(event)
 	            .member(member)
+	            .revState(dto.getRevState())
 	            .applyAt(LocalDateTime.now())
 	            .build();
 
@@ -525,7 +530,7 @@ public class EventServiceImpl implements EventService {
 			}
 			// 프로그램 정보 추가
 			dto.setEventName(info.getEventName());
-			dto.setTarget(info.getTarget());
+			dto.setCategory(info.getCategory());
 			dto.setEventStartPeriod(info.getEventStartPeriod());
 			dto.setEventEndPeriod(info.getEventEndPeriod());
 			dto.setDaysOfWeek(info.getDaysOfWeek());
