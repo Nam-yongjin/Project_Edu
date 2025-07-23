@@ -43,8 +43,8 @@ public class DemonstrationController {
 	@GetMapping("/demRes")
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(
 			@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam("pageCount") int pageCount) {
-
+			@RequestParam("pageCount") Integer pageCount) {
+		
 		PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = demonstrationService.getAllDemRes(search, pageCount);
 		return AllDemRes;
 	}
@@ -53,7 +53,7 @@ public class DemonstrationController {
 	@GetMapping("/demReg")
 	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(
 			@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam("pageCount") int pageCount) {
+			@RequestParam("pageCount") Integer pageCount) {
 		PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = demonstrationService.getAllDemReg(search,
 				pageCount);
 		return AllDemReg;
@@ -62,21 +62,20 @@ public class DemonstrationController {
 	// 신청한 물품 대여 조회
 	// memId는 나중에 서버 인증 토큰으로 꺼내 처리할것(보안 이슈)
 	@GetMapping("/demRental")
-	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam("pageCount") int pageCount) {
-		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService.getAllDemRental(JWTFilter.getMemId(), search,
-				pageCount);
+	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(
+			@RequestParam(value = "search", required = false, defaultValue = "") String search,
+			@RequestParam("pageCount") Integer pageCount, @RequestParam("memId") String memId) {
+		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService
+				.getAllDemRental(memId, search, pageCount);
 		return AllDemRental;
 	}
 
-	// 신증 물품 리스트 목록 조회
+	// 실증 물품 리스트 목록 조회
 	@GetMapping("/demList")
-	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") int pageCount) {
+	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") Integer pageCount) {
 		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount);
 		return AllDemList;
 	}
-	
-	
 
 	// 실증 장비 신청 상세 페이지
 	@GetMapping("/demDetail")
@@ -94,71 +93,64 @@ public class DemonstrationController {
 		return checkResList;
 	}
 
-	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-	@PutMapping("/ResState")
-	public ResponseEntity<String> DemResStateChange(
-			@RequestBody DemonstrationApprovalResDTO demonstrationApprovalResDTO) {
-		demonstrationService.approveOrRejectDemRes(demonstrationApprovalResDTO);
-		return ResponseEntity.ok("Res 상태 변경 성공");
-	}
 
-	// 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-	@PutMapping("/RegState")
-	public ResponseEntity<String> DemRegStateChange(
-			@RequestBody DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {
-		demonstrationService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
-		return ResponseEntity.ok("Reg 상태 변경 성공");
-	}
-	
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
 	@PutMapping("/RentalDate")
-	public ResponseEntity<String> DemRentalDateChange(@RequestBody DemonstrationResRentalDTO demonstrationResRentalDTO)
-	{
+	public ResponseEntity<String> DemRentalDateChange(
+			@RequestBody DemonstrationResRentalDTO demonstrationResRentalDTO) {
 		demonstrationService.rentalDateChange(demonstrationResRentalDTO);
 		return ResponseEntity.ok("Rental 날짜 변경 성공");
 	}
-	
+
 	// 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 	@PostMapping("/ReservationRes")
-	public ResponseEntity<String> DemResReservation(@RequestBody DemonstrationReservationDTO demonstrationReservationDTO)
-	{
+	public ResponseEntity<String> DemResReservation(
+			@RequestBody DemonstrationReservationDTO demonstrationReservationDTO) {
 		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
 		return ResponseEntity.ok("예약 성공");
 	}
-	
+
 	// 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 	@DeleteMapping("/CancelRes")
-	public ResponseEntity<String> DemResCancel(@RequestBody DemonstrationReservationCancelDTO demonstrationReservationCancelDTO)
-	{
+	public ResponseEntity<String> DemResCancel(
+			@RequestBody DemonstrationReservationCancelDTO demonstrationReservationCancelDTO) {
 		demonstrationService.demonstrationReservationCancel(demonstrationReservationCancelDTO);
 		return ResponseEntity.ok("예약 취소 완료");
+	}
+	
+	// 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
+	@PutMapping("/ChangeRes")
+	public ResponseEntity<String> DemResChange(@RequestBody DemonstrationReservationDTO demonstrationReservationDTO)
+	{
+		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
+		return ResponseEntity.ok("예약 변경 성공");
 	}
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@PostMapping("/addDem")
-	public ResponseEntity<String> DemAdd(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO)
-	{
+	public ResponseEntity<String> DemAdd(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
 
 		demonstrationService.addDemonstration(demonstrationFormDTO);
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
-	
+
 	// 실증 상품 수정하는 기능
 	@PutMapping("/UpdateDem")
-	public ResponseEntity<String> DemUpdate(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO)
-	{
-		demonstrationService.updateDemonstration(demonstrationFormDTO); 
+	public ResponseEntity<String> DemUpdate(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
+		demonstrationService.updateDemonstration(demonstrationFormDTO);
 		return ResponseEntity.ok("실증 물품 수정 완료");
 	}
-	
+
 	// 실증 번호를 받아 실증 상품을 삭제하는 기능
 	@DeleteMapping("/DeleteDem")
-	public ResponseEntity<String> demDelete(@RequestParam("demNum") Long demNum)
-	{
+	public ResponseEntity<String> demDelete(@RequestParam("demNum") Long demNum) {
 		demonstrationService.deleteDemonstration(demNum);
 		return ResponseEntity.ok("실증 물품 삭제 완료");
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
 	}
-
 	
+	
+	
+	
+
 }
