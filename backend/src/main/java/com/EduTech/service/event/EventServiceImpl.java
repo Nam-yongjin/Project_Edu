@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +20,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventBanner;
 import com.EduTech.entity.event.EventInfo;
+import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.EventUse;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberState;
 import com.EduTech.repository.event.EventBannerRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.event.EventUseRepository;
@@ -104,7 +108,7 @@ public class EventServiceImpl implements EventService {
 	@Override
     public void registerEvent(EventInfoDTO dto, MultipartFile file) {
         EventInfo info = modelMapper.map(dto, EventInfo.class);
-        info.setStats(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
+        info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
 
         setFileInfo(info, file);
         infoRepository.save(info);
@@ -225,7 +229,7 @@ public class EventServiceImpl implements EventService {
 	
 	// 사용자 검색
 	@Override
-    public Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, String state) {
+    public Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, EventState state) {
         option = (option != null && !option.isBlank()) ? option : "all";
         query = (query != null && !query.isBlank()) ? query : null;
         state = (state != null && !state.isBlank()) ? state : null;
@@ -254,7 +258,7 @@ public class EventServiceImpl implements EventService {
 	
 	// 관리자 검색 목록
 	@Override
-    public Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String option, String query, String state) {
+    public Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String option, String query, EventState state) {
         option = (option != null && !option.isBlank()) ? option : "all";
         query = (query != null && !query.isBlank()) ? query : null;
         state = (state != null && !state.isBlank()) ? state : null;
@@ -340,6 +344,90 @@ public class EventServiceImpl implements EventService {
 	// 6. 사용자 신청/취소/중복확인
 	// ========================================
 	
+	// 사용자 행사 신청
+	@Override
+	public void applyEvent(EventApplyRequestDTO dto) {
+	    Long eventNum = dto.getEventNum();
+	    String memId = dto.getMemId();
+
+	    if (memId == null || memId.isBlank()) {
+	        throw new IllegalStateException("로그인한 사용자만 신청할 수 있습니다.");
+	    }
+
+	    if (isAlreadyApplied(eventNum, memId)) {
+	        throw new IllegalStateException("이미 신청한 프로그램입니다.");
+	    }
+
+	    EventInfo event = infoRepository.findById(eventNum)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+
+	    LocalDateTime now = LocalDateTime.now();
+
+	    if (now.isBefore(event.getApplyStartPeriod())) {
+	        throw new IllegalStateException("신청 기간이 아닙니다.");
+	    }
+	    if (now.isAfter(event.getApplyEndPeriod())) {
+	        throw new IllegalStateException("신청 기간이 종료되었습니다.");
+	    }
+
+	    Member member = memberRepository.findById(memId)
+	            .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
+
+	    if (member.getState() == MemberState.BEN) {
+	        throw new IllegalStateException("회원이 정지 상태로 인해 프로그램을 신청할 수 없습니다.");
+	    }
+	    if (member.getState() == MemberState.LEAVE) {
+	        throw new IllegalStateException("탈퇴한 계정은 신청할 수 없습니다.");
+	    }
+
+	    if (!isEligible(event.getTarget(), member)) {
+	        throw new IllegalStateException("신청 대상이 아닙니다.");
+	    }
+
+	    EventUse eventUse = EventUse.builder()
+	            .eventInfo(event)
+	            .member(member)
+	            .applyAt(LocalDateTime.now())
+	            .build();
+
+	    try {
+	        useRepository.save(eventUse);
+	    } catch (DataIntegrityViolationException e) {
+	        log.warn("중복 신청 시도 감지 - eventNum={}, memId={}", eventNum, memId);
+	        throw new IllegalStateException("이미 신청한 프로그램입니다.");
+	    }
+	}
+	
+	// 행사 신청 취소
+	@Override
+	public void cancelEvent(Long evtRevNum) {
+	    EventUse eventUse = useRepository.findById(evtRevNum)
+	            .orElseThrow(() -> new IllegalArgumentException("신청 내역이 존재하지 않습니다."));
+	    useRepository.delete(eventUse);
+	}
+	
+	// 행사 신청 여부 확인
+	@Override
+	public boolean isAlreadyApplied(Long eventNum, String memIid) {
+	    return useRepository.existsByEventInfo_eventNumAndMember_memId(eventNum, memIid);
+	}
+	
+	// 행사 신청 가능 여부(화면단 버튼 비활성화용)
+	@Override
+	public boolean isAvailable(Long eventNum) {
+	    EventInfo event = infoRepository.findById(eventNum)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+	    return event.getApplyEndPeriod().toLocalDate().isAfter(LocalDate.now());
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -351,14 +439,13 @@ public class EventServiceImpl implements EventService {
 	    EventInfo info = use.getEventInfo();
 	    Member member = use.getMember();
 
-	    String state = info.getEventEndPeriod().isBefore(LocalDate.now()) ? "행사종료" : "신청완료";
+	    String state = info.getEventEndPeriod().isBefore(LocalDate.now().atStartOfDay()) ? "행사종료" : "신청완료";
 
 	    String eventStartPeriod = info.getEventStartPeriod() != null ? info.getEventStartPeriod().toString() : "";
 	    String eventEndPeriod = info.getEventEndPeriod() != null ? info.getEventEndPeriod().toString() : "";
 
 	    return EventUseDTO.builder()
 	            .evtRevNum(use.getEvtRevNum())
-	            .applyAt(use.getApplyAt())
 	            .eventNum(info.getEventNum())
 	            .eventName(info.getEventName())
 	            .eventStartPeriod(info.getEventStartPeriod())
@@ -366,7 +453,7 @@ public class EventServiceImpl implements EventService {
 	            .place(info.getPlace())
 	            .maxCapacity(info.getMaxCapacity())
 	            .currCapacity(useRepository.countByEvent(info.getEventNum()))
-	            .revState(state)
+	            .revState(revState)
 	            .memId(member != null ? member.getMemId() : null)
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
@@ -402,5 +489,76 @@ public class EventServiceImpl implements EventService {
 	            info.setFilePath(fileInfoMap.get("filePath"));
 	        }
 	    }
+	}
+	
+	// 배너 조회 리스트
+	@Override
+	public List<EventBannerDTO> getAllBanners() {
+		LocalDate today = LocalDate.now();
+		List<EventBanner> result = bannerRepository.findValidBanners(today);
+
+		return result.stream().map(banner -> {
+			EventInfo info = banner.getEventInfo();
+			EventBannerDTO dto = new EventBannerDTO();
+			dto.setEvtFileNum(banner.getEvtFileNum());
+			dto.setOriginalName(banner.getOriginalName());
+			dto.setFilePath(banner.getFilePath());
+			dto.setEventInfoId(info.getEventNum());
+
+			// 썸네일 경로 생성 (s_ 접두사 방식)
+			String filePath = banner.getFilePath();
+			if (filePath != null && filePath.contains("/")) {
+				String fileName = Paths.get(filePath).getFileName().toString();
+				String parent = Paths.get(filePath).getParent().toString();
+				dto.setThumbnailPath(filePath);
+			}
+			// 프로그램 정보 추가
+			dto.setEventName(info.getEventName());
+			dto.setTarget(info.getTarget());
+			dto.setEventStartPeriod(info.getEventStartPeriod());
+			dto.setEventEndPeriod(info.getEventEndPeriod());
+			dto.setDaysOfWeek(info.getDaysOfWeek());
+			dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
+
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	// 사용자 신청 리스트
+	// 회원 ID(mid)를 기준으로 해당 회원이 신청한 프로그램 목록을 페이지 형태로 조회
+	@Override
+	public Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable) {
+		Page<EventUse> result = useRepository.findByMember_MemId(memId, pageable);
+
+		return result.map(this::toDTO);
+	}
+	
+	// 관리자용: 특정 프로그램의 신청자 목록 조회
+	@Override
+	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
+		List<EventUse> list = useRepository.findAllByMember_MemId(eventNum);
+		return list.stream().map(this::toDTO).collect(Collectors.toList());
+	}
+
+	@Override
+	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String eventInfo, EventState state) {
+		boolean noFilter = (eventName == null || eventName.isBlank()) && (eventInfo == null || eventInfo.isBlank());
+
+		Page<EventInfo> result = noFilter ? infoRepository.findAll(pageable)
+				: infoRepository.searchEvent(eventName, eventInfo, pageable);
+
+		final String finalState = (state != null && !state.isBlank()) ? state : null;
+
+		List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
+			EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
+			dto.setCurrCapacity(useRepository.countByEvent(event.getEventNum()));
+			dto.setOriginalName(event.getOriginalName());
+			String calculatedState = calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod());
+			dto.setState(calculatedState);
+			dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
+			return dto;
+		}).filter(dto -> finalState == null || finalState.equals(dto.getState())).toList();
+
+		return new PageImpl<>(filteredList, pageable, filteredList.size());
 	}
 }

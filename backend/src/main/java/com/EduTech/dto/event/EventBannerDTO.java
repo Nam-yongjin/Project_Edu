@@ -10,10 +10,11 @@ import lombok.Data;
 @Data
 public class EventBannerDTO {
 	
-	private Long evtFileName;		// 첨부파일 번호
+	private Long evtFileNum;		// 첨부파일 번호
 	private String originalName;	// 원본파일명
 	private String filePath;		// 파일저장경로
 	private String fileType;		// 파일 종류
+	private String thumbnailPath;	// 썸네일 경로
 	private Long eventInfoId;		// 
 	
 	private String eventName;		// 행사명
