@@ -17,4 +17,10 @@ public class DemonstrationTimeResDTO { // 이 dto는 실증 신청의 사용 시
 	private LocalDate demDate; // 사용 시작일과 사용 종료일을 하루 단위로 나눈 날짜
 	private Boolean state; // 예약 상태
 	private Long demNum; // 실증 번호
+	public DemonstrationTimeResDTO(LocalDate demDate, boolean state, Long demNum) {
+	    this.demDate = demDate;
+	    this.state = state;
+	    this.demNum = demNum;
+	}
+	
 }

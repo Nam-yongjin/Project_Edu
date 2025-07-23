@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
-import com.EduTech.dto.demonstration.DemonstrationFormUpdateDTO;
-import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
+import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationResRentalDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
@@ -28,7 +29,6 @@ import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.dto.demonstration.PageResponseDTO;
 import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.demonstration.DemonstrationService;
-import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,24 +62,26 @@ public class DemonstrationController {
 	// 신청한 물품 대여 조회
 	// memId는 나중에 서버 인증 토큰으로 꺼내 처리할것(보안 이슈)
 	@GetMapping("/demRental")
-	public PageResponseDTO<DemonstrationListDTO> getAllDemRentalPage(@RequestParam(value = "search", required = false, defaultValue = "") String search,
+	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(@RequestParam(value = "search", required = false, defaultValue = "") String search,
 			@RequestParam("pageCount") int pageCount) {
-		PageResponseDTO<DemonstrationListDTO> AllDemRental = demonstrationService.getAllDemRental(JWTFilter.getMemId(), search,
+		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService.getAllDemRental(JWTFilter.getMemId(), search,
 				pageCount);
 		return AllDemRental;
 	}
 
 	// 신증 물품 리스트 목록 조회
 	@GetMapping("/demList")
-	public PageResponseDTO<DemonstrationListDTO> getAllDemListPage(@RequestParam("pageCount") int pageCount) {
-		PageResponseDTO<DemonstrationListDTO> AllDemList = demonstrationService.getAllDemList(pageCount);
+	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") int pageCount) {
+		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount);
 		return AllDemList;
 	}
+	
+	
 
 	// 실증 장비 신청 상세 페이지
 	@GetMapping("/demDetail")
-	public DemonstrationListDTO getDemDetailList(@RequestParam("demNum") Long demNum) {
-		DemonstrationListDTO DemDetail = getDemDetailList(demNum);
+	public DemonstrationDetailDTO getDemDetailList(@RequestParam("demNum") Long demNum) {
+		DemonstrationDetailDTO DemDetail = getDemDetailList(demNum);
 		return DemDetail;
 	}
 
@@ -143,9 +145,9 @@ public class DemonstrationController {
 	
 	// 실증 상품 수정하는 기능
 	@PutMapping("/UpdateDem")
-	public ResponseEntity<String> DemUpdate(@ModelAttribute DemonstrationFormUpdateDTO demonstrationFormUpdateDTO)
+	public ResponseEntity<String> DemUpdate(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO)
 	{
-		demonstrationService.updateDemonstration(demonstrationFormUpdateDTO); 
+		demonstrationService.updateDemonstration(demonstrationFormDTO); 
 		return ResponseEntity.ok("실증 물품 수정 완료");
 	}
 	
