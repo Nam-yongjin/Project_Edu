@@ -30,6 +30,8 @@ import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.dto.demonstration.PageResponseDTO;
 import com.EduTech.entity.demonstration.DemonstrationState;
+import com.EduTech.entity.event.EventState;
+import com.EduTech.entity.event.EventUse;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
@@ -62,6 +64,10 @@ public class DemonstrationServiceTests {
 	private PasswordEncoder passwordEncoder;
 	@MockBean
 	EventServiceImpl eventServiceImpl;
+	@MockBean
+	EventState eventState;
+	@MockBean
+	EventUse eventUse;
 
 	// @Test
 	@DisplayName("검색어 없는 실증 교사 조회 테스트")
