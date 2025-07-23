@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
-import com.EduTech.dto.demonstration.DemonstrationListDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
@@ -266,7 +265,7 @@ public class DemonstrationRepositoryTests {
 		// 따라서, JPA가 관리하는 엔티티 상태 변화 감지, 연관된 엔티티에 대한 Cascade 처리, orphanRemoval 등은 전혀 작동하지
 		// 않습니다.
 	}
-
+/*
 	// @Test // 상품 목록 페이지 (정상) <나머지 null값은 사용안할 값임 상관 x>
 	public void demonstrationListProductTest() {
 		List<Page<DemonstrationListDTO>> allData = new ArrayList<>();
@@ -284,7 +283,7 @@ public class DemonstrationRepositoryTests {
 			System.out.println(allData.get(i).getContent()); // 페이지 목록 출력 (페이지 접근시 get(i))
 		}
 	}
-
+*/
 	/*
 	// @Test // 상품 상세 정보 페이지 (정상)
 	public void demonstrationListProductDetailTest() {
@@ -390,12 +389,12 @@ public class DemonstrationRepositoryTests {
 		demonstrationReserveRepository.updateDemResChangeDateAll(LocalDate.parse("2020-12-20"),LocalDate.parse("2050-12-20"),Long.valueOf(10),"user5");
 	}
 
-	
+	/*
 	//@Test //  물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate가 수정되는 테스트 (정상)
 	public void demonstrationResUpdate2Test() {
 		demonstrationReserveRepository.updateDemResChangeDate(LocalDate.parse("2222-12-22"),Long.valueOf(0));
 	}
-	
+	*/
 	//@Test // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, 상태를 변경하는 테스트  (정상)
 		public void demonstrationResUpdate3Test() {
 			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT,"user1",Long.valueOf(10));
