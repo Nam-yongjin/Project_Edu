@@ -1,5 +1,7 @@
 package com.EduTech.controller.member;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.EduTech.dto.member.CompanyDetailDTO;
 import com.EduTech.dto.member.CompanyModifyDTO;
 import com.EduTech.dto.member.CompanyRegisterDTO;
+import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
@@ -24,6 +27,7 @@ import com.EduTech.dto.member.TeacherDetailDTO;
 import com.EduTech.dto.member.TeacherModifyDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
 import com.EduTech.security.jwt.JWTFilter;
+import com.EduTech.security.jwt.JWTProvider;
 import com.EduTech.service.member.MemberService;
 
 import jakarta.validation.Valid;
@@ -150,5 +154,15 @@ public class MemberController {
 	
 	// 비밀번호 찾기
 	
-	// 카카오톡 로그인
+	// 카카오 로그인
+	@GetMapping("/login/kakao")
+    public Map<String, Object> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
+        MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
+        Map<String, Object> claims = memberDTO.getClaims();
+        String jwtAccessToken = JWTProvider.generateToken(claims, 10);
+        String jwtRefreshToken = JWTProvider.generateToken(claims, 60 * 24);
+        claims.put("accessToken", jwtAccessToken);
+        claims.put("refreshToken", jwtRefreshToken);
+        return claims;
+    }
 }

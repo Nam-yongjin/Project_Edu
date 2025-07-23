@@ -1,8 +1,12 @@
 package com.EduTech.service.member;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.EduTech.dto.member.CompanyDetailDTO;
 import com.EduTech.dto.member.CompanyModifyDTO;
 import com.EduTech.dto.member.CompanyRegisterDTO;
+import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
@@ -12,6 +16,7 @@ import com.EduTech.dto.member.StudentRegisterDTO;
 import com.EduTech.dto.member.TeacherDetailDTO;
 import com.EduTech.dto.member.TeacherModifyDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
+import com.EduTech.entity.member.Member;
 
 public interface MemberService {
 
@@ -42,4 +47,19 @@ public interface MemberService {
 	void modifyCompanyInfo(String memId, CompanyModifyDTO companyModifyDTO);
 	
 	void leaveMember(String memId);
+	
+	
+	
+	MemberDTO getKakaoMember(String accessToken);
+	default MemberDTO entityToDTO(Member member) {
+		
+		List<String> roleNames = new ArrayList<>();
+	    roleNames.add(member.getRole().name());
+
+		MemberDTO memberDTO = new MemberDTO(member.getMemId(), member.getPw(), 
+				member.getName(), roleNames);
+
+		return memberDTO;
+	}
+
 }

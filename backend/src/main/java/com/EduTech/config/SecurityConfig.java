@@ -10,11 +10,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.EduTech.security.CustomAccessDeniedHandler;
+import com.EduTech.security.LoginFailHandler;
+import com.EduTech.security.LoginSuccessHandler;
+import com.EduTech.security.jwt.JWTFilter;
 
 @Configuration
 // prePostEnabled: 메서드가 실행되기 전에 권한을 검사,  @PreAuthorize를 사용
@@ -40,12 +44,12 @@ public class SecurityConfig {
 		// api서버 로그인
         http.formLogin(config -> {
             config.loginPage(("/api/login"));
-//            config.successHandler(new LoginSuccessHandler());
-//            config.failureHandler(new LoginFailHandler());
+            config.successHandler(new LoginSuccessHandler());
+            config.failureHandler(new LoginFailHandler());
         });
         
         // JWT 체크
-//        http.addFilterBefore(new JWTFilter(), UsernamePasswordAuthenticationFilter.class); 
+        http.addFilterBefore(new JWTFilter(), UsernamePasswordAuthenticationFilter.class); 
         
         // CustomSecurityConfig에 접근제한시 CustomAccessDeniedHandler를 이용하도록 설정
         http.exceptionHandling(config -> {
