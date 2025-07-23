@@ -32,4 +32,6 @@ public class AdminController {
 		AdminService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
 		return ResponseEntity.ok("Reg 상태 변경 성공");
 	}
+	
+	// 관리자 
 }
