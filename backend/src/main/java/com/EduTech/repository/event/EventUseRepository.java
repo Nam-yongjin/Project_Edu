@@ -14,7 +14,7 @@ import com.EduTech.entity.member.Member;
 
 public interface EventUseRepository extends JpaRepository<EventUse, Long>{
 
-	boolean existsByEvent_eventNumAndMember_memId(Long eventNum, String memId);	// 중복신청 여부 확인
+	boolean existsByEventInfo_eventNumAndMember_memId(Long eventNum, String memId);	// 중복신청 여부 확인
 
 	@Query("SELECT COUNT(p) FROM EventBanner p WHERE p.event.eventNum = :eventNum")	// 신청자 수 카운트
 	int countByEvent(@Param("eventNum") Long eventNum);	// eventNum 앞이 int 인지 Long인지 모르겠다
@@ -36,6 +36,6 @@ public interface EventUseRepository extends JpaRepository<EventUse, Long>{
 	void deleteByMember_MemId(String memId);
 
 	// 특정 회원 프로그램 신청 내역을 모두 조회(필요시 사용하면 됨, 현재는 필요 없음)
-	List<EventUse> findAllByMember_MemId(String memId);
+	List<EventUse> findAllByMember_MemId(Long eventNum);
 	
 }

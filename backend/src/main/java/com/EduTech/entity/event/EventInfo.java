@@ -8,6 +8,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,8 +44,9 @@ public class EventInfo {
 	@Column(nullable = false)
 	private LocalDateTime applyEndPeriod; // 신청종료기간
 
-	@Column(nullable = false, length = 20) // 신청전 / 신청중 / 신청마감 등
-	private String stats;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false) // 신청전 / 신청중 / 신청마감 등
+	private EventState state;
 
 	@Builder.Default
 	@ElementCollection

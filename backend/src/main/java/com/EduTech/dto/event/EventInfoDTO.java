@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.EduTech.entity.event.EventCategory;
+import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.RevState;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -16,8 +17,8 @@ public class EventInfoDTO {
 	private Long eventNum;			// 행사 아이디
 	private String eventName;		// 행사명
 	private String eventInfo;		// 소개
-	private String state; 			// 신청전, 신청중, 신청마감
-	private String revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
+	private EventState state; 		// 신청전, 신청중, 신청마감
+	private RevState revState;		// 상태(대기, 수락, 거절)  현제 serviceimpl의 관리자 일반목록 검색으로 인해 String로 바꿈 하지만 나중에 RevState로 바꿔야함
 	private String target;			// 모집대상
 	private EventCategory category; // 모집대상 분류 (일반인, 학생, 선생)
 	private Integer maxCapacity;	// 모집인원
@@ -26,7 +27,7 @@ public class EventInfoDTO {
 	private String etc;				// 기타 유의상황
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-	private LocalDateTime applyStartPeriod; // 신청시작기간(년 일 월 시 분)
+	private LocalDateTime apply ; // 신청시작기간(년 일 월 시 분)
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime applyEndPeriod; // 신청종료기간

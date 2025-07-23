@@ -21,7 +21,7 @@ public interface EventBannerRepository extends JpaRepository<EventBanner, Long> 
 			    SELECT pb FROM EventBanner pb
 			    WHERE pb.eventInfo.eventEndPeriod >= :today
 			""")
-	List<EventBanner> findActiveEventBanners(@Param("today") LocalDate today);
+	List<EventBanner> findValidBanners(@Param("today") LocalDate today);
 
 	// MAX 3개로 제한
 	@Query("""
