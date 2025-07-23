@@ -1,6 +1,6 @@
 import LoginComponent from "../../components/member/LoginComponent"
 import MainMenu from "../../menus/MainMenu"
-
+import { Outlet } from "react-router-dom"
 
 const LoginPage = () => {
     return (
@@ -8,6 +8,7 @@ const LoginPage = () => {
             <MainMenu />
             <div className="flex flex-wrap w-full h-full justify-center	items-center border-2">
                 <LoginComponent />
+                <Outlet />
             </div>
         </div>
     )

@@ -2,12 +2,11 @@ import { Suspense, lazy } from "react";
 import Loading from "./Loading";
 import { createBrowserRouter } from "react-router-dom";
 import memberRouter from "./memberRouter";
-import loginRouter from "./loginRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
 const Login = lazy(() => import("../pages/member/LoginPage"))
-
+const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
 
 const root = createBrowserRouter([
     {
@@ -21,7 +20,12 @@ const root = createBrowserRouter([
     {
         path: "login",
         element: <Suspense fallback={<Loading />}><Login /></Suspense>,
-        children: loginRouter()
+        children: [
+            {
+                path: "kakao",
+                element: <Suspense fallback={<Loading />}><KakaoRedirect /></Suspense>,
+            }
+        ]
     },
 
 ])
