@@ -30,25 +30,25 @@ export const loginPost = async (loginParam) => {
 
 // 회원가입전 이용약관 및 사용자 역할
 export const registerUser = async () => {
-    const res = await jwtAxios.post(`${host}/register`)
+    const res = await axios.post(`${host}/register`)
     return res.data
 }
 
 // 회원가입
-export const registerMember = async () => {
-    const res = await jwtAxios.post(`${host}/register/member`)
+export const registerMember = async (params) => {
+    const res = await axios.post(`${host}/register/member`, params)
     return res.data
 }
-export const registerStudent = async () => {
-    const res = await jwtAxios.post(`${host}/register/student`)
+export const registerStudent = async (params) => {
+    const res = await axios.post(`${host}/register/student`, params)
     return res.data
 }
-export const registerTeacher = async () => {
-    const res = await jwtAxios.post(`${host}/register/teacher`)
+export const registerTeacher = async (params) => {
+    const res = await axios.post(`${host}/register/teacher`, params)
     return res.data
 }
-export const registerCompany = async () => {
-    const res = await jwtAxios.post(`${host}/register/company`)
+export const registerCompany = async (params) => {
+    const res = await axios.post(`${host}/register/company`, params)
     return res.data
 }
 

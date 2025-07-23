@@ -25,7 +25,9 @@ const loginSlice = createSlice({
             console.log("login.....");
             const payload = action.payload;
 
-            setCookie("member", JSON.stringify(payload), 1) // 쿠키 만료시간
+            if (!payload.error) {
+                setCookie("member", JSON.stringify(payload), 1) // 쿠키 만료시간
+            }
             return payload;
         },
         logout: (state, action) => {

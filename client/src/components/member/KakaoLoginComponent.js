@@ -6,7 +6,7 @@ const KakaoLoginComponent = () => {
     const link = getKakaoLoginLink()
     return (
         <div className="flex flex-col">
-            <div className="text-center text-blue-500">로그인시 자동 가입처리 됩니다</div>
+            <div className="text-center text-blue-500">로그인시 자동 가입</div>
             <div className="flex justify-center	w-full">
                 <div className="m-6">
                     <Link to={link}><img src={kakaoLogo}  /></Link>
