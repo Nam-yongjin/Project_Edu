@@ -14,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,6 +44,9 @@ public class EventInfo {
 
 	@Column(nullable = false)
 	private LocalDateTime applyEndPeriod; // 신청종료기간
+	
+	@Enumerated(EnumType.STRING)
+	private EventCategory category;	// 유저, 학생, 선생
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false) // 신청전 / 신청중 / 신청마감 등
@@ -80,5 +84,12 @@ public class EventInfo {
 	
 	@Column(length = 200)
 	private String fileType;	// 파일 종류
+	
+	@PrePersist
+	public void prePersist() {
+	    if (this.state == null) {
+	        this.state = EventState.BEFORE; // 또는 기본 상태
+	    }
+	}
 	
 }
