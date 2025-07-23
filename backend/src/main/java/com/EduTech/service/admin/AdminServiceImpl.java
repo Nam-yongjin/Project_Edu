@@ -1,9 +1,15 @@
 package com.EduTech.service.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.EduTech.dto.admin.AdminMemberViewReqDTO;
+import com.EduTech.dto.admin.AdminMemberViewResDTO;
+import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
@@ -35,4 +41,51 @@ public class AdminServiceImpl implements AdminService {
 			demonstrationRegistrationRepository.updateDemResChangeState(demonstrationApprovalRegDTO.getDemonstrationState(),
 					demonstrationApprovalRegDTO.getMemId(), demonstrationApprovalRegDTO.getDemRegNum());
 		}
+		
+		// 관리자가 회원들에게 메시지 보내는 기능
+		@Override
+		public void sendMessageForUser(AdminMessageDTO adminMessageDTO) {
+			
+		}
+		
+		// 관리자 회원 목록 페이지 조회 기능
+		@Override
+		public List<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewReqDTO) {
+			List<AdminMemberViewResDTO> hello=new ArrayList<>();
+			return hello;
+		}
+		
+		/*
+		public List<Member> searchMembers(String searchType, String search, MemberRole role, MemberState state) {
+		    Specification<Member> spec = Specification.where(null);
+
+		    if (search != null && !search.isEmpty()) {
+		        switch (searchType) {
+		            case "id":
+		                spec = spec.and(MemberSpecs.memIdContains(search));
+		                break;
+		            case "name":
+		                spec = spec.and(MemberSpecs.nameContains(search));
+		                break;
+		            case "email":
+		                spec = spec.and(MemberSpecs.emailContains(search));
+		                break;
+		            default:
+		                spec = spec.and(
+		                    Specification.where(MemberSpecs.memIdContains(search))
+		                        .or(MemberSpecs.nameContains(search))
+		                        .or(MemberSpecs.emailContains(search))
+		                );
+		        }
+		    }
+
+		    if (role != null) {
+		        spec = spec.and(MemberSpecs.hasRole(role));
+		    }
+		    if (state != null) {
+		        spec = spec.and(MemberSpecs.hasState(state));
+		    }
+
+		    return memberRepository.findAll(spec);
+		} */
 }
