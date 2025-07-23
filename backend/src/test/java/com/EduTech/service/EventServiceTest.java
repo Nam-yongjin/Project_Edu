@@ -1,4 +1,4 @@
-package com.EduTech.repository;
+package com.EduTech.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,6 +18,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
 
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
 import com.EduTech.entity.member.MemberRole;
@@ -41,26 +42,26 @@ public class EventServiceTest {
     @Autowired
     private ModelMapper modelMapper;
 
-    private Member admin;
+    private Member user;
 
     @BeforeEach
     public void setup() {
-        admin = Member.builder()
-                .memId("admin01")
-                .pw("1234")
-                .name("관리자")
+        user = Member.builder()
+                .memId("user2")
+                .pw("12345")
+                .name("일반")
                 .gender(MemberGender.MALE)
                 .birthDate(LocalDate.of(1985, 1, 1))
-                .phone("01012345678")
+                .phone("01023456789")
                 .addr("서울시 강남구")
-                .email("admin@edutech.com")
+                .email("user@edutech.com")
                 .checkSms(true)
                 .checkEmail(true)
-                .role(MemberRole.ADMIN)
+                .role(MemberRole.USER)
                 .state(MemberState.NORMAL)
                 .build();
 
-        memberRepository.save(admin);
+        memberRepository.save(user);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class EventServiceTest {
                     .eventName("서비스 테스트 이벤트")
                     .eventInfo("서비스 테스트용 설명입니다.")
                     .place("2층 강의실")
-                    .target("청소년")
+                    .category(EventCategory.USER) 
                     .applyStartPeriod(LocalDateTime.now().minusDays(1))
                     .applyEndPeriod(LocalDateTime.now().plusDays(5))
                     .eventStartPeriod(LocalDateTime.now().plusDays(10))
@@ -97,14 +98,14 @@ public class EventServiceTest {
         }
     }
 
-    //@Test
+    @Test
     @DisplayName("2. 프로그램 상세 조회")
     public void getEventTest() {
         EventInfoDTO dto = EventInfoDTO.builder()
                 .eventName("조회 테스트")
                 .eventInfo("조회 테스트 설명")
                 .place("3층 강의실")
-                .target("성인")
+                .category(EventCategory.USER) 
                 .applyStartPeriod(LocalDateTime.now().minusDays(1))
                 .applyEndPeriod(LocalDateTime.now().plusDays(5))
                 .eventStartPeriod(LocalDateTime.now().plusDays(10))
@@ -126,14 +127,14 @@ public class EventServiceTest {
         assertEquals("조회 테스트", result.getEventName());
     }
 
-    //@Test
+    @Test
     @DisplayName("3. 신청 가능 여부 확인")
     public void isAvailableTest() {
         EventInfoDTO dto = EventInfoDTO.builder()
                 .eventName("신청 가능 테스트")
                 .eventInfo("가능 여부 확인")
                 .place("지하 강당")
-                .target("전체")
+                .category(EventCategory.USER) 
                 .applyStartPeriod(LocalDateTime.now().minusDays(1))
                 .applyEndPeriod(LocalDateTime.now().plusDays(3))
                 .eventStartPeriod(LocalDateTime.now().plusDays(5))
@@ -153,6 +154,8 @@ public class EventServiceTest {
 
         assertTrue(eventService.isAvailable(eventNum));
     }
+    
+    
 
     // 추가로 다음 테스트도 추천합니다:
     // - applyEventTest: dto 기반 신청 시 예외 없이 처리되는지
