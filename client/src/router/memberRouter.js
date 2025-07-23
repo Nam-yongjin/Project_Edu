@@ -9,8 +9,8 @@ const memberRouter = () => {
     return [
         
         // {
-        //     path: "kakao",
-        //     element: <Suspense fallback={<Loading />}><KakaoRedirect /></Suspense>,
+        //     path: "",
+        //     element: <Suspense fallback={<Loading />}>< /></Suspense>,
         // },
 
     ]

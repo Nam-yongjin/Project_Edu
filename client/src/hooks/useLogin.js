@@ -1,7 +1,6 @@
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { setCookie, removeCookie } from "../util/cookieUtil";
 import { loginPost } from "../api/memberApi";
-import { loginKakao } from "../api/kakaoApi";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import signinState from "../atoms/signinState";
 
@@ -25,15 +24,6 @@ const useLogin = () => {
         removeCookie('member')
         resetState()
     };
-
-    // 카카오 로그인
-    // const doLoginKakao = async (token) => {
-    //     const formData = new FormData()
-    //     formData.append("accessToken", token)
-    //     const result = await loginKakao(formData);
-    //     saveAsCookie(result)
-    //     return result
-    // }
 
     // 1일 동안 쿠키 저장
     const saveAsCookie = (data) => {
