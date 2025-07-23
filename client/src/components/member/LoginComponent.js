@@ -23,6 +23,7 @@ const LoginComponent = () => {
     const handleClickLogin = (e) => {
         doLogin(loginParam)
             .then(data => {
+                console.log(data)
                 if (data.error) {
                     alert("아이디와 패스워드를 다시 확인하세요")
                 } else {
@@ -31,7 +32,10 @@ const LoginComponent = () => {
                 }
             })
     }
-
+    const handleKeydown = (e) => {
+        if (e.key === "Enter")
+            handleClickLogin();
+    }
 
     return (
         <div className="border-2 border-sky-200 mt-10 m-2 p-4">
@@ -48,7 +52,7 @@ const LoginComponent = () => {
                 <div className="relative mb-4 flex w-full flex-wrap items-center">
                     <div className="w-full p-3 text-left font-bold">Password</div>
                     <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
-                        name="pw" type={'password'} value={loginParam.pw} onChange={handleChange} /> </div>
+                        name="pw" type={'password'} value={loginParam.pw} onChange={handleChange} onKeyDown={handleKeydown}/> </div>
             </div>
             <div className="flex justify-center">
                 <div className="relative mb-4 flex w-full justify-center">

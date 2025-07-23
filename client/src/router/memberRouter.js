@@ -2,16 +2,20 @@ import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 
 
-// const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
+const Member = lazy(() => import("../pages/member/memberRegisterPage"))
+
 
 const memberRouter = () => {
 
     return [
-        
-        // {
-        //     path: "",
-        //     element: <Suspense fallback={<Loading />}>< /></Suspense>,
-        // },
+        {
+            path: "myInfo",
+            element: <Suspense fallback={<Loading />}></Suspense>,
+        },
+        {
+            path: "modify",
+            element: <Suspense fallback={<Loading />}></Suspense>,
+        },
 
     ]
 

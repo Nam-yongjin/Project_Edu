@@ -1,7 +1,7 @@
 import { Suspense, lazy } from "react";
 import Loading from "./Loading";
 import { createBrowserRouter } from "react-router-dom";
-import memberRouter from "./memberRouter";
+import registerRouter from "./registerRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
@@ -15,7 +15,8 @@ const root = createBrowserRouter([
     },
     {
         path: "register",
-        element: <Suspense fallback={<Loading />}><Register /></Suspense>
+        element: <Suspense fallback={<Loading />}><Register /></Suspense>,
+        children: registerRouter()
     },
     {
         path: "login",

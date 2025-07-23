@@ -13,10 +13,22 @@ const useLogin = () => {
 
     // 로그인
     const doLogin = async (loginParam) => {
-        const result = await loginPost(loginParam);
+        try {
+            const result = await loginPost(loginParam);
+            if (result.error) {
+                return result; // 실패면 쿠키 저장하지 않고 리턴
+            }
+            saveAsCookie(result);
+            return result;
+        } catch (ex) {
+            console.error("로그인 실패:", ex);
 
-        saveAsCookie(result);
-        return result;
+            // 401 에러 메시지를 사용자에게 보여줄 수 있도록
+            return {
+                error: true,
+                message: "아이디 또는 비밀번호가 잘못되었습니다."
+            };
+        }
     };
 
     // 로그아웃
