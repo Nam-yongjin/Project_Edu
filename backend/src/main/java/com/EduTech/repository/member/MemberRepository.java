@@ -11,6 +11,8 @@ import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
+import java.util.List;
+
 
 public interface MemberRepository extends JpaRepository<Member, String>{
 
@@ -41,4 +43,7 @@ public interface MemberRepository extends JpaRepository<Member, String>{
 	@Modifying
 	@Query(value = "DELETE FROM member WHERE role = 'LEAVE' AND updatedAt <= DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
 	void deleteMembersAfterOneWeekLeave();
+	
+	// 다른 회원의 이메일과 카카오 이메일이 중복되는지 확인
+	Optional<Member> findByEmail(String Email);
 }

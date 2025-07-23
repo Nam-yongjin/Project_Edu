@@ -1,13 +1,29 @@
 package com.EduTech.service.member;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.EduTech.dto.member.CompanyDetailDTO;
 import com.EduTech.dto.member.CompanyModifyDTO;
 import com.EduTech.dto.member.CompanyRegisterDTO;
+import com.EduTech.dto.member.KakaoDTO;
+import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
@@ -19,6 +35,7 @@ import com.EduTech.dto.member.TeacherModifyDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberGender;
 import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
@@ -280,6 +297,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 회원 탈퇴
 	@Override
+	@Transactional
 	public void leaveMember(String memId) {
 		Member member = memberRepository.findById(memId).orElseThrow();
 		
@@ -318,4 +336,132 @@ public class MemberServiceImpl implements MemberService {
 	// 아이디 찾기
 		
 	// 비밀번호 찾기
+	
+	// 카카오 로그인
+	@Override
+	@Transactional
+	public MemberDTO getKakaoMember(String accessToken) {
+		KakaoDTO kakaoDTO = getInfoFromKakaoAccessToken(accessToken);
+		Optional<Member> result = memberRepository.findByEmail(kakaoDTO.getEmail());
+
+		Member member;
+		if (result.isPresent()) {	// 회원 로그인
+			member = result.get();
+		} else {	// 자동 회원가입
+			member = makeKakaoMember(kakaoDTO);
+			memberRepository.save(member);
+		}
+		MemberDTO memberDTO = entityToDTO(member);
+		return memberDTO;
+	}
+	private KakaoDTO getInfoFromKakaoAccessToken(String accessToken) {
+		String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
+
+		RestTemplate restTemplate = new RestTemplate();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + accessToken);
+		headers.add("Content-Type", "application/x-www-form-urlencoded");
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+
+		UriComponents uriBuilder = UriComponentsBuilder.fromUriString(kakaoGetUserURL).build();
+		ResponseEntity<LinkedHashMap> response = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity, LinkedHashMap.class);
+
+	    LinkedHashMap<String, Object> body = response.getBody();
+	    LinkedHashMap<String, Object> kakaoAccount = (LinkedHashMap<String, Object>) body.get("kakao_account");
+		
+	    try {
+	    	String email = (String) kakaoAccount.get("email");
+		    String name = (String) kakaoAccount.get("name");
+		    String genderStr = (String) kakaoAccount.get("gender");
+		    String birth = (String) kakaoAccount.get("birthday");   // MMDD
+		    String birthYear = (String) kakaoAccount.get("birthyear"); // YYYY
+		    String phoneNumber = (String) kakaoAccount.get("phone_number"); // +82 10-XXXX-XXXX
+		    LocalDate birthDate = null;
+		    try {
+		        birthDate = LocalDate.parse(birthYear + birth, DateTimeFormatter.ofPattern("yyyyMMdd"));
+		    } catch (Exception e) {
+		        // 파싱 실패 시 처리
+		        birthDate = null;
+		    }
+		    MemberGender gender = genderStr != null && genderStr.equalsIgnoreCase("male") ?
+		            MemberGender.MALE : MemberGender.FEMALE;
+
+		    return KakaoDTO.builder()
+		            .email(email)
+		            .name(name)
+		            .gender(gender)
+		            .birthDate(birthDate)
+		            .phone(phoneNumber)
+		            .build();
+	    } catch (Exception e) {
+	        System.out.println("카카오 유저 정보 파싱 중 오류: " + e.getMessage());
+	        e.printStackTrace();
+	        throw e;
+	    }
+
+	}
+	// 랜덤 아이디
+	private String generateRandomMemId() {
+	    int length = ThreadLocalRandom.current().nextInt(6, 17); // 6~16자
+	    String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	    StringBuilder sb = new StringBuilder(length);
+	    for (int i = 0; i < length; i++) {
+	        int index = ThreadLocalRandom.current().nextInt(characters.length());
+	        sb.append(characters.charAt(index));
+	    }
+	    return sb.toString();
+	}
+	// 랜덤 비밀번호
+	private String generateRandomPassword() {
+	    int length = ThreadLocalRandom.current().nextInt(6, 17); // 6~16자
+	    String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$.";
+	    StringBuilder sb = new StringBuilder(length);
+	    for (int i = 0; i < length; i++) {
+	        int index = ThreadLocalRandom.current().nextInt(characters.length());
+	        sb.append(characters.charAt(index));
+	    }
+	    return sb.toString();
+	}
+	// 전화번호 유효성 검증
+	private String normalizePhoneNumber(String kakaoPhoneNumber) {
+	    if (kakaoPhoneNumber == null) return null;
+
+	    // +82 10-1234-5678 -> 01012345678
+	    String normalized = kakaoPhoneNumber.replaceAll("[^0-9]", ""); // 숫자만 남김
+
+	    if (normalized.startsWith("82")) {
+	        normalized = "0" + normalized.substring(2); // 82 -> 0
+	    }
+
+	    return normalized;
+	}
+	private Member makeKakaoMember(KakaoDTO kakaoDTO) {
+		String memId = generateRandomMemId();	// 랜덤 아이디
+	    String rawPassword = generateRandomPassword();	// 랜덤 비밀번호
+	    String encodedPassword = passwordEncoder.encode(rawPassword);
+	    String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone()); // 전화번호 유효성
+	    
+	    System.out.println(memId);
+	    System.out.println(rawPassword);
+	    System.out.println(kakaoDTO.getName());
+	    System.out.println(kakaoDTO.getEmail());
+	    System.out.println(kakaoDTO.getBirthDate());
+	    System.out.println(kakaoDTO.getGender());
+	    System.out.println(normalizedPhone);
+	    
+		return Member.builder()
+	            .memId(memId)
+	            .pw(encodedPassword)
+	            .name(kakaoDTO.getName())
+	            .email(kakaoDTO.getEmail())
+	            .birthDate(kakaoDTO.getBirthDate())
+	            .gender(kakaoDTO.getGender())
+	            .phone(normalizedPhone)
+	            .state(MemberState.NORMAL)
+	            .role(MemberRole.USER)
+	            .kakao(kakaoDTO.getEmail())
+	            .build();
+	}
+	
 }

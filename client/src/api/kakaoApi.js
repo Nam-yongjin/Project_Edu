@@ -14,7 +14,7 @@ export const getKakaoLoginLink = () => {
 
 export const getAccessToken = async (authCode) => {
     const header = {
-        hewders: {
+        headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         }
     }
@@ -29,6 +29,14 @@ export const getAccessToken = async (authCode) => {
     const accessToken = res.data.access_token
 
     return accessToken
+}
+
+export const getMemberWithAccessToken = async (accessToken) => {
+
+    const res = await axios.get(`${host}/login/kakao?accessToken=${accessToken}`)
+
+    return res.data
+
 }
 
 // export const loginKakao = async (param) => {

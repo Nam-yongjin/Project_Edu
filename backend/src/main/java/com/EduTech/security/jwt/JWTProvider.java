@@ -15,7 +15,7 @@ import io.jsonwebtoken.security.Keys;
 
 public class JWTProvider {
 
-	public static String key;
+	public static String KEY = "secretKey!@#accessToken!@#refreshToekn!@#generateToken!@#validateToken";
 
 	public static String generateToken(Map<String, Object> valueMap, int min) {
 
@@ -23,15 +23,18 @@ public class JWTProvider {
 
 //		claims에 담긴 사용자 정보를 바탕으로 JWT 토큰 생성
 		try {
-			key = Keys.hmacShaKeyFor(JWTProvider.key.getBytes("UTF-8"));
+			key = Keys.hmacShaKeyFor(JWTProvider.KEY.getBytes("UTF-8"));
 
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 
-		String jwtStr = Jwts.builder().setHeader(Map.of("typ", "JWT")).setClaims(valueMap)
+		String jwtStr = Jwts.builder()
+				.setHeader(Map.of("typ", "JWT"))
+				.setClaims(valueMap)
 				.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-				.setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant())).signWith(key).compact();
+				.setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
+				.signWith(key).compact();
 
 		return jwtStr;
 
@@ -42,8 +45,11 @@ public class JWTProvider {
 
 //		전달된 토큰을 검증하고, 유효하면 claim(Map) 반환
 		try {
-			SecretKey key = Keys.hmacShaKeyFor(JWTProvider.key.getBytes("UTF-8"));
-			claim = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token) // 파싱 및 검증, 실패 시 에러
+			SecretKey key = Keys.hmacShaKeyFor(JWTProvider.KEY.getBytes("UTF-8"));
+			claim = Jwts.parserBuilder()
+					.setSigningKey(key)
+					.build()
+					.parseClaimsJws(token) // 파싱 및 검증, 실패 시 에러
 					.getBody();
 		} catch (MalformedJwtException malformedJwtException) {
 			throw new JWTException("MalFormed");
