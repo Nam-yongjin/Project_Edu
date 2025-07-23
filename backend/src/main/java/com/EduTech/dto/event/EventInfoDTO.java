@@ -24,7 +24,6 @@ public class EventInfoDTO {
     private String eventInfo;		// 소개
     private EventState state; 		// 신청전, 신청중, 신청마감
     private RevState revState;		// 상태(대기, 수락, 거절)
-    private String target;			// 모집대상
     private EventCategory category; // 모집대상 분류
     private Integer maxCapacity;	// 모집인원
     private Integer currCapacity;	// 현재인원
