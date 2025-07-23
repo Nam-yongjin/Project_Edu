@@ -3,7 +3,6 @@ package com.EduTech.service.event;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +24,13 @@ import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventBanner;
+import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.EventUse;
 import com.EduTech.entity.event.RevState;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.repository.event.EventBannerRepository;
 import com.EduTech.repository.event.EventInfoRepository;
@@ -82,9 +83,9 @@ public class EventServiceImpl implements EventService {
 	// 현재 행사 신청 가능여부
 	private EventState calculateState(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
 	    LocalDateTime now = LocalDateTime.now();
-	    if (now.isBefore(applyStartPeriod)) return EventState.신청전;
-	    else if (now.isAfter(applyEndPeriod)) return EventState.신청마감;
-	    else return EventState.신청중;
+	    if (now.isBefore(applyStartPeriod)) return EventState.BEFORE;
+	    else if (now.isAfter(applyEndPeriod)) return EventState.CLOSED;
+	    else return EventState.OPEN;
 	}
 	
 /*	
@@ -98,18 +99,16 @@ public class EventServiceImpl implements EventService {
 */
 	
 	// 모집대상 이건 나중에 category 로 바꿔야함
-	private boolean isEligible(String target, Member member) {
-        if (target == null || target.isBlank() || "전체".equals(target)) return true;
-        if (member.getBirthDate() == null) return false;
+	private boolean isEligible(EventCategory category, Member member) {
+	    if (category == null) return true; // 전체 대상
+	    if (member == null || member.getRole() == null) return false;
 
-        int age = Period.between(member.getBirthDate(), LocalDate.now()).getYears();
-        return switch (target) {
-            case "어린이" -> age >= 0 && age <= 12;
-            case "청소년" -> age >= 13 && age <= 18;
-            case "성인" -> age >= 19;
-            default -> false;
-        };
-    }
+	    return switch (category) {
+	        case USER -> member.getRole() == MemberRole.USER;
+	        case STUDENT -> member.getRole() == MemberRole.STUDENT;
+	        case TEACHER -> member.getRole() == MemberRole.TEACHER;
+	    };
+	}
 	
 	// ========================================
     // 3. 행사 등록/수정/삭제
@@ -117,13 +116,26 @@ public class EventServiceImpl implements EventService {
 	
 	// 행사 등록
 	@Override
-    public void registerEvent(EventInfoDTO dto, MultipartFile file) {
-        EventInfo info = modelMapper.map(dto, EventInfo.class);
-        info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
+	public void registerEvent(EventInfoDTO dto, MultipartFile file) {
+	    EventInfo info = modelMapper.map(dto, EventInfo.class);
 
-        setFileInfo(info, file);
-        infoRepository.save(info);
-    }
+	    // 누락 필드 보정
+	    info.setCurrCapacity(0); // 새 등록 이벤트는 현재 인원 0
+
+	    // null 방지: daysOfWeek는 @ElementCollection이므로 null이면 오류 발생 가능
+	    if (info.getDaysOfWeek() == null) {
+	        info.setDaysOfWeek(new ArrayList<>());
+	    }
+
+	    // 상태 계산
+	    info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
+
+	    // 파일 처리
+	    setFileInfo(info, file);
+
+	    // 저장
+	    infoRepository.save(info);
+	}
 	
 	// 행사 수정
 	@Override
@@ -391,7 +403,7 @@ public class EventServiceImpl implements EventService {
 	        throw new IllegalStateException("탈퇴한 계정은 신청할 수 없습니다.");
 	    }
 
-	    if (!isEligible(event.getTarget(), member)) {
+	    if (!isEligible(event.getCategory(), member)) {
 	        throw new IllegalStateException("신청 대상이 아닙니다.");
 	    }
 
@@ -452,7 +464,7 @@ public class EventServiceImpl implements EventService {
 	            .place(info.getPlace())
 	            .maxCapacity(info.getMaxCapacity())
 	            .currCapacity(useRepository.countByEventInfo(info.getEventNum()))
-	            .revState(RevState.ACCEPT)
+	            .revState(RevState.APPROVED)
 	            .memId(member != null ? member.getMemId() : null)
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
