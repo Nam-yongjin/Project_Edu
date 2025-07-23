@@ -71,12 +71,12 @@ public class DemonstrationServiceTests {
 	EventUse eventUse;
 	@MockBean
 	EventUseRepository eventUseRepository;
-	// @Test
+	//@Test
 	@DisplayName("검색어 없는 실증 교사 조회 테스트")
 	void getAllDemResWithoutSearch() {
 		// given
 		String search = "";
-		int pageCount = 0;
+		int pageCount = 1;
 
 		// when
 		PageResponseDTO<DemonstrationListReserveDTO> response = demonstrationService.getAllDemRes(search, pageCount);
@@ -92,11 +92,11 @@ public class DemonstrationServiceTests {
 		});
 	}
 
-	// @Test
+	//@Test
 	@DisplayName("검색어로 필터링된 실증 교사 페이지 조회 테스트")
 	void getAllDemResWithSearch() {
 		// given
-		String search = "자동";
+		String search = "고";
 		int pageCount = 0;
 
 		// when
@@ -113,7 +113,7 @@ public class DemonstrationServiceTests {
 		});
 	}
 
-	// @Test
+	//@Test
 	@DisplayName("검색어 없는 실증 기업 조회 테스트")
 	void getAllDemRegWithoutSearch() {
 		// given
@@ -135,11 +135,11 @@ public class DemonstrationServiceTests {
 		});
 	}
 
-	// @Test
+	//@Test
 	@DisplayName("검색어로 필터링된 실증 기업 페이지 조회 테스트")
 	void getAllDemRegWithSearch() {
 		// given
-		String search = "털";
+		String search = "트";
 		int pageCount = 0;
 
 		// when
@@ -177,12 +177,12 @@ public class DemonstrationServiceTests {
 		demonstrationService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
 	}
 */
-	// @Test
+	//@Test
 	@DisplayName("실증 신청 물품 대여 현황 조회 테스트")
 	void getDemRental() {
-		String search = "product";
+		String search = "T";
 		int pageCount = 0;
-		String memId = "user2";
+		String memId = "user0";
 		PageResponseDTO<DemonstrationRentalListDTO> response = demonstrationService.getAllDemRental(memId, search,
 				pageCount);
 
@@ -251,21 +251,21 @@ public class DemonstrationServiceTests {
 	@DisplayName("실증 장비 신청 상세 페에지")
 	void demDetail()
 	{
-		Long demNum=Long.valueOf(111);
+		Long demNum=Long.valueOf(110);
 		DemonstrationDetailDTO demonstrationDetailDTO=demonstrationService.getDemDetailList(demNum);
 		System.out.println(demonstrationDetailDTO);
 	}
 	
-	@Test
+	//@Test
 	@DisplayName("예약 테스트")
 	void reservationDem() {
 		DemonstrationReservationDTO demonstrationReservationDTO=new DemonstrationReservationDTO();
-		demonstrationReservationDTO.setMemId("user2");
-		demonstrationReservationDTO.setDemNum(Long.valueOf(105));
+		demonstrationReservationDTO.setMemId("user12");
+		demonstrationReservationDTO.setDemNum(Long.valueOf(110));
 		demonstrationReservationDTO.setApplyAt(LocalDate.now());
 		demonstrationReservationDTO.setDemonstrationstate(DemonstrationState.ACCEPT);
-		demonstrationReservationDTO.setStartDate(LocalDate.parse("2025-08-20"));
-		demonstrationReservationDTO.setEndDate(LocalDate.parse("2025-08-25"));
+		demonstrationReservationDTO.setStartDate(LocalDate.parse("2025-09-10"));
+		demonstrationReservationDTO.setEndDate(LocalDate.parse("2025-09-30"));
 		
 		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
 	}
@@ -276,7 +276,7 @@ public class DemonstrationServiceTests {
 	@DisplayName("예약 취소")
 	void reservationCancel() {
 		DemonstrationReservationCancelDTO demonstrationReservationCancelDTO=new DemonstrationReservationCancelDTO();
-		demonstrationReservationCancelDTO.setDemNum(Long.valueOf(105));
+		demonstrationReservationCancelDTO.setDemNum(Long.valueOf(106));
 		demonstrationReservationCancelDTO.setMemId("user2");
 		demonstrationService.demonstrationReservationCancel(demonstrationReservationCancelDTO);
 	}
@@ -288,12 +288,12 @@ public class DemonstrationServiceTests {
 	void addDem() {
 
 		DemonstrationFormDTO demonstrationFormDTO = new DemonstrationFormDTO();
-		demonstrationFormDTO.setDemInfo("이 상품은 아주 멋진 상품입니다.");
-		demonstrationFormDTO.setDemMfr("아주 멋진 상품을 만든 제조사 입니다.");
-		demonstrationFormDTO.setDemName("멋진 상품임");
+		demonstrationFormDTO.setDemInfo("힘들");
+		demonstrationFormDTO.setDemMfr("다");
+		demonstrationFormDTO.setDemName("그만");
 		demonstrationFormDTO.setExpDate(LocalDate.parse("2025-10-20"));
-		demonstrationFormDTO.setItemNum(Long.valueOf(120));
-		demonstrationFormDTO.setMemId("user3");
+		demonstrationFormDTO.setItemNum(Long.valueOf(125));
+		demonstrationFormDTO.setMemId("user1");
 
 		try {
 			List<MultipartFile> imageList = new ArrayList<>();
@@ -374,7 +374,7 @@ public class DemonstrationServiceTests {
 	//@Test
 	@DisplayName("상품 삭제 테스트")
 	public void deleteDem() {
-		Long demNum=Long.valueOf(111);
+		Long demNum=Long.valueOf(100);
 		
 		demonstrationService.deleteDemonstration(demNum);
 	}
