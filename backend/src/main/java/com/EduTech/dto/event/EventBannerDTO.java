@@ -20,10 +20,10 @@ public class EventBannerDTO {
 	private String eventName;		// 행사명
 	private String target;			// 모집 대상
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime eventStartPeriod; // 행사시작기간(년 일 월)
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime eventEndPeriod; 	// 행사종료기간
 	
 	private List<Integer> daysOfWeek; // 요일 (숫자)
