@@ -28,6 +28,7 @@ import com.EduTech.entity.event.EventBanner;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.EventUse;
+import com.EduTech.entity.event.RevState;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.repository.event.EventBannerRepository;
@@ -79,14 +80,24 @@ public class EventServiceImpl implements EventService {
     }
 	
 	// 현재 행사 신청 가능여부
+	private EventState calculateState(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
+	    LocalDateTime now = LocalDateTime.now();
+	    if (now.isBefore(applyStartPeriod)) return EventState.신청전;
+	    else if (now.isAfter(applyEndPeriod)) return EventState.신청마감;
+	    else return EventState.신청중;
+	}
+	
+/*	
+	// 현재 행사 신청 가능여부
 	private String calculateState(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(applyStartPeriod)) return "신청전";
         else if (now.isAfter(applyEndPeriod)) return "신청마감";
         else return "신청중";
     }
+*/
 	
-	// 모집대상
+	// 모집대상 이건 나중에 category 로 바꿔야함
 	private boolean isEligible(String target, Member member) {
         if (target == null || target.isBlank() || "전체".equals(target)) return true;
         if (member.getBirthDate() == null) return false;
@@ -155,7 +166,7 @@ public class EventServiceImpl implements EventService {
             bannerRepository.delete(banner);
         });
 
-        List<EventUse> uses = useRepository.findByEvent_eventNum(eventNum);
+        List<EventUse> uses = useRepository.findByEventInfo_EventNum(eventNum);
         useRepository.deleteAll(uses);
 
         if (programToDelete.getFilePath() != null && !programToDelete.getFilePath().isEmpty()) {
@@ -193,7 +204,7 @@ public class EventServiceImpl implements EventService {
 		EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
 		dto.setOriginalName(info.getOriginalName());
 		dto.setState(calculateState(info.getApplyStartPeriod(), info.getApplyEndPeriod()));
-		dto.setCurrCapacity(useRepository.countByEvent(eventNum));
+		dto.setCurrCapacity(useRepository.countByEventInfo(eventNum));
 		dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
 		return dto;
 	}	
@@ -217,7 +228,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
             EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
-            dto.setCurrCapacity(useRepository.countByEvent(event.getEventNum()));
+            dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
             dto.setOriginalName(event.getOriginalName());
             dto.setState(calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod()));
             dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
@@ -232,7 +243,7 @@ public class EventServiceImpl implements EventService {
     public Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, EventState state) {
         option = (option != null && !option.isBlank()) ? option : "all";
         query = (query != null && !query.isBlank()) ? query : null;
-        state = (state != null && !state.isBlank()) ? state : null;
+        state = (state != null && !state.name().isBlank()) ? state : null;
 
         String searchType = (query != null && !query.isBlank()
                 && ("progName".equals(option) || "content".equals(option) || "all".equals(option))) ? option : null;
@@ -241,7 +252,7 @@ public class EventServiceImpl implements EventService {
 
         return result.map(p -> {
             EventInfoDTO dto = modelMapper.map(p, EventInfoDTO.class);
-            dto.setCurrCapacity(useRepository.countByEvent(p.getEventNum()));
+            dto.setCurrCapacity(useRepository.countByEventInfo(p.getEventNum()));
             dto.setOriginalName(p.getOriginalName());
             dto.setState(calculateState(p.getApplyStartPeriod(), p.getApplyEndPeriod()));
             dto.setDayNames(convertToDayNames(p.getDaysOfWeek()));
@@ -261,14 +272,14 @@ public class EventServiceImpl implements EventService {
     public Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String option, String query, EventState state) {
         option = (option != null && !option.isBlank()) ? option : "all";
         query = (query != null && !query.isBlank()) ? query : null;
-        state = (state != null && !state.isBlank()) ? state : null;
+        state = (state != null && !state.name().isBlank()) ? state : null;
         String searchType = "eventName".equals(option) ? option : null;
 
         Page<EventInfo> result = infoRepository.searchAdminEvent(searchType, query, state, null, null, pageable);
 
         return result.map(p -> {
         	EventInfoDTO dto = modelMapper.map(p, EventInfoDTO.class);
-            dto.setCurrCapacity(useRepository.countByEvent(p.getEventNum()));
+            dto.setCurrCapacity(useRepository.countByEventInfo(p.getEventNum()));
             dto.setOriginalName(p.getOriginalName());
             dto.setState(calculateState(p.getApplyStartPeriod(), p.getApplyEndPeriod()));
             dto.setDayNames(convertToDayNames(p.getDaysOfWeek()));
@@ -283,7 +294,7 @@ public class EventServiceImpl implements EventService {
         List<EventInfo> infoList = infoRepository.findByEventEndPeriodGreaterThanEqual(LocalDate.now(), sort);
         return infoList.stream().map(p -> {
             EventInfoDTO dto = modelMapper.map(p, EventInfoDTO.class);
-            dto.setCurrCapacity(useRepository.countByEvent(p.getEventNum()));
+            dto.setCurrCapacity(useRepository.countByEventInfo(p.getEventNum()));
             return dto;
         }).collect(Collectors.toList());
     }
@@ -409,7 +420,7 @@ public class EventServiceImpl implements EventService {
 	// 행사 신청 여부 확인
 	@Override
 	public boolean isAlreadyApplied(Long eventNum, String memIid) {
-	    return useRepository.existsByEventInfo_eventNumAndMember_memId(eventNum, memIid);
+	    return useRepository.existsByEventInfo_EventNumAndMember_MemId(eventNum, memIid);
 	}
 	
 	// 행사 신청 가능 여부(화면단 버튼 비활성화용)
@@ -420,20 +431,8 @@ public class EventServiceImpl implements EventService {
 	    return event.getApplyEndPeriod().toLocalDate().isAfter(LocalDate.now());
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	// ========================================
-	// 9. 공통 메서드
+	// 7. 공통 메서드
 	// ========================================
 	private EventUseDTO toDTO(EventUse use) {
 	    EventInfo info = use.getEventInfo();
@@ -452,8 +451,8 @@ public class EventServiceImpl implements EventService {
 	            .eventEndPeriod(info.getEventEndPeriod())
 	            .place(info.getPlace())
 	            .maxCapacity(info.getMaxCapacity())
-	            .currCapacity(useRepository.countByEvent(info.getEventNum()))
-	            .revState(revState)
+	            .currCapacity(useRepository.countByEventInfo(info.getEventNum()))
+	            .revState(RevState.ACCEPT)
 	            .memId(member != null ? member.getMemId() : null)
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
@@ -536,7 +535,7 @@ public class EventServiceImpl implements EventService {
 	// 관리자용: 특정 프로그램의 신청자 목록 조회
 	@Override
 	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
-		List<EventUse> list = useRepository.findAllByMember_MemId(eventNum);
+		List<EventUse> list = useRepository.findByEventInfo_EventNum(eventNum);
 		return list.stream().map(this::toDTO).collect(Collectors.toList());
 	}
 
@@ -547,13 +546,13 @@ public class EventServiceImpl implements EventService {
 		Page<EventInfo> result = noFilter ? infoRepository.findAll(pageable)
 				: infoRepository.searchEvent(eventName, eventInfo, pageable);
 
-		final String finalState = (state != null && !state.isBlank()) ? state : null;
+		final String finalState = (state != null && !state.name().isBlank()) ? state.name() : null;
 
 		List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
 			EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
-			dto.setCurrCapacity(useRepository.countByEvent(event.getEventNum()));
+			dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
 			dto.setOriginalName(event.getOriginalName());
-			String calculatedState = calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod());
+			EventState calculatedState = calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod());
 			dto.setState(calculatedState);
 			dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
 			return dto;

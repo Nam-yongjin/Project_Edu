@@ -28,7 +28,6 @@ public class EventBanner {
 	
 	@Column(nullable = false, length = 100)
 	private String originalName;
-
 	@Column(nullable = false, length = 200)
 	private String filePath;
 	

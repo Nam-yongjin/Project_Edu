@@ -1,5 +1,13 @@
 package com.EduTech.entity.event;
 
 public enum RevState {
-	WAIT,ACCEPT,REJECT //대기, 수락, 거절
+	WAITING("대기"),
+    APPROVED("수락"),
+    REJECTED("거절");
+
+    private final String label;
+
+    RevState(String label) { this.label = label; }
+
+    public String getLabel() { return label; }
 }
