@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 
 import com.EduTech.entity.event.EventBanner;
+import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.member.Member;
@@ -53,7 +54,7 @@ public class EventBannerRepositoryTest {
                 .email("admin@test.com")
                 .checkSms(true)
                 .checkEmail(true)
-                .role(MemberRole.ADMIN)
+                .role(MemberRole.USER)
                 .state(MemberState.NORMAL)
                 .build();
         memberRepository.save(admin);
@@ -66,7 +67,7 @@ public class EventBannerRepositoryTest {
                 .place("1층 강의실")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 1, 10, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 30, 12, 0))
-                .target("청소년")
+                .category(EventCategory.USER) 
                 .maxCapacity(30)
                 .currCapacity(0)
                 .state(EventState.OPEN)

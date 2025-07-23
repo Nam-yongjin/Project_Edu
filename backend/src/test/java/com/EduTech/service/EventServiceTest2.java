@@ -1,4 +1,4 @@
-package com.EduTech.repository;
+package com.EduTech.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -18,6 +18,8 @@ import org.springframework.test.annotation.Rollback;
 
 import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.entity.event.EventCategory;
+import com.EduTech.entity.event.RevState;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
 import com.EduTech.entity.member.MemberRole;
@@ -51,7 +53,7 @@ public class EventServiceTest2 {
                 .name("관리자")
                 .gender(MemberGender.MALE)
                 .birthDate(LocalDate.of(1985, 1, 1))
-                .phone("01012345678")
+                .phone("12345678901")
                 .addr("서울시 강남구")
                 .email("admin@edutech.com")
                 .checkSms(true)
@@ -68,14 +70,14 @@ public class EventServiceTest2 {
     public void applyEventTest() {
         // 1. 사용자 등록
         Member member = Member.builder()
-                .memId("testUser01")
-                .pw("pw1234")
+                .memId("testUser02")
+                .pw("pw12345")
                 .name("테스트 사용자")
                 .gender(MemberGender.FEMALE)
                 .birthDate(LocalDate.of(2008, 5, 10)) // 청소년
-                .phone("01055557777")
+                .phone("01011112222")
                 .addr("서울시 중구")
-                .email("user@test.com")
+                .email("user02@test.com")
                 .checkSms(true)
                 .checkEmail(true)
                 .role(MemberRole.USER)
@@ -88,7 +90,7 @@ public class EventServiceTest2 {
                 .eventName("신청 가능 이벤트")
                 .eventInfo("테스트용 신청 프로그램")
                 .place("4층 강의실")
-                .target("청소년") // 청소년만 가능
+                .category(EventCategory.USER) 
                 .applyStartPeriod(LocalDateTime.now().minusDays(1))
                 .applyEndPeriod(LocalDateTime.now().plusDays(5))
                 .eventStartPeriod(LocalDateTime.now().plusDays(10))
@@ -112,6 +114,7 @@ public class EventServiceTest2 {
         EventApplyRequestDTO applyDTO = EventApplyRequestDTO.builder()
                 .eventNum(eventNum)
                 .memId(member.getMemId())
+                .revState(RevState.WAITING)
                 .build();
 
         // 5. 예외 없이 처리되는지 검증

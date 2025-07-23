@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 
+import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.EventUse;
@@ -66,7 +67,7 @@ public class EventUseRepositoryTest {
 	                .eventInfo("테스트")
 	                .eventStartPeriod(LocalDateTime.of(2025, 6, 1, 14, 0))
 	                .eventEndPeriod(LocalDateTime.of(2025, 6, 30, 16, 0))
-	                .target("성인")
+	                .category(EventCategory.USER) 
 	                .maxCapacity(20)
 	                .originalName("test.pdf")
 	                .filePath("/files/test.pdf")

@@ -67,9 +67,6 @@ public class EventInfo {
 	@Column(nullable = false)
 	private LocalDateTime eventEndPeriod; // 행사종료기간
 
-	@Column(nullable = false, length = 20)
-	private String target; // 수강대상
-
 	@Column(nullable = false)
 	private int maxCapacity; // 모집인원
 	
