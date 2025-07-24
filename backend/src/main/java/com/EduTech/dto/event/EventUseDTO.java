@@ -27,7 +27,9 @@ public class EventUseDTO {
 	private String place;					// 장소
 	private Integer maxCapacity;			// 모집인원
 	private Integer currCapacity;			// 현재인원
-	private RevState revState;				// 상태(대기, 수락, 거절)
+	
+	@Builder.Default
+	private RevState revState = RevState.WAITING;	// 상태(대기, 수락, 거절)
 	
 	private Long eventNum;	// 행사 아이디
 	private String memId;	// 회원 아이디
