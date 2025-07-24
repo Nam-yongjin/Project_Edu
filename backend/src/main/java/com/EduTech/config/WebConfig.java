@@ -2,6 +2,7 @@ package com.EduTech.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.EduTech.controller.formatter.LocalDateFormatter;
@@ -19,4 +20,5 @@ public class WebConfig implements WebMvcConfigurer{
 		registry.addFormatter(new LocalDateTimeFormatter());
 		registry.addFormatter(new LocalTimeFormatter());
 	}
+	
 }

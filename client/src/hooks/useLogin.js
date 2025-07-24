@@ -58,6 +58,6 @@ const useLogin = () => {
             return
         }
     }
-    return { loginState, isLogin, doLogin, doLogout, /*doLoginKakao,*/ saveAsCookie, exceptionHandle }
+    return { loginState, isLogin, doLogin, doLogout, saveAsCookie, exceptionHandle }
 }
 export default useLogin
