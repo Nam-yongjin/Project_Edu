@@ -97,7 +97,7 @@ public class AdminServiceImpl implements AdminService {
 		}
 
 		// 기본 Pageable (페이지, 사이즈는 클라이언트에서 넘긴다고 가정)
-		Pageable pageable = PageRequest.of(pageCount, 10, Sort.by("id").descending());
+		Pageable pageable = PageRequest.of(pageCount, 10, Sort.by("memId").descending());
 
 		Page<Member> memberPage = memberRepository.findAll(spec, pageable);
 
@@ -117,7 +117,7 @@ public class AdminServiceImpl implements AdminService {
 			dtoList.add(adminMemberViewResDTO);
 		}
 
-		return new PageResponseDTO<AdminMemberViewResDTO>(dtoList, memberPage.getNumber(), memberPage.getTotalPages());
+		return new PageResponseDTO<AdminMemberViewResDTO>(dtoList, memberPage.getTotalPages(),memberPage.getNumber());
 	}
 
 	// 관리자가 회원 상태 수정하는 기능
