@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
-import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
@@ -27,7 +26,6 @@ import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
-import com.EduTech.dto.demonstration.PageResponseDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationImage;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;

@@ -6,9 +6,11 @@ import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.member.MemberState;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 // 관리자 회원 정보 조회 dto(백->프론트)
 @Data
+@NoArgsConstructor
 public class AdminMemberViewResDTO {
 	private String memId; // 회원 아이디
 	private String name; // 회원 이름
