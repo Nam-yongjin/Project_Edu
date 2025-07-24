@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
-import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
@@ -26,8 +25,6 @@ import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
-import com.EduTech.dto.demonstration.PageResponseDTO;
-import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.demonstration.DemonstrationService;
 
 import lombok.RequiredArgsConstructor;
@@ -87,7 +84,7 @@ public class DemonstrationController {
 	// 예약 날짜 확인
 	@GetMapping("/demResCon")
 	public List<DemonstrationTimeResDTO> checkReservationStateList(
-			@RequestBody DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
+			 DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
 		List<DemonstrationTimeResDTO> checkResList = demonstrationService
 				.checkReservationState(demonstrationTimeReqDTO);
 		return checkResList;
