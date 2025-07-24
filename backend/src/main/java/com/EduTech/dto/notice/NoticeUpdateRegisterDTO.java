@@ -18,6 +18,10 @@ public class NoticeUpdateRegisterDTO {
 	
 	private boolean isPinned; //게시판 고정
 	
+	private String name; //이름
+	
+	private String memId; //아이디
+	
 	private List<String> oldFiles; //기존 파일목록
 	
 	private List<MultipartFile> newFiles; //새로 업로드 할 파일
