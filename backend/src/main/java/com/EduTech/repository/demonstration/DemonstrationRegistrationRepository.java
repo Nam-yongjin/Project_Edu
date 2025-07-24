@@ -43,6 +43,10 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
      @Param("demNum") Long demNum,
      @Param("memId") String memId
     ); 
+	
+	// 나중에 회원 탈퇴할때, 실증 등록 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
+	@Query("SELECT state FROM DemonstrationRegistration WHERE member.memId=:memId")
+	DemonstrationState findByState(@Param("memId") String memId);
 }
 
 
