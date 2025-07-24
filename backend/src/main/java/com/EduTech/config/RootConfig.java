@@ -21,10 +21,10 @@ public class RootConfig {
 			.setMatchingStrategy(MatchingStrategies.LOOSE)
 			.setSkipNullEnabled(true);	//event에 등록시간null 중복입력 방지를 위한 코드 추가
 		
-		// ✅ ID 필드 매핑 방지 (중요)
+		// 필드 매핑 방지 (중요)
 		modelMapper.typeMap(EventInfoDTO.class, EventInfo.class)
         	.addMappings(mapper -> {
-        		mapper.skip(EventInfo::setEventNum);    // ID는 그대로 두고
+        		mapper.skip(EventInfo::setEventNum);    // EventNum null로 덮어쓰기 방지
         		mapper.skip(EventInfo::setApplyAt);     // 등록일은 null로 덮어쓰지 않도록 방지
         	});
 
