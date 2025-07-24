@@ -100,7 +100,7 @@ public class MemberRepositoryTests {
 				.role(MemberRole.USER)
 				.build();
 		memberRepository.save(member);
-		memberRepository.flush();;
+		memberRepository.flush();
 		
 	}
 	

@@ -3,7 +3,6 @@ package com.EduTech.service.member;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.EduTech.dto.member.MemberDTO;
@@ -35,13 +34,4 @@ public class MemberDetailService implements UserDetailsService{
         return memberDTO;
     }
     
-	public UserDetails loadUserByKakao(String kakaoEmail) throws UsernameNotFoundException {
-		System.out.println(">> 로그인 시도 ID: " + kakaoEmail);
-		Member member = memberRepository.findByKakao(kakaoEmail)
-				.orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
-		
-		MemberDTO memberDTO = memberService.entityToDTO(member);
-		
-		return memberDTO;
-	}
 }
