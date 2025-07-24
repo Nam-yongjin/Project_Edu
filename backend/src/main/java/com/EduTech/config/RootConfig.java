@@ -23,7 +23,10 @@ public class RootConfig {
 		
 		// ✅ ID 필드 매핑 방지 (중요)
 		modelMapper.typeMap(EventInfoDTO.class, EventInfo.class)
-        	.addMappings(mapper -> mapper.skip(EventInfo::setEventNum));
+        	.addMappings(mapper -> {
+        		mapper.skip(EventInfo::setEventNum);    // ID는 그대로 두고
+        		mapper.skip(EventInfo::setApplyAt);     // 등록일은 null로 덮어쓰지 않도록 방지
+        	});
 
 		
 		return modelMapper;
