@@ -30,6 +30,7 @@ import com.EduTech.repository.notice.NoticeSpecifications;
 import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.util.FileUtil;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,6 +43,13 @@ public class NoticeServiceImpl implements NoticeService {
 	private final MemberRepository memberRepository; // MemberEntity 가져오려면 필요
 	private final ModelMapper modelMapper; // DTO <-> Entity 매핑을 위해 필요
 	private final FileUtil fileUtil; // 파일 처리를 위해 필요
+	
+	@PostConstruct //Test 돌릴 때 ModelMapper가 혼동할 때 넣어줌
+	public void setupModelMapper() {
+	    modelMapper.getConfiguration().setAmbiguityIgnored(true);
+	    modelMapper.typeMap(Notice.class, NoticeDetailDTO.class)
+	        .addMapping(src -> src.getMember().getMemId(), NoticeDetailDTO::setWriterMemid);
+	}
 
 	// 공지사항 등록
 	@Override // 상위 타입 메서드 재정의
