@@ -1,8 +1,5 @@
 package com.EduTech.service;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +7,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.EduTech.dto.admin.AdminMessageDTO;
+import com.EduTech.dto.Page.PageResponseDTO;
+import com.EduTech.dto.admin.AdminMemberViewReqDTO;
+import com.EduTech.dto.admin.AdminMemberViewResDTO;
+import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
+import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.entity.demonstration.DemonstrationState;
+import com.EduTech.entity.member.MemberRole;
+import com.EduTech.entity.member.MemberState;
 import com.EduTech.service.admin.AdminService;
 import com.EduTech.service.mail.MailService;
 
@@ -23,6 +25,61 @@ public class AdminServiceTests {
 	AdminService adminService;
 	@Autowired
 	MailService mailService;
+	
+	//@Test
+	@DisplayName("res 상태 업데이트 테스트")
+	public void ResStateUpdateTest() {
+		DemonstrationApprovalResDTO demonstrationApprovalResDTO=new DemonstrationApprovalResDTO();
+		demonstrationApprovalResDTO.setDemonstrationState(DemonstrationState.REJECT);
+		demonstrationApprovalResDTO.setDemRevNum(Long.valueOf(201));
+		demonstrationApprovalResDTO.setMemId("user0");
+		adminService.approveOrRejectDemRes(demonstrationApprovalResDTO);
+	}
+	
+	//@Test
+	@DisplayName("reg 상태 다중 업데이트 테스트")
+	public void RegStateUpdateTest() {
+		DemonstrationApprovalRegDTO demonstrationApprovalRegDTO=new DemonstrationApprovalRegDTO();
+		demonstrationApprovalRegDTO.setDemonstrationState(DemonstrationState.ACCEPT);
+		demonstrationApprovalRegDTO.setDemRegNum(Long.valueOf(313));
+		demonstrationApprovalRegDTO.setMemId("user1");
+		adminService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
+	}
+		
+	//@Test
+	@DisplayName("회원 상태 업데이트 테스트") 
+	public void MemStateUpdateTest() {
+		List<String> memId=new ArrayList<>();
+		memId.add("user3");
+		memId.add("user10");
+		memId.add("user1");
+		MemberState state=MemberState.BEN;
+		adminService.MemberStateChange(memId,state);
+	}
+	
+	//@Test
+	@DisplayName("회원 상태 다중 업데이트 테스트") 
+	public void MemStateUpdateOneTest() {
+		List<String> memId=new ArrayList<>();
+		memId.add("user1");
+		MemberState state=MemberState.NORMAL;
+		adminService.MemberStateChange(memId,state);
+	}
+	
+	
+	//@Test
+	@DisplayName("관리자 회원 목록 페이지 조회 기능 테스트")
+	public void adminMemberListTest() {
+		AdminMemberViewReqDTO adminMemberViewReqDTO=new AdminMemberViewReqDTO();
+		adminMemberViewReqDTO.setState(MemberState.BEN);
+		int pageCount=0;
+		
+		PageResponseDTO<AdminMemberViewResDTO> members=adminService.adminViewMembers(adminMemberViewReqDTO,pageCount);
+		
+		System.out.println(members);
+		
+	}
+	
 /*
 	// @Test
 	@DisplayName("simple mail 테스트")

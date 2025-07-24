@@ -145,9 +145,5 @@ public class DemonstrationController {
 		return ResponseEntity.ok("실증 물품 삭제 완료");
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
 	}
-	
-	
-	
-	
 
 }
