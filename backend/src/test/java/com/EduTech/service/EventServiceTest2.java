@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -39,9 +38,6 @@ public class EventServiceTest2 {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     private Member admin;
 
@@ -75,7 +71,7 @@ public class EventServiceTest2 {
                 .name("테스트 사용자")
                 .gender(MemberGender.FEMALE)
                 .birthDate(LocalDate.of(2008, 5, 10)) // 청소년
-                .phone("01011112222")
+                .phone("01021211212")
                 .addr("서울시 중구")
                 .email("user02@test.com")
                 .checkSms(true)
