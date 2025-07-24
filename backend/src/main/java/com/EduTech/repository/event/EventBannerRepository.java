@@ -1,6 +1,6 @@
 package com.EduTech.repository.event;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,14 +21,14 @@ public interface EventBannerRepository extends JpaRepository<EventBanner, Long> 
 			    SELECT pb FROM EventBanner pb
 			    WHERE pb.eventInfo.eventEndPeriod >= :today
 			""")
-	List<EventBanner> findValidBanners(@Param("today") LocalDate today);
+	List<EventBanner> findValidBanners(@Param("today") LocalDateTime today);
 
 	// MAX 3개로 제한
 	@Query("""
 			    SELECT COUNT(pb) FROM EventBanner pb
 			    WHERE pb.eventInfo.eventEndPeriod >= :today
 			""")
-	long countValidBanners(@Param("today") LocalDate today);
+	long countValidBanners(@Param("today") LocalDateTime today);
 	
 	
 }

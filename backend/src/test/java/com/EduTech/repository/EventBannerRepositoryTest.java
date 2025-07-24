@@ -49,7 +49,7 @@ public class EventBannerRepositoryTest {
                 .name("관리자")
                 .gender(MemberGender.MALE)
                 .birthDate(LocalDate.of(1990, 1, 1))
-                .phone("01011112222")
+                .phone("01012355343")
                 .addr("대구")
                 .email("admin@test.com")
                 .checkSms(true)

@@ -19,7 +19,7 @@ public class EventBannerDTO {
 	private Long eventInfoId;		// 
 	
 	private String eventName;		// 행사명
-	private EventCategory category;			// 모집 대상
+	private EventCategory category;	// 모집 대상
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime eventStartPeriod; // 행사시작기간(년 일 월)

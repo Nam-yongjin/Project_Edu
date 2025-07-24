@@ -88,17 +88,7 @@ public class EventServiceImpl implements EventService {
 	    else return EventState.OPEN;
 	}
 	
-/*	
-	// 현재 행사 신청 가능여부
-	private String calculateState(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isBefore(applyStartPeriod)) return "신청전";
-        else if (now.isAfter(applyEndPeriod)) return "신청마감";
-        else return "신청중";
-    }
-*/
-	
-	// 모집대상 이건 나중에 category 로 바꿔야함
+	// 모집대상
 	private boolean isEligible(EventCategory category, Member member) {
 	    if (category == null) return true; // 전체 대상
 	    if (member == null || member.getRole() == null) return false;
@@ -126,6 +116,9 @@ public class EventServiceImpl implements EventService {
 	    if (info.getDaysOfWeek() == null) {
 	        info.setDaysOfWeek(new ArrayList<>());
 	    }
+	    
+	    // 작성시간
+	    info.setApplyAt(LocalDateTime.now());
 
 	    // 상태 계산
 	    info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
@@ -138,6 +131,7 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	// 행사 수정
+	/*
 	@Override
     public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
         EventInfo origin = infoRepository.findById(eventNum)
@@ -160,11 +154,39 @@ public class EventServiceImpl implements EventService {
 
         infoRepository.save(origin);
     }
+	*/
+	@Override
+	public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
+	    EventInfo origin = infoRepository.findById(eventNum)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+
+	    // ⚠ ID 필드 덮어쓰기 방지를 위해 null로 설정하거나 수동 매핑
+	    dto.setEventNum(null); // ID를 덮어쓰지 않도록 방지
+
+	    String originalFilePath = origin.getFilePath();
+	    String originalFileName = origin.getOriginalName();
+
+	 // ★ 여기서 ID를 건드리지 않게 modelMapper 설정되어 있어야 함
+	    modelMapper.map(dto, origin);
+
+	    // 파일 업로드 처리
+	    if (file != null && !file.isEmpty()) {
+	        if (originalFilePath != null && !originalFilePath.isEmpty()) {
+	            fileUtil.deleteFiles(List.of(originalFilePath));
+	        }
+	        setFileInfo(origin, file);
+	    } else {
+	        origin.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : originalFilePath);
+	        origin.setOriginalName(dto.getOriginalName() != null ? dto.getOriginalName() : originalFileName);
+	    }
+
+	    infoRepository.save(origin);
+	}
 	
-	// 행사 종료
+	// 행사 삭제
 	@Override
     public void deleteEvent(Long eventNum) {
-        EventInfo programToDelete = infoRepository.findById(eventNum)
+        EventInfo eventToDelete = infoRepository.findById(eventNum)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
 
         bannerRepository.findByEventInfo_EventNum(eventNum).ifPresent(banner -> {
@@ -181,15 +203,15 @@ public class EventServiceImpl implements EventService {
         List<EventUse> uses = useRepository.findByEventInfo_EventNum(eventNum);
         useRepository.deleteAll(uses);
 
-        if (programToDelete.getFilePath() != null && !programToDelete.getFilePath().isEmpty()) {
+        if (eventToDelete.getFilePath() != null && !eventToDelete.getFilePath().isEmpty()) {
             try {
-                fileUtil.deleteFiles(List.of(programToDelete.getFilePath()));
+                fileUtil.deleteFiles(List.of(eventToDelete.getFilePath()));
             } catch (RuntimeException e) {
                 throw new RuntimeException("파일 삭제 중 문제가 발생했습니다. 관리자에게 문의해주세요.");
             }
         }
 
-        infoRepository.delete(programToDelete);
+        infoRepository.delete(eventToDelete);
     }
 	
 	// ========================================
@@ -203,7 +225,7 @@ public class EventServiceImpl implements EventService {
 		return infoRepository.findAll().stream().filter(info -> !info.getApplyEndPeriod().toLocalDate().isBefore(today))
 				.map(info -> {
 					EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
-					dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
+					//dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
 					return dto;
 				}).collect(Collectors.toList());
 	}
@@ -217,7 +239,7 @@ public class EventServiceImpl implements EventService {
 		dto.setOriginalName(info.getOriginalName());
 		dto.setState(calculateState(info.getApplyStartPeriod(), info.getApplyEndPeriod()));
 		dto.setCurrCapacity(useRepository.countByEventInfo(eventNum));
-		dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
+		//dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
 		return dto;
 	}	
 	
@@ -229,26 +251,30 @@ public class EventServiceImpl implements EventService {
 	
 	
 	// 행사 목록 조회
-	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String content, String state) {
-        boolean noFilter = (eventName == null || eventName.isBlank()) && (content == null || content.isBlank());
+	@Override
+	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String eventInfo, EventState state) {
+		boolean noFilter = (eventName == null || eventName.isBlank()) && (eventInfo == null || eventInfo.isBlank());
 
-        Page<EventInfo> result = noFilter
-                ? infoRepository.findAll(pageable)
-                : infoRepository.searchEvent(eventName, content, pageable);
+		Page<EventInfo> result = noFilter 
+				? infoRepository.findAll(pageable)
+				: infoRepository.searchEvent(eventName, eventInfo, pageable);
 
-        final String finalState = (state != null && !state.isBlank()) ? state : null;
+		final String finalState = (state != null && !state.name().isBlank()) ? state.name() : null;
 
-        List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
-            EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
-            dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
-            dto.setOriginalName(event.getOriginalName());
-            dto.setState(calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod()));
-            dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
-            return dto;
-        }).filter(dto -> finalState == null || finalState.equals(dto.getState())).toList();
+		List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
+			EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
+			dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
+			dto.setOriginalName(event.getOriginalName());
+			EventState calculatedState = calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod());
+			dto.setApplyAt(event.getApplyAt());
+			dto.setState(calculatedState);
+			//dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
+			return dto;
+		}).filter(dto -> finalState == null || finalState.equals(dto.getState())).toList();
 
-        return new PageImpl<>(filteredList, pageable, filteredList.size());
-    }
+		return new PageImpl<>(filteredList, pageable, filteredList.size());
+	}
+	
 	
 	// 사용자 검색
 	@Override
@@ -258,7 +284,7 @@ public class EventServiceImpl implements EventService {
         state = (state != null && !state.name().isBlank()) ? state : null;
 
         String searchType = (query != null && !query.isBlank()
-                && ("progName".equals(option) || "content".equals(option) || "all".equals(option))) ? option : null;
+                && ("eventName".equals(option) || "eventInfo".equals(option) || "all".equals(option))) ? option : null;
 
         Page<EventInfo> result = infoRepository.searchEvent(searchType, query, state, null, null, pageable);
 
@@ -267,7 +293,7 @@ public class EventServiceImpl implements EventService {
             dto.setCurrCapacity(useRepository.countByEventInfo(p.getEventNum()));
             dto.setOriginalName(p.getOriginalName());
             dto.setState(calculateState(p.getApplyStartPeriod(), p.getApplyEndPeriod()));
-            dto.setDayNames(convertToDayNames(p.getDaysOfWeek()));
+            //dto.setDayNames(convertToDayNames(p.getDaysOfWeek()));
             return dto;
         });
     }
@@ -294,16 +320,32 @@ public class EventServiceImpl implements EventService {
             dto.setCurrCapacity(useRepository.countByEventInfo(p.getEventNum()));
             dto.setOriginalName(p.getOriginalName());
             dto.setState(calculateState(p.getApplyStartPeriod(), p.getApplyEndPeriod()));
-            dto.setDayNames(convertToDayNames(p.getDaysOfWeek()));
+            //dto.setDayNames(convertToDayNames(p.getDaysOfWeek()));
             return dto;
         });
     }
 	
+	// 관리자용: 특정 프로그램의 신청자 목록 조회
+	@Override
+	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
+		List<EventUse> list = useRepository.findByEventInfo_EventNum(eventNum);
+		return list.stream().map(this::toDTO).collect(Collectors.toList());
+	}
+	
+	// 사용자 신청 리스트
+	// 회원 ID(mid)를 기준으로 해당 회원이 신청한 프로그램 목록을 페이지 형태로 조회
+	@Override
+	public Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable) {
+		Page<EventUse> result = useRepository.findByMember_MemId(memId, pageable);
+
+		return result.map(this::toDTO);
+	}
+	
 	// 진행 중인 이벤트만 조회
 	@Override
     public List<EventInfoDTO> searchNotEndedEventList() {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        List<EventInfo> infoList = infoRepository.findByEventEndPeriodGreaterThanEqual(LocalDate.now(), sort);
+        Sort sort = Sort.by(Sort.Direction.DESC, "applyAt");
+        List<EventInfo> infoList = infoRepository.findByEventEndPeriodGreaterThanEqual(LocalDateTime.now(), sort);
         return infoList.stream().map(p -> {
             EventInfoDTO dto = modelMapper.map(p, EventInfoDTO.class);
             dto.setCurrCapacity(useRepository.countByEventInfo(p.getEventNum()));
@@ -318,9 +360,9 @@ public class EventServiceImpl implements EventService {
 	// 배너 등록
 	@Override
     public void registerBanner(EventBannerDTO dto, MultipartFile file) {
-        LocalDate today = LocalDate.now();
+		LocalDateTime today = LocalDateTime.now();
         long currentBannerCount = bannerRepository.countValidBanners(today);
-        if (currentBannerCount >= 3) {
+        if (currentBannerCount >= 9) {
             throw new IllegalStateException("배너는 최대 3개까지 등록할 수 있습니다.");
         }
 
@@ -362,6 +404,40 @@ public class EventServiceImpl implements EventService {
         }
         bannerRepository.delete(banner);
     }
+	
+	// 배너 조회 리스트
+	@Override
+	public List<EventBannerDTO> getAllBanners() {
+		LocalDateTime today = LocalDateTime.now();
+		List<EventBanner> result = bannerRepository.findValidBanners(today);
+
+		return result.stream().map(banner -> {
+			EventInfo info = banner.getEventInfo();
+			EventBannerDTO dto = new EventBannerDTO();
+			dto.setEvtFileNum(banner.getEvtFileNum());
+			dto.setOriginalName(banner.getOriginalName());
+			dto.setFilePath(banner.getFilePath());
+			dto.setEventInfoId(info.getEventNum());
+
+			// 썸네일 경로 생성 (s_ 접두사 방식)
+			String filePath = banner.getFilePath();
+			if (filePath != null && filePath.contains("/")) {
+				String fileName = Paths.get(filePath).getFileName().toString();
+				String parent = Paths.get(filePath).getParent().toString();
+				dto.setThumbnailPath(filePath);
+			}
+			
+			// 프로그램 정보 추가
+			dto.setEventName(info.getEventName());
+			dto.setCategory(info.getCategory());
+			dto.setEventStartPeriod(info.getEventStartPeriod());
+			dto.setEventEndPeriod(info.getEventEndPeriod());
+			dto.setDaysOfWeek(info.getDaysOfWeek());
+			dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
+
+			return dto;
+		}).collect(Collectors.toList());
+	}
 	
 	// ========================================
 	// 6. 사용자 신청/취소/중복확인
@@ -457,8 +533,8 @@ public class EventServiceImpl implements EventService {
 
 	    String state = info.getEventEndPeriod().isBefore(LocalDate.now().atStartOfDay()) ? "행사종료" : "신청완료";
 
-	    String eventStartPeriod = info.getEventStartPeriod() != null ? info.getEventStartPeriod().toString() : "";
-	    String eventEndPeriod = info.getEventEndPeriod() != null ? info.getEventEndPeriod().toString() : "";
+//	    String eventStartPeriod = info.getEventStartPeriod() != null ? info.getEventStartPeriod().toString() : "";
+//	    String eventEndPeriod = info.getEventEndPeriod() != null ? info.getEventEndPeriod().toString() : "";
 
 	    return EventUseDTO.builder()
 	            .evtRevNum(use.getEvtRevNum())
@@ -469,7 +545,7 @@ public class EventServiceImpl implements EventService {
 	            .place(info.getPlace())
 	            .maxCapacity(info.getMaxCapacity())
 	            .currCapacity(useRepository.countByEventInfo(info.getEventNum()))
-	            .revState(RevState.APPROVED)
+	            .revState(use.getRevState())
 	            .memId(member != null ? member.getMemId() : null)
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
@@ -477,7 +553,7 @@ public class EventServiceImpl implements EventService {
 	            .build();
 	}
 
-	private void setFileInfo(EventInfo info, MultipartFile file) {
+	public void setFileInfo(EventInfo info, MultipartFile file) {
 	    if (file != null && !file.isEmpty()) {
 	        String originalFilename = file.getOriginalFilename();
 	        
@@ -497,7 +573,7 @@ public class EventServiceImpl implements EventService {
 	            fileUtil.deleteFiles(List.of(oldPath));
 	        }
 
-	        List<Object> uploaded = fileUtil.saveFiles(List.of(file), "program");
+	        List<Object> uploaded = fileUtil.saveFiles(List.of(file), "event");
 	        if (!uploaded.isEmpty()) {
 	            @SuppressWarnings("unchecked")
 	            Map<String, String> fileInfoMap = (Map<String, String>) uploaded.get(0);
@@ -507,74 +583,28 @@ public class EventServiceImpl implements EventService {
 	    }
 	}
 	
-	// 배너 조회 리스트
-	@Override
-	public List<EventBannerDTO> getAllBanners() {
-		LocalDate today = LocalDate.now();
-		List<EventBanner> result = bannerRepository.findValidBanners(today);
+	// 행사 목록 조회
+/*
+	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String content, String state) {
+        boolean noFilter = (eventName == null || eventName.isBlank()) && (content == null || content.isBlank());
 
-		return result.stream().map(banner -> {
-			EventInfo info = banner.getEventInfo();
-			EventBannerDTO dto = new EventBannerDTO();
-			dto.setEvtFileNum(banner.getEvtFileNum());
-			dto.setOriginalName(banner.getOriginalName());
-			dto.setFilePath(banner.getFilePath());
-			dto.setEventInfoId(info.getEventNum());
+        Page<EventInfo> result = noFilter
+                ? infoRepository.findAll(pageable)
+                : infoRepository.searchEvent(eventName, content, pageable);
 
-			// 썸네일 경로 생성 (s_ 접두사 방식)
-			String filePath = banner.getFilePath();
-			if (filePath != null && filePath.contains("/")) {
-				String fileName = Paths.get(filePath).getFileName().toString();
-				String parent = Paths.get(filePath).getParent().toString();
-				dto.setThumbnailPath(filePath);
-			}
-			// 프로그램 정보 추가
-			dto.setEventName(info.getEventName());
-			dto.setCategory(info.getCategory());
-			dto.setEventStartPeriod(info.getEventStartPeriod());
-			dto.setEventEndPeriod(info.getEventEndPeriod());
-			dto.setDaysOfWeek(info.getDaysOfWeek());
-			dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
+        final String finalState = (state != null && !state.isBlank()) ? state : null;
 
-			return dto;
-		}).collect(Collectors.toList());
-	}
+        List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
+            EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
+            dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
+            dto.setOriginalName(event.getOriginalName());
+            dto.setState(calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod()));
+            dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
+            return dto;
+        }).filter(dto -> finalState == null || finalState.equals(dto.getState())).toList();
 
-	// 사용자 신청 리스트
-	// 회원 ID(mid)를 기준으로 해당 회원이 신청한 프로그램 목록을 페이지 형태로 조회
-	@Override
-	public Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable) {
-		Page<EventUse> result = useRepository.findByMember_MemId(memId, pageable);
-
-		return result.map(this::toDTO);
-	}
+        return new PageImpl<>(filteredList, pageable, filteredList.size());
+    }
+*/
 	
-	// 관리자용: 특정 프로그램의 신청자 목록 조회
-	@Override
-	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
-		List<EventUse> list = useRepository.findByEventInfo_EventNum(eventNum);
-		return list.stream().map(this::toDTO).collect(Collectors.toList());
-	}
-
-	@Override
-	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String eventInfo, EventState state) {
-		boolean noFilter = (eventName == null || eventName.isBlank()) && (eventInfo == null || eventInfo.isBlank());
-
-		Page<EventInfo> result = noFilter ? infoRepository.findAll(pageable)
-				: infoRepository.searchEvent(eventName, eventInfo, pageable);
-
-		final String finalState = (state != null && !state.name().isBlank()) ? state.name() : null;
-
-		List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
-			EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
-			dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
-			dto.setOriginalName(event.getOriginalName());
-			EventState calculatedState = calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod());
-			dto.setState(calculatedState);
-			dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
-			return dto;
-		}).filter(dto -> finalState == null || finalState.equals(dto.getState())).toList();
-
-		return new PageImpl<>(filteredList, pageable, filteredList.size());
-	}
 }

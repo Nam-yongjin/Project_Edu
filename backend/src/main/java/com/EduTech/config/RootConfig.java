@@ -5,6 +5,9 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.entity.event.EventInfo;
+
 @Configuration
 public class RootConfig {
 
@@ -12,9 +15,20 @@ public class RootConfig {
 	@Bean
 	public ModelMapper getMapper() {
 		ModelMapper modelMapper = new ModelMapper();
-		modelMapper.getConfiguration().setFieldMatchingEnabled(true)
-				.setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
-				.setMatchingStrategy(MatchingStrategies.LOOSE);
+		modelMapper.getConfiguration()
+			.setFieldMatchingEnabled(true)
+			.setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
+			.setMatchingStrategy(MatchingStrategies.LOOSE)
+			.setSkipNullEnabled(true);	//event에 등록시간null 중복입력 방지를 위한 코드 추가
+		
+		// 필드 매핑 방지 (중요)
+		modelMapper.typeMap(EventInfoDTO.class, EventInfo.class)
+        	.addMappings(mapper -> {
+        		mapper.skip(EventInfo::setEventNum);    // EventNum null로 덮어쓰기 방지
+        		mapper.skip(EventInfo::setApplyAt);     // 등록일은 null로 덮어쓰지 않도록 방지
+        	});
+
+		
 		return modelMapper;
 	}
 }

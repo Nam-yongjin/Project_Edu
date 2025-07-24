@@ -107,7 +107,7 @@ public class EventInfoRepositoryTest {
                         DayOfWeek.MONDAY.getValue(),
                         DayOfWeek.WEDNESDAY.getValue(),
                         DayOfWeek.FRIDAY.getValue()
-                ))) // ✅ 불변 컬렉션 제거
+                ))) // 불변 컬렉션 제거
                 .place("로비")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 3, 9, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 10, 11, 0))
