@@ -40,57 +40,75 @@ public class EventUseRepositoryTest {
 	@Test
 	@Transactional
 	@Rollback(false)
-	@DisplayName("프로그램 이용 신청")
+	@DisplayName("✅ 프로그램 이용 신청 테스트 - 랜덤 데이터")
 	public void applyProgramUseTest() {
 
+	    // 랜덤 값 생성
+	    String randomMemId = generateRandomString("user_", 5);
+	    String randomPhone = generateRandomPhone();
+	    String randomEmail = generateRandomEmail();
+
+	    // 🔷 1. 회원 저장
 	    Member member = Member.builder()
-	        .memId("0123456789123456")
+	        .memId(randomMemId)
 	        .pw("1234")
-	        .name("테스터")
-	        .birthDate(LocalDate.of(2000, 1, 1))
-	        .phone("01012345678")
+	        .name("양희찬")
+	        .birthDate(LocalDate.of(2000, 7, 15))
+	        .phone(randomPhone)
 	        .addr("대구광역시")
-	        .email("tester@example.com")
+	        .email(randomEmail)
 	        .checkSms(true)
 	        .checkEmail(true)
-	        .role(MemberRole.USER)
+	        .role(MemberRole.ADMIN)
 	        .state(MemberState.NORMAL)
 	        .build();
 	    memberRepository.save(member);
-	        
-	        EventInfo eventInfo = EventInfo.builder()
-	                .eventName("테스트 프로그램")
-	                .applyStartPeriod(LocalDateTime.of(2025, 5, 1, 10, 0))
-	                .applyEndPeriod(LocalDateTime.of(2025, 5, 31, 18, 0))
-	                .daysOfWeek(List.of(DayOfWeek.MONDAY.getValue(), DayOfWeek.WEDNESDAY.getValue()))
-	                .place("1층 강의실")
-	                .eventInfo("테스트")
-	                .eventStartPeriod(LocalDateTime.of(2025, 6, 1, 14, 0))
-	                .eventEndPeriod(LocalDateTime.of(2025, 6, 30, 16, 0))
-	                .category(EventCategory.USER) 
-	                .maxCapacity(20)
-	                .originalName("test.pdf")
-	                .filePath("/files/test.pdf")
-	                .state(EventState.BEFORE)
-	                .currCapacity(0)
-	                .build();
-	        eventInfoRepository.save(eventInfo);
 
-	        EventUse eventUse = EventUse.builder()
-	                .applyAt(LocalDateTime.of(2025, 5, 12, 10, 35))
-	                .eventInfo(eventInfo)
-	                .member(member)
-	                .revState(RevState.WAITING)  // ✅ 여기에 명시해야 함
-	                .build();
+	    System.out.println("\n🔹 [회원 등록 완료]");
+	    System.out.println("  ▶ ID: " + member.getMemId());
+	    System.out.println("  ▶ 이메일: " + member.getEmail());
+	    System.out.println("  ▶ 전화번호: " + member.getPhone());
 
-	        EventUse saved = eventUseRepository.save(eventUse);
-	        System.out.println("프로그램 신청 시간: " + saved.getApplyAt());
-	        
-	        // ✅ 결과 검증
-	        assert saved.getEvtRevNum() != null;
-	        assert saved.getMember().getName().equals("테스터");
-		
-		
+	    // 🔷 2. 행사 저장
+	    EventInfo eventInfo = EventInfo.builder()
+	            .eventName("테스트 프로그램")
+	            .applyStartPeriod(LocalDateTime.of(2025, 5, 1, 10, 0))
+	            .applyEndPeriod(LocalDateTime.of(2025, 5, 31, 18, 0))
+	            .daysOfWeek(List.of(DayOfWeek.MONDAY.getValue(), DayOfWeek.WEDNESDAY.getValue()))
+	            .place("1층 강의실")
+	            .eventInfo("테스트")
+	            .eventStartPeriod(LocalDateTime.of(2025, 6, 1, 14, 0))
+	            .eventEndPeriod(LocalDateTime.of(2025, 6, 30, 16, 0))
+	            .category(EventCategory.USER)
+	            .maxCapacity(20)
+	            .originalName("test.pdf")
+	            .filePath("/files/test.pdf")
+	            .state(EventState.BEFORE)
+	            .currCapacity(0)
+	            .build();
+	    eventInfoRepository.save(eventInfo);
+
+	    System.out.println("\n🔹 [행사 등록 완료]");
+	    System.out.println("  ▶ 행사명: " + eventInfo.getEventName());
+
+	    // 🔷 3. 신청 저장
+	    EventUse eventUse = EventUse.builder()
+	            .applyAt(LocalDateTime.of(2025, 5, 12, 10, 35))
+	            .eventInfo(eventInfo)
+	            .member(member)
+	            .revState(RevState.WAITING)
+	            .build();
+
+	    EventUse saved = eventUseRepository.save(eventUse);
+
+	    System.out.println("\n✅ [프로그램 신청 완료]");
+	    System.out.println("  ▶ 신청자 ID: " + saved.getMember().getMemId());
+	    System.out.println("  ▶ 신청자 전화번호: " + saved.getMember().getPhone());
+	    System.out.println("  ▶ 신청자 이메일: " + saved.getMember().getEmail());
+	    System.out.println("  ▶ 신청 일시: " + saved.getApplyAt());
+
+	    assert saved.getEvtRevNum() != null;
+	    assert saved.getMember().getEmail().equals(randomEmail);
 	}
 	
 	@Test
@@ -114,17 +132,41 @@ public class EventUseRepositoryTest {
 	@Test
 	@Transactional
 	@Rollback(false)
-	@DisplayName("프로그램 신청내역 삭제")
+	@DisplayName("프로그램 신청내역 삭제 테스트")
 	public void deleteEventUseTest() {
-	    Long evtRevNum = 1L; // 또는 저장된 실제 신청번호 사용
+	    // 가장 최근 신청 내역 조회 (있다면)
+	    List<EventUse> uses = eventUseRepository.findAll();
+	    if (!uses.isEmpty()) {
+	        EventUse last = uses.get(uses.size() - 1);
+	        Long evtRevNum = last.getEvtRevNum();
 
-	    boolean exists = eventUseRepository.existsById(evtRevNum);
-	    if (exists) {
 	        eventUseRepository.deleteById(evtRevNum);
 	        System.out.println("신청번호 " + evtRevNum + " 삭제 완료");
 	    } else {
-	        System.out.println("신청번호 " + evtRevNum + " 는 존재하지 않습니다.");
+	        System.out.println("삭제할 신청 내역이 존재하지 않습니다.");
 	    }
+	}
+	
+	// 랜덤 문자열 생성 (숫자/영문자)
+	private String generateRandomString(String prefix, int length) {
+	    String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	    StringBuilder sb = new StringBuilder(prefix);
+	    for (int i = 0; i < length; i++) {
+	        sb.append(chars.charAt((int) (Math.random() * chars.length())));
+	    }
+	    return sb.toString();
+	}
+
+	// 랜덤 휴대폰 번호 생성
+	private String generateRandomPhone() {
+	    int middle = (int) (Math.random() * 9000) + 1000;
+	    int last = (int) (Math.random() * 9000) + 1000;
+	    return "010" + middle + last;
+	}
+
+	// 랜덤 이메일 생성
+	private String generateRandomEmail() {
+	    return generateRandomString("user", 6) + "@example.com";
 	}
 	
 	
