@@ -11,13 +11,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
+import com.EduTech.dto.admin.BoardListDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.notice.NoticeCreateRegisterDTO;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
@@ -123,4 +126,6 @@ public class AdminServiceImpl implements AdminService {
 		memberRepository.updateMemberState(memberState,memId);
 		
 	}
+	
+	
 }
