@@ -24,7 +24,7 @@ public interface NewsService {
 		void deleteNews(Long newsNum);
 		
 		//공지사항 삭제(일괄)
-		void deleteNews(List<Long> newsNums);
+		void deleteNewsByIds(List<Long> newsNums);
 		
 		//공지사항 상세 조회
 		NewsDetailDTO getNewsDetail(Long newsNum);
