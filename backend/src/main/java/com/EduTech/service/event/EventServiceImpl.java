@@ -362,7 +362,7 @@ public class EventServiceImpl implements EventService {
     public void registerBanner(EventBannerDTO dto, MultipartFile file) {
 		LocalDateTime today = LocalDateTime.now();
         long currentBannerCount = bannerRepository.countValidBanners(today);
-        if (currentBannerCount >= 6) {
+        if (currentBannerCount >= 9) {
             throw new IllegalStateException("배너는 최대 3개까지 등록할 수 있습니다.");
         }
 
