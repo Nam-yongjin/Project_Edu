@@ -19,9 +19,11 @@ import com.EduTech.dto.news.NewsFileDTO;
 import com.EduTech.dto.news.NewsListDTO;
 import com.EduTech.dto.news.NewsSearchDTO;
 import com.EduTech.dto.news.NewsUpdateRegisterDTO;
+import com.EduTech.dto.notice.NoticeDetailDTO;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.news.News;
 import com.EduTech.entity.news.NewsFile;
+import com.EduTech.entity.notice.Notice;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.news.NewsFileRepository;
 import com.EduTech.repository.news.NewsRepository;
@@ -29,6 +31,7 @@ import com.EduTech.repository.news.NewsSpecifications;
 import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.util.FileUtil;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -41,6 +44,16 @@ public class NewsServiceImpl implements NewsService {
 	private final MemberRepository memberRepository; // MemberEntity 가져오려면 필요
 	private final ModelMapper modelMapper; // DTO <-> Entity 매핑을 위해 필요
 	private final FileUtil fileUtil; // 파일 처리를 위해 필요
+	
+	//ModelMapper configuration errors:
+	//Test 돌릴 때 ModelMapper가 경로를 혼동하면 넣어줌
+	//어떤 경로 사용할지 지정
+	@PostConstruct
+	public void setupModelMapper() {
+	    modelMapper.getConfiguration().setAmbiguityIgnored(true); //모호함 허용
+	    modelMapper.typeMap(Notice.class, NewsDetailDTO.class)
+	        .addMapping(src -> src.getMember().getMemId(), NewsDetailDTO::setWriterMemid);
+	}
 
 	// 언론보도 등록
 	@Override // 상위 타입 메서드 재정의
@@ -156,7 +169,7 @@ public class NewsServiceImpl implements NewsService {
 
 	// 언론보도 삭제(일괄)
 	@Override
-	public void deleteNews(List<Long> newsNums) {
+	public void deleteNewsByIds(List<Long> newsNums) {
 		List<News> newsList = newsRepository.findAllById(newsNums);
 
 		if (newsList.size() != newsNums.size()) {
