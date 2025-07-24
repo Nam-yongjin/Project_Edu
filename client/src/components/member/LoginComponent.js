@@ -23,11 +23,10 @@ const LoginComponent = () => {
     const handleClickLogin = (e) => {
         doLogin(loginParam)
             .then(data => {
-                console.log(data)
                 if (data.error) {
                     alert("아이디와 패스워드를 다시 확인하세요")
                 } else {
-                    alert("로그인 성공")
+                    alert("로그인 되었습니다.")
                     moveToPath('/')
                 }
             })

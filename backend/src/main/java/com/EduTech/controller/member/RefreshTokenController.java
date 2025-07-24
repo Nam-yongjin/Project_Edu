@@ -19,7 +19,9 @@ public class RefreshTokenController {
 	// Access Token 재발급
 	@RequestMapping("/api/refresh")
 	public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
-
+		System.out.println("/api/refresh 호출됨");
+	    System.out.println("authHeader = " + authHeader);
+	    System.out.println("refreshToken = " + refreshToken);
 		// 유효성 검사
 		if (refreshToken == null) {
 			throw new JWTException("NULL_REFRASH");

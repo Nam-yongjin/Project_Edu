@@ -1,12 +1,9 @@
 package com.EduTech.service.member;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.EduTech.dto.member.MemberDTO;
@@ -20,26 +17,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberDetailService implements UserDetailsService{
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
     
-    @Autowired
-    private MemberService memberService;
+    private final MemberService memberService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    	System.out.println(">> 로그인 시도 ID: " + username);
+	
         Member member = memberRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
+        
         if(member.getState() == MemberState.LEAVE) {
         	throw new UsernameNotFoundException("LEAVE_MEMBER");
         }
-
-        return User.builder()
-                .username(member.getMemId())
-                .password(member.getPw()) // bcrypt 인코딩된 비밀번호
-                .roles("USER") // 권한
-                .build();
+        
+        MemberDTO memberDTO = memberService.entityToDTO(member);
+        return memberDTO;
     }
     
 	public UserDetails loadUserByKakao(String kakaoEmail) throws UsernameNotFoundException {

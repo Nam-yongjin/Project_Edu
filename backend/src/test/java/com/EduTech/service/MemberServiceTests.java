@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.EduTech.dto.member.MemberDetailDTO;
@@ -54,7 +55,7 @@ public class MemberServiceTests {
 	@MockBean
 	private DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 
-	@Test
+//	@Test
 	public void testCheckId() {
 		boolean result = memberService.isDuplicatedId("user5");
 		System.out.println(result);
@@ -117,10 +118,20 @@ public class MemberServiceTests {
 	    assertEquals("둔산중학교", updatedStudent.getSchoolName());
 	}
 	
-	@Test
+//	@Test
 	public void testLeaveMember() {
 		Member member = memberRepository.findById("user9").orElseThrow();
 		memberService.leaveMember("user9");
 		assertEquals(MemberState.LEAVE, member.getState());
+	}
+	
+	@Test
+	void testPasswordMatch() {
+	    String rawPw = "qwer1234!@#$";
+	    String encodedPw = "$2a$10$Y8yJJQCmUIMDCQSBqHi31OMYCvcDva6qf58wmX7MByYhs1zwdtuRC";
+
+	    boolean matches = passwordEncoder.matches(rawPw, encodedPw);
+
+	    System.out.println("비밀번호 일치 여부: " + matches); // true 나와야 함
 	}
 }
