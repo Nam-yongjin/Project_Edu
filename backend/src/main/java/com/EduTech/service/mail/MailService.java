@@ -19,7 +19,7 @@ public class MailService {
 
         try {
             // 메일을 받을 수신자 설정
-            simpleMailMessage.setTo("chm2006@naver.com");
+            simpleMailMessage.setTo("tee1694@naver.com");
             // 메일의 제목 설정
             simpleMailMessage.setSubject("테스트 메일 제목");
             // 메일의 내용 설정
@@ -39,7 +39,7 @@ public class MailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 
             // 메일을 받을 수신자 설정
-            mimeMessageHelper.setTo("chm2006@naver.com");
+            mimeMessageHelper.setTo("tee1694@naver.com");
             // 메일의 제목 설정
             mimeMessageHelper.setSubject("html 적용 테스트 메일 제목");
 
