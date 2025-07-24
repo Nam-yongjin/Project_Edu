@@ -1,5 +1,6 @@
 package com.EduTech.repository.member;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
 
@@ -48,4 +50,10 @@ public interface MemberRepository extends JpaRepository<Member, String>,JpaSpeci
 	
 	// 카카오 회원인지 확인
 	Optional<Member> findByKakao(String kakao);
+	
+	// 관리자가 멤버 상태 수정하는 쿼리문
+	@Modifying
+	@Query("update Member m set m.state = :state where m.memId in :memId")
+	void updateMemberState(@Param("state") MemberState state, @Param("memId") List<String> memId);
+	
 }
