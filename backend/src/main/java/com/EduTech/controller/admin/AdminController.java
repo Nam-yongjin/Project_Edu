@@ -148,7 +148,7 @@ public class AdminController {
 	@DeleteMapping(("/deleteNewsList"))
 	public ResponseEntity<String>deleteNewsList(List<Long> newsNum)
 	{
-		newsService.deleteNews(newsNum);
+		newsService.deleteNewsByIds(newsNum);
 		return ResponseEntity.ok("언론 보도 일괄 삭제 완료");
 	}
 	// 관리자 문의 사항 답변 기능(보류)
