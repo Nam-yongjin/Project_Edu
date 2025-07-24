@@ -321,6 +321,11 @@ public class MemberServiceImpl implements MemberService {
 //
 //		}
 		
+		// 관리자 계정은 탈퇴불가
+		if (member.getRole().equals("ADMIN")) {
+			throw new IllegalStateException("관리자는 탈퇴할 수 없습니다.");
+		}
+		
 		// 블랙리스트 회원일시 탈퇴불가
 		if (member.getState().equals("BEN")) {
 			throw new IllegalStateException("블랙리스트 회원은 탈퇴할 수 없습니다.");

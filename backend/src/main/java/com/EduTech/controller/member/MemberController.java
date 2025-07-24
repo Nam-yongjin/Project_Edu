@@ -151,8 +151,16 @@ public class MemberController {
 	}
 	
 	// 아이디 찾기
+	@GetMapping("/member/findId")
+	public ResponseEntity<String> findId(@RequestParam String phone){
+		return ResponseEntity.ok("");
+	}
 	
 	// 비밀번호 찾기
+	@GetMapping("/member/resetPw")
+	public ResponseEntity<String> resetPw(@RequestParam String phone){
+		return ResponseEntity.ok("");
+	}
 	
 	// 카카오 로그인
 	@GetMapping("/login/kakao")
