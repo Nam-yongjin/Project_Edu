@@ -32,6 +32,7 @@ import com.EduTech.dto.member.StudentRegisterDTO;
 import com.EduTech.dto.member.TeacherDetailDTO;
 import com.EduTech.dto.member.TeacherModifyDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
+import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
@@ -39,6 +40,8 @@ import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
+import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
+import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.member.CompanyRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.StudentRepository;
@@ -57,7 +60,8 @@ public class MemberServiceImpl implements MemberService {
 	private final CompanyRepository companyRepository;
 	private final ModelMapper modelMapper;
 	private final PasswordEncoder passwordEncoder;
-
+	private final DemonstrationRegistrationRepository demonstrationRegistrationRepository;
+	private final DemonstrationReserveRepository demonstrationReserveRespository;
 	// 일반회원 회원가입
 	@Override
 	@Transactional
@@ -299,7 +303,8 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void leaveMember(String memId) {
 		Member member = memberRepository.findById(memId).orElseThrow();
-		
+		DemonstrationState demonstrationStateReg=demonstrationRegistrationRepository.findByState(memId);
+		DemonstrationState demonstrationStateRes=demonstrationReserveRespository.findByState(memId);
 		// 현재 예약중인 시설, 행사, 실증대여 있을시 탈퇴불가 처리
 	    // 역할별 탈퇴 제약 조건 예시
 //	    if (member.getRole().equals("COMPANY")) {
@@ -329,6 +334,14 @@ public class MemberServiceImpl implements MemberService {
 		// 블랙리스트 회원일시 탈퇴불가
 		if (member.getState().equals("BEN")) {
 			throw new IllegalStateException("블랙리스트 회원은 탈퇴할 수 없습니다.");
+		}
+		
+		if (demonstrationStateReg.equals(DemonstrationState.ACCEPT)) {
+			throw new IllegalStateException("실증 등록 중인 회원은 탈퇴할 수 없습니다.");
+		}
+		
+		if (demonstrationStateRes.equals(DemonstrationState.ACCEPT)) {
+			throw new IllegalStateException("실증 신청 중인 회원은 탈퇴할 수 없습니다.");
 		}
 		
 		member.setState(MemberState.LEAVE);
