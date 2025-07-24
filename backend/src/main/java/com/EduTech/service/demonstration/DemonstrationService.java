@@ -2,8 +2,7 @@ package com.EduTech.service.demonstration;
 
 import java.util.List;
 
-import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
-import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
@@ -15,7 +14,6 @@ import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
-import com.EduTech.dto.demonstration.PageResponseDTO;
 
 
 public interface DemonstrationService {

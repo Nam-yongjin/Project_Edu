@@ -9,6 +9,8 @@ import lombok.Data;
 
 // 관리자 회원 정보 페이지에서 필터링 처리위해
 // 값 받아오는 dto (프론트->백)
+// 실제 정보가 아니라 어떤 필드가 변햇는지를 알려줌
+// 바뀐 값만 값 넣어서 옴.
 @Data
 public class AdminMemberViewReqDTO {
 	private String memId; // 회원 아이디
