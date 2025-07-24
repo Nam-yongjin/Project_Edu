@@ -23,12 +23,14 @@ public class EventInfoDTO {
     private String eventName;		// 행사명
     private String eventInfo;		// 소개
     private EventState state; 		// 신청전, 신청중, 신청마감
-    private RevState revState;		// 상태(대기, 수락, 거절)
     private EventCategory category; // 모집대상 분류
     private Integer maxCapacity;	// 모집인원
     private Integer currCapacity;	// 현재인원
     private String place;			// 장소
     private String etc;				// 기타 유의사항
+    
+    @Builder.Default
+	private RevState revState = RevState.WAITING;	// 상태(대기, 수락, 거절)
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime applyStartPeriod;
@@ -41,10 +43,14 @@ public class EventInfoDTO {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime eventEndPeriod;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	private LocalDateTime applyAt; // 등록일
 
     private String originalName;	// 대표 파일명
     private String filePath;		// 대표 파일 경로
 
     private List<Integer> daysOfWeek;
-    private List<String> dayNames;
+    //private List<String> dayNames;
+
 }

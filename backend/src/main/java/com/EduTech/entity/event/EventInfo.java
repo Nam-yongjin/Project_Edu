@@ -39,6 +39,10 @@ public class EventInfo {
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String eventInfo; // 행사 상세 내용
 	
+	@Builder.Default
+	@Column(nullable = false)
+	private LocalDateTime applyAt = LocalDateTime.now(); // 동록일
+	
 	@Column(nullable = false)
 	private LocalDateTime applyStartPeriod; // 신청시작기간
 

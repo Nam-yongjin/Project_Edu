@@ -7,7 +7,11 @@ public enum RevState {
 
     private final String label;
 
-    RevState(String label) { this.label = label; }
+    RevState(String label) {
+        this.label = label;
+    }
 
-    public String getLabel() { return label; }
+    public String getLabel() {
+        return label;
+    }
 }

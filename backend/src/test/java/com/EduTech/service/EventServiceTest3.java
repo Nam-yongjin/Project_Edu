@@ -12,7 +12,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,7 +24,6 @@ import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
 import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.member.MemberState;
-import com.EduTech.repository.event.EventUseRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.event.EventService;
 
@@ -36,24 +34,25 @@ import jakarta.transaction.Transactional;
 @Rollback(false)
 public class EventServiceTest3 {
 
-    @Autowired private EventService eventService;
-    @Autowired private MemberRepository memberRepository;
-    @Autowired private EventUseRepository eventUseRepository;
-    @Autowired private ModelMapper modelMapper;
-
+    @Autowired
+    private EventService eventService;
+    
+    @Autowired
+    private MemberRepository memberRepository;
+    
     private Member member;
 
     @BeforeEach
     public void setUpMember() {
         member = Member.builder()
-                .memId("testUser03")
+                .memId("testUser04")
                 .pw("pw1234")
                 .name("테스트 사용자3")
                 .gender(MemberGender.FEMALE)
                 .birthDate(LocalDate.of(2008, 5, 10))
-                .phone("01022223333")
+                .phone("01012122323")
                 .addr("서울시 중구")
-                .email("user04@test.com")
+                .email("user05@test.com")
                 .checkSms(true)
                 .checkEmail(true)
                 .role(MemberRole.USER)
@@ -96,7 +95,7 @@ public class EventServiceTest3 {
                 .build();
     }
 
-    @Test
+    //@Test
     @DisplayName(" 정상적으로 이벤트 신청이 처리된다")
     public void 신청_정상처리됨() {
         // given

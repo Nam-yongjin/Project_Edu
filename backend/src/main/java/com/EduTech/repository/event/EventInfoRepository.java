@@ -1,6 +1,5 @@
 package com.EduTech.repository.event;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -68,6 +67,6 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 	Page<EventInfo> searchEvent(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
-	List<EventInfo> findByEventEndPeriodGreaterThanEqual(LocalDate eventEndPeriod, Sort sort); 
+	List<EventInfo> findByEventEndPeriodGreaterThanEqual(LocalDateTime localDateTime, Sort sort); 
 	
 }
