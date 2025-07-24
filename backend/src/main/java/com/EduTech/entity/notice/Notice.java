@@ -58,7 +58,9 @@ public class Notice extends BaseEntity{
 	
 	//하나의 공지글에 여러 개의 파일 첨부 가능, 공지글이 삭제되면 파일도 같이 삭제
 	@Builder.Default
-	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
 	private List<NoticeFile> noticeFile = new ArrayList<>();
+
+	
 	
 }

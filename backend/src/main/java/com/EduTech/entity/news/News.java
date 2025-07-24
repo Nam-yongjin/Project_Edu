@@ -45,7 +45,7 @@ public class News extends BaseEntity{
 	
 	//하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
 	@Builder.Default
-	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL)
 	private List<NewsFile> newsFile = new ArrayList<>();
 	
 }
