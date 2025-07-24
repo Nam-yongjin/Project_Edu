@@ -20,6 +20,7 @@ import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.service.admin.AdminService;
+import com.EduTech.service.mail.MailService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,11 +28,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/admin")
 public class AdminController {
-	private final AdminService AdminService;
+	private final AdminService adminService;
+	
 	@PutMapping("/ResState")
 	public ResponseEntity<String> DemResStateChange(
 			@RequestBody DemonstrationApprovalResDTO demonstrationApprovalResDTO) {
-		AdminService.approveOrRejectDemRes(demonstrationApprovalResDTO);
+		adminService.approveOrRejectDemRes(demonstrationApprovalResDTO);
 		return ResponseEntity.ok("Res 상태 변경 성공");
 	}
 
@@ -39,7 +41,7 @@ public class AdminController {
 	@PutMapping("/RegState")
 	public ResponseEntity<String> DemRegStateChange(
 			@RequestBody DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {
-		AdminService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
+		adminService.approveOrRejectDemReg(demonstrationApprovalRegDTO);
 		return ResponseEntity.ok("Reg 상태 변경 성공");
 	}
 	
@@ -47,7 +49,7 @@ public class AdminController {
 	@PostMapping("/sendMessage")
 	public ResponseEntity<String> SendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO)
 	{
-		
+		adminService.sendMessageForUser(adminMessageDTO);
 		return ResponseEntity.ok("메시지 전송 성공!");
 	}
 	
@@ -55,7 +57,7 @@ public class AdminController {
 	@GetMapping("/members")
 	public PageResponseDTO<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewDTO,@RequestParam("pageCount") Integer pageCount)
 	{
-		PageResponseDTO<AdminMemberViewResDTO> members=AdminService.adminViewMembers(adminMemberViewDTO,pageCount);
+		PageResponseDTO<AdminMemberViewResDTO> members=adminService.adminViewMembers(adminMemberViewDTO,pageCount);
 		return members;
 	}
 	

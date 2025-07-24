@@ -12,6 +12,6 @@ import lombok.Data;
 public class AdminMessageDTO { 
 	private String title; // 메시지 보낼 제목
 	private String content; // 메시지 보낼 내용
-	private MultipartFile file; // 메시지 보낼 첨부파일 (여기 dto는 db에 저장하지 않으므로 file을 dto에 넣었음)
-	private List<String> memberList=new ArrayList<>(); // 메시지 보낼 멤버 리스트 (멤버 아이디가 담겨잇을곳)
+	private List<MultipartFile> AttachmentFile; // 메시지 보낼 첨부파일 (여기 dto는 db에 저장하지 않으므로 file을 dto에 넣었음)
+	private List<String> memberList; // 메시지 보낼 멤버 리스트 (멤버 아이디가 담겨잇을곳)
 }

@@ -24,6 +24,7 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.MemberSpecs;
+import com.EduTech.service.mail.MailService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +38,9 @@ public class AdminServiceImpl implements AdminService {
 	DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	@Autowired
 	MemberRepository memberRepository;
-
+	@Autowired
+	MailService mailService;
+	
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// String memId = JWTFilter.getMemId(); 나중에 로그인 구현되면 추가
@@ -57,7 +60,7 @@ public class AdminServiceImpl implements AdminService {
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
 	public void sendMessageForUser(AdminMessageDTO adminMessageDTO) {
-
+		mailService.sendSimpleMailMessage(adminMessageDTO);
 	}
 
 	// 관리자 회원 목록 페이지 조회 기능
