@@ -22,7 +22,7 @@ const loginSlice = createSlice({
         login: (state, action) => { //  dispatch(login(memberInfo)) 여기서 action 호출
             // action.payload로 데이터 받은 후 return 시 ,state에 값 저장됨. 
             // 여기선 추가로 쿠키에도 저장
-            console.log("login.....");
+            alert("로그인 하였습니다")
             const payload = action.payload;
 
             if (!payload.error) {
@@ -31,7 +31,7 @@ const loginSlice = createSlice({
             return payload;
         },
         logout: (state, action) => {
-            console.log("logout....");
+            alert("로그아웃 하였습니다")
             removeCookie("member")
             return { ...initState };
         }

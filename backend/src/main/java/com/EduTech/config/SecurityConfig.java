@@ -4,12 +4,9 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,6 +29,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
 //		CORS 설정: 웹 브라우저에서 다른 출처(도메인, 포트, 프로토콜)의 리소스에 접근하려고 할 때 보안상 제한이 걸리는 것을 제어하고 허용하는 메커니즘
+//		기존 cors 관련 설정은 삭제하고, 새로운 cors 관련 설정을 추가
 		http.cors(httpSecurityCorsConfigurer -> {
 			httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
 		});
@@ -44,9 +42,9 @@ public class SecurityConfig {
 		// CSRF(사이트 간 요청 위조) 보호 기능을 비활성화, REST API에서는 일반적으로 CSRF 미사용
 		http.csrf(config -> config.disable());
 		
-		// api서버 로그인
+		// API 서버로 로그인
         http.formLogin(config -> {
-            config.loginProcessingUrl(("/api/login"));
+            config.loginProcessingUrl("/api/login");
             config.successHandler(new LoginSuccessHandler());
             config.failureHandler(new LoginFailHandler());
         });
@@ -62,6 +60,7 @@ public class SecurityConfig {
 		return http.build();
 	}
 	
+//	새로운 cors
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 
@@ -82,13 +81,5 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-	@Bean
-	public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) throws Exception {
-	    return http.getSharedObject(AuthenticationManagerBuilder.class)
-	            .userDetailsService(userDetailsService)
-	            .passwordEncoder(passwordEncoder)
-	            .and()
-	            .build();
-	}
+
 }
