@@ -47,6 +47,7 @@ public class AdminController {
 	@PostMapping("/sendMessage")
 	public ResponseEntity<String> SendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO)
 	{
+		
 		return ResponseEntity.ok("메시지 전송 성공!");
 	}
 	
