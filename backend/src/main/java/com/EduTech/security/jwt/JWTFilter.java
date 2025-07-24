@@ -28,13 +28,10 @@ public class JWTFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String authHeader = request.getHeader("Authorization");
+			System.out.println(authHeader);
 			if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			    response.setContentType("application/json;charset=UTF-8");
-			    Gson gson = new Gson();
-			    String json = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
-			    response.getWriter().println(json);
-			    return; // 더 이상 처리 안 함
+			    filterChain.doFilter(request, response);
+			    return;  // 헤더 없거나 형식 안 맞으면 인증 안하고 다음 필터 실행
 			}
 			String accessToken = authHeader.substring(7);
 
@@ -43,9 +40,9 @@ public class JWTFilter extends OncePerRequestFilter {
 			String memId = (String) claims.get("memId");
 			String pw = (String) claims.get("pw");
 			String name = (String) claims.get("name");
-			List<String> roleNames = (List<String>) claims.get("roleNames");
+			String roleName = (String) claims.get("roleName");
 
-			MemberDTO memberDTO = new MemberDTO(memId, pw, name, roleNames);
+			MemberDTO memberDTO = new MemberDTO(memId, pw, name, roleName);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
 					null, memberDTO.getAuthorities());
