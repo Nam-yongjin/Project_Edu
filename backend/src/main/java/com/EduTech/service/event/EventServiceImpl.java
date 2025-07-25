@@ -583,6 +583,11 @@ public class EventServiceImpl implements EventService {
 	    }
 	}
 	
+	
+	// 내너의 경우에는 위의 코드를 사용 못할수도 있으므오 다른 코드를 작성해야 할수도 있음 나중에 확인 해봄
+	
+	
+	
 	// 행사 목록 조회
 /*
 	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String content, String state) {
