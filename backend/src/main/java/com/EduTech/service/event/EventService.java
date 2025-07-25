@@ -34,7 +34,7 @@ public interface EventService {
     
     EventInfo getEventEntity(Long eventNum); // 내부용 Entity 직접 조회
 
-    List<EventInfoDTO> searchNotEndedEventList(); // 진행 중인 이벤트만 조회
+    List<EventInfoDTO> searchNotEndEventList(); // 진행 중인 이벤트만 조회
 
     // =============================
     // 2. 이벤트 등록/수정/삭제
