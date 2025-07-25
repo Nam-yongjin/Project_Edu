@@ -39,18 +39,25 @@ public class EventServiceTestCommon2 {
     private EventUseRepository useRepository;
 
     private Member member;
+    
+    // 랜덤 값 생성
+    String randomMemId = generateRandomString("user_", 5);
+    String randomPhone = generateRandomPhone();
+    String randomEmail = generateRandomEmail();
+    
+    private final String fixedEmail = "hong@test.com";
 
     @BeforeEach
     void setUp() {
         member = Member.builder()
-                .memId("testUser41")
+        		.memId(randomMemId)
                 .pw("1234")
                 .name("홍길동")
                 .gender(MemberGender.MALE)
                 .birthDate(LocalDate.of(1990, 1, 1))
-                .phone("01058367503")
+                .phone(randomPhone)
                 .addr("서울시 테스트구")
-                .email("hong1@test.com")
+                .email(fixedEmail)
                 .checkSms(true)
                 .checkEmail(true)
                 .role(MemberRole.USER)
@@ -103,4 +110,27 @@ public class EventServiceTestCommon2 {
         assertEquals("hong@test.com", dto.getEmail());
         assertEquals("승인", dto.getRevState()); // RevState enum의 toString() 또는 별도 매핑 필요
     }
+    
+    
+    // 랜덤 문자열 생성 (숫자/영문자)
+ 	private String generateRandomString(String prefix, int length) {
+ 	    String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+ 	    StringBuilder sb = new StringBuilder(prefix);
+ 	    for (int i = 0; i < length; i++) {
+ 	        sb.append(chars.charAt((int) (Math.random() * chars.length())));
+ 	    }
+ 	    return sb.toString();
+ 	}
+
+ 	// 랜덤 휴대폰 번호 생성
+ 	private String generateRandomPhone() {
+ 	    int middle = (int) (Math.random() * 9000) + 1000;
+ 	    int last = (int) (Math.random() * 9000) + 1000;
+ 	    return "010" + middle + last;
+ 	}
+
+ 	// 랜덤 이메일 생성
+ 	private String generateRandomEmail() {
+ 	    return generateRandomString("user", 6) + "@example.com";
+ 	}
 }
