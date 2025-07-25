@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import PhoneVerification from './PhoneVerification';
-import BasicLayout from '../../layouts/BasicLayout';
+import PhoneVerification from '../PhoneVerification';
+import BasicLayout from '../../../layouts/BasicLayout';
 
-const MemberRegisterComponent = () => {
+const StudentRegisterComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
     const [form, setForm] = useState({
         memId: '',
@@ -15,7 +15,8 @@ const MemberRegisterComponent = () => {
         addrDetail: '',
         checkSms: false,
         checkEmail: false,
-        role: 'MEMBER'
+        schoolName: '',
+        role: 'STUDENT'
     });
 
     const [errors, setErrors] = useState({});
@@ -57,6 +58,10 @@ const MemberRegisterComponent = () => {
 
         if (!verifiedPhone) {
             errs.phone = '휴대폰 인증이 필요합니다.';
+        }
+
+        if (!form.schoolName) {
+            errs.schoolName = '학교명을 입력해주세요.';
         }
 
         return errs;
@@ -127,6 +132,9 @@ const MemberRegisterComponent = () => {
                     이메일 수신 동의
                 </label>
                 {errors.checkEmail && <div style={{ color: 'red' }}>{errors.checkEmail}</div>}
+                
+                <input name="schoolName" type="text" value={form.schoolName} onChange={handleChange} />
+                {errors.schoolName && <div style={{ color: 'red' }}>{errors.schoolName}</div>}
 
                 <PhoneVerification onVerified={setVerifiedPhone} />
                 {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
@@ -139,4 +147,4 @@ const MemberRegisterComponent = () => {
     );
 };
 
-export default MemberRegisterComponent;
+export default StudentRegisterComponent;
