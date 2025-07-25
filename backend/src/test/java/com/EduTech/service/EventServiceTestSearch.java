@@ -268,7 +268,7 @@ public class EventServiceTestSearch {
       System.out.println("[9] 종료되지 않은 이벤트 목록 조회 시작");
 
       try {
-          List<EventInfoDTO> ongoingEvents = eventService.searchNotEndedEventList();
+          List<EventInfoDTO> ongoingEvents = eventService.searchNotEndEventList();
 
           System.out.println("진행 중인 이벤트 수: " + ongoingEvents.size());
           ongoingEvents.forEach(e ->
@@ -310,7 +310,7 @@ public class EventServiceTestSearch {
           eventInfoRepository.save(event);
 
           // when
-          List<EventInfoDTO> ongoingEvents = eventService.searchNotEndedEventList();
+          List<EventInfoDTO> ongoingEvents = eventService.searchNotEndEventList();
 
           // then
           System.out.println("진행 중인 이벤트 수: " + ongoingEvents.size());
