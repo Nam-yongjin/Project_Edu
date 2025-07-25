@@ -54,6 +54,4 @@ public class MemberRegisterDTO {
 	
     @NotNull(message = "이메일 수신 동의 여부는 필수입니다.")
 	private boolean checkEmail;
-	
-	private String kakao;
 }
