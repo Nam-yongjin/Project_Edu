@@ -41,7 +41,7 @@ public class Question extends BaseEntity{
 	private String content;
 	 
 	@Column(nullable = false) //공개여부
-	private boolean state;
+	private Boolean state;
 	
 	@Column(nullable = false) //조회수
 	private Long view;	
