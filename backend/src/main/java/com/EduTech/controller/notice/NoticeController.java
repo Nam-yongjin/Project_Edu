@@ -52,7 +52,7 @@ public class NoticeController {
 	
 	//고정 공지사항 조회
 	@GetMapping("/pinned")
-	public ResponseEntity<List<NoticeListDTO>> getPinnedNotices() {
+	public ResponseEntity<List<NoticeListDTO>> getPinnedNotice() {
 		return ResponseEntity.ok(noticeService.findPinned());
 	}
 	
