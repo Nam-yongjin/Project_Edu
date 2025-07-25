@@ -105,7 +105,7 @@ public class NewsServiceImpl implements NewsService {
 	@Override
 	public void updateNews(NewsUpdateRegisterDTO dto, List<MultipartFile> file, Long newsNum) {
 		News news = newsRepository.findById(newsNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 보도자료가 존재하지 않습니다. 번호: " + newsNum));
+				.orElseThrow(() -> new IllegalArgumentException("해당 뉴스가 존재하지 않습니다. 번호: " + newsNum));
 		// ModelMapper로 DTO데이터를 Entity에 매핑
 		modelMapper.map(dto, news);
 		news.setUpdatedAt(LocalDateTime.now());
@@ -161,7 +161,7 @@ public class NewsServiceImpl implements NewsService {
 	@Override
 	public void deleteNews(Long newsNum) {
 		News news = newsRepository.findById(newsNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 보도자료가 존재하지 않습니다. 번호: " + newsNum));
+				.orElseThrow(() -> new IllegalArgumentException("해당 뉴스가 존재하지 않습니다. 번호: " + newsNum));
 
 		deleteExistingFile(newsNum);
 		newsRepository.delete(news);
@@ -178,7 +178,7 @@ public class NewsServiceImpl implements NewsService {
 			List<Long> notFoundIds = newsNums.stream().filter(id -> !foundIds.contains(id))
 					.collect(Collectors.toList());
 
-			throw new IllegalArgumentException("존재하지 않는 보도자료 번호: " + notFoundIds);
+			throw new IllegalArgumentException("존재하지 않는 뉴스 번호: " + notFoundIds);
 		}
 
 		newsNums.forEach(this::deleteExistingFile);
@@ -190,7 +190,7 @@ public class NewsServiceImpl implements NewsService {
 	@Transactional(readOnly = true) // 읽기 전용
 	public NewsDetailDTO getNewsDetail(Long newsNum) {
 		News news = newsRepository.findById(newsNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 보도자료가 존재하지 않습니다. 번호: " + newsNum));
+				.orElseThrow(() -> new IllegalArgumentException("해당 뉴스가 존재하지 않습니다. 번호: " + newsNum));
 
 		// ModelMapper로 기본 매핑
 		NewsDetailDTO newsDetailDTO = modelMapper.map(news, NewsDetailDTO.class);
@@ -234,7 +234,7 @@ public class NewsServiceImpl implements NewsService {
 	@Override
 	public void increaseView(Long newsNum) {
 		News news = newsRepository.findById(newsNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 보도자료가 존재하지 않습니다. 번호: " + newsNum));
+				.orElseThrow(() -> new IllegalArgumentException("해당 뉴스가 존재하지 않습니다. 번호: " + newsNum));
 		news.setView(news.getView() + 1);
 
 	}
