@@ -224,7 +224,7 @@ public class EventServiceTest4 {
     //@Test
     @DisplayName("9. 종료되지 않은 이벤트 목록 조회")
     void testSearchNotEndedEventList() {
-        List<EventInfoDTO> ongoingEvents = eventService.searchNotEndedEventList();
+        List<EventInfoDTO> ongoingEvents = eventService.searchNotEndEventList();
         System.out.println("진행 중인 이벤트 수: " + ongoingEvents.size());
         ongoingEvents.forEach(e -> System.out.println(" - " + e.getEventName() + " | 종료일: " + e.getEventEndPeriod()));
         assertNotNull(ongoingEvents);
@@ -255,7 +255,7 @@ public class EventServiceTest4 {
             eventInfoRepository.save(event);
 
             // when: 종료되지 않은 이벤트 조회
-            List<EventInfoDTO> ongoingEvents = eventService.searchNotEndedEventList();
+            List<EventInfoDTO> ongoingEvents = eventService.searchNotEndEventList();
 
             // then
             assertNotNull(ongoingEvents, "결과 리스트는 null이면 안 됩니다.");
