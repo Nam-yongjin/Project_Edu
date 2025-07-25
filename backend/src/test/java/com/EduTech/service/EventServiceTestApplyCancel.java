@@ -41,20 +41,25 @@ public class EventServiceTestApplyCancel {
 
     @Autowired
     private MemberRepository memberRepository;
+    
+    // 랜덤 값 생성
+    String randomMemId = generateRandomString("user_", 5);
+    String randomPhone = generateRandomPhone();
+    String randomEmail = generateRandomEmail();
 
     private Member user;
 
     @BeforeEach
     public void setup() {
         user = Member.builder()
-                .memId("applicant4")
+        		.memId(randomMemId)
                 .pw("pw123")
                 .name("테스트사용자4")
                 .gender(MemberGender.FEMALE)
                 .birthDate(LocalDate.of(1990, 6, 15))
-                .phone("01011234215")
-                .addr("서울시 마포구")
-                .email("applicant4@test.com")
+                .phone(randomPhone)
+    	        .addr("대구광역시")
+    	        .email(randomEmail)
                 .checkSms(true)
                 .checkEmail(false)
                 .role(MemberRole.USER)
@@ -64,7 +69,7 @@ public class EventServiceTestApplyCancel {
         System.out.println("테스트 사용자 저장 완료: " + user.getMemId());
     }
 
-    //@Test
+    @Test
     @DisplayName("1. 사용자 프로그램 신청 테스트")
     void testApplyEvent() {
         System.out.println("\n [테스트 1] 사용자 프로그램 신청 테스트 시작");
@@ -166,7 +171,7 @@ public class EventServiceTestApplyCancel {
         }
     }
 
-    //@Test
+    @Test
     @DisplayName("3. 신청 여부 확인 테스트")
     public void testIsAlreadyApplied() {
         System.out.println("\n [테스트 3] 신청 여부 확인 테스트 시작");
@@ -212,7 +217,7 @@ public class EventServiceTestApplyCancel {
         }
     }
 
-    //@Test
+    @Test
     @DisplayName("4. 신청 불가능한 기간 확인 테스트")
     public void testApplyEventOutsidePeriod() {
         System.out.println("\n [테스트 4] 신청 불가능한 기간 테스트 시작");
@@ -259,5 +264,28 @@ public class EventServiceTestApplyCancel {
             fail("예외 발생: " + e.getMessage());
         }
     }
+    
+    
+    // 랜덤 문자열 생성 (숫자/영문자)
+ 	private String generateRandomString(String prefix, int length) {
+ 	    String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+ 	    StringBuilder sb = new StringBuilder(prefix);
+ 	    for (int i = 0; i < length; i++) {
+ 	        sb.append(chars.charAt((int) (Math.random() * chars.length())));
+ 	    }
+ 	    return sb.toString();
+ 	}
+
+ 	// 랜덤 휴대폰 번호 생성
+ 	private String generateRandomPhone() {
+ 	    int middle = (int) (Math.random() * 9000) + 1000;
+ 	    int last = (int) (Math.random() * 9000) + 1000;
+ 	    return "010" + middle + last;
+ 	}
+
+ 	// 랜덤 이메일 생성
+ 	private String generateRandomEmail() {
+ 	    return generateRandomString("user", 6) + "@example.com";
+ 	}
 
 }

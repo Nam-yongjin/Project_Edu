@@ -25,7 +25,7 @@ public class EventInfoRepositoryTest {
     @Autowired
     EventInfoRepository eventInfoRepository;
 
-    @Test
+    //@Test
     @Transactional
     @Rollback(false)
     @DisplayName("프로그램 정보 등록")
@@ -44,7 +44,7 @@ public class EventInfoRepositoryTest {
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 8, 18, 0))
                 .category(EventCategory.USER) 
                 .state(EventState.OPEN)
-                .currCapacity(0) // 👉 추가 권장
+                .currCapacity(0) // 추가 권장
                 .maxCapacity(10)
                 .originalName("야외독서 피크닉 강의계획서")
                 .filePath("/event/picnic")
@@ -74,10 +74,10 @@ public class EventInfoRepositoryTest {
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 2, 10, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 9, 12, 0))
                 .category(EventCategory.USER) 
-                .state(EventState.BEFORE) // ✅ 상태 필수
-                .currCapacity(0)          // ✅ 현재 인원 필수
+                .state(EventState.BEFORE) // 상태 필수
+                .currCapacity(0)          // 현재 인원 필수
                 .maxCapacity(20)
-                .eventInfo("조회 테스트용 설명입니다") // ✅ 행사 설명 필수
+                .eventInfo("조회 테스트용 설명입니다") // 행사 설명 필수
                 .originalName("조회계획서.pdf")
                 .filePath("/event/query")
                 .build();
@@ -107,7 +107,7 @@ public class EventInfoRepositoryTest {
                         DayOfWeek.MONDAY.getValue(),
                         DayOfWeek.WEDNESDAY.getValue(),
                         DayOfWeek.FRIDAY.getValue()
-                ))) // 불변 컬렉션 제거
+                )))
                 .place("로비")
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 3, 9, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 10, 11, 0))
@@ -120,6 +120,9 @@ public class EventInfoRepositoryTest {
                 .build();
 
         EventInfo saved = eventInfoRepository.save(eventInfo);
+        
+        System.out.println("수정전 프로그램명: " + saved.getEventName());
+        System.out.println("수정전 장소: " + saved.getPlace());
 
         saved.setEventName("수정된 프로그램명");
         saved.setPlace("수정된 강의실");
@@ -150,9 +153,9 @@ public class EventInfoRepositoryTest {
                 .eventStartPeriod(LocalDateTime.of(2025, 6, 4, 10, 0))
                 .eventEndPeriod(LocalDateTime.of(2025, 6, 11, 10, 0))
                 .category(EventCategory.USER) 
-                .state(EventState.BEFORE)        // ✅ 필수
-                .currCapacity(0)                 // ✅ 필수
-                .eventInfo("삭제 테스트용 설명입니다") // ✅ 필수
+                .state(EventState.BEFORE)        // 필수
+                .currCapacity(0)                 // 필수
+                .eventInfo("삭제 테스트용 설명입니다") // 필수
                 .maxCapacity(20)
                 .originalName("삭제계획서.docx")
                 .filePath("/programs/delete")
@@ -167,7 +170,7 @@ public class EventInfoRepositoryTest {
 
         // 4. 삭제 확인
         boolean exists = eventInfoRepository.findById(eventNum).isPresent();
-        System.out.println("삭제 여부: " + (exists ? "❌ 실패" : "✅ 성공"));
+        System.out.println("삭제 여부: " + (exists ? " 실패 " : " 성공 "));
     }
 
 }

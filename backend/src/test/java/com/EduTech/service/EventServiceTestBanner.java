@@ -87,7 +87,7 @@ public class EventServiceTestBanner {
         // 추가 초기화 작업
     }
 */
-    //@Test
+    @Test
     @DisplayName("1. 배너 등록 테스트")
     public void testRegisterBanner() throws Exception {
         try {
