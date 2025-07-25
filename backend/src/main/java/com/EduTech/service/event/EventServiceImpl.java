@@ -343,7 +343,7 @@ public class EventServiceImpl implements EventService {
 	
 	// 진행 중인 이벤트만 조회
 	@Override
-    public List<EventInfoDTO> searchNotEndedEventList() {
+    public List<EventInfoDTO> searchNotEndEventList() {
         Sort sort = Sort.by(Sort.Direction.DESC, "applyAt");
         List<EventInfo> infoList = infoRepository.findByEventEndPeriodGreaterThanEqual(LocalDateTime.now(), sort);
         return infoList.stream().map(p -> {
@@ -392,8 +392,8 @@ public class EventServiceImpl implements EventService {
 	
 	// 배너 삭제
 	@Override
-    public void deleteBanner(Long bannerNo) {
-		EventBanner banner = bannerRepository.findById(bannerNo)
+    public void deleteBanner(Long evtFileNum) {
+		EventBanner banner = bannerRepository.findById(evtFileNum)
                 .orElseThrow(() -> new IllegalArgumentException("해당 배너가 존재하지 않습니다."));
         String filePath = banner.getFilePath();
         if (filePath != null) {
@@ -527,7 +527,7 @@ public class EventServiceImpl implements EventService {
 	// ========================================
 	// 7. 공통 메서드
 	// ========================================
-	private EventUseDTO toDTO(EventUse use) {
+	public EventUseDTO toDTO(EventUse use) {
 	    EventInfo info = use.getEventInfo();
 	    Member member = use.getMember();
 
