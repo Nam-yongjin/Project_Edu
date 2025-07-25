@@ -19,14 +19,14 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 
 	private String name;
 
-	private String roleName;
+	private String role;
 
 	// 생성자
-	public MemberDTO(String memId, String pw, String name, String roleName) {
-		super(memId, pw, List.of(new SimpleGrantedAuthority("ROLE_" + roleName)));
+	public MemberDTO(String memId, String pw, String name, String role) {
+		super(memId, pw, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 		this.memId = memId;
 		this.name = name;
-		this.roleName = roleName;
+		this.role = role;
 	}
 	
 	// JWT 등을 쓸 때 사용자의 정보를 Map으로 추출
@@ -34,7 +34,7 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 		Map<String, Object> dataMap = new HashMap<>();
 		dataMap.put("memId", memId);
 		dataMap.put("name", name);
-		dataMap.put("roleName", roleName);
+		dataMap.put("role", role);
 		return dataMap;
 	}
 

@@ -1,19 +1,71 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginPost } from "../api/memberApi";
+import { loginPost, readMember, readStudent, readTeacher, readCompany } from "../api/memberApi";
 import { setCookie, getCookie, removeCookie } from "../util/cookieUtil";
+import jwtAxios from "../util/jwtUtil";
 
 const initState = {
-    email: ''
+    memId: '',
+    email: '',
+    role: ''
 };
 const loadMemberCookie = () => {
-    const memberInfo = getCookie("member")
+    const memberInfo = getCookie("member");
 
-    return memberInfo
-}
+    // 이미 객체일 경우 대비 처리
+    if (!memberInfo) return initState;
+
+    if (typeof memberInfo === 'object') {
+        return memberInfo;
+    }
+
+    try {
+        return JSON.parse(memberInfo);
+    } catch (e) {
+        console.error("쿠키 파싱 실패", e);
+        return initState;
+    }
+};
+
+// 역할별 myInfo 호출
+const fetchUserInfoByRole = async (role) => {
+    switch (role) {
+        case "STUDENT":
+            return await readStudent();
+        case "TEACHER":
+            return await readTeacher();
+        case "COMPANY":
+            return await readCompany();
+        default:
+            return await readMember();
+    }
+};
+
 // 서버에 로그인 요청을 보내는 비동기 thunk 함수
-export const loginPostAsync = createAsyncThunk('loginPostAsync', (param) => {
-    return loginPost(param); // createAsyncThunk()를 사용해서 비동기 통신을 호출하는 함수
-});
+export const loginPostAsync = createAsyncThunk(
+    'loginPostAsync',
+    async (loginParam) => {
+        const loginRes = await loginPost(loginParam); // accessToken
+        const token = loginRes.accessToken;
+
+        // 토큰 저장
+        setCookie("accessToken", token, 1);
+
+        // jwtAxios 설정
+        jwtAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // 서버에 role 정보를 물어보는 API가 따로 없다면 기본적으로 readMember로 요청하고 role을 얻어야 함
+        let basicInfo = await readMember();
+        const role = basicInfo.role;
+
+        const detailedInfo = await fetchUserInfoByRole(role);
+
+        return {
+            memId: detailedInfo.memId,
+            email: detailedInfo.email,
+            role: role // 또는 detailedInfo.role
+        };
+    }
+);
 
 const loginSlice = createSlice({
     name: 'loginSlice',
@@ -26,9 +78,11 @@ const loginSlice = createSlice({
             const payload = action.payload;
 
             if (!payload.error) {
-                setCookie("member", JSON.stringify(payload), 1) // 쿠키 만료시간
+                setCookie("member", JSON.stringify(payload), 1);
+                state.memId = payload.memId || '';
+                state.email = payload.email || '';
+                state.role = payload.role || '';
             }
-            return payload;
         },
         logout: (state, action) => {
             alert("로그아웃 되었습니다.")
@@ -42,19 +96,16 @@ const loginSlice = createSlice({
                 console.log("pending"); // 비동기 요청 시작
             })
             .addCase(loginPostAsync.fulfilled, (state, action) => {
-                console.log("fulfilled"); // 요청 성공
-
                 const payload = action.payload;
 
-                // 정상적인 로그인시에만 쿠키 저장
-                if (!payload.error) {
-                    setCookie('member', JSON.stringify(payload), 1); // 1일
-                }
+                setCookie('member', JSON.stringify(payload), 1);
 
-                return payload;
+                state.memId = payload.memId;
+                state.email = payload.email;
+                state.role = payload.role;
             })
-            .addCase(loginPostAsync.rejected, (state, action) => {
-                console.log("rejected"); // 요청 실패 
+            .addCase(loginPostAsync.rejected, () => {
+                console.log("로그인 실패");
             });
     }
 });
