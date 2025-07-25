@@ -40,7 +40,7 @@ public class EventUseRepositoryTest {
 	@Test
 	@Transactional
 	@Rollback(false)
-	@DisplayName("✅ 프로그램 이용 신청 테스트 - 랜덤 데이터")
+	@DisplayName(" 프로그램 이용 신청 테스트 - 랜덤 데이터")
 	public void applyProgramUseTest() {
 
 	    // 랜덤 값 생성
@@ -64,7 +64,7 @@ public class EventUseRepositoryTest {
 	        .build();
 	    memberRepository.save(member);
 
-	    System.out.println("\n🔹 [회원 등록 완료]");
+	    System.out.println("\n [회원 등록 완료]");
 	    System.out.println("  ▶ ID: " + member.getMemId());
 	    System.out.println("  ▶ 이메일: " + member.getEmail());
 	    System.out.println("  ▶ 전화번호: " + member.getPhone());
@@ -88,8 +88,8 @@ public class EventUseRepositoryTest {
 	            .build();
 	    eventInfoRepository.save(eventInfo);
 
-	    System.out.println("\n🔹 [행사 등록 완료]");
-	    System.out.println("  ▶ 행사명: " + eventInfo.getEventName());
+	    System.out.println("\n [행사 등록 완료]");
+	    System.out.println(" 행사명: " + eventInfo.getEventName());
 
 	    // 🔷 3. 신청 저장
 	    EventUse eventUse = EventUse.builder()
@@ -101,11 +101,11 @@ public class EventUseRepositoryTest {
 
 	    EventUse saved = eventUseRepository.save(eventUse);
 
-	    System.out.println("\n✅ [프로그램 신청 완료]");
-	    System.out.println("  ▶ 신청자 ID: " + saved.getMember().getMemId());
-	    System.out.println("  ▶ 신청자 전화번호: " + saved.getMember().getPhone());
-	    System.out.println("  ▶ 신청자 이메일: " + saved.getMember().getEmail());
-	    System.out.println("  ▶ 신청 일시: " + saved.getApplyAt());
+	    System.out.println("\n [프로그램 신청 완료]");
+	    System.out.println(" 신청자 ID: " + saved.getMember().getMemId());
+	    System.out.println(" 신청자 전화번호: " + saved.getMember().getPhone());
+	    System.out.println(" 신청자 이메일: " + saved.getMember().getEmail());
+	    System.out.println(" 신청 일시: " + saved.getApplyAt());
 
 	    assert saved.getEvtRevNum() != null;
 	    assert saved.getMember().getEmail().equals(randomEmail);
