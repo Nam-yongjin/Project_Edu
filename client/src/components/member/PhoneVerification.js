@@ -95,6 +95,7 @@ const PhoneVerification = ({ onVerified }) => {
 
     return (
         <div>
+            <div id="recaptcha-container"></div>
             <input
                 type="text"
                 placeholder="전화번호 입력 ('-' 없이)"
@@ -129,7 +130,7 @@ const PhoneVerification = ({ onVerified }) => {
                 </>
             )}
 
-            <div id="recaptcha-container"></div>
+            
         </div>
     );
 };
