@@ -40,29 +40,30 @@ const fetchUserInfoByRole = async (role) => {
     }
 };
 
-// 서버에 로그인 요청을 보내는 비동기 thunk 함수
+// 로그인 후 토큰 저장 및 사용자 정보(메인 + 상세) 가져오기
 export const loginPostAsync = createAsyncThunk(
     'loginPostAsync',
     async (loginParam) => {
-        const loginRes = await loginPost(loginParam); // accessToken
+        // 1) 로그인 요청 및 accessToken 받기
+        const loginRes = await loginPost(loginParam);
         const token = loginRes.accessToken;
 
-        // 토큰 저장
+        // 2) 토큰 쿠키에 저장 및 axios 헤더 설정
         setCookie("accessToken", token, 1);
-
-        // jwtAxios 설정
         jwtAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        // 서버에 role 정보를 물어보는 API가 따로 없다면 기본적으로 readMember로 요청하고 role을 얻어야 함
-        let basicInfo = await readMember();
+        // 3) 기본 회원정보 조회 (role 포함)
+        const basicInfo = await readMember();
         const role = basicInfo.role;
 
+        // 4) role별 상세 정보 조회 함수 호출
         const detailedInfo = await fetchUserInfoByRole(role);
 
+        // 5) 필요한 정보 리턴
         return {
             memId: detailedInfo.memId,
             email: detailedInfo.email,
-            role: role // 또는 detailedInfo.role
+            role: role,
         };
     }
 );
