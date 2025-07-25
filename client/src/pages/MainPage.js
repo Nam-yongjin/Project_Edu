@@ -1,12 +1,11 @@
-import Header from "../layouts/Header"
-import Footer from "../layouts/Footer"
+import BasicLayout from "../layouts/BasicLayout"
 
 const MainPage = () => {
     return (
         <div className=" text-3xl">
-            <div><Header /></div>
+            <BasicLayout>
             <div>Main Page</div>
-            <div><Footer /></div>
+            </BasicLayout>
         </div>
     )
 }
