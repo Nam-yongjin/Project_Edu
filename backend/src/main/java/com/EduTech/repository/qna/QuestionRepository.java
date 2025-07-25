@@ -15,6 +15,4 @@ public interface QuestionRepository extends JpaRepository<Question, Long>,JpaSpe
 	@Transactional
 	@Query("UPDATE Question SET title=:title, content=:content, state=:state WHERE questionNum=:questionNum")
 	void updateQuestion(@Param("title") String title,@Param("content") String content,@Param("state") Boolean state, @Param("questionNum") Long questionNum);	
-
-	
 }
