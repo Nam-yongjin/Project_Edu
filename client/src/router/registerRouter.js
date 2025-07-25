@@ -3,9 +3,9 @@ import { Suspense, lazy } from "react";
 
 
 const Member = lazy(() => import("../pages/member/memberRegisterPage"))
-const Student = lazy(() => import("../pages/member/studentRegisterPage"))
-const Teacher = lazy(() => import("../pages/member/teacherRegisterPage"))
-const Company = lazy(() => import("../pages/member/companyRegisterPage"))
+const Student = lazy(() => import("../pages/member/student/studentRegisterPage"))
+const Teacher = lazy(() => import("../pages/member/teacher/teacherRegisterPage"))
+const Company = lazy(() => import("../pages/member/company/companyRegisterPage"))
 
 const registerRouter = () => {
 

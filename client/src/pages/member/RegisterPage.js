@@ -1,10 +1,13 @@
 import { Outlet } from "react-router-dom"
+import BasicLayout from "../../layouts/BasicLayout"
+import RegisterComponent from "../../components/member/RegisterComponent"
 
 const RegisterPage = () => {
     return (
         <div>
-
-            <Outlet />
+            <BasicLayout>
+                <div>register</div>
+            </BasicLayout>
         </div>
     )
 }
