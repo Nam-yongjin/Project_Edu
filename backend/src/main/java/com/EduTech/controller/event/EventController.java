@@ -219,4 +219,5 @@ public class EventController {
 			List<EventInfoDTO> result = eventService.searchNotEndEventList();
 			return ResponseEntity.ok(result);
 		}
+		
 }
