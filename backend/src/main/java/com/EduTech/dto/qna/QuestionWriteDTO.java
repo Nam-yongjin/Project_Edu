@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDTO {
+public class QuestionWriteDTO {
 	private String title;
 }
