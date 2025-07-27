@@ -27,8 +27,7 @@ const root = createBrowserRouter([
                 element: <Suspense fallback={<Loading />}><KakaoRedirect /></Suspense>,
             }
         ]
-    },
-
+    }
 ])
 
 export default root
