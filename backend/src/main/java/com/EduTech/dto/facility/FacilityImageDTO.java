@@ -1,18 +1,12 @@
 package com.EduTech.dto.facility;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class FacilityImageDTO {
-
-    private Long facImageNum;   // 이미지 번호
-    private String imageName;   // 이미지 이름
-    private String imageUrl;    // 이미지 URL
-    private Long facilityNum;   // 시설 번호
+    private Long facImageNum;  // 이미지 고유 번호
+    private String imageName;  // 이미지 원본 이름
+    private String imageUrl;   // 이미지 접근 경로
 }
