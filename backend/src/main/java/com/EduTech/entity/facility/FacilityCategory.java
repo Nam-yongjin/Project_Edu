@@ -1,5 +1,16 @@
 package com.EduTech.entity.facility;
 
 public enum FacilityCategory {
-	CONFERENCE, SEMINAR; //회의실, 강의실
+	CONFERENCE("회의실"),
+	SEMINAR("강의실");
+	
+    private final String label;
+
+    FacilityCategory(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 }
