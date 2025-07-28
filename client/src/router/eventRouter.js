@@ -9,12 +9,12 @@ const eventRouter = () => {
 
     return [
         {
-             path:"EventList",
-            element: <Suspense fallback={<Loading />}><EventList /></Suspense>,
+             path:"evList",
+            element: <Suspense fallback={<Loading />}><evList /></Suspense>,
         } ,
          {
-            path:"EventDetail",
-            element: <Suspense fallback={<Loading />}><EventDetail /></Suspense>,
+            path:"evDetail",
+            element: <Suspense fallback={<Loading />}><evDetail /></Suspense>,
         }
     ]
 
