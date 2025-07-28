@@ -91,7 +91,7 @@ public class FacilityController {
         facilityService.updateReservationState(dto);
         return ResponseEntity.ok().build();
     }
-    
+/*    
     // 사용자 예약 취소
     @PatchMapping("/my/reservation/{facRevNum}/cancel")
     public ResponseEntity<?> userCancel(
@@ -101,7 +101,7 @@ public class FacilityController {
         boolean success = facilityService.cancelReservation(facRevNum, false, user.getUsername());
         return ResponseEntity.ok(success ? "취소 완료" : "취소 실패");
     }
-    
+*/    
     //관치자 에약 취소
     @PatchMapping("/admin/reservation/{facRevNum}/cancel")
     public ResponseEntity<?> adminCancel(@PathVariable Long facRevNum) {

@@ -2,8 +2,6 @@ package com.EduTech.entity.facility;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,22 +17,18 @@ public class Facility {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facilityNum;
+    private Long facilityNum;		// 장소번호
 
-    @Column(nullable = false, length = 50)
-    private String facName;
+    @Column(length = 100)
+    private String facName;			// 장소명
 
-    private String facInfo;
+    private String facInfo;			// 소개
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FacilityCategory category; // 예: CONFERENCE, SEMINAR (enum으로 따로 분리 권장)
+    private int capacity;			// 수용인원
 
-    private int capacity;
+    private String facItem;			// 구비품목
 
-    private String facItem;
-
-    private String etc;
+    private String etc;				// 기타유의사항
 
     // 관계 설정 생략 가능 (양방향 필요 시 추가)
 }

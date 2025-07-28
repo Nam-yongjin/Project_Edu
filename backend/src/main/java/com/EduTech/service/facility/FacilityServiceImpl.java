@@ -58,7 +58,6 @@ public class FacilityServiceImpl implements FacilityService {
         FacilityDetailDTO dto = new FacilityDetailDTO();
         dto.setFacName(facility.getFacName());
         dto.setFacInfo(facility.getFacInfo());
-        dto.setCategory(facility.getCategory().name());
         dto.setCapacity(facility.getCapacity());
         dto.setFacItem(facility.getFacItem());
         dto.setEtc(facility.getEtc());

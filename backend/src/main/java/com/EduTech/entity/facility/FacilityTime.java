@@ -21,15 +21,15 @@ public class FacilityTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facTimeNum;
+    private Long facTimeNum;		// 예약번호
 
-    private LocalDate facDate;
+    private LocalDate facDate;		// 예약일
 
-    private LocalTime startTime;
+    private LocalTime startTime;	// 시작시간
 
-    private LocalTime endTime;
+    private LocalTime endTime;		// 종료시간
 
-    private boolean available; // 예약 가능 여부
+    private boolean available; 		// 예약 가능 여부
 
     @ManyToOne
     @JoinColumn(name = "facility_num")

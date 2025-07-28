@@ -14,7 +14,7 @@ public class FacilityReserveListDTO {
     private Long facRevNum;         // 예약 번호
     private String facName;         // 시설명
     private LocalDate facDate;      // 예약일
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private FacilityState state; // WAIT / ACCEPT / REJECT
+    private LocalTime startTime;	// 시작시간
+    private LocalTime endTime;		// 종료시간
+    private FacilityState state; 	// WAITING / ACCEPT / REJECT
 }

@@ -18,13 +18,13 @@ public class FacilityImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facImageNum;
+    private Long facImageNum;		// 이미지 번호
 
-    private String imageName;
+    private String imageName;		// 이미지 이름
 
-    private String imageUrl;
+    private String imageUrl;		// 이미지 URL
 
     @ManyToOne
     @JoinColumn(name = "facility_num")
-    private Facility facility;
+    private Facility facility;		// 장소번호
 }
