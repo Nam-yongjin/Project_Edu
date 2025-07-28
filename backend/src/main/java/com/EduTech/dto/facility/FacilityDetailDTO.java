@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FacilityDetailDTO {
-    private String facName;			// 장소명
+    private String facName;			// 장소명.
     private int capacity;			// 수용인원
     private String facItem;			// 구비품목
     private String etc;				// 기타 유의사항

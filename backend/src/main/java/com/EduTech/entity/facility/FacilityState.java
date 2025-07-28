@@ -14,5 +14,6 @@ public enum FacilityState {
 
     public String getLabel() {
         return label;
+        
     }
 }

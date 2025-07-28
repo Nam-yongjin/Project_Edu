@@ -25,7 +25,7 @@ public class FacilityReserve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facRevNum;			//예약 번호
+    private Long facRevNum;			//예약 번호 
 
     private LocalDate facDate;		// 예약날자
 
