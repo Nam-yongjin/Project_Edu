@@ -41,6 +41,9 @@ const Header = () => {
                     <li className="mx-11 hover:text-blue-400 cursor-pointer">공간운영</li>
                     <li className="mx-11 hover:text-blue-400 cursor-pointer">지원사업</li>
                     <li className="mx-11 hover:text-blue-400 cursor-pointer">알림마당</li>
+                    {loginState.role === 'ADMIN' ? (
+                        <li className="mx-11 hover:text-blue-400 cursor-pointer">관리자</li>
+                    ) : (<></>)}
                 </ul>
             </nav>
 

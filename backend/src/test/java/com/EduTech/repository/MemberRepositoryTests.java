@@ -79,7 +79,7 @@ public class MemberRepositoryTests {
 	private EventUseRepository eventUseRepository;
 
 //	등록 테스트
-	@Test
+//	@Test
 	@Transactional
 	@Commit
 	public void testInsertMember() {
@@ -98,6 +98,32 @@ public class MemberRepositoryTests {
 				.checkEmail(false)
 				.state(MemberState.NORMAL)
 				.role(MemberRole.USER)
+				.build();
+		memberRepository.save(member);
+		memberRepository.flush();
+		
+	}
+	
+	// 관리자계정
+	@Test
+	@Transactional
+	@Commit
+	public void testInsertAdmin() {
+
+		Member member = Member.builder()
+				.memId("admin")
+				.pw(passwordEncoder.encode("admin"))
+				.name("관리자")
+				.email("admin@test.com")
+				.birthDate(LocalDate.of(2000, 7, 5))
+				.gender(MemberGender.MALE)
+				.phone("01000000000")
+				.addr("어드민")
+				.addrDetail("어드민")
+				.checkSms(true)
+				.checkEmail(false)
+				.state(MemberState.NORMAL)
+				.role(MemberRole.ADMIN)
 				.build();
 		memberRepository.save(member);
 		memberRepository.flush();
