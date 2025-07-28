@@ -5,7 +5,7 @@ const eventPage = () => {
     return (
         <div>
             <BasicLayout>
-                <Outlet/>
+                <Outlet />
             </BasicLayout>
         </div>
     )
