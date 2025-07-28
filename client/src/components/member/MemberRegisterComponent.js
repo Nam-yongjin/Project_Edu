@@ -111,8 +111,7 @@ const MemberRegisterComponent = () => {
                 addr: '',
                 addrDetail: '',
                 checkSms: false,
-                checkEmail: false,
-                kakao: ''
+                checkEmail: false
             });
             setVerifiedPhone(null);
             setErrors({});
@@ -164,6 +163,11 @@ const MemberRegisterComponent = () => {
                     value={form.name}
                     onChange={handleChange} />
                 {errors.name && <div style={{ color: 'red' }}>{errors.name}</div>}
+            </div>
+
+            <div>
+                <PhoneVerification onVerified={setVerifiedPhone} />
+                {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
             </div>
 
             <div>
@@ -239,13 +243,7 @@ const MemberRegisterComponent = () => {
             </div>
 
             <div>
-                <PhoneVerification onVerified={setVerifiedPhone} />
-                {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
-
-            </div>
-
-            <div>
-                <button className='rounded p-1 w-18 bg-blue-500	text-white' onClick={handleSubmit}>회원가입</button>
+                <button className='rounded p-1 w-18 bg-blue-500	text-white active:bg-blue-600' onClick={handleSubmit}>회원가입</button>
             </div>
         </div>
     );

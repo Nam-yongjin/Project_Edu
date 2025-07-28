@@ -20,6 +20,7 @@ import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
+import com.EduTech.dto.member.MemberResetPwDTO;
 import com.EduTech.dto.member.StudentDetailDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
@@ -151,15 +152,16 @@ public class MemberController {
 	}
 	
 	// 아이디 찾기
-	@GetMapping("/member/findId")
+	@GetMapping("/findId")
 	public ResponseEntity<String> findId(@RequestParam String phone){
-		return ResponseEntity.ok("");
+		return ResponseEntity.ok(memberService.findId(phone));
 	}
 	
-	// 비밀번호 찾기
-	@GetMapping("/member/resetPw")
-	public ResponseEntity<String> resetPw(@RequestParam String phone){
-		return ResponseEntity.ok("");
+	// 비밀번호 찾기(변경)
+	@PutMapping("/resetPw")
+	public ResponseEntity<String> resetPw(@RequestBody MemberResetPwDTO memberResetPwDTO){
+		memberService.resetPw(memberResetPwDTO.getMemId(), memberResetPwDTO);
+		return ResponseEntity.ok("비밀번호가 변경되었습니다.");
 	}
 	
 	// 카카오 로그인
