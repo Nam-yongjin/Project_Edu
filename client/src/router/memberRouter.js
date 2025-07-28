@@ -1,10 +1,6 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 
-
-const Member = lazy(() => import("../pages/member/memberRegisterPage"))
-
-
 const memberRouter = () => {
 
     return [
