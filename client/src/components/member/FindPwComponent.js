@@ -34,7 +34,7 @@ const FindPwComponent = () => {
         }
     };
 
-    if (resetComplete) return <p>✅ 비밀번호가 재설정되었습니다. 로그인해 주세요.</p>;
+    if (resetComplete) return <p>비밀번호가 재설정되었습니다. 로그인해 주세요.</p>;
 
     return (
         <div>

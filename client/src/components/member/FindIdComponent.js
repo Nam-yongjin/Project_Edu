@@ -25,7 +25,7 @@ const FindIdComponent = () => {
             {!foundId ? (
                 <PhoneVerification onVerified={handleVerified} />
             ) : (
-                <p>🔍 찾은 아이디: <strong>{foundId}</strong></p>
+                <p>찾은 아이디: <strong>{foundId}</strong></p>
             )}
         </div>
     );
