@@ -15,7 +15,6 @@ public class FacilityDetailDTO {
     private String etc;				// 기타 유의사항
     private String availableTime;	// 에약 가능 시간
     private String facInfo;       	// 시설 소개
-    private String category;      	// CONFERENCE / SEMINAR 등
 
     private List<FacilityImageDTO> images;  // 이미지 정보 리스트
 }

@@ -12,5 +12,5 @@ public class FacilityTimeDTO {
     private LocalDate facDate;      // 날짜
     private LocalTime startTime;    // 시작 시간
     private LocalTime endTime;      // 종료 시간
-    private boolean available;          // 예약 가능 여부
+    private boolean available;      // 예약 가능 여부
 }

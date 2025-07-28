@@ -25,16 +25,16 @@ public class FacilityReserve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facRevNum;
+    private Long facRevNum;			//예약 번호
 
-    private LocalDate facDate;
+    private LocalDate facDate;		// 예약날자
 
-    private LocalTime startTime;
+    private LocalTime startTime;	// 시작시간
 
-    private LocalTime endTime;
+    private LocalTime endTime;		// 종료시간
 
     @Column(nullable = false)
-    private LocalDateTime reserveAt;
+    private LocalDateTime reserveAt;	// 예약신청일
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -42,8 +42,8 @@ public class FacilityReserve {
 
     @ManyToOne
     @JoinColumn(name = "facility_num")
-    private Facility facility;
+    private Facility facility;		// 
 
     @Column(nullable = false, length = 30)
-    private String memId; // 실제 시스템에서는 Member 객체로 연결 가능
+    private String memId; 			// 실제 시스템에서는 Member 객체로 연결 가능
 }
