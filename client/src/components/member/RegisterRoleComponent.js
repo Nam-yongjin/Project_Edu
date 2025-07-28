@@ -54,7 +54,7 @@ const RegisterRoleComponent = () => {
                     기업
                 </label>
             </div>
-            <button className="mt-4 p-2 bg-blue-500 text-white rounded"
+            <button className="mt-4 p-2 bg-blue-500 text-white rounded active:bg-blue-600"
                 onClick={handleSubmit}>
                 다음
             </button>

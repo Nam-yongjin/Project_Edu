@@ -7,6 +7,7 @@ import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
+import com.EduTech.dto.member.MemberResetPwDTO;
 import com.EduTech.dto.member.StudentDetailDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
@@ -45,7 +46,9 @@ public interface MemberService {
 	
 	void leaveMember(String memId);
 	
+	String findId(String phone);
 	
+	void resetPw(String memId, MemberResetPwDTO memberResetPwDTO);
 	
 	MemberDTO getKakaoMember(String accessToken);
 
