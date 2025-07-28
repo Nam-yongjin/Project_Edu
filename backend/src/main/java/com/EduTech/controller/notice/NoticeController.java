@@ -44,10 +44,10 @@ public class NoticeController {
 	}
 	
 	//공지사항 상세 조회(조회수 증가)
-	@GetMapping("/{id}")
-	public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable Long id) {
-		noticeService.increaseView(id); //클릭 시조회수 증가
-		return ResponseEntity.ok(noticeService.getNoticeDetail(id));
+	@GetMapping("/{noticeNum}")
+	public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable Long noticeNum) {
+		noticeService.increaseView(noticeNum); //클릭 시 조회수 증가
+		return ResponseEntity.ok(noticeService.getNoticeDetail(noticeNum));
 	}
 	
 	//고정 공지사항 조회
@@ -69,27 +69,27 @@ public class NoticeController {
 	
 	//공지사항 수정
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/{id}")
-	public ResponseEntity<String> updateNotice(@PathVariable Long id,
+	@PostMapping("/{noticeNum}")
+	public ResponseEntity<String> updateNotice(@PathVariable Long noticeNum,
 			@ModelAttribute NoticeUpdateRegisterDTO dto,
 			@RequestPart(required = false) List<MultipartFile> file) {
-		noticeService.updateNotice(dto, file, id);
+		noticeService.updateNotice(dto, file, noticeNum);
 		return ResponseEntity.ok("공지사항이 수정되었습니다.");
 	}
 	
 	//공지사항 삭제(단일)
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/{id}")
-	public ResponseEntity<String> deleteNotice(@PathVariable Long id) {
-		noticeService.deleteNotice(id);
+	@PostMapping("/{noticeNum}")
+	public ResponseEntity<String> deleteNotice(@PathVariable Long noticeNum) {
+		noticeService.deleteNotice(noticeNum);
 		return ResponseEntity.ok("공지사항이 삭제되었습니다.");
 	}
 	
 	//공지사항 삭제(일괄)
 		@PreAuthorize("hasRole('ADMIN')")
-		@PostMapping("/{id}")
-		public ResponseEntity<String> deleteNotices(@RequestBody List<Long> ids) {
-			noticeService.deleteNotices(ids);
+		@PostMapping("/{noticeNum}")
+		public ResponseEntity<String> deleteNotices(@RequestBody List<Long> noticeNums) {
+			noticeService.deleteNotices(noticeNums);
 			return ResponseEntity.ok("공지사항이 일괄 삭제되었습니다.");
 		}
 	
