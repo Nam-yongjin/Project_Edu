@@ -44,7 +44,7 @@ public interface FacilityReserveRepository extends JpaRepository<FacilityReserve
     );
 
     // 관리자: 승인/거절 상태 변경 (중복 방지 위해 현재 상태 조건 포함)
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
         UPDATE FacilityReserve r
         SET r.state = :newState
@@ -57,7 +57,7 @@ public interface FacilityReserveRepository extends JpaRepository<FacilityReserve
     );
     
     // 예약 상태를 'CANCELLED'로 변경하는 쿼리
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
         UPDATE FacilityReserve r
         SET r.state = 'CANCELLED'
