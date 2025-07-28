@@ -3,9 +3,7 @@ import MemberRegisterComponent from "../../components/member/MemberRegisterCompo
 const memberRegisterPage = () => {
     return(
         <div>
-            
             <MemberRegisterComponent />
-            
         </div>
     )
 }
