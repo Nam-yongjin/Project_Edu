@@ -27,7 +27,7 @@ const Header = () => {
         <header className="flex items-center justify-between px-14 h-20 bg-white shadow">
             {/* 로고 */}
             <div className="flex items-center">
-                <img src={logo} alt="로고" className="h-[120px] max-h-[120px] cursor-pointer" 
+                <img src={logo} alt="로고" className="w-[300px] h-[120px] flex-shrink-0 cursor-pointer" 
                 onClick={handleClickLogo} />
                 {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
             </div>
