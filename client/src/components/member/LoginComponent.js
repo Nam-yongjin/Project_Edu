@@ -45,7 +45,7 @@ const LoginComponent = () => {
             <div className="flex justify-center">
                 <div className="relative mb-4 flex w-full flex-wrap items-center">
                     <div className="w-full p-3 text-left font-bold">ID</div>
-                    <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
+                    <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md" autoFocus
                         name="memId" type={'text'} value={loginParam.memId} onChange={handleChange} onKeyDown={handleKeydown} /> </div>
             </div>
             <div className="flex justify-center">
