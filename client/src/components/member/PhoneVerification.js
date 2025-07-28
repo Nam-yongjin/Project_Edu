@@ -51,7 +51,7 @@ const PhoneVerification = ({ onVerified }) => {
             return;
         }
         if (!isValidPhone(phone)) {
-            alert('유효한 전화번호를 입력해주세요.');
+            alert('유효한 휴대폰번호를 입력해주세요.');
             return;
         }
 
@@ -98,7 +98,7 @@ const PhoneVerification = ({ onVerified }) => {
             <div id="recaptcha-container"></div>
             <input
                 type="text"
-                placeholder="전화번호 입력 ('-' 없이)"
+                placeholder="휴대폰번호 입력 ('-' 없이)"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 disabled={disable}
