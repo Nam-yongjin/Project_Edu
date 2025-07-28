@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,6 @@ import com.EduTech.dto.news.NewsFileDTO;
 import com.EduTech.dto.news.NewsListDTO;
 import com.EduTech.dto.news.NewsSearchDTO;
 import com.EduTech.dto.news.NewsUpdateRegisterDTO;
-import com.EduTech.dto.notice.NoticeDetailDTO;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.news.News;
 import com.EduTech.entity.news.NewsFile;
@@ -62,6 +62,9 @@ public class NewsServiceImpl implements NewsService {
 		Member member = memberRepository.findById(JWTFilter.getMemId())
 				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
 				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) { //관리자 권한 확인
+			throw new AccessDeniedException("뉴스 작성 권한이 없습니다.");
+	    }
 		// DTO를 News Entity로 변환(ModelMapper 사용)
 		News news = modelMapper.map(dto, News.class);
 		news.setCreatedAt(LocalDateTime.now()); // 작성 시간 설정
@@ -104,6 +107,13 @@ public class NewsServiceImpl implements NewsService {
 	// 언론보도 수정
 	@Override
 	public void updateNews(NewsUpdateRegisterDTO dto, List<MultipartFile> file, Long newsNum) {
+		Member member = memberRepository.findById(JWTFilter.getMemId())
+				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("뉴스 수정 권한이 없습니다.");
+	    }
+		
 		News news = newsRepository.findById(newsNum)
 				.orElseThrow(() -> new IllegalArgumentException("해당 뉴스가 존재하지 않습니다. 번호: " + newsNum));
 		// ModelMapper로 DTO데이터를 Entity에 매핑
@@ -160,6 +170,12 @@ public class NewsServiceImpl implements NewsService {
 	// 언론보도 삭제(단일)
 	@Override
 	public void deleteNews(Long newsNum) {
+		Member member = memberRepository.findById(JWTFilter.getMemId())
+				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("뉴스 삭제 권한이 없습니다.");
+	    }
 		News news = newsRepository.findById(newsNum)
 				.orElseThrow(() -> new IllegalArgumentException("해당 뉴스가 존재하지 않습니다. 번호: " + newsNum));
 
@@ -170,6 +186,13 @@ public class NewsServiceImpl implements NewsService {
 	// 언론보도 삭제(일괄)
 	@Override
 	public void deleteNewsByIds(List<Long> newsNums) {
+		Member member = memberRepository.findById(JWTFilter.getMemId())
+				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("뉴스 삭제 권한이 없습니다.");
+	    }
+		
 		List<News> newsList = newsRepository.findAllById(newsNums);
 
 		if (newsList.size() != newsNums.size()) {
