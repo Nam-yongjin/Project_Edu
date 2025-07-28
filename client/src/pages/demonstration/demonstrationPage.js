@@ -5,7 +5,7 @@ const DemonstrationPage = () => {
     return (
         <div>
             <BasicLayout>
-                <div>demonstration</div>
+                <Outlet/>
             </BasicLayout>
         </div>
     )
