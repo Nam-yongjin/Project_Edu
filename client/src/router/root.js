@@ -51,6 +51,11 @@ const root = createBrowserRouter([
         path: "demonstration",
         element: <Suspense fallback={<Loading />}><Demonstration /></Suspense>,
         children: demonstrationRouter()
+    },
+    {
+        path: "event",
+        element: <Suspense fallbackk={<Loading />}><Event /></Suspense>,
+        children: eventRouter()
     }
 
 ])
