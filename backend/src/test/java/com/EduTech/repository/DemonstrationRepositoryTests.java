@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Commit;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
@@ -41,6 +42,8 @@ import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.notice.NoticeFileRepository;
 import com.EduTech.util.FileUtil;
+
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 public class DemonstrationRepositoryTests {
@@ -413,4 +416,29 @@ public class DemonstrationRepositoryTests {
 			System.out.println(demonstrationTimedto);
 		}	
 		*/
+		
+		@Test
+		@Transactional
+		@Commit
+		public void testInsertMember() {
+
+			Member member = Member.builder()
+					.memId("oj4263")
+					.pw(passwordEncoder.encode("qwer1234!@#$"))
+					.name("남용진")
+					.email("oj4263@test.com")
+					.birthDate(LocalDate.of(2000, 7, 5))
+					.gender(MemberGender.MALE)
+					.phone("01012345678")
+					.addr("테스트주소")
+					.addrDetail("테스트 상세주소")
+					.checkSms(true)
+					.checkEmail(false)
+					.state(MemberState.NORMAL)
+					.role(MemberRole.USER)
+					.build();
+			memberRepository.save(member);
+			memberRepository.flush();
+			
+		}
 }
