@@ -301,10 +301,10 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 				.regDate(LocalDate.now()).expDate(demonstrationFormDTO.getExpDate()).state(DemonstrationState.WAIT)
 				.demonstration(Demonstration.builder().demNum(demNum).build())
 				.member(member).build();
-
+		
 		// 실증 등록
 		demonstrationRegistrationRepository.save(demonstrationRegistration);
-
+		 System.out.println("저장된 Demonstration ID: " + demonstration.getDemNum());
 		// 폴더에 이미지 저장 (demImages라는 폴더에)
 		List<Object> files = fileUtil.saveFiles(demonstrationFormDTO.getImageList(), "demImages");
 
