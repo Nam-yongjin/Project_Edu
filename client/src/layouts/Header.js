@@ -3,11 +3,13 @@ import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import useMove from '../hooks/useMove';
-import sideIcon from '../assets/side.png'
+import sideIcon from '../assets/side.png';
+import useLogin from '../hooks/useLogin';
 
 const Header = () => {
-    const loginState = useSelector((state) => state.loginState)
-    const { moveToPath } = useMove()
+    const loginState = useSelector((state) => state.loginState);
+    const { moveToPath } = useMove();
+    const { doLogout } = useLogin();
     const getMyPageLink = (role) => {
         switch (role) {
             case "STUDENT":
@@ -18,11 +20,16 @@ const Header = () => {
                 return "/company/myInfo";
             default:
                 return "/member/myInfo"; // 기본 경로
-        }
-    }
+        };
+    };
     const handleClickLogo = (e) => {
-        moveToPath('/')
-    }
+        moveToPath('/');
+    };
+    const handleLogout = () => {
+        doLogout();
+        alert("로그아웃 되었습니다.");
+        moveToPath('/');
+    };
 
     return (
         <header className="flex items-center justify-between px-14 h-20 bg-white shadow">
@@ -51,7 +58,7 @@ const Header = () => {
             <div className="flex items-center space-x-6 text-sm">
                 {loginState && loginState.memId ? (
                     <>
-                        <span className="hover:text-blue-400 cursor-pointer active:text-blue-600"><Link to={'/logout'}>로그아웃</Link></span>
+                        <span className="hover:text-blue-400 cursor-pointer active:text-blue-600" onClick={handleLogout}><Link to={'/logout'}>로그아웃</Link></span>
                         <span className="hover:text-blue-400 cursor-pointer active:text-blue-600"><Link to={getMyPageLink(loginState.role)}>마이페이지</Link></span>
                     </>
                 ) : (

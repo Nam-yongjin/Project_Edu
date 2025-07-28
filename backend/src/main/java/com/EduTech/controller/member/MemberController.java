@@ -1,6 +1,7 @@
 package com.EduTech.controller.member;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,7 +72,7 @@ public class MemberController {
 
 	// 아이디 중복 체크
 	@GetMapping("/checkId")
-	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String memId) {
+	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam("memId") String memId) {
 		return ResponseEntity.ok(memberService.isDuplicatedId(memId));
 	}
 
@@ -88,6 +89,7 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
 	public ResponseEntity<StudentDetailDTO> studentInfo() {
 		String memId = JWTFilter.getMemId();
+		System.out.println("memId = " + memId);
 		return ResponseEntity.ok(memberService.readStudentInfo(memId));
 	}
 
@@ -153,8 +155,13 @@ public class MemberController {
 	
 	// 아이디 찾기
 	@GetMapping("/findId")
-	public ResponseEntity<String> findId(@RequestParam String phone){
-		return ResponseEntity.ok(memberService.findId(phone));
+	public ResponseEntity<String> findId(@RequestParam("phone") String phone){
+		String memId = memberService.findId(phone);
+	    if (memId != null) {
+	        return ResponseEntity.ok(memId);
+	    } else {
+	        throw new NoSuchElementException("해당 전화번호로 등록된 아이디가 없습니다.");
+	    }
 	}
 	
 	// 비밀번호 찾기(변경)

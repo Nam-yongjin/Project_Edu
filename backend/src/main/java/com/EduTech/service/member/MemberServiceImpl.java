@@ -84,12 +84,15 @@ public class MemberServiceImpl implements MemberService {
 		member.setPw(passwordEncoder.encode(member.getPw()));
 		member.setState(MemberState.NORMAL);
 		member.setRole(MemberRole.STUDENT);
-		memberRepository.save(member);
 
 		Student student = modelMapper.map(studentRegisterDTO, Student.class);
+		student.setMemId(null);
 		student.setMember(member);
-		student.setMemId(member.getMemId());
-		studentRepository.save(student);
+	    member.setStudent(student);
+	    member.setTeacher(null);
+	    member.setCompany(null);
+
+		memberRepository.save(member);
 	}
 
 	// 교사회원 회원가입
@@ -100,28 +103,34 @@ public class MemberServiceImpl implements MemberService {
 		member.setPw(passwordEncoder.encode(member.getPw()));
 		member.setState(MemberState.NORMAL);
 		member.setRole(MemberRole.TEACHER);
-		memberRepository.save(member);
-
+		
 		Teacher teacher = modelMapper.map(teacherRegisterDTO, Teacher.class);
+		teacher.setMemId(null);
 		teacher.setMember(member);
-		teacher.setMemId(member.getMemId());
-		teacherRepository.save(teacher);
+	    member.setStudent(null);
+	    member.setTeacher(teacher);
+	    member.setCompany(null);
+
+		memberRepository.save(member);
 	}
 
 	// 기업회원 회원가입
 	@Override
 	@Transactional
 	public void registerCompany(CompanyRegisterDTO companyRegisterDTO) {
-		Member member = modelMapper.map(companyRegisterDTO, Member.class);
-		member.setPw(passwordEncoder.encode(member.getPw()));
-		member.setState(MemberState.NORMAL);
-		member.setRole(MemberRole.COMPANY);
-		memberRepository.save(member);
+	    Member member = modelMapper.map(companyRegisterDTO, Member.class);
+	    member.setPw(passwordEncoder.encode(companyRegisterDTO.getPw()));
+	    member.setState(MemberState.NORMAL);
+	    member.setRole(MemberRole.COMPANY);
 
-		Company company = modelMapper.map(companyRegisterDTO, Company.class);
-		company.setMember(member);
-		company.setMemId(member.getMemId());
-		companyRepository.save(company);
+	    Company company = modelMapper.map(companyRegisterDTO, Company.class);
+	    company.setMemId(null);
+	    company.setMember(member);
+	    member.setStudent(null);
+	    member.setTeacher(null);
+	    member.setCompany(company);
+
+	    memberRepository.save(member);
 	}
 
 	// 아이디 중복 체크
@@ -239,15 +248,11 @@ public class MemberServiceImpl implements MemberService {
 		member.setCheckSms(studentModifyDTO.isCheckSms());
 		member.setCheckEmail(studentModifyDTO.isCheckEmail());
 
-		memberRepository.save(member);
-
 		Student student = studentRepository.findById(memId).orElseThrow();
 
 		student.setSchoolName(studentModifyDTO.getSchoolName());
-		student.setMember(member);
-		student.setMemId(member.getMemId());
 
-		studentRepository.save(student);
+		memberRepository.save(member);
 	}
 
 	// 교사회원정보 수정
@@ -264,15 +269,11 @@ public class MemberServiceImpl implements MemberService {
 		member.setCheckSms(teacherModifyDTO.isCheckSms());
 		member.setCheckEmail(teacherModifyDTO.isCheckEmail());
 
-		memberRepository.save(member);
-
 		Teacher teacher = teacherRepository.findById(memId).orElseThrow();
 
 		teacher.setSchoolName(teacherModifyDTO.getSchoolName());
-		teacher.setMember(member);
-		teacher.setMemId(member.getMemId());
 
-		teacherRepository.save(teacher);
+		memberRepository.save(member);
 	}
 
 	// 기업회원정보 수정
@@ -289,16 +290,12 @@ public class MemberServiceImpl implements MemberService {
 		member.setCheckSms(companyModifyDTO.isCheckSms());
 		member.setCheckEmail(companyModifyDTO.isCheckEmail());
 
-		memberRepository.save(member);
-
 		Company company = companyRepository.findById(memId).orElseThrow();
 
 		company.setCompanyName(companyModifyDTO.getCompanyName());
 		company.setPosition(companyModifyDTO.getPosition());
-		company.setMember(member);
-		company.setMemId(member.getMemId());
 
-		companyRepository.save(company);
+		memberRepository.save(member);
 	}
 
 	// 회원 탈퇴
