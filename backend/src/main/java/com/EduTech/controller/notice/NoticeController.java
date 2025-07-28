@@ -8,10 +8,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -37,14 +39,14 @@ public class NoticeController {
 	//일반 회원
 	
 	//공지사항 전체 조회(검색, 페이징)
-	@GetMapping
+	@GetMapping("/NoticeList")
 	public ResponseEntity<Page<NoticeListDTO>> getNoticeList(@ModelAttribute NoticeSearchDTO searchDTO,
 			@PageableDefault(size = 10, sort = "postedAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		return ResponseEntity.ok(noticeService.getNoticeList(searchDTO, pageable));
 	}
 	
 	//공지사항 상세 조회(조회수 증가)
-	@GetMapping("/{noticeNum}")
+	@GetMapping("/NoticeDetail")
 	public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable Long noticeNum) {
 		noticeService.increaseView(noticeNum); //클릭 시 조회수 증가
 		return ResponseEntity.ok(noticeService.getNoticeDetail(noticeNum));
@@ -60,7 +62,7 @@ public class NoticeController {
 	
 	//공지사항 등록
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping
+	@PostMapping("/AddNotice")
 	public ResponseEntity<String> createNotice(@ModelAttribute NoticeCreateRegisterDTO dto,
 			@RequestPart(required = false) List<MultipartFile> file) {
 		noticeService.createNotice(dto, file);
@@ -69,7 +71,7 @@ public class NoticeController {
 	
 	//공지사항 수정
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/{noticeNum}")
+	@PutMapping("/UpdateNotice")
 	public ResponseEntity<String> updateNotice(@PathVariable Long noticeNum,
 			@ModelAttribute NoticeUpdateRegisterDTO dto,
 			@RequestPart(required = false) List<MultipartFile> file) {
@@ -79,7 +81,7 @@ public class NoticeController {
 	
 	//공지사항 삭제(단일)
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/{noticeNum}")
+	@DeleteMapping("/DeleteNotice")
 	public ResponseEntity<String> deleteNotice(@PathVariable Long noticeNum) {
 		noticeService.deleteNotice(noticeNum);
 		return ResponseEntity.ok("공지사항이 삭제되었습니다.");
@@ -87,7 +89,7 @@ public class NoticeController {
 	
 	//공지사항 삭제(일괄)
 		@PreAuthorize("hasRole('ADMIN')")
-		@PostMapping("/{noticeNum}")
+		@DeleteMapping("/DeleteNotices")
 		public ResponseEntity<String> deleteNotices(@RequestBody List<Long> noticeNums) {
 			noticeService.deleteNotices(noticeNums);
 			return ResponseEntity.ok("공지사항이 일괄 삭제되었습니다.");
