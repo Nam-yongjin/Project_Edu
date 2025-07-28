@@ -1,4 +1,4 @@
-const EventListPage = () => {
+const EventListPages = () => {
     return (
         <div>
             <h1>행사 리스트 페이지</h1>
@@ -6,4 +6,4 @@ const EventListPage = () => {
         </div>
     );
 }
-export default EventListPage;
+export default EventListPages;

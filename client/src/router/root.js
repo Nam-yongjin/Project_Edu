@@ -16,6 +16,7 @@ const ResetPw = lazy(() => import("../pages/member/ResetPwPage"))
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
 const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
 const Notice = lazy(() => import("../pages/notice/noticePage"))
+const Event = lazy(() => import("../pages/event/eventPages"))
 
 
 const root = createBrowserRouter([
