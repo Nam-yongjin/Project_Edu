@@ -38,6 +38,8 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
+import com.EduTech.repository.member.MemberRepository;
+import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -58,7 +60,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	DemonstrationImageRepository demonstrationImageRepository;
 	@Autowired
 	FileUtil fileUtil;
-
+	@Autowired
+	MemberRepository memberRepository;
 	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search, Integer pageCount) {
@@ -282,7 +285,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
+	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO,String memId) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -291,10 +294,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationRepository.save(demonstration);
 		Long demNum = demonstration.getDemNum();
 
+		System.out.println(memId);
+		Member member = memberRepository.findById(memId)
+			    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		DemonstrationRegistration demonstrationRegistration = DemonstrationRegistration.builder()
 				.regDate(LocalDate.now()).expDate(demonstrationFormDTO.getExpDate()).state(DemonstrationState.WAIT)
 				.demonstration(Demonstration.builder().demNum(demNum).build())
-				.member(Member.builder().memId(demonstrationFormDTO.getMemId()).build()).build();
+				.member(member).build();
 
 		// 실증 등록
 		demonstrationRegistrationRepository.save(demonstrationRegistration);
