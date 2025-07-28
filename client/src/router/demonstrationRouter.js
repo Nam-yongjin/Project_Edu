@@ -11,19 +11,19 @@ const demonstrationRouter = () => {
 
     return [
         {
-            path: "addDem",
+            path: "add",
             element: <Suspense fallback={<Loading />}><AddDem /></Suspense>,
         },
         {
-            path: "updateDem",
+            path: "update",
             element: <Suspense fallback={<Loading />}><UpdateDem /></Suspense>,
         },
         {
-            path:"demDetail",
+            path:"detail",
             element: <Suspense fallback={<Loading />}><DemDetail /></Suspense>
         },
         {
-             path:"demList",
+             path:"list",
             element: <Suspense fallback={<Loading />}><DemList /></Suspense>
         }
     ]
