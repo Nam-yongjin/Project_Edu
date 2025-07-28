@@ -8,19 +8,19 @@ const mapping = `${API_MAPPING}`
 const notice = `${host}${mapping.notice}`
 
 //공지사항 전체(검색 + 페이징)
-export const fetchNoticeList = async (params) => {
+export const NoticeList = async (params) => {
     const res = await axios.get(`${notice}`, {params}); //쿼리스트링(검색, 페이지)
     return res.data;
 }
 
 //공지사항 상세(조회수 증가)
-export const fetchNoticeDetail = async (noticeNum) => {
+export const NoticeDetail = async (noticeNum) => {
     const res = await axios.get(`${notice}/${noticeNum}`); //식별자(상세조회, 수정, 삭제)
     return res.data;
 }
 
 //고정 공지사항 조회
-export const fetchPinnedNotice = async () => {
+export const PinnedNotice = async () => {
     const res = await axios.get(`${notice}/pinned`); //정해진 서브 경로(특정 목적의 Api)
     return res.data;
 }
