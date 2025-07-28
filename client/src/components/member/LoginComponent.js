@@ -2,6 +2,7 @@ import { useState } from "react";
 import useLogin from "../../hooks/useLogin";
 import KakaoLoginComponent from "./KakaoLoginComponent";
 import useMove from "../../hooks/useMove";
+import { Link } from "react-router-dom";
 
 const initState = {
     memId: '',
@@ -45,13 +46,13 @@ const LoginComponent = () => {
                 <div className="relative mb-4 flex w-full flex-wrap items-center">
                     <div className="w-full p-3 text-left font-bold">ID</div>
                     <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
-                        name="memId" type={'text'} value={loginParam.memId} onChange={handleChange} onKeyDown={handleKeydown}/> </div>
+                        name="memId" type={'text'} value={loginParam.memId} onChange={handleChange} onKeyDown={handleKeydown} /> </div>
             </div>
             <div className="flex justify-center">
                 <div className="relative mb-4 flex w-full flex-wrap items-center">
                     <div className="w-full p-3 text-left font-bold">Password</div>
                     <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
-                        name="pw" type={'password'} value={loginParam.pw} onChange={handleChange} onKeyDown={handleKeydown}/> </div>
+                        name="pw" type={'password'} value={loginParam.pw} onChange={handleChange} onKeyDown={handleKeydown} /> </div>
             </div>
             <div className="flex justify-center">
                 <div className="relative mb-4 flex w-full justify-center">
@@ -60,6 +61,15 @@ const LoginComponent = () => {
                             onClick={handleClickLogin}>
                             LOGIN
                         </button>
+                    </div>
+                </div>
+            </div>
+            <div className="flex justify-center">
+                <div className="relative mb-4 flex w-full justify-center">
+                    <div className="p-6 flex justify-center font-bold">
+                        <div className="hover:text-gray-400 cursor-pointer active:text-gray-600"><Link to={'/findId'}>아이디찾기</Link></div>
+                        <div> | </div>
+                        <div className="hover:text-gray-400 cursor-pointer active:text-gray-600"><Link to={'/resetPw'}>비밀번호 찾기(재설정)</Link></div>
                     </div>
                 </div>
             </div>

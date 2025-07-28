@@ -2,13 +2,17 @@ import { Suspense, lazy } from "react";
 import Loading from "./Loading";
 import { createBrowserRouter } from "react-router-dom";
 import registerRouter from "./registerRouter";
+import memberRouter from "./memberRouter";
 import demonstrationRouter from "./demonstrationRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
 const Login = lazy(() => import("../pages/member/LoginPage"))
+// const Member = lazy(() => import("../pages/member/Memberpage"))
+const FindId = lazy(() => import("../pages/member/FindIdPage"))
+const ResetPw = lazy(() => import("../pages/member/ResetPwPage"))
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
-const Demonstration= lazy(() => import("../pages/demonstration/demonstrationPage"))
+const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
 
 const root = createBrowserRouter([
     {
@@ -27,8 +31,21 @@ const root = createBrowserRouter([
             {
                 path: "kakao",
                 element: <Suspense fallback={<Loading />}><KakaoRedirect /></Suspense>,
-            }, 
+            },
         ]
+    },
+    // {
+    //     path: "member",
+    //     element: <Suspense fallback={<Loading />}><Member /></Suspense>,
+    //     children: memberRouter()
+    // },
+    {
+        path: "findId",
+        element: <Suspense fallback={<Loading />}><FindId /></Suspense>,
+    },
+    {
+        path: "resetPw",
+        element: <Suspense fallback={<Loading />}><ResetPw /></Suspense>,
     },
     {
         path: "demonstration",
