@@ -3,9 +3,7 @@ import StudentRegisterComponent from "../../../components/member/student/Student
 const studentRegisterPage = () => {
     return (
         <div>
-
             <StudentRegisterComponent/>
-
         </div>
     )
 }

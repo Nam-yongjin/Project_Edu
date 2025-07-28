@@ -3,10 +3,11 @@ import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import useMove from '../hooks/useMove';
+import sideIcon from '../assets/side.png'
 
 const Header = () => {
     const loginState = useSelector((state) => state.loginState)
-    const {moveToPath} = useMove()
+    const { moveToPath } = useMove()
     const getMyPageLink = (role) => {
         switch (role) {
             case "STUDENT":
@@ -27,8 +28,8 @@ const Header = () => {
         <header className="flex items-center justify-between px-14 h-20 bg-white shadow">
             {/* 로고 */}
             <div className="flex items-center">
-                <img src={logo} alt="로고" className="w-[300px] h-[120px] flex-shrink-0 cursor-pointer" 
-                onClick={handleClickLogo} />
+                <img src={logo} alt="로고" className="w-[300px] h-[120px] flex-shrink-0 cursor-pointer"
+                    onClick={handleClickLogo} />
                 {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
             </div>
 
@@ -56,9 +57,11 @@ const Header = () => {
                         <span className="hover:text-blue-400 cursor-pointer"><Link to={'/register'}>회원가입</Link></span>
                     </>
                 )}
-                <img src={searchIcon} alt="검색" className="h-6" />
+                <img src={searchIcon} alt="검색" className="h-6 cursor-pointer" />
                 {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
                 Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
+                <img src={sideIcon} alt="사이드메뉴" className="h-6 cursor-pointer" />
+                {/* <a href="https://www.flaticon.com/kr/free-icons/" title="햄버거 아이콘">햄버거 아이콘 제작자: Lizel Arina - Flaticon</a> */}
             </div>
         </header>
 
