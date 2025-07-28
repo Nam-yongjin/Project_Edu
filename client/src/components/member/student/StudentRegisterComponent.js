@@ -91,7 +91,6 @@ const StudentRegisterComponent = () => {
 
     return (
         <div>
-            <BasicLayout>
             <div className='mt-10 m-2 p-4'>
 
                 <h2>회원가입</h2>
@@ -142,7 +141,6 @@ const StudentRegisterComponent = () => {
                 <button type="submit">회원가입</button>
             </form>
             </div>
-            </BasicLayout>
         </div>
     );
 };
