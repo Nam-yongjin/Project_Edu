@@ -30,6 +30,9 @@ public interface FacilityService {
 
     // 관리자: 예약 승인 또는 거절 처리
     boolean updateReservationState(FacilityReserveApproveRequestDTO approveRequest);
+    
+    // 예약 취소 처리 (사용자 or 관리자)
+    boolean cancelReservation(Long facRevNum, boolean isAdmin, String memId);
 
     // 해당 날짜가 휴무일인지 확인
     boolean isHoliday(Long facilityNum, LocalDate date);
@@ -42,7 +45,4 @@ public interface FacilityService {
 
     // 관리자: 휴무일 삭제
     void deleteHoliday(Long holidayId);
-    
-    // 예약 취소 처리 (사용자 or 관리자)
-    boolean cancelReservation(Long facRevNum, boolean isAdmin, String memId);
 }
