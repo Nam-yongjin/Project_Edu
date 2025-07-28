@@ -4,6 +4,7 @@ import { createBrowserRouter } from "react-router-dom";
 import registerRouter from "./registerRouter";
 import memberRouter from "./memberRouter";
 import demonstrationRouter from "./demonstrationRouter";
+import noticeRouter from "./noticeRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
@@ -13,6 +14,7 @@ const FindId = lazy(() => import("../pages/member/FindIdPage"))
 const ResetPw = lazy(() => import("../pages/member/ResetPwPage"))
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
 const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
+const Notice = lazy(() => import("../pages/notice/noticePage"))
 
 const root = createBrowserRouter([
     {
@@ -51,6 +53,11 @@ const root = createBrowserRouter([
         path: "demonstration",
         element: <Suspense fallback={<Loading />}><Demonstration /></Suspense>,
         children: demonstrationRouter()
+    },
+    {
+        path: "notice",
+        element: <Suspense fallback={<Loading />}><Notice /></Suspense>,
+        children: noticeRouter()
     }
 
 ])
