@@ -96,12 +96,12 @@ export const leaveMember = async () => {
 
 // 아이디 찾기
 export const findId = async (params) => {
-    const res = await jwtAxios.get(`${host}/member/findId`, params)
+    const res = await jwtAxios.get(`${host}/findId`, params)
     return res.data
 }
 
 // 비밀번호 찾기(변경)
 export const resetPw = async (params) => {
-    const res = await jwtAxios.put(`${host}/member/resetPw`, params)
+    const res = await jwtAxios.put(`${host}/resetPw`, params)
     return res.data
 }

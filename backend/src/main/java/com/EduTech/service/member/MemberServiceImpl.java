@@ -367,6 +367,7 @@ public class MemberServiceImpl implements MemberService {
 	            .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원이 존재하지 않습니다."));
 		if (memberResetPwDTO.getPhone().equals(member.getPhone())) {
 			member.setPw(passwordEncoder.encode(memberResetPwDTO.getPw()));
+			memberRepository.save(member);
 		}else {
 			throw new NoSuchElementException("해당 전화번호로 가입된 아이디가 없습니다.");
 		}

@@ -1,21 +1,20 @@
 import { useState } from 'react';
 import PhoneVerification from './PhoneVerification';
+import { findId } from '../../api/memberApi';
 
 const FindIdComponent = () => {
     const [foundId, setFoundId] = useState(null);
 
     const handleVerified = async (phone) => {
         try {
-            const res = await fetch(`/member/findId?phone=${encodeURIComponent(phone)}`);
-            const data = await res.json();
-
-            if (res.ok) {
-                setFoundId(data.username);
+            const data = await findId({ params: { phone } });
+            setFoundId(data);
+        } catch (error) {
+            if (error.response?.data) {
+                alert(error.response.data);
             } else {
-                alert(data.message || '아이디를 찾을 수 없습니다.');
+                alert('아이디 찾기 실패: ' + error.message);
             }
-        } catch (err) {
-            alert('서버 요청 실패: ' + err.message);
         }
     };
 
