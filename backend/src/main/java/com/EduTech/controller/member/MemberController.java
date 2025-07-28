@@ -157,7 +157,7 @@ public class MemberController {
 	}
 	
 	// 비밀번호 찾기
-	@GetMapping("/member/resetPw")
+	@PutMapping("/member/resetPw")
 	public ResponseEntity<String> resetPw(@RequestParam String phone){
 		return ResponseEntity.ok("");
 	}
