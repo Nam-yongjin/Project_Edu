@@ -25,6 +25,7 @@ import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
+import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.demonstration.DemonstrationService;
 
 import lombok.RequiredArgsConstructor;
@@ -126,8 +127,9 @@ public class DemonstrationController {
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@PostMapping("/addDem")
 	public ResponseEntity<String> DemAdd(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
-
-		demonstrationService.addDemonstration(demonstrationFormDTO);
+		String memId = JWTFilter.getMemId();
+		System.out.println(memId);
+		demonstrationService.addDemonstration(demonstrationFormDTO,memId);
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
 
