@@ -38,7 +38,7 @@ public class Facility {
 
     private int capacity;			// 수용인원
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String facItem;			// 구비품목
 
     private String etc;				// 기타유의사항
