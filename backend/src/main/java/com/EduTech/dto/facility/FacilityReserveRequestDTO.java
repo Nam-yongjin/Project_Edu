@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FacilityReserveRequestDTO {
-    private String facName;         // 시설명
+    private String facName;         // 시설명.
     private LocalDate facDate;      // 예약 날짜
     private LocalTime startTime;    // 시작 시간
     private LocalTime endTime;      // 종료 시간

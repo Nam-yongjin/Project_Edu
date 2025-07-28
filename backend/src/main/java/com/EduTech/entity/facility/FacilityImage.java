@@ -18,7 +18,7 @@ public class FacilityImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facImageNum;		// 이미지 번호
+    private Long facImageNum;		// 이미지 번호 
 
     private String imageName;		// 이미지 이름
 

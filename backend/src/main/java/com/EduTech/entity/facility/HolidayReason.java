@@ -14,5 +14,6 @@ public enum HolidayReason {
 
     public String getLabel() {
         return label;
+        
     }
 }

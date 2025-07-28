@@ -161,7 +161,7 @@ public class FacilityServiceImpl implements FacilityService {
         return updated > 0;
     }
     
-    // 사용자/관리자 에약 취소 처리
+    // 사용자/관리자 에약 취소 처리 
     @Override
     @Transactional
     public boolean cancelReservation(Long facRevNum, boolean isAdmin, String requesterId) {

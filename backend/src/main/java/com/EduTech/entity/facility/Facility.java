@@ -17,7 +17,7 @@ public class Facility {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facilityNum;		// 장소번호
+    private Long facilityNum;		// 장소번호.
 
     @Column(length = 100)
     private String facName;			// 장소명

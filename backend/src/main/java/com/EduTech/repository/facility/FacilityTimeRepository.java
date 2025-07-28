@@ -11,7 +11,7 @@ import com.EduTech.entity.facility.FacilityTime;
 
 public interface FacilityTimeRepository extends JpaRepository<FacilityTime, Long> {
 
-    // 특정 시설 + 날짜의 예약 가능 시간대 리스트
+    // 특정 시설 + 날짜의 예약 가능 시간대 리스트.
     List<FacilityTime> findByFacility_FacilityNumAndFacDate(Long facilityNum, LocalDate facDate);
 
     // 한 달 단위로 예약 가능 시간대 리스트 조회 (달력용)

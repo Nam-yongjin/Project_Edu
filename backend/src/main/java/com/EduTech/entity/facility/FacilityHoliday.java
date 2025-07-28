@@ -28,7 +28,7 @@ public class FacilityHoliday {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long holidayId;			// 휴일 번호
+    private Long holidayId;			// 휴일 번호 
     
     @Column(nullable = false)
     private LocalDate holidayDate;	// 휴일

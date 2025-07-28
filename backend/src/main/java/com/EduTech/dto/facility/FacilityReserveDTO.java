@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FacilityReserveDTO {
-	private Long facilityNum; 		// 시설 고유 번호
+	private Long facilityNum; 		// 시설 고유 번호.
     private Long facRevNum;         // 예약 번호
     private String facName;         // 시설명
     private LocalDate facDate;      // 예약일

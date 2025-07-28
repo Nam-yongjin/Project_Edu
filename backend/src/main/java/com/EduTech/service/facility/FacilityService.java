@@ -10,7 +10,7 @@ import java.util.List;
 //시설 예약 관련 서비스 인터페이스
 public interface FacilityService {
 
-    // 시설 상세 정보 조회 (이미지 포함)
+    // 시설 상세 정보 조회 (이미지 포함) 
     FacilityDetailDTO getFacilityDetail(String facName);
 
     // 특정 시설의 예약 가능 시간대 조회 (특정 날짜 기준)

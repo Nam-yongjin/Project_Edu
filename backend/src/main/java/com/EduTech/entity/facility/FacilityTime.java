@@ -21,7 +21,7 @@ public class FacilityTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facTimeNum;		// 예약번호
+    private Long facTimeNum;		// 예약번호 
 
     private LocalDate facDate;		// 예약일
 

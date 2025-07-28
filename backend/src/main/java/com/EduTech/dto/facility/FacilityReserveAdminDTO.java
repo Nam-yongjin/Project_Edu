@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FacilityReserveAdminDTO {
-    private Long facRevNum;         // 예약 번호
+    private Long facRevNum;         // 예약 번호.
     private String facName;         // 시설명
     private String memId;           // 신청자 ID
     private LocalDate facDate;      // 예약일
