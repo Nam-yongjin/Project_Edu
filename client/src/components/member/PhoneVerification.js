@@ -65,7 +65,6 @@ const PhoneVerification = ({ onVerified }) => {
             setCooldown(180);
             alert('인증번호가 전송되었습니다.');
         } catch (error) {
-            console.error('OTP 전송 오류:', error);
             if (error.code === 'auth/cancelled') {
                 alert('reCAPTCHA 인증이 취소되었습니다. 다시 시도해주세요.');
             } else if (error.code === 'auth/too-many-requests') {

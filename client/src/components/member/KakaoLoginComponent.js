@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { getKakaoLoginLink } from "../../api/kakaoApi";
-import kakaoLogo from '../../assets/icon-kakao-talk.png'
+import kakaoLogo from '../../assets/icon-kakao-talk.png';
 
 const KakaoLoginComponent = () => {
-    const link = getKakaoLoginLink()
+    const link = getKakaoLoginLink();
     return (
         <div className="flex flex-col">
             <div className="text-center text-blue-500">로그인시 자동 가입</div>
@@ -16,4 +16,4 @@ const KakaoLoginComponent = () => {
         </div>
     )
 }
-export default KakaoLoginComponent
+export default KakaoLoginComponent;
