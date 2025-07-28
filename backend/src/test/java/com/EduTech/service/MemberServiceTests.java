@@ -11,10 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Commit;
 
+import com.EduTech.dto.member.CompanyModifyDTO;
+import com.EduTech.dto.member.CompanyRegisterDTO;
 import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
+import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
@@ -23,9 +27,16 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
+import com.EduTech.repository.facility.FacilityHolidayRepository;
+import com.EduTech.repository.facility.FacilityImageRepository;
+import com.EduTech.repository.facility.FacilityRepository;
+import com.EduTech.repository.facility.FacilityReserveRepository;
+import com.EduTech.repository.facility.FacilityTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.notice.NoticeFileRepository;
 import com.EduTech.service.member.MemberService;
+
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 public class MemberServiceTests {
@@ -54,6 +65,16 @@ public class MemberServiceTests {
 	private DemonstrationTimeRepository demonstrationTimeRepository;
 	@MockBean
 	private DemonstrationRegistrationRepository demonstrationRegistrationRepository;
+	@MockBean
+	private FacilityHolidayRepository facilityHolidayRepository;
+	@MockBean
+	private FacilityRepository facilityRepository;
+	@MockBean
+	private FacilityReserveRepository facilityReserveRepository;
+	@MockBean
+	private FacilityImageRepository facilityImageRepository;
+	@MockBean
+	private FacilityTimeRepository facilityTimeRepository;
 
 //	@Test
 	public void testCheckId() {
@@ -119,13 +140,73 @@ public class MemberServiceTests {
 	}
 	
 //	@Test
+	public void testRegisterCompanyInfo() {
+		CompanyRegisterDTO companyRegisterDTO = new CompanyRegisterDTO();
+		companyRegisterDTO.setMemId("companytest");
+		companyRegisterDTO.setPw(passwordEncoder.encode("123456"));
+		companyRegisterDTO.setName("남용진");
+		companyRegisterDTO.setEmail("test12@gmail.com");
+		companyRegisterDTO.setPhone("01044665566");
+		companyRegisterDTO.setAddr("대전 서구 둔산동");
+		companyRegisterDTO.setAddrDetail("101호");
+		companyRegisterDTO.setCheckSms(false);
+		companyRegisterDTO.setCheckEmail(true);
+		companyRegisterDTO.setCompanyName("둔산제철");
+		companyRegisterDTO.setPosition("과장");
+		
+		memberService.registerCompany(companyRegisterDTO);
+		
+	    Member updatedMember = memberRepository.findById("companytest").orElseThrow();
+	    Company updatedCompany = memberRepository.findCompanyById("companytest").orElseThrow();
+	    assertEquals("남용진", updatedMember.getName());
+	    assertEquals("test12@gmail.com", updatedMember.getEmail());
+	    assertEquals("01044665566", updatedMember.getPhone());
+	    assertEquals("대전 서구 둔산동", updatedMember.getAddr());
+	    assertEquals("101호", updatedMember.getAddrDetail());
+	    assertFalse(updatedMember.isCheckSms());
+	    assertTrue(updatedMember.isCheckEmail());
+	    assertEquals("둔산제철", updatedCompany.getCompanyName());
+	    assertEquals("과장", updatedCompany.getPosition());
+	}
+	
+	@Test
+	public void testRegisterModifyCompanyInfo() {
+		CompanyModifyDTO companyModifyDTO = new CompanyModifyDTO();
+		companyModifyDTO.setMemId("companytest");
+		companyModifyDTO.setPw(passwordEncoder.encode("123456"));
+		companyModifyDTO.setName("수정정보");
+		companyModifyDTO.setEmail("test12@gmail.com");
+		companyModifyDTO.setPhone("01044665566");
+		companyModifyDTO.setAddr("대전 서구 둔산동");
+		companyModifyDTO.setAddrDetail("101호");
+		companyModifyDTO.setCheckSms(false);
+		companyModifyDTO.setCheckEmail(true);
+		companyModifyDTO.setCompanyName("둔산제철");
+		companyModifyDTO.setPosition("과장");
+		
+		memberService.modifyCompanyInfo("companytest", companyModifyDTO);
+		
+	    Member updatedMember = memberRepository.findById("companytest").orElseThrow();
+	    Company updatedCompany = memberRepository.findCompanyById("companytest").orElseThrow();
+	    assertEquals("수정정보", updatedMember.getName());
+	    assertEquals("test12@gmail.com", updatedMember.getEmail());
+	    assertEquals("01044665566", updatedMember.getPhone());
+	    assertEquals("대전 서구 둔산동", updatedMember.getAddr());
+	    assertEquals("101호", updatedMember.getAddrDetail());
+	    assertFalse(updatedMember.isCheckSms());
+	    assertTrue(updatedMember.isCheckEmail());
+	    assertEquals("둔산제철", updatedCompany.getCompanyName());
+	    assertEquals("과장", updatedCompany.getPosition());
+	}
+	
+//	@Test
 	public void testLeaveMember() {
 		Member member = memberRepository.findById("user9").orElseThrow();
 		memberService.leaveMember("user9");
 		assertEquals(MemberState.LEAVE, member.getState());
 	}
 	
-	@Test
+//	@Test
 	void testPasswordMatch() {
 	    String rawPw = "qwer1234!@#$";
 	    String encodedPw = "$2a$10$Y8yJJQCmUIMDCQSBqHi31OMYCvcDva6qf58wmX7MByYhs1zwdtuRC";

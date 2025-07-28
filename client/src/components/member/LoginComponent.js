@@ -7,19 +7,19 @@ import { Link } from "react-router-dom";
 const initState = {
     memId: '',
     pw: ''
-}
+};
 
 const LoginComponent = () => {
-    const [loginParam, setLoginParam] = useState({ ...initState })
+    const [loginParam, setLoginParam] = useState({ ...initState });
 
-    const { doLogin } = useLogin()
-    const { moveToPath } = useMove()
+    const { doLogin } = useLogin();
+    const { moveToPath } = useMove();
 
     const handleChange = (e) => {
-        loginParam[e.target.name] = e.target.value
+        loginParam[e.target.name] = e.target.value;
 
-        setLoginParam({ ...loginParam })
-    }
+        setLoginParam({ ...loginParam });
+    };
 
     const handleClickLogin = (e) => {
         doLogin(loginParam)
@@ -29,13 +29,13 @@ const LoginComponent = () => {
                 } else {
                     alert("로그인 되었습니다.")
                     moveToPath('/')
-                }
-            })
-    }
+                };
+            });
+    };
     const handleKeydown = (e) => {
         if (e.key === "Enter")
             handleClickLogin();
-    }
+    };
 
     return (
         <div className="border-2 border-sky-200 mt-10 m-2 p-4">
@@ -78,4 +78,4 @@ const LoginComponent = () => {
     )
 
 }
-export default LoginComponent
+export default LoginComponent;

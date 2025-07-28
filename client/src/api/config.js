@@ -1,4 +1,4 @@
-export const API_SERVER_HOST = 'http://localhost:8090'
+export const API_SERVER_HOST = 'http://localhost:8090';
 
 export const API_MAPPING = {
     member: '/member',
@@ -13,4 +13,4 @@ export const API_MAPPING = {
     notice: '/notice',
     question: '/question',
     answer: '/answer'
-}
+};

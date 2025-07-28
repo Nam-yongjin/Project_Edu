@@ -28,7 +28,6 @@ public class JWTFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String authHeader = request.getHeader("Authorization");
-			System.out.println(authHeader);
 			if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 			    filterChain.doFilter(request, response);
 			    return;  // 헤더 없거나 형식 안 맞으면 인증 안하고 다음 필터 실행
@@ -89,20 +88,4 @@ public class JWTFilter extends OncePerRequestFilter {
 		return ((MemberDTO) principal).getUsername();
 	}
 
-	public static List<String> getRoleNames() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		if (principal == null || !(principal instanceof MemberDTO)) {
-			return List.of();
-		}
-
-		Collection<? extends GrantedAuthority> authorities = ((MemberDTO) principal).getAuthorities();
-
-		return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-	}
-
-	// 특정 Role이 있는지 검사
-	public static boolean hasRole(String role) {
-		return getRoleNames().contains("ROLE_" + role.toUpperCase());
-	}
 }

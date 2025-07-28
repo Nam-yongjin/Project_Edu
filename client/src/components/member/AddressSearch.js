@@ -16,4 +16,4 @@ const AddressSearch = ({ onAddressSelected }) => {
         </div>
     );
 };
-export default AddressSearch
+export default AddressSearch;
