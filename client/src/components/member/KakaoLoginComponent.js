@@ -9,7 +9,7 @@ const KakaoLoginComponent = () => {
             <div className="text-center text-blue-500">로그인시 자동 가입</div>
             <div className="flex justify-center	w-full">
                 <div className="m-6">
-                    <Link to={link}><img src={kakaoLogo}  /></Link>
+                    <Link to={link}><img className="active:bg-gray-200" src={kakaoLogo}  /></Link>
                     {/* <a href="https://www.flaticon.com/kr/free-icons/-" title="카카오 톡 아이콘">카카오 톡 아이콘 제작자: Fathema Khanom - Flaticon</a> */}
                 </div>
             </div>

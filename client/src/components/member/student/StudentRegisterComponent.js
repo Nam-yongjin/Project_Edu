@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import PhoneVerification from '../PhoneVerification';
 import useMove from '../../../hooks/useMove';
+import { registerStudent } from '../../../api/memberApi';
+import AddressSearch from '../AddressSearch';
 
 const StudentRegisterComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
-    const {moveToPath} = useMove()
+    const { moveToPath } = useMove()
     const [form, setForm] = useState({
         memId: '',
         pw: '',
+        pwCheck: '',
         name: '',
         email: '',
         birthDate: '',
@@ -30,7 +33,14 @@ const StudentRegisterComponent = () => {
         }));
     };
 
-        const validate = () => {
+    const handleAddressSelected = (address) => {
+        setForm(prev => ({
+            ...prev,
+            addr: address
+        }));
+    };
+
+    const validate = () => {
         const errs = {};
 
         if (!/^[A-Za-z0-9]{6,16}$/.test(form.memId)) {
@@ -39,6 +49,10 @@ const StudentRegisterComponent = () => {
 
         if (!/^[A-Za-z0-9!@#$.]{6,16}$/.test(form.pw)) {
             errs.pw = '비밀번호는 6~16자, 특수문자(!@#$.) 사용 가능.';
+        }
+
+        if (form.pw !== form.pwCheck) {
+            errs.pwCheck = '비밀번호가 일치하지 않습니다.';
         }
 
         if (!/^[가-힣]{1,6}$/.test(form.name)) {
@@ -81,66 +95,170 @@ const StudentRegisterComponent = () => {
             return;
         }
 
-        const dataToSubmit = {
+        // pwCheck를 제거한 객체
+        const { pwCheck, ...dataToSubmit } = {
             ...form,
             phone: verifiedPhone
         };
 
-        console.log('제출:', dataToSubmit);
-        alert('회원가입 성공!');
-        moveToPath('/')
+        registerStudent(dataToSubmit).then((response) => {
+            console.log('제출:', dataToSubmit);
+            alert('회원가입 완료');
+            // 초기화
+            setForm({
+                memId: '',
+                pw: '',
+                pwCheck: '',
+                name: '',
+                email: '',
+                birthDate: '',
+                gender: '',
+                addr: '',
+                addrDetail: '',
+                checkSms: false,
+                checkEmail: false
+            });
+            setVerifiedPhone(null);
+            setErrors({});
+            moveToPath('/')
+        }).catch((error) => {
+            alert('회원가입 실패');
+            console.error(error);
+        })
+
     };
 
     return (
-        <div>
-            <div className='mt-10 m-2 p-4'>
-
-                <h2>회원가입</h2>
-                <input name="memId" placeholder="아이디" value={form.memId} onChange={handleChange} />
+        <div className='space-y-5 mt-10 mx-2 pl-4'>
+            <div className='text-3xl'>회원가입</div>
+            <div>
+                <input
+                    name="memId"
+                    placeholder="아이디"
+                    value={form.memId}
+                    onChange={handleChange} />
                 {errors.memId && <div style={{ color: 'red' }}>{errors.memId}</div>}
+            </div>
 
-                <input name="pw" type="password" placeholder="비밀번호" value={form.pw} onChange={handleChange} />
+            <div>
+                <input
+                    name="pw"
+                    type="password"
+                    placeholder="비밀번호"
+                    value={form.pw}
+                    onChange={handleChange} />
                 {errors.pw && <div style={{ color: 'red' }}>{errors.pw}</div>}
+            </div>
 
-                <input name="name" placeholder="이름" value={form.name} onChange={handleChange} />
+            <div>
+                <input
+                    name="pwCheck"
+                    type="password"
+                    placeholder="비밀번호 확인"
+                    value={form.pwCheck}
+                    onChange={handleChange}
+                />
+                {errors.pwCheck && <div style={{ color: 'red' }}>{errors.pwCheck}</div>}
+            </div>
+
+            <div>
+                <input
+                    name="name"
+                    placeholder="이름"
+                    value={form.name}
+                    onChange={handleChange} />
                 {errors.name && <div style={{ color: 'red' }}>{errors.name}</div>}
+            </div>
 
-                <input name="email" type="email" placeholder="이메일" value={form.email} onChange={handleChange} />
+            <div>
+                <PhoneVerification onVerified={setVerifiedPhone} />
+                {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
+            </div>
+
+            <div>
+                <input
+                    name="email"
+                    type="email"
+                    placeholder="이메일"
+                    value={form.email}
+                    onChange={handleChange} />
                 {errors.email && <div style={{ color: 'red' }}>{errors.email}</div>}
+            </div>
 
-                <input name="birthDate" type="date" value={form.birthDate} onChange={handleChange} />
+            <div>
+                <input
+                    name="birthDate"
+                    type="date"
+                    value={form.birthDate}
+                    onChange={handleChange} />
                 {errors.birthDate && <div style={{ color: 'red' }}>{errors.birthDate}</div>}
+            </div>
 
-                <select name="gender" value={form.gender} onChange={handleChange}>
+            <div>
+                <select
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleChange}>
                     <option value="">성별 선택</option>
                     <option value="MALE">남성</option>
                     <option value="FEMALE">여성</option>
                 </select>
                 {errors.gender && <div style={{ color: 'red' }}>{errors.gender}</div>}
+            </div>
 
-                <input name="addr" placeholder="주소" value={form.addr} onChange={handleChange} />
-                <input name="addrDetail" placeholder="상세 주소" value={form.addrDetail} onChange={handleChange} />
+            <div>
+                <AddressSearch onAddressSelected={handleAddressSelected} />
+                <input
+                    name="addr"
+                    placeholder="주소"
+                    value={form.addr}
+                    readOnly
+                />
+            </div>
+            <div>
+                <input
+                    name="addrDetail"
+                    placeholder="상세 주소"
+                    value={form.addrDetail}
+                    onChange={handleChange} />
+            </div>
 
+            <div>
+                <input
+                    name="schoolName"
+                    type="text"
+                    placeholder="학교명"
+                    value={form.schoolName}
+                    onChange={handleChange} />
+                {errors.schoolName && <div style={{ color: 'red' }}>{errors.schoolName}</div>}
+            </div>
+
+            <div>
                 <label>
-                    <input name="checkSms" type="checkbox" checked={form.checkSms} onChange={handleChange} />
+                    <input
+                        name="checkSms"
+                        type="checkbox"
+                        checked={form.checkSms}
+                        onChange={handleChange} />
                     SMS 수신 동의
                 </label>
                 {errors.checkSms && <div style={{ color: 'red' }}>{errors.checkSms}</div>}
+            </div>
 
+            <div>
                 <label>
-                    <input name="checkEmail" type="checkbox" checked={form.checkEmail} onChange={handleChange} />
+                    <input
+                        name="checkEmail"
+                        type="checkbox"
+                        checked={form.checkEmail}
+                        onChange={handleChange} />
                     이메일 수신 동의
                 </label>
                 {errors.checkEmail && <div style={{ color: 'red' }}>{errors.checkEmail}</div>}
-                
-                <input name="schoolName" type="text" value={form.schoolName} onChange={handleChange} />
-                {errors.schoolName && <div style={{ color: 'red' }}>{errors.schoolName}</div>}
+            </div>
 
-                <PhoneVerification onVerified={setVerifiedPhone} />
-                {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
-
-                <button onClick={handleSubmit}>회원가입</button>
-
+            <div>
+                <button className='rounded p-1 w-18 bg-blue-500	text-white active:bg-blue-600' onClick={handleSubmit}>회원가입</button>
             </div>
         </div>
     );
