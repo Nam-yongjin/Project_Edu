@@ -2,9 +2,11 @@ import searchIcon from '../assets/search.png';
 import logo from '../assets/logo.png';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import useMove from '../hooks/useMove';
 
 const Header = () => {
     const loginState = useSelector((state) => state.loginState)
+    const {moveToPath} = useMove()
     const getMyPageLink = (role) => {
         switch (role) {
             case "STUDENT":
@@ -17,12 +19,16 @@ const Header = () => {
                 return "/member/myInfo"; // 기본 경로
         }
     }
+    const handleClickLogo = (e) => {
+        moveToPath('/')
+    }
 
     return (
         <header className="flex items-center justify-between px-14 h-20 bg-white shadow">
             {/* 로고 */}
             <div className="flex items-center">
-                <img src={logo} alt="로고" className="h-[120px] max-h-[120px]" />
+                <img src={logo} alt="로고" className="h-[120px] max-h-[120px] cursor-pointer" 
+                onClick={handleClickLogo} />
                 {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
             </div>
 
