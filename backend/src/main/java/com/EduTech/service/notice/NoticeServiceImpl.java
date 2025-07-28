@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,6 +59,9 @@ public class NoticeServiceImpl implements NoticeService {
 		Member member = memberRepository.findById(JWTFilter.getMemId())
 				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
 				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("공지사항 작성 권한이 없습니다.");
+	    }
 		// DTO를 Notice Entity로 변환(ModelMapper 사용)
 		Notice notice = modelMapper.map(dto, Notice.class);
 		notice.setCreatedAt(LocalDateTime.now()); // 작성 시간 설정
@@ -100,6 +104,12 @@ public class NoticeServiceImpl implements NoticeService {
 	// 공지사항 수정
 	@Override
 	public void updateNotice(NoticeUpdateRegisterDTO dto, List<MultipartFile> file, Long noticeNum) {
+		Member member = memberRepository.findById(JWTFilter.getMemId())
+				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("공지사항 수정 권한이 없습니다.");
+	    }
 		Notice notice = noticeRepository.findById(noticeNum)
 				.orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다. 번호: " + noticeNum));
 		// ModelMapper로 DTO데이터를 Entity에 매핑
@@ -156,6 +166,12 @@ public class NoticeServiceImpl implements NoticeService {
 	// 공지사항 삭제(단일)
 	@Override
 	public void deleteNotice(Long noticeNum) {
+		Member member = memberRepository.findById(JWTFilter.getMemId())
+				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("공지사항 삭제 권한이 없습니다.");
+	    }
 		Notice notice = noticeRepository.findById(noticeNum)
 				.orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다. 번호: " + noticeNum));
 
@@ -166,6 +182,13 @@ public class NoticeServiceImpl implements NoticeService {
 	// 공지사항 삭제(일괄)
 	@Override
 	public void deleteNotices(List<Long> noticeNums) {
+		Member member = memberRepository.findById(JWTFilter.getMemId())
+				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
+		if (!member.getRole().equals("ADMIN")) {
+			throw new AccessDeniedException("공지사항 삭제 권한이 없습니다.");
+	    }
+		
 		List<Notice> noticeList = noticeRepository.findAllById(noticeNums);
 
 		if (noticeList.size() != noticeNums.size()) {
