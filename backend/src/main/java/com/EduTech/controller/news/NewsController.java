@@ -44,10 +44,10 @@ private final NewsService newsService;
 	}
 	
 	//언론보도 상세 조회(조회수 증가)
-	@GetMapping("/{id}")
-	public ResponseEntity<NewsDetailDTO> getNewsDetail(@PathVariable Long id) {
-		newsService.increaseView(id); //클릭 시조회수 증가
-		return ResponseEntity.ok(newsService.getNewsDetail(id));
+	@GetMapping("/{newsNum}")
+	public ResponseEntity<NewsDetailDTO> getNewsDetail(@PathVariable Long newsNum) {
+		newsService.increaseView(newsNum); //클릭 시조회수 증가
+		return ResponseEntity.ok(newsService.getNewsDetail(newsNum));
 	}
 	
 	//관리자 전용
@@ -63,27 +63,27 @@ private final NewsService newsService;
 	
 	//언론보도 수정
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/{id}")
-	public ResponseEntity<String> updateNews(@PathVariable Long id,
+	@PostMapping("/{newsNum}")
+	public ResponseEntity<String> updateNews(@PathVariable Long newsNum,
 			@ModelAttribute NewsUpdateRegisterDTO dto,
 			@RequestPart(required = false) List<MultipartFile> file) {
-		newsService.updateNews(dto, file, id);
+		newsService.updateNews(dto, file, newsNum);
 		return ResponseEntity.ok("뉴스가 수정되었습니다.");
 	}
 	
 	//언론보도 삭제(단일)
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/{id}")
-	public ResponseEntity<String> deleteNews(@PathVariable Long id) {
-		newsService.deleteNews(id);
+	@PostMapping("/{newsNum}")
+	public ResponseEntity<String> deleteNews(@PathVariable Long newsNum) {
+		newsService.deleteNews(newsNum);
 		return ResponseEntity.ok("뉴스가 삭제되었습니다.");
 	}
 	
 	//언론보도 삭제(일괄)
 		@PreAuthorize("hasRole('ADMIN')")
-		@PostMapping("/{id}")
-		public ResponseEntity<String> deleteNewsByIds(@RequestBody List<Long> ids) {
-			newsService.deleteNewsByIds(ids);
+		@PostMapping("/{newsNums}")
+		public ResponseEntity<String> deleteNewsByIds(@RequestBody List<Long> newsNums) {
+			newsService.deleteNewsByIds(newsNums);
 			return ResponseEntity.ok("뉴스가 일괄 삭제되었습니다.");
 		}
 
