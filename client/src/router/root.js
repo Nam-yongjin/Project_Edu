@@ -5,6 +5,7 @@ import registerRouter from "./registerRouter";
 import memberRouter from "./memberRouter";
 import demonstrationRouter from "./demonstrationRouter";
 import noticeRouter from "./noticeRouter";
+import eventRouter from "./eventRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
@@ -15,6 +16,8 @@ const ResetPw = lazy(() => import("../pages/member/ResetPwPage"))
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
 const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
 const Notice = lazy(() => import("../pages/notice/noticePage"))
+const Event = lazy(() => import("../pages/event/eventPage"))
+
 
 const root = createBrowserRouter([
     {
