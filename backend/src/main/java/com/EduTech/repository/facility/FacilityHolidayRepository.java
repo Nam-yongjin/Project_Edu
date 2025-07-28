@@ -15,6 +15,9 @@ public interface FacilityHolidayRepository extends JpaRepository<FacilityHoliday
     // 특정 시설 + 날짜가 휴무인지 여부.
     boolean existsByFacility_FacilityNumAndHolidayDate(Long facilityNum, LocalDate date);
 
+    // 특정 시설 + 날짜 기준 휴무 단건 조회
+    FacilityHoliday findByFacility_FacilityNumAndHolidayDate(Long facilityNum, LocalDate date);
+    
     // 삭제 전 중복 체크용 (동일 날짜/시설 휴무 있는지 확인).
-    boolean existsByFacility_FacilityNumAndHolidayDateAndIdNot(Long facilityNum, LocalDate date, Long excludeId);
+    boolean existsByFacility_FacilityNumAndHolidayDateAndHolidayIdNot(Long facilityNum, LocalDate date, Long excludeId);
 }
