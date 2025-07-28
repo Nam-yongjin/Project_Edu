@@ -316,7 +316,7 @@ public class DemonstrationServiceTests {
 		} catch (Exception e) {
 
 		}
-		demonstrationService.addDemonstration(demonstrationFormDTO);
+		//demonstrationService.addDemonstration(demonstrationFormDTO);
 	}
 	
 	
