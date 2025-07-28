@@ -11,8 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +31,9 @@ import com.EduTech.repository.facility.FacilityHolidayRepository;
 import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
 import com.EduTech.service.facility.FacilityService;
+import com.EduTech.service.mail.MailService;
 
 @SpringBootTest
-@ComponentScan(basePackages = "com.EduTech", excludeFilters = {
-	    @ComponentScan.Filter(type = FilterType.REGEX, pattern = "com\\.EduTech\\.service\\.mail\\..*")
-	})
 @Transactional
 @Rollback(false)	// DB에 실제로 저장되도록 설정
 class FacilityServiceTest {
@@ -52,6 +49,9 @@ class FacilityServiceTest {
 
     @Autowired
     private FacilityHolidayRepository holidayRepository;
+    
+    @MockBean
+    private MailService mailService;
 
     @Test
     @DisplayName("[1] 시설 상세 정보 조회 테스트 (이미지 포함)")
