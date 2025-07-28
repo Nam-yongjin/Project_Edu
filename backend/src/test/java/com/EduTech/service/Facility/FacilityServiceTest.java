@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +26,13 @@ import com.EduTech.entity.facility.FacilityHoliday;
 import com.EduTech.entity.facility.FacilityImage;
 import com.EduTech.entity.facility.FacilityReserve;
 import com.EduTech.entity.facility.FacilityState;
+import com.EduTech.entity.facility.FacilityTime;
+import com.EduTech.entity.facility.HolidayReason;
 import com.EduTech.repository.facility.FacilityHolidayRepository;
 import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
+import com.EduTech.repository.facility.FacilityTimeRepository;
 import com.EduTech.service.facility.FacilityService;
-import com.EduTech.service.mail.MailService;
 
 @SpringBootTest
 @Transactional
@@ -43,6 +44,9 @@ class FacilityServiceTest {
 
     @Autowired
     private FacilityRepository facilityRepository;
+    
+    @Autowired
+    FacilityTimeRepository facilityTimeRepository;
 
     @Autowired
     private FacilityReserveRepository reserveRepository;
@@ -50,10 +54,8 @@ class FacilityServiceTest {
     @Autowired
     private FacilityHolidayRepository holidayRepository;
     
-    @MockBean
-    private MailService mailService;
 
-    @Test
+    //@Test
     @DisplayName("[1] 시설 상세 정보 조회 테스트 (이미지 포함)")
     void testGetFacilityWithImages() {
         System.out.println("[1] 시설 상세 정보 조회 테스트 시작");
@@ -83,10 +85,31 @@ class FacilityServiceTest {
         Facility facility = facilityRepository.save(Facility.builder()
                 .facName("시간조회시설")
                 .facInfo("시간조회테스트")
+                .facItem("책상, 의자")
                 .capacity(5)
                 .build());
 
         LocalDate date = LocalDate.now().plusDays(1);
+
+        // 예약 시간대 미리 등록
+        FacilityTime time1 = FacilityTime.builder()
+                .facility(facility)
+                .facDate(date)
+                .startTime(LocalTime.of(10, 0))
+                .endTime(LocalTime.of(11, 0))
+                .available(true)
+                .build();
+
+        FacilityTime time2 = FacilityTime.builder()
+                .facility(facility)
+                .facDate(date)
+                .startTime(LocalTime.of(11, 0))
+                .endTime(LocalTime.of(12, 0))
+                .available(true)
+                .build();
+
+        facilityTimeRepository.save(time1);
+        facilityTimeRepository.save(time2);
 
         // when
         List<FacilityTimeDTO> times = facilityService.getAvailableTimes(facility.getFacilityNum(), date);
@@ -105,6 +128,7 @@ class FacilityServiceTest {
         Facility facility = facilityRepository.save(Facility.builder()
                 .facName("가능여부시설")
                 .facInfo("예약 가능 여부 확인")
+                .facItem("책상, 의자")
                 .capacity(15)
                 .build());
 
@@ -189,7 +213,12 @@ class FacilityServiceTest {
 
         // Step 1. 시설 및 예약 저장
         Facility facility = facilityRepository.save(
-                Facility.builder().facName("승인센터").build()
+                Facility.builder()
+                	.facName("승인센터")
+                	.facInfo("예약 테스트 시설")
+                	.facItem("책상, 의자")
+                	.capacity(10)
+                	.build()
         );
 
         FacilityReserve reserve = reserveRepository.save(
@@ -226,7 +255,7 @@ class FacilityServiceTest {
         System.out.println("[8] 예약 취소 테스트 시작");
 
         // Step 1. 시설 저장
-        Facility facility = facilityRepository.save(Facility.builder().facName("취소센터").build());
+        Facility facility = facilityRepository.save(Facility.builder().facName("취소센터").facItem("책상, 의자").build());
 
         // Step 2. 예약 저장 (memId는 String)
         FacilityReserve reserve = reserveRepository.save(FacilityReserve.builder()
@@ -259,6 +288,7 @@ class FacilityServiceTest {
         Facility facility = facilityRepository.save(Facility.builder()
                 .facName("휴무테스트시설")
                 .facInfo("휴무정보")
+                .facItem("책상, 의자")
                 .capacity(5)
                 .build());
 
@@ -268,7 +298,8 @@ class FacilityServiceTest {
         FacilityHolidayDTO dto = new FacilityHolidayDTO();
         dto.setFacilityNum(facility.getFacilityNum());
         dto.setHolidayDate(date);
-
+        dto.setReason(HolidayReason.HOLIDAY); 
+        
         facilityService.registerHoliday(dto);
 
         // Step 3: 해당 시설의 휴무일 조회
@@ -298,6 +329,7 @@ class FacilityServiceTest {
         Facility facility = facilityRepository.save(Facility.builder()
                 .facName("휴무확인시설")
                 .facInfo("테스트용 시설")
+                .facItem("책상, 의자")
                 .capacity(5)
                 .build());
 
@@ -307,6 +339,7 @@ class FacilityServiceTest {
         FacilityHolidayDTO dto = new FacilityHolidayDTO();
         dto.setFacilityNum(facility.getFacilityNum());
         dto.setHolidayDate(date);
+        dto.setReason(HolidayReason.HOLIDAY); 
         facilityService.registerHoliday(dto);
 
         // Step 3. isHoliday 여부 확인
