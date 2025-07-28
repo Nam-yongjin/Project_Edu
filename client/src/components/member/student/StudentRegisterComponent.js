@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import PhoneVerification from '../PhoneVerification';
-import BasicLayout from '../../../layouts/BasicLayout';
+import useMove from '../../../hooks/useMove';
 
 const StudentRegisterComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
+    const {moveToPath} = useMove()
     const [form, setForm] = useState({
         memId: '',
         pw: '',
@@ -67,9 +68,9 @@ const StudentRegisterComponent = () => {
         return errs;
     };
 
-    const handleVerified = (phone) => {
-        setVerifiedPhone(phone);
-    };
+    // const handleVerified = (phone) => {
+    //     setVerifiedPhone(phone);
+    // };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -87,6 +88,7 @@ const StudentRegisterComponent = () => {
 
         console.log('제출:', dataToSubmit);
         alert('회원가입 성공!');
+        moveToPath('/')
     };
 
     return (
@@ -94,7 +96,6 @@ const StudentRegisterComponent = () => {
             <div className='mt-10 m-2 p-4'>
 
                 <h2>회원가입</h2>
-                <form onSubmit={handleSubmit}>
                 <input name="memId" placeholder="아이디" value={form.memId} onChange={handleChange} />
                 {errors.memId && <div style={{ color: 'red' }}>{errors.memId}</div>}
 
@@ -138,8 +139,8 @@ const StudentRegisterComponent = () => {
                 <PhoneVerification onVerified={setVerifiedPhone} />
                 {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
 
-                <button type="submit">회원가입</button>
-            </form>
+                <button onClick={handleSubmit}>회원가입</button>
+
             </div>
         </div>
     );
