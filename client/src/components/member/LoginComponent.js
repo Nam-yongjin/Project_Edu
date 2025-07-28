@@ -56,7 +56,7 @@ const LoginComponent = () => {
             <div className="flex justify-center">
                 <div className="relative mb-4 flex w-full justify-center">
                     <div className="w-2/5 p-6 flex justify-center font-bold">
-                        <button className="rounded p-4 w-36 bg-blue-500 text-xl	text-white"
+                        <button className="rounded p-4 w-36 bg-blue-500 text-xl	text-white active:bg-blue-600"
                             onClick={handleClickLogin}>
                             LOGIN
                         </button>
