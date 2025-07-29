@@ -8,24 +8,16 @@ const FindIdComponent = () => {
     const { moveToLogin } = useMove();
 
     const handleVerified = (phone, user) => {
-        console.log(phone)
         findId({ phone })
-            .then((data) => {
-                if (data) {
-                    setFoundId(data);
+            .then((memId) => {
+                if (memId) {
+                    setFoundId(memId);
                 } else {
-                    alert('해당 전화번호로 등록된 아이디가 없습니다.');
+                    alert("아이디를 찾을 수 없습니다.");
                 }
             })
             .catch((error) => {
-                const errData = error.response?.data;
-                if (typeof errData === 'string') {
-                    alert(errData);
-                } else if (errData?.message) {
-                    alert(errData.message);
-                } else {
-                    alert('아이디 찾기 실패: ' + error.message);
-                }
+                alert("아이디 찾기 실패: " + (error.response?.data || error.message));
             });
     };
 
@@ -37,7 +29,7 @@ const FindIdComponent = () => {
             ) : (
                 <>
                     <p>찾은 아이디: <strong>{foundId}</strong></p>
-                    <button onClick={moveToLogin}>로그인 페이지로 이동</button>
+                    <button className='rounded p-1 w-18 bg-blue-500	text-white active:bg-blue-600' onClick={moveToLogin}>로그인 페이지로 이동</button>
                 </>
             )}
         </div>

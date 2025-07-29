@@ -37,11 +37,10 @@ public class JWTFilter extends OncePerRequestFilter {
 			Map<String, Object> claims = JWTProvider.validateToken(accessToken);
 
 			String memId = (String) claims.get("memId");
-			String pw = (String) claims.get("pw");
-			String name = (String) claims.get("name");
-			String roleName = (String) claims.get("roleName");
+			String email = (String) claims.get("email");
+			String role = (String) claims.get("role");
 
-			MemberDTO memberDTO = new MemberDTO(memId, pw, name, roleName);
+			MemberDTO memberDTO = new MemberDTO(memId, email, role);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
 					null, memberDTO.getAuthorities());
@@ -50,9 +49,7 @@ public class JWTFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 
 		} catch (Exception e) {
-			Gson gson = new Gson();
-			String json = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN", "message", e.getMessage()));
-
+			String json = new Gson().toJson(Map.of("error", "TOKEN_ERROR", "message", e.getMessage()));
 			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().println(json);
 
@@ -67,6 +64,18 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		// 회원가입 경로 제외
 		if (path.startsWith("/register") && request.getMethod().equals("POST")) {
+			return true;
+		}
+		// 아이디 중복 체크 경로 제외
+		if (path.startsWith("/checkId") && request.getMethod().equals("GET")) {
+			return true;
+		}
+		// 아이디 찾기크 경로 제외
+		if (path.startsWith("/findId") && request.getMethod().equals("GET")) {
+			return true;
+		}
+		// 비밀번호 찾기(변경) 경로 제외
+		if (path.startsWith("/resetPw") && request.getMethod().equals("PUT")) {
 			return true;
 		}
 

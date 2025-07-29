@@ -357,8 +357,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public String findId(String phone) {
-		Optional<String> memId = memberRepository.findMemIdByPhone(phone);
-		return memId.orElseThrow(() -> new NoSuchElementException("해당 전화번호로 가입된 아이디가 없습니다."));
+		return memberRepository.findMemIdByPhone(phone);
 	}
 
 	// 비밀번호 찾기(변경)
