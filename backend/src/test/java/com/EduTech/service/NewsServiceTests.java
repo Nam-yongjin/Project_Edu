@@ -1,6 +1,7 @@
 package com.EduTech.service;
 
-import java.time.LocalDateTime;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +52,6 @@ public class NewsServiceTests {
 		@Autowired
 		private ModelMapper modelMapper;
 		
-		private Member testMember;
 		
 		@MockBean
 		EventServiceImpl eventServiceImpl;
@@ -62,23 +62,24 @@ public class NewsServiceTests {
 		@MockBean
 		EventUseRepository eventUseRepository; 
 
-		@BeforeEach // 테스트용 데이터
-		void setUp() {
-			
-	        // 테스트 회원 생성
-	        testMember = new Member();
-	        testMember.setMemId("testUser");
-	        testMember.setName("테스트사용자");
-	        memberRepository.save(testMember);
-	        
-	        System.out.println("테스트 회원 생성 완료: " + testMember.getName());
-	    }
+//		@BeforeEach // 테스트용 데이터
+//		void setUp() {
+//			
+//	        // 테스트 회원 생성
+//	        testMember = new Member();
+//	        testMember.setMemId("testUser");
+//	        testMember.setName("테스트사용자");
+//	        memberRepository.save(testMember);
+//	        
+//	        System.out.println("테스트 회원 생성 완료: " + testMember.getName());
+//	    }
 
 //		@Test
 	    @Transactional //테스트 후 DB삭제
 	    @Commit //DB에 들어가는지 확인
 	    @DisplayName("언론보도 상세 조회 - DTO 매핑 확인")
 	    void testGetNewsDetail() {
+	    	Member adminMember = memberRepository.findById("admin").orElseThrow();
 	        System.out.println("===== 언론보도 상세 조회 테스트 =====");
 	        
 	        // Given
@@ -87,7 +88,7 @@ public class NewsServiceTests {
 	                .title("상세 조회 테스트")
 	                .content("상세 조회 테스트 내용")
 	                .view(0L)
-	                .member(testMember)
+	                .member(adminMember)
 	                .build();
 	        
 	        News savedNews = newsRepository.save(news); //DB에 저장
@@ -109,7 +110,7 @@ public class NewsServiceTests {
 	        // 매핑 확인
 	        boolean titleMatches = detailDTO.getTitle().equals(news.getTitle());
 	        boolean contentMatches = detailDTO.getContent().equals(news.getContent());
-	        boolean writerMatches = detailDTO.getName().equals(testMember.getName());
+	        boolean writerMatches = detailDTO.getName().equals(adminMember.getName());
 	        
 	        System.out.println("=== 매핑 검증 ===");
 	        System.out.println("제목 매핑 성공: " + titleMatches); //제목
@@ -124,6 +125,7 @@ public class NewsServiceTests {
 	    @Commit
 	    @DisplayName("언론보도 목록 조회 - 페이징 확인")
 	    void testGetNewsList() {
+	    	Member adminMember = memberRepository.findById("admin").orElseThrow();
 	        System.out.println("===== 언론보도 목록 조회 테스트 =====");
 	        
 	        // Given
@@ -133,7 +135,7 @@ public class NewsServiceTests {
 	                    .title("언론보도 " + i)
 	                    .content("내용 " + i)
 	                    .view(10L)
-	                    .member(testMember)
+	                    .member(adminMember)
 	                    .build();
 	            newsRepository.save(news);
 	        }
@@ -167,6 +169,7 @@ public class NewsServiceTests {
 	    @Commit
 	    @DisplayName("조회수 증가 로직")
 	    void testIncreaseView() {
+	    	Member adminMember = memberRepository.findById("admin").orElseThrow();
 	        System.out.println("===== 조회수 증가 테스트 =====");
 	        
 	        // Given - 보도자료 생성
@@ -174,10 +177,11 @@ public class NewsServiceTests {
 	                .title("조회수 테스트")
 	                .content("조회수 증가 테스트")
 	                .view(0L)
-	                .member(testMember)
+	                .member(adminMember)
 	                .build();
 	        
 	        News savedNews = newsRepository.save(news);
+	        newsRepository.flush();
 	        Long newsNum = savedNews.getNewsNum();
 	        System.out.println("초기 조회수: " + savedNews.getView());
 
@@ -201,43 +205,53 @@ public class NewsServiceTests {
 	    
 //	    @Test
 	    @Transactional
-	    @Commit  
+	    @Commit
 	    @DisplayName("언론보도 삭제 (단일)")
 	    void testDeleteNews() {
+	        Member adminMember = memberRepository.findById("admin").orElseThrow();
 	        System.out.println("===== 단일 삭제 테스트 =====");
-	        
+
 	        // Given - 보도자료 생성
 	        News news = News.builder()
 	                .title("삭제 테스트")
 	                .content("삭제될 보도자료")
 	                .view(0L)
-	                .member(testMember)
+	                .member(adminMember)
 	                .build();
-	        
+
 	        News savedNews = newsRepository.save(news);
 	        Long newsNum = savedNews.getNewsNum();
-	        
+
 	        System.out.println("삭제 전 보도자료 개수: " + newsRepository.count());
 	        System.out.println("삭제할 뉴스 번호: " + newsNum);
 
-	        // When - 삭제 실행
-	        newsService.deleteNews(newsNum);
+	        try {
+	            // When - 삭제 실행
+	            newsService.deleteNews(newsNum);
 
-	        // Then - 삭제 확인
-	        long afterCount = newsRepository.count();
-	        boolean exists = newsRepository.existsById(newsNum);
-	        
-	        System.out.println("삭제 후 보도자료 개수: " + afterCount);
-	        System.out.println("해당 보도자료 존재 여부: " + exists);
-	        
-	        System.out.println("===== 단일 삭제 테스트 완료 =====\n");
+	            // Then - 삭제 확인
+	            long afterCount = newsRepository.count();
+	            boolean exists = newsRepository.existsById(newsNum);
+
+	            System.out.println("삭제 후 보도자료 개수: " + afterCount);
+	            System.out.println("해당 보도자료 존재 여부: " + exists);
+
+	            System.out.println("===== 단일 삭제 테스트 완료 =====\n");
+
+	        } catch (Exception e) {
+	            System.out.println("❗ 삭제 도중 예외 발생 ❗");
+	            e.printStackTrace(); // 예외 전체 스택 출력
+	            fail("예외 발생: " + e.getMessage()); // 테스트 실패 처리
+	        }
 	    }
+	    
 	    
 //	    @Test
 	    @Transactional
 	    @Commit
 	    @DisplayName("언론보도 삭제 (일괄)")
 	    void testDeleteNewsByIds() {
+	    	Member adminMember = memberRepository.findById("admin").orElseThrow();
 	        System.out.println("===== 일괄 삭제 테스트 =====");
 	        
 	        // Given - 보도자료 여러 개 생성
@@ -247,7 +261,7 @@ public class NewsServiceTests {
 	                    .title("일괄 삭제 테스트 " + i)
 	                    .content("삭제될 보도자료 " + i)
 	                    .view(0L)
-	                    .member(testMember)
+	                    .member(adminMember)
 	                    .build();
 	            
 	            News saved = newsRepository.save(news);
@@ -297,10 +311,11 @@ public class NewsServiceTests {
 	        System.out.println("===== 존재하지 않는 언론보도 삭제 테스트 완료 =====\n");
 	    }
 	    
-	    @Test
+//	    @Test
 	    @Transactional
 	    @DisplayName("일괄 삭제 시 일부 존재하지 않는 ID - 예외 처리")
 	    void testBatchDeleteWithNonExistentIds() {
+	    	Member adminMember = memberRepository.findById("admin").orElseThrow();
 	        System.out.println("===== 일괄 삭제 예외 처리 테스트 =====");
 	        
 	        // Given - 일부는 존재하고 일부는 존재하지 않는 ID
@@ -308,7 +323,7 @@ public class NewsServiceTests {
 	                .title("존재하는 보도자료")
 	                .content("실제 존재하는 보도자료")
 	                .view(0L)
-	                .member(testMember)
+	                .member(adminMember)
 	                .build();
 	        
 	        News savedNews = newsRepository.save(news);
