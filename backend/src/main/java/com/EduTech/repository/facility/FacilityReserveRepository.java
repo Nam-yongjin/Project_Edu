@@ -15,7 +15,7 @@ import com.EduTech.entity.facility.FacilityState;
 public interface FacilityReserveRepository extends JpaRepository<FacilityReserve, Long> {
 
     // 내 예약 내역 조회 (마이페이지).
-    List<FacilityReserve> findByMemIdOrderByReserveAtDesc(String memId);
+	List<FacilityReserve> findByMember_MemIdOrderByReserveAtDesc(String memId);
 
     // 특정 상태(WAITING, APPROVED 등) 예약들만 조회 (관리자용 필터)
     List<FacilityReserve> findByState(FacilityState state);
