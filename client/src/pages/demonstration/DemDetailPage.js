@@ -1,8 +1,11 @@
+import DemTitleComponent from "../../components/demonstration/DemTitleComponent";
+import DetailComponent from "../../components/demonstration/DetailComponent";
+
 const DemDetailPage = () => {
     return (
-        <div>
-            <h1>실증 상품 상세 페이지</h1>
-            <br></br>
+        <div className="w-full">
+           <DemTitleComponent title="장비 신청" />
+           <DetailComponent />
         </div>
     );
 }
