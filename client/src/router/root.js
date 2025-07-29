@@ -3,6 +3,7 @@ import Loading from "./Loading";
 import { createBrowserRouter } from "react-router-dom";
 import registerRouter from "./registerRouter";
 import memberRouter from "./memberRouter";
+import companyRouter from "./companyRouter";
 import demonstrationRouter from "./demonstrationRouter";
 import noticeRouter from "./noticeRouter";
 import eventRouter from "./eventRouter";
@@ -11,6 +12,7 @@ const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
 const Login = lazy(() => import("../pages/member/LoginPage"))
 // const Member = lazy(() => import("../pages/member/Memberpage"))
+const Company = lazy(() => import("../pages/member/company/CompanyPage"))
 const FindId = lazy(() => import("../pages/member/FindIdPage"))
 const ResetPw = lazy(() => import("../pages/member/ResetPwPage"))
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
@@ -44,6 +46,11 @@ const root = createBrowserRouter([
     //     element: <Suspense fallback={<Loading />}><Member /></Suspense>,
     //     children: memberRouter()
     // },
+    {
+        path: "company",
+        element: <Suspense fallback={<Loading />}><Company /></Suspense>,
+        children: companyRouter()
+    },
     {
         path: "findId",
         element: <Suspense fallback={<Loading />}><FindId /></Suspense>,

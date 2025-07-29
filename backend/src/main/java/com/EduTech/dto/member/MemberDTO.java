@@ -21,7 +21,7 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 
 	// 생성자
 	public MemberDTO(String memId, String email, String role) {
-		super(memId, email, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+		super(memId, "", List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 		this.memId = memId;
 		this.email = email;
 		this.role = role;
