@@ -114,7 +114,7 @@ public class FacilityServiceImpl implements FacilityService {
         reserve.setFacDate(requestDTO.getFacDate());
         reserve.setStartTime(requestDTO.getStartTime());
         reserve.setEndTime(requestDTO.getEndTime());
-        reserve.setMember(member);  // 수정 완료
+        reserve.setMemId(requestDTO.getMemId());
         reserve.setReserveAt(LocalDateTime.now());
         reserve.setState(FacilityState.WAITING);
 
@@ -147,7 +147,7 @@ public class FacilityServiceImpl implements FacilityService {
                     FacilityReserveAdminDTO dto = new FacilityReserveAdminDTO();
                     dto.setFacRevNum(r.getFacRevNum());
                     dto.setFacName(r.getFacility().getFacName());
-                    dto.setMemId(r.getMember().getMemId()); // ✅ 수정된 부분
+                    dto.setMemId(r.getMemId());
                     dto.setFacDate(r.getFacDate());
                     dto.setStartTime(r.getStartTime());
                     dto.setEndTime(r.getEndTime());
@@ -175,8 +175,8 @@ public class FacilityServiceImpl implements FacilityService {
         FacilityReserve reserve = facilityReserveRepository.findById(facRevNum)
             .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
 
-        // 사용자일 경우 본인 예약만 취소 가능
-        if (!isAdmin && !reserve.getMember().getMemId().equals(requesterId)) {
+     // 사용자일 경우 본인 예약만 취소 가능
+        if (!isAdmin && !reserve.getMemId().equals(requesterId)) {
             throw new SecurityException("본인의 예약만 취소할 수 있습니다.");
         }
 
