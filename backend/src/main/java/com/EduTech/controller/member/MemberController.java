@@ -151,34 +151,34 @@ public class MemberController {
 		memberService.leaveMember(memId);
 		return ResponseEntity.ok("회원탈퇴가 완료되었습니다. 일주일뒤 재가입 가능합니다.");
 	}
-	
+
 	// 아이디 찾기
 	@GetMapping("/findId")
-	public ResponseEntity<String> findId(@RequestParam("phone") String phone){
+	public ResponseEntity<String> findId(@RequestParam("phone") String phone) {
 		String memId = memberService.findId(phone);
-	    if (memId != null) {
-	        return ResponseEntity.ok(memId);
-	    } else {
-	        throw new NoSuchElementException("해당 전화번호로 등록된 아이디가 없습니다.");
-	    }
+		if (memId != null) {
+			return ResponseEntity.ok(memId);
+		} else {
+			throw new NoSuchElementException("해당 전화번호로 등록된 아이디가 없습니다.");
+		}
 	}
-	
+
 	// 비밀번호 찾기(변경)
 	@PutMapping("/resetPw")
-	public ResponseEntity<String> resetPw(@RequestBody MemberResetPwDTO memberResetPwDTO){
+	public ResponseEntity<String> resetPw(@RequestBody MemberResetPwDTO memberResetPwDTO) {
 		memberService.resetPw(memberResetPwDTO.getMemId(), memberResetPwDTO);
 		return ResponseEntity.ok("비밀번호가 변경되었습니다.");
 	}
-	
+
 	// 카카오 로그인
 	@GetMapping("/login/kakao")
-    public Map<String, Object> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
-        MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
-        Map<String, Object> claims = memberDTO.getClaims();
-        String jwtAccessToken = JWTProvider.generateToken(claims, 10);
-        String jwtRefreshToken = JWTProvider.generateToken(claims, 60 * 24);
-        claims.put("accessToken", jwtAccessToken);
-        claims.put("refreshToken", jwtRefreshToken);
-        return claims;
-    }
+	public Map<String, Object> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
+		MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
+		Map<String, Object> claims = memberDTO.getClaims();
+		String jwtAccessToken = JWTProvider.generateToken(claims, 10);
+		String jwtRefreshToken = JWTProvider.generateToken(claims, 60 * 24);
+		claims.put("accessToken", jwtAccessToken);
+		claims.put("refreshToken", jwtRefreshToken);
+		return claims;
+	}
 }
