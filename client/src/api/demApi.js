@@ -1,14 +1,14 @@
 import jwtAxios from "../util/jwtUtil";
 import { API_SERVER_HOST } from "./config";
 import { API_MAPPING } from "./config";
-
+import axios from "axios";
 const host = `${API_SERVER_HOST}/api/demonstration`
 const mapping = `${API_MAPPING}`
 
 
 // 실증 상품 등록하는 요청
 export const postAdd = async (formData) => {
-    const res = await jwtAxios.post(`${host}/addDem`,formData, {
+    const res = await axios.post(`${host}/addDem`,formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
     return res.data;
