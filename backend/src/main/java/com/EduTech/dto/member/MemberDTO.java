@@ -14,14 +14,16 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 
 	// 인증 및 권한에 필요한 최소한의 정보
 	private String memId;
+	
+	private String pw;
 
 	private String email;
 
 	private String role;
 
 	// 생성자
-	public MemberDTO(String memId, String email, String role) {
-		super(memId, "", List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+	public MemberDTO(String memId, String pw, String email, String role) {
+		super(memId, pw, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 		this.memId = memId;
 		this.email = email;
 		this.role = role;
