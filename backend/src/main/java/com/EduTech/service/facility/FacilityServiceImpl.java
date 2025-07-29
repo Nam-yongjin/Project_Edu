@@ -40,7 +40,6 @@ public class FacilityServiceImpl implements FacilityService {
     private final FacilityTimeRepository facilityTimeRepository;
     private final FacilityReserveRepository facilityReserveRepository;
     private final FacilityHolidayRepository facilityHolidayRepository;
-    private final MemberRepository memberRepository;
 
     // 시설 상세 정보 조회 (이미지 포함)
     @Override
@@ -104,10 +103,10 @@ public class FacilityServiceImpl implements FacilityService {
         if (!isReservable(facility.getFacilityNum(), requestDTO.getFacDate(), requestDTO.getStartTime(), requestDTO.getEndTime())) {
             throw new IllegalStateException("해당 시간은 이미 예약되어 있거나 예약할 수 없습니다.");
         }
-
+        
         // 회원 정보 조회 및 설정
-        Member member = memberRepository.findById(requestDTO.getMemId())
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+//        Member member = memberRepository.findById(requestDTO.getMemId())
+//                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
         FacilityReserve reserve = new FacilityReserve();
         reserve.setFacility(facility);
