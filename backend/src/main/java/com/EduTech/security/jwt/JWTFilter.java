@@ -33,11 +33,10 @@ public class JWTFilter extends OncePerRequestFilter {
 			Map<String, Object> claims = JWTProvider.validateToken(accessToken);
 
 			String memId = (String) claims.get("memId");
-			String pw = (String) claims.get("pw");
 			String email = (String) claims.get("email");
 			String role = (String) claims.get("role");
 
-			MemberDTO memberDTO = new MemberDTO(memId, pw, email, role);
+			MemberDTO memberDTO = new MemberDTO(memId, "", email, role);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
 					null, memberDTO.getAuthorities());

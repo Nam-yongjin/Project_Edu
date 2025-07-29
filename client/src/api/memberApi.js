@@ -59,20 +59,20 @@ export const checkDuplicateId = async (params) => {
 };
 
 // 회원정보조회
-export const readMember = async () => {
-    const res = await jwtAxios.get(`${member}/myInfo`);
+export const readMember = async (params) => {
+    const res = await jwtAxios.get(`${member}/myInfo`, {params: params});
     return res.data;
 };
-export const readStudent = async () => {
-    const res = await jwtAxios.get(`${student}/myInfo`);
+export const readStudent = async (params) => {
+    const res = await jwtAxios.get(`${student}/myInfo`, {params: params});
     return res.data;
 };
-export const readTeacher = async () => {
-    const res = await jwtAxios.get(`${teacher}/myInfo`);
+export const readTeacher = async (params) => {
+    const res = await jwtAxios.get(`${teacher}/myInfo`, {params: params});
     return res.data;
 };
-export const readCompany = async () => {
-    const res = await jwtAxios.get(`${company}/myInfo`);
+export const readCompany = async (params) => {
+    const res = await jwtAxios.get(`${company}/myInfo`, {params: params});
     return res.data;
 };
 
