@@ -73,11 +73,11 @@ public class MemberServiceImpl implements MemberService {
 		member.setPw(passwordEncoder.encode(member.getPw()));
 		member.setState(MemberState.NORMAL);
 		member.setRole(MemberRole.USER);
-		
-	    member.setStudent(null);
-	    member.setTeacher(null);
-	    member.setCompany(null);
-	    
+
+		member.setStudent(null);
+		member.setTeacher(null);
+		member.setCompany(null);
+
 		memberRepository.save(member);
 	}
 
@@ -93,9 +93,9 @@ public class MemberServiceImpl implements MemberService {
 		Student student = modelMapper.map(studentRegisterDTO, Student.class);
 		student.setMemId(null);
 		student.setMember(member);
-	    member.setStudent(student);
-	    member.setTeacher(null);
-	    member.setCompany(null);
+		member.setStudent(student);
+		member.setTeacher(null);
+		member.setCompany(null);
 
 		memberRepository.save(member);
 	}
@@ -108,13 +108,13 @@ public class MemberServiceImpl implements MemberService {
 		member.setPw(passwordEncoder.encode(member.getPw()));
 		member.setState(MemberState.NORMAL);
 		member.setRole(MemberRole.TEACHER);
-		
+
 		Teacher teacher = modelMapper.map(teacherRegisterDTO, Teacher.class);
 		teacher.setMemId(null);
 		teacher.setMember(member);
-	    member.setStudent(null);
-	    member.setTeacher(teacher);
-	    member.setCompany(null);
+		member.setStudent(null);
+		member.setTeacher(teacher);
+		member.setCompany(null);
 
 		memberRepository.save(member);
 	}
@@ -123,19 +123,19 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public void registerCompany(CompanyRegisterDTO companyRegisterDTO) {
-	    Member member = modelMapper.map(companyRegisterDTO, Member.class);
-	    member.setPw(passwordEncoder.encode(companyRegisterDTO.getPw()));
-	    member.setState(MemberState.NORMAL);
-	    member.setRole(MemberRole.COMPANY);
+		Member member = modelMapper.map(companyRegisterDTO, Member.class);
+		member.setPw(passwordEncoder.encode(companyRegisterDTO.getPw()));
+		member.setState(MemberState.NORMAL);
+		member.setRole(MemberRole.COMPANY);
 
-	    Company company = modelMapper.map(companyRegisterDTO, Company.class);
-	    company.setMemId(null);
-	    company.setMember(member);
-	    member.setStudent(null);
-	    member.setTeacher(null);
-	    member.setCompany(company);
+		Company company = modelMapper.map(companyRegisterDTO, Company.class);
+		company.setMemId(null);
+		company.setMember(member);
+		member.setStudent(null);
+		member.setTeacher(null);
+		member.setCompany(company);
 
-	    memberRepository.save(member);
+		memberRepository.save(member);
 	}
 
 	// 아이디 중복 체크
@@ -371,11 +371,11 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void resetPw(String memId, MemberResetPwDTO memberResetPwDTO) {
 		Member member = memberRepository.findById(memId)
-	            .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원이 존재하지 않습니다."));
+				.orElseThrow(() -> new NoSuchElementException("해당 ID의 회원이 존재하지 않습니다."));
 		if (memberResetPwDTO.getPhone().equals(member.getPhone())) {
 			member.setPw(passwordEncoder.encode(memberResetPwDTO.getPw()));
 			memberRepository.save(member);
-		}else {
+		} else {
 			throw new NoSuchElementException("해당 전화번호로 가입된 아이디가 없습니다.");
 		}
 	}
@@ -388,6 +388,7 @@ public class MemberServiceImpl implements MemberService {
 		Optional<Member> result = memberRepository.findByEmail(kakaoDTO.getEmail());
 
 		Member member;
+
 		if (result.isPresent()) { // 회원 로그인
 			member = result.get();
 		} else { // 자동 회원가입
@@ -395,6 +396,7 @@ public class MemberServiceImpl implements MemberService {
 			memberRepository.save(member);
 		}
 		MemberDTO memberDTO = entityToDTO(member);
+
 		return memberDTO;
 	}
 
@@ -442,18 +444,6 @@ public class MemberServiceImpl implements MemberService {
 
 	}
 
-	// 랜덤 아이디
-	private String generateRandomMemId() {
-		int length = ThreadLocalRandom.current().nextInt(6, 17); // 6~16자
-		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		StringBuilder sb = new StringBuilder(length);
-		for (int i = 0; i < length; i++) {
-			int index = ThreadLocalRandom.current().nextInt(characters.length());
-			sb.append(characters.charAt(index));
-		}
-		return sb.toString();
-	}
-
 	// 랜덤 비밀번호
 	private String generateRandomPassword() {
 		int length = ThreadLocalRandom.current().nextInt(6, 17); // 6~16자
@@ -482,20 +472,11 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	private Member makeKakaoMember(KakaoDTO kakaoDTO) {
-		String memId = generateRandomMemId(); // 랜덤 아이디
 		String rawPassword = generateRandomPassword(); // 랜덤 비밀번호
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone()); // 전화번호 유효성
 
-		System.out.println(memId);
-		System.out.println(rawPassword);
-		System.out.println(kakaoDTO.getName());
-		System.out.println(kakaoDTO.getEmail());
-		System.out.println(kakaoDTO.getBirthDate());
-		System.out.println(kakaoDTO.getGender());
-		System.out.println(normalizedPhone);
-
-		return Member.builder().memId(memId).pw(encodedPassword).name(kakaoDTO.getName()).email(kakaoDTO.getEmail())
+		return Member.builder().memId(kakaoDTO.getEmail()).pw(encodedPassword).name(kakaoDTO.getName()).email(kakaoDTO.getEmail())
 				.birthDate(kakaoDTO.getBirthDate()).gender(kakaoDTO.getGender()).phone(normalizedPhone)
 				.state(MemberState.NORMAL).role(MemberRole.USER).kakao(kakaoDTO.getEmail()).build();
 	}
