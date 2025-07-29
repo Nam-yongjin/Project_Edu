@@ -87,8 +87,6 @@ public class NewsRepositoryTests {
 		News news = News.builder()
 				.title("createTest")
 				.content("언론보도 등록 테스트!!")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.member(adminMember)
 				.build();
 				
@@ -116,8 +114,6 @@ public class NewsRepositoryTests {
 		News news = News.builder()
 				.title("readTest")
 				.content("언론보도 조회 테스트!!")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.member(adminMember)
 				.build();
 				
@@ -146,8 +142,6 @@ public class NewsRepositoryTests {
 		News news = News.builder()
 				.title("기존 제목")
 				.content("기존 내용")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.member(adminMember)
 				.build();
 				
@@ -191,8 +185,6 @@ public class NewsRepositoryTests {
 		News news = News.builder()
 				.title("deleteTest")
 				.content("언론보도 삭제 테스트!!")
-				.createdAt(LocalDateTime.now()) //NewsEntity에 있어야 함
-				.updatedAt(LocalDateTime.now())
 				.member(adminMember)
 				.build();
 				

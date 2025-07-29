@@ -86,8 +86,6 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("상세 조회 테스트")
 	                .content("상세 조회 테스트 내용")
-	                .createdAt(LocalDateTime.now())
-	                .updatedAt(LocalDateTime.now())
 	                .view(0L)
 	                .member(testMember)
 	                .build();
@@ -134,8 +132,6 @@ public class NewsServiceTests {
 	            News news = News.builder()
 	                    .title("언론보도 " + i)
 	                    .content("내용 " + i)
-	                    .createdAt(LocalDateTime.now().minusDays(i))
-	                    .updatedAt(LocalDateTime.now().minusDays(i))
 	                    .view(10L)
 	                    .member(testMember)
 	                    .build();
@@ -177,8 +173,6 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("조회수 테스트")
 	                .content("조회수 증가 테스트")
-	                .createdAt(LocalDateTime.now())
-	                .updatedAt(LocalDateTime.now())
 	                .view(0L)
 	                .member(testMember)
 	                .build();
@@ -216,8 +210,6 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("삭제 테스트")
 	                .content("삭제될 보도자료")
-	                .createdAt(LocalDateTime.now())
-	                .updatedAt(LocalDateTime.now())
 	                .view(0L)
 	                .member(testMember)
 	                .build();
@@ -254,8 +246,6 @@ public class NewsServiceTests {
 	            News news = News.builder()
 	                    .title("일괄 삭제 테스트 " + i)
 	                    .content("삭제될 보도자료 " + i)
-	                    .createdAt(LocalDateTime.now())
-	                    .updatedAt(LocalDateTime.now())
 	                    .view(0L)
 	                    .member(testMember)
 	                    .build();
@@ -317,8 +307,6 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("존재하는 보도자료")
 	                .content("실제 존재하는 보도자료")
-	                .createdAt(LocalDateTime.now())
-	                .updatedAt(LocalDateTime.now())
 	                .view(0L)
 	                .member(testMember)
 	                .build();
