@@ -14,7 +14,7 @@ import lombok.ToString;
 public class PageResponseDTO <T>{
 	 private List<T> content;
 	    private int totalPages;
-	    private int currentPage;
+	   private int currentPage;
 
 	    public PageResponseDTO(Page<T> page) {
 	        this.content = page.getContent(); // 페이지 요소
