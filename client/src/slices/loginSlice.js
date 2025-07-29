@@ -70,16 +70,15 @@ export const loginPostAsync = createAsyncThunk(
 
 const loginSlice = createSlice({
     name: 'loginSlice',
-    initialState: loadMemberCookie() || initState, // 쿠키가 없다면 초기값 사용 초기 상태(state)를 설정하는 부분이에요.
+    initialState: loadMemberCookie() || initState, // 쿠키가 없다면 초기값 사용 초기 상태(state)를 설정
     reducers: {
         login: (state, action) => { //  dispatch(login(memberInfo)) 여기서 action 호출
-            // action.payload로 데이터 받은 후 return 시 ,state에 값 저장됨. 
-            // 여기선 추가로 쿠키에도 저장
+            // action.payload로 데이터 받은 후 return 시 ,state에 값 저장
             alert("로그인 되었습니다.")
             const payload = action.payload;
 
             if (!payload.error) {
-                setCookie("member", JSON.stringify(payload), 1);
+                setCookie("member", JSON.stringify(payload), 1);    // 쿠키 저장
                 state.memId = payload.memId || '';
                 state.email = payload.email || '';
                 state.role = payload.role || '';

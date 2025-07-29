@@ -73,6 +73,11 @@ public class MemberServiceImpl implements MemberService {
 		member.setPw(passwordEncoder.encode(member.getPw()));
 		member.setState(MemberState.NORMAL);
 		member.setRole(MemberRole.USER);
+		
+	    member.setStudent(null);
+	    member.setTeacher(null);
+	    member.setCompany(null);
+	    
 		memberRepository.save(member);
 	}
 
