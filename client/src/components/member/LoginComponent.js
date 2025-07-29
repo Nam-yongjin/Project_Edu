@@ -21,15 +21,14 @@ const LoginComponent = () => {
         setLoginParam({ ...loginParam });
     };
 
-    const handleClickLogin = (e) => {
+    const handleClickLogin = () => {
         doLogin(loginParam)
             .then(data => {
                 if (data.error) {
                     alert("아이디와 패스워드를 다시 확인하세요")
-                } else {
-                    alert("로그인 되었습니다.")
+                }else{
                     moveToPath('/')
-                };
+                }
             });
     };
     const handleKeydown = (e) => {
