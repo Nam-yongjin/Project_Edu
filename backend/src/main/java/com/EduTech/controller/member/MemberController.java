@@ -140,7 +140,6 @@ public class MemberController {
 	@PreAuthorize("hasRole('COMPANY')")
 	public ResponseEntity<String> modifyCompany(@RequestBody @Valid CompanyModifyDTO companyModifyDTO) {
 		String memId = JWTFilter.getMemId();
-		System.out.println(memId);
 		memberService.modifyCompanyInfo(memId, companyModifyDTO);
 		return ResponseEntity.ok("회원정보가 수정되었습니다.");
 	}
