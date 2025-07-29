@@ -28,6 +28,7 @@ import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.demonstration.DemonstrationService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -126,7 +127,7 @@ public class DemonstrationController {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@PostMapping("/addDem")
-	public ResponseEntity<String> DemAdd(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
+	public ResponseEntity<String> DemAdd( @Valid @ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
 		System.out.println("컨트롤러 진입");
 		String memId = JWTFilter.getMemId();
 		System.out.println(demonstrationFormDTO);
@@ -136,7 +137,7 @@ public class DemonstrationController {
 
 	// 실증 상품 수정하는 기능
 	@PutMapping("/UpdateDem")
-	public ResponseEntity<String> DemUpdate(@ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
+	public ResponseEntity<String> DemUpdate(@Valid @ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
 		demonstrationService.updateDemonstration(demonstrationFormDTO);
 		return ResponseEntity.ok("실증 물품 수정 완료");
 	}
@@ -144,6 +145,14 @@ public class DemonstrationController {
 	// 실증 번호를 받아 실증 상품을 삭제하는 기능
 	@DeleteMapping("/DeleteDem")
 	public ResponseEntity<String> demDelete(@RequestParam("demNum") Long demNum) {
+		demonstrationService.deleteDemonstration(demNum);
+		return ResponseEntity.ok("실증 물품 삭제 완료");
+		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
+	}
+	
+	// 실증 등록 수정 페이지에서 실증번호를 받아와 실증 상품의 정보를 받아오는 기능
+	@GetMapping("/SelectOne")
+	public ResponseEntity<String> SelectOne(@RequestParam("demNum") Long demNum) {
 		demonstrationService.deleteDemonstration(demNum);
 		return ResponseEntity.ok("실증 물품 삭제 완료");
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
