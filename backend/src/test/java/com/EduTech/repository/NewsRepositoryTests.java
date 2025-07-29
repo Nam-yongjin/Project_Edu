@@ -2,9 +2,6 @@ package com.EduTech.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,9 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Commit;
 
 import com.EduTech.entity.member.Member;
-import com.EduTech.entity.member.MemberGender;
-import com.EduTech.entity.member.MemberRole;
-import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.news.News;
 import com.EduTech.entity.news.NewsFile;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
@@ -46,7 +40,7 @@ public class NewsRepositoryTests {
 	@Autowired
 	private FileUtil fileutil;
 	
-	private Member adminMember;
+	
 	
 	@MockBean //오류 나는 거 제외하고 테스트(Repository관련만 MockBean해야 함)
 	private DemonstrationReserveRepository demonstrationReserveRepository;
@@ -59,31 +53,32 @@ public class NewsRepositoryTests {
 	@MockBean
 	private DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	
-	@BeforeEach //테스트용 데이터
-    public void setup() {
-        this.adminMember = Member.builder() //필요한 데이터만 설정
-    		    .memId("admin")
-    		    .pw("1234")
-    		    .name("관리자")
-    		    .email("admin@test.com")
-    		    .birthDate(LocalDate.of(2025, 7, 15))
-    		    .gender(MemberGender.MALE)
-    		    .addr("테스트주소")
-    		   	.addrDetail("테스트 상세주소")
-				.checkSms(true)
-				.checkEmail(false)
-				.state(MemberState.NORMAL)
-				.role(MemberRole.ADMIN)
-				.build();
-       
-		memberRepository.save(adminMember);
-	}
+////	@BeforeEach //테스트용 데이터
+//    public void setup() {
+//        this.adminMember = Member.builder() //필요한 데이터만 설정
+//    		    .memId("admin")
+//    		    .pw("1234")
+//    		    .name("관리자")
+//    		    .email("admin@test.com")
+//    		    .birthDate(LocalDate.of(2025, 7, 15))
+//    		    .gender(MemberGender.MALE)
+//    		    .addr("테스트주소")
+//    		   	.addrDetail("테스트 상세주소")
+//				.checkSms(true)
+//				.checkEmail(false)
+//				.state(MemberState.NORMAL)
+//				.role(MemberRole.ADMIN)
+//				.build();
+//       
+//		memberRepository.save(adminMember);
+//	}
 	
 //	@Test
 	@Transactional
 	@DisplayName("언론보도 등록")
 	@Commit //flush()를 사용하려면 commit도 같이 써야함!!
 	public void createTest() {
+		Member adminMember = memberRepository.findById("admin").orElseThrow();
 		News news = News.builder()
 				.title("createTest")
 				.content("언론보도 등록 테스트!!")
@@ -111,6 +106,7 @@ public class NewsRepositoryTests {
 	@DisplayName("언론보도 조회")
 	@Commit
 	public void readTest() {
+		Member adminMember = memberRepository.findById("admin").orElseThrow();
 		News news = News.builder()
 				.title("readTest")
 				.content("언론보도 조회 테스트!!")
@@ -139,6 +135,7 @@ public class NewsRepositoryTests {
 	@DisplayName("언론보도 수정")
 	@Commit
 	public void updateTest() {
+		Member adminMember = memberRepository.findById("admin").orElseThrow();
 		News news = News.builder()
 				.title("기존 제목")
 				.content("기존 내용")
@@ -182,6 +179,7 @@ public class NewsRepositoryTests {
 	@DisplayName("언론보도 삭제")
 	@Commit
 	public void deleteTest() {
+		Member adminMember = memberRepository.findById("admin").orElseThrow();
 		News news = News.builder()
 				.title("deleteTest")
 				.content("언론보도 삭제 테스트!!")
