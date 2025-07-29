@@ -1,6 +1,8 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 
+const Modify = lazy(() => import("../pages/member/company/companyModifyPage"))
+
 const companyRouter = () => {
 
     return [
@@ -10,7 +12,7 @@ const companyRouter = () => {
         },
         {
             path: "modify",
-            element: <Suspense fallback={<Loading />}></Suspense>,
+            element: <Suspense fallback={<Loading />}><Modify /></Suspense>,
         },
 
     ]
