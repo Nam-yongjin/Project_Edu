@@ -108,14 +108,14 @@ const TeacherInfoComponent = () => {
             <div>
                 <input
                     name="addr"
-                    value={form.addr}
+                    value={form.addr ?? ''}
                     disabled={true}
                 />
             </div>
             <div>
                 <input
                     name="addrDetail"
-                    value={form.addrDetail}
+                    value={form.addrDetail ?? ''}
                     disabled={true} />
             </div>
 
