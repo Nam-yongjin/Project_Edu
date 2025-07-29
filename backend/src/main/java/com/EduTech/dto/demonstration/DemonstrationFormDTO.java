@@ -31,7 +31,6 @@ public class DemonstrationFormDTO { // 기업이 실증 물품 dto (프론트->�
 
 	@NotNull(message = "개수는 필수입니다.")
 	@Min(value = 0, message = "0 이상의 값만 입력가능합니다.")
-	@Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
 	private Long itemNum; // 개수
 
 	@NotNull(message="반납 예정일은 필수입니다.")

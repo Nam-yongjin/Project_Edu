@@ -8,9 +8,7 @@ const mapping = `${API_MAPPING}`
 
 // 실증 상품 등록하는 요청
 export const postAdd = async (formData) => {
-    const res = await axios.post(`${host}/addDem`,formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const res = await jwtAxios.post(`${host}/addDem`,formData);
     return res.data;
 }
 
