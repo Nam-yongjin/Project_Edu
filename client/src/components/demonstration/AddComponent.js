@@ -171,15 +171,13 @@ const AddComponent = () => {
 
                     <div className="mt-4 flex justify-end gap-4 pr-2">
                         <button
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow"
-                            onClick={addDem}
-                        >
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 active:bg-blue-800 shadow"
+                            onClick={addDem}>
                             상품 등록
                         </button>
                         <button
-                            className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 shadow"
-                            onClick={moveToReturn}
-                        >
+                            className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 active:bg-gray-600 shadow"
+                            onClick={moveToReturn}>
                             뒤로가기
                         </button>
                     </div>
