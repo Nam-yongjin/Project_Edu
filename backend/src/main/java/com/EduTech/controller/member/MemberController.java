@@ -106,6 +106,7 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('COMPANY', 'ADMIN')")
 	public ResponseEntity<CompanyDetailDTO> companyInfo() {
 		String memId = JWTFilter.getMemId();
+		System.out.println(memId);
 		return ResponseEntity.ok(memberService.readCompanyInfo(memId));
 	}
 

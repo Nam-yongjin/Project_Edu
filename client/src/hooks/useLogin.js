@@ -1,5 +1,5 @@
 import { useNavigate, createSearchParams } from "react-router-dom";
-import { loginPostAsync, logout, login } from "../slices/loginSlice";
+import { logout, login } from "../slices/loginSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { loginPost } from "../api/memberApi";
 

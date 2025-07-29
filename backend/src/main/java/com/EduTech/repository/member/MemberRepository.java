@@ -15,6 +15,8 @@ import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
 
+import jakarta.transaction.Transactional;
+
 public interface MemberRepository extends JpaRepository<Member, String>,JpaSpecificationExecutor<Member>{
 
 	// 아이디 중복 체크
@@ -34,7 +36,7 @@ public interface MemberRepository extends JpaRepository<Member, String>,JpaSpeci
 
 	// 전화번호로 아이디찾기
 	@Query("SELECT m.memId FROM Member m  WHERE m.phone = :phone")
-	Optional<String> findMemIdByPhone(@Param("phone") String phone);
+	String findMemIdByPhone(@Param("phone") String phone);
 
 	// 아이디와 전화번호로 비밀번호 찾기(비빌먼호 변경)
 	@Query("SELECT m FROM Member m  WHERE m.memId = :memId AND m.phone = :phone")
@@ -42,7 +44,8 @@ public interface MemberRepository extends JpaRepository<Member, String>,JpaSpeci
 
 	// 회원탈퇴 신청한지 일주일지난 회원정보 자동삭제(LEAVE로 업데이트한 시각과의 차이를 매일 0시에 비교하고 삭제)
 	@Modifying
-	@Query(value = "DELETE FROM member WHERE role = 'LEAVE' AND updatedAt <= DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
+	@Transactional
+	@Query(value = "DELETE FROM member WHERE state = 'LEAVE' AND updated_at <= DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
 	void deleteMembersAfterOneWeekLeave();
 
 	// 다른 회원의 이메일과 카카오 이메일이 중복되는지 확인
