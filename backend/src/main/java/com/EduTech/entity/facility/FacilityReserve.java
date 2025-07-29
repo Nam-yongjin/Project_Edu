@@ -53,12 +53,7 @@ public class FacilityReserve {
     @JoinColumn(name = "facility_num")
     private Facility facility;		// 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "memId", nullable = false)
-	private Member member;
-    
-    /*
     @Column(nullable = false, length = 30)
     private String memId; 			// 실제 시스템에서는 Member 객체로 연결 가능
-    */
+
 }
