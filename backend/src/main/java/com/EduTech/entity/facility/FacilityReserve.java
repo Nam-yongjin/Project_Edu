@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.EduTech.entity.member.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -50,6 +53,12 @@ public class FacilityReserve {
     @JoinColumn(name = "facility_num")
     private Facility facility;		// 
 
+    @ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "memId", nullable = false)
+	private Member member;
+    
+    /*
     @Column(nullable = false, length = 30)
     private String memId; 			// 실제 시스템에서는 Member 객체로 연결 가능
+    */
 }
