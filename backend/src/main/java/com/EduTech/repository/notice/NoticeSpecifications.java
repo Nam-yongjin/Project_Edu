@@ -81,7 +81,7 @@ public class NoticeSpecifications {
 			//설정한 시간 사이에 작성된 게시물만 필터링
 			if (dto.getStartDate() != null && dto.getEndDate() != null) {
                 predicates.add(cb.between(
-                    root.get("createdAt"),
+                    root.get("created_at"),
                     dto.getStartDate().atStartOfDay(),
                     dto.getEndDate().atTime(23, 59, 59)
                 ));
