@@ -77,7 +77,7 @@ const ResetPwComponent = () => {
                         value={memId}
                         onChange={(e) => setMemId(e.target.value)}
                     />
-                    <button onClick={handleCheckId}>아이디 확인</button>
+                    <button className="border border-black px-1 bg-gray-300 active:bg-gray-400" onClick={handleCheckId}>아이디 확인</button>
                 </>
             )}
 
@@ -99,7 +99,7 @@ const ResetPwComponent = () => {
                         value={pwCheck}
                         onChange={(e) => setPwCheck(e.target.value)}
                     />
-                    <button onClick={handleResetPassword}>비밀번호 재설정</button>
+                    <button className="border border-black px-1 bg-gray-300 active:bg-gray-400" onClick={handleResetPassword}>비밀번호 재설정</button>
                 </>
             )}
         </div>

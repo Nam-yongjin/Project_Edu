@@ -26,7 +26,7 @@ const LoginComponent = () => {
             .then(data => {
                 if (data.error) {
                     alert("아이디와 패스워드를 다시 확인하세요")
-                }else{
+                } else {
                     moveToPath('/')
                 }
             });
