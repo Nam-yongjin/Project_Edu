@@ -1,14 +1,10 @@
 package com.EduTech.security.jwt;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,10 +33,11 @@ public class JWTFilter extends OncePerRequestFilter {
 			Map<String, Object> claims = JWTProvider.validateToken(accessToken);
 
 			String memId = (String) claims.get("memId");
+			String pw = (String) claims.get("pw");
 			String email = (String) claims.get("email");
 			String role = (String) claims.get("role");
 
-			MemberDTO memberDTO = new MemberDTO(memId, email, role);
+			MemberDTO memberDTO = new MemberDTO(memId, pw, email, role);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
 					null, memberDTO.getAuthorities());
