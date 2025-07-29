@@ -20,4 +20,5 @@ public class MemberDetailDTO {
 	private String addrDetail;	// 상세주소
 	private boolean	checkSms;	// SMS수신동의
 	private boolean checkEmail;	// 이메일수신동의
+	private String kakao;
 }

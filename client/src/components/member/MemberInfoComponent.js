@@ -15,13 +15,16 @@ const MemberInfoComponent = () => {
         addrDetail: '',
         checkSms: false,
         checkEmail: false,
-        role: 'MEMBER'
+        role: 'MEMBER',
+        kakao: ''
     });
 
     useEffect(() => {
         const fetchCompanyInfo = async () => {
             try {
                 const data = await readMember();
+
+                const translatedMemId = data.kakao ? "카카오회원" : data.memId;
 
                 // gender 값 변환 처리
                 const translatedGender = data.gender === "MALE"
@@ -33,6 +36,7 @@ const MemberInfoComponent = () => {
                 setForm(prev => ({
                     ...prev,
                     ...data,
+                    memId: translatedMemId,
                     gender: translatedGender
                 }));
             } catch (err) {
@@ -107,14 +111,14 @@ const MemberInfoComponent = () => {
             <div>
                 <input
                     name="addr"
-                    value={form.addr}
+                    value={form.addr ?? ''}
                     disabled={true}
                 />
             </div>
             <div>
                 <input
                     name="addrDetail"
-                    value={form.addrDetail}
+                    value={form.addrDetail ?? ''}
                     disabled={true} />
             </div>
 
