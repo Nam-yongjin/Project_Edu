@@ -88,8 +88,6 @@ public class NoticeRepositoryTests {
 		Notice notice = Notice.builder()
 				.title("createTest")
 				.content("공지사항 등록 테스트!!")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.isPinned(false)
 				.member(adminMember)
 				.build();
@@ -118,8 +116,6 @@ public class NoticeRepositoryTests {
 		Notice notice = Notice.builder()
 				.title("readTest")
 				.content("공지사항 조회 테스트!!")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.isPinned(false)
 				.member(adminMember)
 				.build();
@@ -149,8 +145,6 @@ public class NoticeRepositoryTests {
 		Notice notice = Notice.builder()
 				.title("기존 제목")
 				.content("기존 내용")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.isPinned(false)
 				.member(adminMember)
 				.build();
@@ -195,8 +189,6 @@ public class NoticeRepositoryTests {
 		Notice notice = Notice.builder()
 				.title("deleteTest")
 				.content("공지사항 삭제 테스트!!")
-				.createdAt(LocalDateTime.now())
-				.updatedAt(LocalDateTime.now())
 				.isPinned(false)
 				.member(adminMember)
 				.build();
