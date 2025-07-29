@@ -4,11 +4,10 @@ import { API_SERVER_HOST } from "./config";
 import { API_MAPPING } from "./config";
 
 const host = `${API_SERVER_HOST}/api`;
-const mapping = `${API_MAPPING}`;
-const member = `${host}${mapping.member}`;
-const student = `${host}${mapping.student}`;
-const teacher = `${host}${mapping.teacher}`;
-const company = `${host}${mapping.company}`;
+const member = `${host}${API_MAPPING.member}`;
+const student = `${host}${API_MAPPING.student}`;
+const teacher = `${host}${API_MAPPING.teacher}`;
+const company = `${host}${API_MAPPING.company}`;
 
 // 로그인
 export const loginPost = async (loginParam) => {

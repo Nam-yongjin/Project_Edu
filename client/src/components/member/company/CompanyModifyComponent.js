@@ -1,4 +1,4 @@
-const CompanyModifyComponents = () => {
+const CompanyModifyComponent = () => {
 
 }
-export default CompanyModifyComponents
+export default CompanyModifyComponent
