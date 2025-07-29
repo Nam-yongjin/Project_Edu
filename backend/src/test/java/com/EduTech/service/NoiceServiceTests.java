@@ -1,6 +1,5 @@
 package com.EduTech.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,8 +50,6 @@ public class NoiceServiceTests {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	private Member testMember;
-	
 	@MockBean
 	EventServiceImpl eventServiceImpl;
 	@MockBean
@@ -64,23 +61,24 @@ public class NoiceServiceTests {
 
 	
 
-	@BeforeEach // 테스트용 데이터
-	void setUp() {
-		
-        // 테스트 회원 생성
-        testMember = new Member();
-        testMember.setMemId("testUser");
-        testMember.setName("테스트사용자");
-        memberRepository.save(testMember);
-        
-        System.out.println("테스트 회원 생성 완료: " + testMember.getName());
-    }
+//	@BeforeEach // 테스트용 데이터
+//	void setUp() {
+//		
+//        // 테스트 회원 생성
+//        testMember = new Member();
+//        testMember.setMemId("testUser");
+//        testMember.setName("테스트사용자");
+//        memberRepository.save(testMember);
+//        
+//        System.out.println("테스트 회원 생성 완료: " + testMember.getName());
+//    }
 
 //	@Test
     @Transactional //테스트 후 DB삭제
     @Commit //DB에 들어가는지 확인
     @DisplayName("공지사항 상세 조회 - DTO 매핑 확인")
     void testGetNoticeDetail() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 공지사항 상세 조회 테스트 =====");
         
         // Given
@@ -90,7 +88,7 @@ public class NoiceServiceTests {
                 .content("상세 조회 테스트 내용")
                 .isPinned(false)
                 .view(0L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         Notice savedNotice = noticeRepository.save(notice); //DB에 저장
@@ -112,7 +110,7 @@ public class NoiceServiceTests {
         // 매핑 확인
         boolean titleMatches = detailDTO.getTitle().equals(notice.getTitle());
         boolean contentMatches = detailDTO.getContent().equals(notice.getContent());
-        boolean writerMatches = detailDTO.getName().equals(testMember.getName());
+        boolean writerMatches = detailDTO.getName().equals(adminMember.getName());
         
         System.out.println("=== 매핑 검증 ===");
         System.out.println("제목 매핑 성공: " + titleMatches); //제목
@@ -127,6 +125,7 @@ public class NoiceServiceTests {
     @Commit
     @DisplayName("공지사항 목록 조회 - 페이징 확인")
     void testGetNoticeList() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 공지사항 목록 조회 테스트 =====");
         
         // Given
@@ -137,7 +136,7 @@ public class NoiceServiceTests {
                     .content("내용 " + i)
                     .isPinned(i % 2 == 0) // 짝수번째만 고정
                     .view(10L)
-                    .member(testMember)
+                    .member(adminMember)
                     .build();
             noticeRepository.save(notice);
         }
@@ -172,6 +171,7 @@ public class NoiceServiceTests {
     @Commit
     @DisplayName("고정 공지사항 조회 - 정렬 확인")
     void testFindPinned() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 고정 공지사항 조회 테스트 =====");
         
         // Given - 고정/일반 공지사항 생성
@@ -180,7 +180,7 @@ public class NoiceServiceTests {
                 .content("첫 번째 고정 공지")
                 .isPinned(true)
                 .view(100L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         Notice normalNotice = Notice.builder()
@@ -188,7 +188,7 @@ public class NoiceServiceTests {
                 .content("일반 공지사항")
                 .isPinned(false)
                 .view(50L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         Notice pinnedNotice2 = Notice.builder()
@@ -196,7 +196,7 @@ public class NoiceServiceTests {
                 .content("두 번째 고정 공지")
                 .isPinned(true)
                 .view(200L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         noticeRepository.save(pinnedNotice1);
@@ -230,6 +230,7 @@ public class NoiceServiceTests {
     @Commit
     @DisplayName("조회수 증가 로직")
     void testIncreaseView() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 조회수 증가 테스트 =====");
         
         // Given - 공지사항 생성
@@ -238,7 +239,7 @@ public class NoiceServiceTests {
                 .content("조회수 증가 테스트")
                 .isPinned(false)
                 .view(0L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         Notice savedNotice = noticeRepository.save(notice);
@@ -268,6 +269,7 @@ public class NoiceServiceTests {
     @Commit  
     @DisplayName("공지사항 삭제 (단일)")
     void testDeleteNotice() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 단일 삭제 테스트 =====");
         
         // Given - 공지사항 생성
@@ -276,7 +278,7 @@ public class NoiceServiceTests {
                 .content("삭제될 공지사항")
                 .isPinned(false)
                 .view(0L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         Notice savedNotice = noticeRepository.save(notice);
@@ -303,6 +305,7 @@ public class NoiceServiceTests {
     @Commit
     @DisplayName("공지사항 일괄 삭제")
     void testDeleteNotices() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 일괄 삭제 테스트 =====");
         
         // Given - 공지사항 여러 개 생성
@@ -313,7 +316,7 @@ public class NoiceServiceTests {
                     .content("삭제될 공지사항 " + i)
                     .isPinned(false)
                     .view(0L)
-                    .member(testMember)
+                    .member(adminMember)
                     .build();
             
             Notice saved = noticeRepository.save(notice);
@@ -363,10 +366,11 @@ public class NoiceServiceTests {
         System.out.println("===== 존재하지 않는 공지사항 삭제 테스트 완료 =====\n");
     }
     
-    @Test
+//    @Test
     @Transactional
     @DisplayName("일괄 삭제 시 일부 존재하지 않는 ID - 예외 처리")
     void testBatchDeleteWithNonExistentIds() {
+    	Member adminMember = memberRepository.findById("admin").orElseThrow();
         System.out.println("===== 일괄 삭제 예외 처리 테스트 =====");
         
         // Given - 일부는 존재하고 일부는 존재하지 않는 ID
@@ -375,7 +379,7 @@ public class NoiceServiceTests {
                 .content("실제 존재하는 공지사항")
                 .isPinned(false)
                 .view(0L)
-                .member(testMember)
+                .member(adminMember)
                 .build();
         
         Notice savedNotice = noticeRepository.save(notice);

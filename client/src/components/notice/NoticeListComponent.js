@@ -1,20 +1,25 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const NoticeListComponent = ({ notices, selectedNotices, setSelectedNotices, isAdmin }) => {
+const NoticeListComponent = ({ notices, selectedNotices, setSelectedNotices}) => {
+  const loginState = useSelector((state) => state.loginState);
   const handleCheckboxChange = (noticeNum, isChecked) => {
     if (isChecked) {
       setSelectedNotices([...selectedNotices, noticeNum]);
     } else {
-      setSelectedNotices(selectedNotices.filter((num) => num !== noticeNum))
+      setSelectedNotices(selectedNotices.filter((num) => num !== noticeNum));
     }
   };
+
   return (
     <div>
       <table>
         <thead>
           <tr>
-            {isAdmin && <th>선택</th>}
+            {loginState.role === 'ADMIN' ? (
+            <th>선택</th>
+            ) : (<></>)}
             <th>번호</th>
             <th>제목</th>
             <th>작성자</th>
@@ -23,58 +28,35 @@ const NoticeListComponent = ({ notices, selectedNotices, setSelectedNotices, isA
           </tr>
         </thead>
         <tbody>
-           <tr>
-              <th>1</th>
-              <th>게시글1</th>
-              <th>admin1</th>
-              <th>2015-07-20</th>
-              <th>34</th>
-            </tr>
-            <tr>
-              <th>2</th>
-              <th>게시글2</th>
-              <th>admin2</th>
-              <th>2015-07-23</th>
-              <th>120</th>
-            </tr>
-            <tr>
-              <th>3</th>
-              <th>게시글3</th>
-              <th>admin3</th>
-              <th>2015-07-29</th>
-              <th>10</th>
-            </tr>
           {notices.length === 0 ? (
             <tr>
-              <td colSpan={isAdmin ? 6 : 5}>작성된 공지사항이 없습니다.</td>
+              <td colSpan={loginState.role === "ADMIN" ? 6 : 5}>작성된 공지사항이 없습니다.</td>
             </tr>
           ) : (
             notices.map((notice) => (
               <tr key={notice.noticeNum}>
-              {isAdmin && (
+                {loginState.role === 'ADMIN' ? (
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedNotices.includes(notice.noticeNum)}
+                      onChange={(e) =>
+                        handleCheckboxChange(notice.noticeNum, e.target.checked)
+                      }
+                    />
+                  </td>
+                ) : (<></>)}
+                <td>{notice.noticeNum}</td>
                 <td>
-                  <input 
-                    type="checkbox"
-                    checked={selectedNotices.includes(notice.noticeNum)}
-                    onChange={(e) => 
-                      handleCheckboxChange(notice.noticeNum, e.target.checked)
-                    }
-                  />
+                  <Link to={`/notice/${notice.noticeNum}`}>
+                    {notice.title}
+                  </Link>
                 </td>
-              )}
-              <td>{notice.noticeNum}</td>
-              <td>
-                <Link
-                  to={`/notice/${notice.noticeNum}`}
-                >
-                  {notice.title}
-                </Link>
-              </td>
-              <td>{notice.name}</td>
-              <td>{notice.createdAt}</td>
-              <td>{notice.view}</td>
-            </tr>
-            ))           
+                <td>{notice.name}</td>
+                <td>{notice.createdAt}</td>
+                <td>{notice.view}</td>
+              </tr>
+            ))
           )}
         </tbody>
       </table>
