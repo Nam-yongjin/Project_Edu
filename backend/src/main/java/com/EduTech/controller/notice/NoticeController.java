@@ -41,7 +41,7 @@ public class NoticeController {
 	//공지사항 전체 조회(검색, 페이징)
 	@GetMapping("/NoticeList")
 	public ResponseEntity<Page<NoticeListDTO>> getNoticeList(@ModelAttribute NoticeSearchDTO searchDTO,
-			@PageableDefault(size = 10, sort = "postedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+			@PageableDefault(size = 10, sort = "created_at", direction = Sort.Direction.DESC) Pageable pageable) {
 		return ResponseEntity.ok(noticeService.getNoticeList(searchDTO, pageable));
 	}
 	

@@ -41,14 +41,14 @@ private final NewsService newsService;
 	//언론보도 전체 조회(검색, 페이징)
 	@GetMapping("/NewsList")
 	public ResponseEntity<Page<NewsListDTO>> getNewsList(@ModelAttribute NewsSearchDTO searchDTO,
-			@PageableDefault(size = 10, sort = "postedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+			@PageableDefault(size = 10, sort = "created_at", direction = Sort.Direction.DESC) Pageable pageable) {
 		return ResponseEntity.ok(newsService.getNewsList(searchDTO, pageable));
 	}
 	
 	//언론보도 상세 조회(조회수 증가)
 	@GetMapping("/NewsDetail")
 	public ResponseEntity<NewsDetailDTO> getNewsDetail(@PathVariable Long id) {
-		newsService.increaseView(id); //클릭 시조회수 증가
+		newsService.increaseView(id); //클릭 시 조회수 증가
 		return ResponseEntity.ok(newsService.getNewsDetail(id));
 	}
 	

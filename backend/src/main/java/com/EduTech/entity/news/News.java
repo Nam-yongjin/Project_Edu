@@ -1,6 +1,5 @@
 package com.EduTech.entity.news;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +30,6 @@ public class News extends BaseEntity{
 	private String title; //제목
 	
 	private String content; //내용
-	
-	private LocalDateTime createdAt; //작성일
-	
-	private LocalDateTime updatedAt; //수정일
 	
 	@Builder.Default
 	private Long view = 0L;	//0으로 초기화 해서 Null값 방지
