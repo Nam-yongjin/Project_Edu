@@ -11,19 +11,19 @@ const noticeRouter = () => {
 
     return [
         {
-             path:"noticeList",
+             path:"list",
             element: <Suspense fallback={<Loading />}><NoticeList /></Suspense>,
         },
          {
-            path:"noticeDetail",
+            path:"detail",
             element: <Suspense fallback={<Loading />}><NoticeDetail /></Suspense>,
         },
         {
-            path: "addNotice",
+            path: "add",
             element: <Suspense fallback={<Loading />}><AddNotice /></Suspense>,
         },
         {
-            path: "updateNotice",
+            path: "update",
             element: <Suspense fallback={<Loading />}><UpdateNotice /></Suspense>,
         }     
         
