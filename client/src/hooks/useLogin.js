@@ -1,15 +1,14 @@
-import { useRecoilState, useResetRecoilState } from "recoil";
-import { setCookie, removeCookie } from "../util/cookieUtil";
-import { loginPost } from "../api/memberApi";
 import { useNavigate, createSearchParams } from "react-router-dom";
-import signinState from "../atoms/signinState";
+import { loginPostAsync, logout, login } from "../slices/loginSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loginPost } from "../api/memberApi";
 
 const useLogin = () => {
 
-    const navigate = useNavigate()
-    const [loginState, setLoginState] = useRecoilState(signinState)
-    const isLogin = loginState.memId ? true : false     // 로그인 여부
-    const resetState = useResetRecoilState(signinState)
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const loginState = useSelector((state) => state.loginState) || {};
+    const isLogin = !!loginState.memId;    // 로그인 여부
 
     // 로그인
     const doLogin = async (loginParam) => {
@@ -18,12 +17,11 @@ const useLogin = () => {
             if (result.error) {
                 return result; // 실패면 쿠키 저장하지 않고 리턴
             }
-            saveAsCookie(result);
+            dispatch(login(result));
             return result;
         } catch (ex) {
             console.error("로그인 실패:", ex);
 
-            // 401 에러 메시지를 사용자에게 보여줄 수 있도록
             return {
                 error: true,
                 message: "아이디 또는 비밀번호가 잘못되었습니다."
@@ -33,14 +31,7 @@ const useLogin = () => {
 
     // 로그아웃
     const doLogout = () => {
-        removeCookie('member')
-        resetState()
-    };
-
-    // 1일 동안 쿠키 저장
-    const saveAsCookie = (data) => {
-        setCookie("member", JSON.stringify(data), 1);
-        setLoginState(data);
+        dispatch(logout())
     };
 
     const exceptionHandle = (ex) => {
@@ -58,6 +49,6 @@ const useLogin = () => {
             return
         }
     }
-    return { loginState, isLogin, doLogin, doLogout, saveAsCookie, exceptionHandle }
+    return { loginState, isLogin, doLogin, doLogout, exceptionHandle }
 }
 export default useLogin

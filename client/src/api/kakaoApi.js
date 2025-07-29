@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_SERVER_HOST } from "./config";
 
 const REST_API_KEY = `40a6bcfce5d2ae851c94353d664e94f8`; // REST API키 
-const REDIRECT_URI = `http://localhost:3000/login/kakao`;
+const REDIRECT_URI = `http://127.0.0.1:3000/login/kakao`;
 const AUTH_CODE_PATH = `https://kauth.kakao.com/oauth/authorize`;
 const ACCESS_TOKEN_URL = `https://kauth.kakao.com/oauth/token`;
 const host = `${API_SERVER_HOST}/api`;

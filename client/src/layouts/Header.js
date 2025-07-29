@@ -27,7 +27,6 @@ const Header = () => {
     };
     const handleLogout = () => {
         doLogout();
-        alert("로그아웃 되었습니다.");
         moveToPath('/');
     };
 
