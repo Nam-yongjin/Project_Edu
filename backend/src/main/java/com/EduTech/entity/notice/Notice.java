@@ -1,6 +1,5 @@
 package com.EduTech.entity.notice;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +40,6 @@ public class Notice extends BaseEntity{
 	private String title; //제목
 	
 	private String content; //내용
-	
-	private LocalDateTime createdAt; //작성일
-	
-	private LocalDateTime updatedAt; //수정일
 	
 	@Builder.Default //Builder 사용할 때 기본 값 유지(false)
 	private boolean isPinned = false; //고정여부
