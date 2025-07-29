@@ -53,7 +53,9 @@ public class FacilityReserve {
     @JoinColumn(name = "facility_num")
     private Facility facility;		// 
 
-    @Column(nullable = false, length = 30)
-    private String memId; 			// 실제 시스템에서는 Member 객체로 연결 가능
+    // FK 회원id
+  	@ManyToOne(fetch = FetchType.LAZY)
+  	@JoinColumn(name = "memId", nullable = false)
+  	private Member member; 			// 실제 시스템에서는 Member 객체로 연결 가능
 
 }

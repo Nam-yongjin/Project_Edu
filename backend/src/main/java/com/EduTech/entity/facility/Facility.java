@@ -51,7 +51,7 @@ public class Facility {
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<FacilityImage> images = new ArrayList<>();
 
- // FK 회원id
+    // FK 회원id
  	@ManyToOne(fetch = FetchType.LAZY)
  	@JoinColumn(name = "memId", nullable = false)
  	private Member member;

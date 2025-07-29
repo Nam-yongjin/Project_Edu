@@ -40,7 +40,7 @@ public class FacilityServiceImpl implements FacilityService {
     private final FacilityTimeRepository facilityTimeRepository;
     private final FacilityReserveRepository facilityReserveRepository;
     private final FacilityHolidayRepository facilityHolidayRepository;
-
+    private final MemberRepository memberRepository;
     // 시설 상세 정보 조회 (이미지 포함)
     @Override
     public FacilityDetailDTO getFacilityDetail(String facName) {
@@ -103,17 +103,16 @@ public class FacilityServiceImpl implements FacilityService {
         if (!isReservable(facility.getFacilityNum(), requestDTO.getFacDate(), requestDTO.getStartTime(), requestDTO.getEndTime())) {
             throw new IllegalStateException("해당 시간은 이미 예약되어 있거나 예약할 수 없습니다.");
         }
-        
-        // 회원 정보 조회 및 설정
-//        Member member = memberRepository.findById(requestDTO.getMemId())
-//                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
+        Member member = memberRepository.findById(requestDTO.getMemId())
+        	    .orElseThrow(() -> new RuntimeException("회원 정보가 존재하지 않습니다."));
+        
         FacilityReserve reserve = new FacilityReserve();
         reserve.setFacility(facility);
         reserve.setFacDate(requestDTO.getFacDate());
         reserve.setStartTime(requestDTO.getStartTime());
         reserve.setEndTime(requestDTO.getEndTime());
-        reserve.setMemId(requestDTO.getMemId());
+        reserve.setMember(member);
         reserve.setReserveAt(LocalDateTime.now());
         reserve.setState(FacilityState.WAITING);
 
@@ -123,7 +122,7 @@ public class FacilityServiceImpl implements FacilityService {
     // 내 예약 목록 조회
     @Override
     public List<FacilityReserveListDTO> getMyReservations(String memId) {
-        return facilityReserveRepository.findByMemIdOrderByReserveAtDesc(memId)
+        return facilityReserveRepository.findByMember_MemIdOrderByReserveAtDesc(memId)
                 .stream()
                 .map(r -> {
                     FacilityReserveListDTO dto = new FacilityReserveListDTO();
@@ -146,7 +145,7 @@ public class FacilityServiceImpl implements FacilityService {
                     FacilityReserveAdminDTO dto = new FacilityReserveAdminDTO();
                     dto.setFacRevNum(r.getFacRevNum());
                     dto.setFacName(r.getFacility().getFacName());
-                    dto.setMemId(r.getMemId());
+                    dto.setMemId(r.getMember().getMemId());
                     dto.setFacDate(r.getFacDate());
                     dto.setStartTime(r.getStartTime());
                     dto.setEndTime(r.getEndTime());
@@ -175,7 +174,7 @@ public class FacilityServiceImpl implements FacilityService {
             .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
 
      // 사용자일 경우 본인 예약만 취소 가능
-        if (!isAdmin && !reserve.getMemId().equals(requesterId)) {
+        if (!isAdmin && !reserve.getMember().getMemId().equals(requesterId)) {
             throw new SecurityException("본인의 예약만 취소할 수 있습니다.");
         }
 

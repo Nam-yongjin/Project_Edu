@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,12 @@ import com.EduTech.entity.facility.FacilityReserve;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.entity.facility.FacilityTime;
 import com.EduTech.entity.facility.HolidayReason;
+import com.EduTech.entity.member.Member;
 import com.EduTech.repository.facility.FacilityHolidayRepository;
 import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
 import com.EduTech.repository.facility.FacilityTimeRepository;
+import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.facility.FacilityService;
 
 @SpringBootTest
@@ -54,8 +57,22 @@ class FacilityServiceTest {
     @Autowired
     private FacilityHolidayRepository holidayRepository;
     
+    @Autowired
+    private MemberRepository memberRepository;
 
-    //@Test
+    @BeforeEach
+    void setupMember() {
+        if (!memberRepository.existsById("user1")) {
+            Member member = Member.builder()
+                    .memId("user1")
+                    .name("테스트회원")
+                    .email("user1@test.com")
+                    .build();
+            memberRepository.save(member);
+        }
+    }
+    
+    @Test
     @DisplayName("[1] 시설 상세 정보 조회 테스트 (이미지 포함)")
     void testGetFacilityWithImages() {
         System.out.println("[1] 시설 상세 정보 조회 테스트 시작");
@@ -142,21 +159,30 @@ class FacilityServiceTest {
         System.out.println("[3] 테스트 완료\n");
     }
 
-    //@Test
+    @Test
     @DisplayName("[4] 예약 신청 처리 테스트")
     void testReserveFacility() {
         System.out.println("[4] 예약 신청 처리 테스트 시작");
 
-        // 시설 저장
+        // [1] 사용자 선 저장 (연관관계용)
+        Member member = Member.builder()
+                .memId("user1")
+                .name("테스트 사용자")
+                .email("user1@example.com")
+                .build();
+        memberRepository.save(member);
+
+        // [2] 시설 저장
         Facility facility = facilityRepository.save(Facility.builder()
                 .facName("예약센터")
                 .facInfo("예약정보")
                 .capacity(20)
                 .facItem("의자")
                 .etc("없음")
+                .member(member) // 시설 등록자도 설정하는 경우
                 .build());
 
-        // 예약 DTO 생성
+        // [3] 예약 DTO 생성
         FacilityReserveRequestDTO dto = FacilityReserveRequestDTO.builder()
                 .facName("예약센터")
                 .facDate(LocalDate.now().plusDays(1))
@@ -165,11 +191,11 @@ class FacilityServiceTest {
                 .memId("user1")
                 .build();
 
-        // 예약 신청
-        facilityService.reserveFacility(dto); // <- 여기 수정됨
+        // [4] 예약 신청
+        facilityService.reserveFacility(dto);
 
-        // 예약 검증
-        List<FacilityReserve> reserves = reserveRepository.findByMemIdOrderByReserveAtDesc("user1");
+        // [5] 예약 검증
+        List<FacilityReserve> reserves = reserveRepository.findByMember_MemIdOrderByReserveAtDesc("user1");
         assertThat(reserves).isNotEmpty();
 
         System.out.println("[4] 테스트 완료\n");
@@ -211,20 +237,30 @@ class FacilityServiceTest {
     void testApproveOrReject() {
         System.out.println("[7] 예약 승인/거절 처리 테스트 시작");
 
-        // Step 1. 시설 및 예약 저장
+        // [1] 관리자 회원 생성
+        Member admin = Member.builder()
+                .memId("admin")
+                .name("관리자")
+                .email("admin@test.com")
+                .build();
+        memberRepository.save(admin);
+
+        // [2] 시설 생성
         Facility facility = facilityRepository.save(
                 Facility.builder()
-                	.facName("승인센터")
-                	.facInfo("예약 테스트 시설")
-                	.facItem("책상, 의자")
-                	.capacity(10)
-                	.build()
+                        .facName("승인센터")
+                        .facInfo("예약 테스트 시설")
+                        .facItem("책상, 의자")
+                        .capacity(10)
+                        .member(admin) // 시설 등록자도 연관 적용 가능
+                        .build()
         );
 
+        // [3] 예약 생성
         FacilityReserve reserve = reserveRepository.save(
                 FacilityReserve.builder()
                         .facility(facility)
-                        .memId("admin") // 필수 필드
+                        .member(admin) // ✅ 변경
                         .facDate(LocalDate.now().plusDays(1))
                         .startTime(LocalTime.of(11, 0))
                         .endTime(LocalTime.of(12, 0))
@@ -233,16 +269,16 @@ class FacilityServiceTest {
                         .build()
         );
 
-        // Step 2. 승인 요청 DTO 생성
+        // [4] 승인 요청 DTO
         FacilityReserveApproveRequestDTO approveRequest = new FacilityReserveApproveRequestDTO();
         approveRequest.setFacRevNum(reserve.getFacRevNum());
         approveRequest.setState(FacilityState.APPROVED);
 
-        // Step 3. 승인 처리 메서드 호출
+        // [5] 승인 처리
         boolean result = facilityService.updateReservationState(approveRequest);
         assertThat(result).isTrue();
 
-        // Step 4. 상태 확인
+        // [6] 상태 확인
         FacilityReserve updated = reserveRepository.findById(reserve.getFacRevNum()).orElseThrow();
         assertThat(updated.getState()).isEqualTo(FacilityState.APPROVED);
 
@@ -254,13 +290,26 @@ class FacilityServiceTest {
     void testCancelReserve() {
         System.out.println("[8] 예약 취소 테스트 시작");
 
-        // Step 1. 시설 저장
-        Facility facility = facilityRepository.save(Facility.builder().facName("취소센터").facItem("책상, 의자").build());
+        // [1] 회원 등록
+        Member user3 = Member.builder()
+                .memId("user3")
+                .name("사용자3")
+                .email("user3@test.com")
+                .build();
+        memberRepository.save(user3);
 
-        // Step 2. 예약 저장 (memId는 String)
+        // [2] 시설 등록
+        Facility facility = facilityRepository.save(Facility.builder()
+                .facName("취소센터")
+                .facItem("책상, 의자")
+                .capacity(5)
+                .member(user3) // 시설 등록자 지정
+                .build());
+
+        // [3] 예약 등록
         FacilityReserve reserve = reserveRepository.save(FacilityReserve.builder()
                 .facility(facility)
-                .memId("user3")
+                .member(user3) // ✅ 변경된 부분
                 .facDate(LocalDate.now().plusDays(2))
                 .startTime(LocalTime.of(14, 0))
                 .endTime(LocalTime.of(15, 0))
@@ -268,11 +317,11 @@ class FacilityServiceTest {
                 .state(FacilityState.WAITING)
                 .build());
 
-        // Step 3. 예약 취소 요청 (일반 사용자 시나리오)
+        // [4] 예약 취소 요청 (user3 본인 요청)
         boolean result = facilityService.cancelReservation(reserve.getFacRevNum(), false, "user3");
         assertThat(result).isTrue();
 
-        // Step 4. 상태 확인
+        // [5] 상태 확인
         FacilityReserve found = reserveRepository.findById(reserve.getFacRevNum()).orElseThrow();
         assertThat(found.getState()).isEqualTo(FacilityState.CANCELLED);
 
