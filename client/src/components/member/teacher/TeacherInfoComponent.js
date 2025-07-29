@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import useMove from '../../../hooks/useMove';
-import { readCompany } from '../../../api/memberApi';
+import { readTeacher } from '../../../api/memberApi';
 
-const CompanyInfoComponent = () => {
+const TeacherInfoComponent = () => {
     const { moveToPath } = useMove();
     const [form, setForm] = useState({
         memId: '',
@@ -15,15 +15,14 @@ const CompanyInfoComponent = () => {
         addrDetail: '',
         checkSms: false,
         checkEmail: false,
-        role: 'COMPANY',
-        companyName: '',
-        position: ''
+        role: 'TEACHER',
+        schoolName: ''
     });
 
     useEffect(() => {
         const fetchCompanyInfo = async () => {
             try {
-                const data = await readCompany();
+                const data = await readTeacher();
 
                 // gender 값 변환 처리
                 const translatedGender = data.gender === "MALE"
@@ -46,7 +45,7 @@ const CompanyInfoComponent = () => {
     }, []);
 
     const handleMoveModify = () => {
-        moveToPath(`/company/modify`)
+        moveToPath(`/teacher/modify`)
     }
     const handleMoveLeave = () => {
         if (window.confirm("정말 탈퇴하시겠습니까?")) {
@@ -122,17 +121,9 @@ const CompanyInfoComponent = () => {
 
             <div>
                 <input
-                    name="companyName"
+                    name="schoolName"
                     type="text"
-                    value={form.companyName}
-                    disabled={true} />
-            </div>
-
-            <div>
-                <input
-                    name="position"
-                    type="text"
-                    value={form.position}
+                    value={form.schoolName}
                     disabled={true} />
             </div>
 
@@ -170,4 +161,4 @@ const CompanyInfoComponent = () => {
     );
 };
 
-export default CompanyInfoComponent;
+export default TeacherInfoComponent;

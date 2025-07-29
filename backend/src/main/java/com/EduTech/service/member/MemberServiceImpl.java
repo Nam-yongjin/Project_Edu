@@ -168,6 +168,8 @@ public class MemberServiceImpl implements MemberService {
 		studentDetailDTO.setName(member.getName());
 		studentDetailDTO.setEmail(member.getEmail());
 		studentDetailDTO.setPhone(member.getPhone());
+		studentDetailDTO.setBirthDate(member.getBirthDate());
+		studentDetailDTO.setGender(member.getGender());
 		studentDetailDTO.setAddr(member.getAddr());
 		studentDetailDTO.setAddrDetail(member.getAddrDetail());
 		studentDetailDTO.setCheckSms(member.isCheckSms());
@@ -190,6 +192,8 @@ public class MemberServiceImpl implements MemberService {
 		teacherDetailDTO.setName(member.getName());
 		teacherDetailDTO.setEmail(member.getEmail());
 		teacherDetailDTO.setPhone(member.getPhone());
+		teacherDetailDTO.setBirthDate(member.getBirthDate());
+		teacherDetailDTO.setGender(member.getGender());
 		teacherDetailDTO.setAddr(member.getAddr());
 		teacherDetailDTO.setAddrDetail(member.getAddrDetail());
 		teacherDetailDTO.setCheckSms(member.isCheckSms());
@@ -212,6 +216,8 @@ public class MemberServiceImpl implements MemberService {
 		companyDetailDTO.setName(member.getName());
 		companyDetailDTO.setEmail(member.getEmail());
 		companyDetailDTO.setPhone(member.getPhone());
+		companyDetailDTO.setBirthDate(member.getBirthDate());
+		companyDetailDTO.setGender(member.getGender());
 		companyDetailDTO.setAddr(member.getAddr());
 		companyDetailDTO.setAddrDetail(member.getAddrDetail());
 		companyDetailDTO.setCheckSms(member.isCheckSms());
