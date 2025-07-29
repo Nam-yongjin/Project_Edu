@@ -78,7 +78,7 @@ public class MemberController {
 
 	// 일반회원 상세정보
 	@GetMapping("/member/myInfo")
-	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<MemberDetailDTO> memberInfo() {
 		String memId = JWTFilter.getMemId();
 		return ResponseEntity.ok(memberService.readMemberInfo(memId));
@@ -86,16 +86,15 @@ public class MemberController {
 
 	// 학생회원 상세정보
 	@GetMapping("/student/myInfo")
-	@PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+	@PreAuthorize("hasRole('STUDENT')")
 	public ResponseEntity<StudentDetailDTO> studentInfo() {
 		String memId = JWTFilter.getMemId();
-		System.out.println("memId = " + memId);
 		return ResponseEntity.ok(memberService.readStudentInfo(memId));
 	}
 
 	// 교사회원 상세정보
 	@GetMapping("/teacher/myInfo")
-	@PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
+	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<TeacherDetailDTO> teacherInfo() {
 		String memId = JWTFilter.getMemId();
 		return ResponseEntity.ok(memberService.readTeacherInfo(memId));
@@ -103,10 +102,9 @@ public class MemberController {
 
 	// 기업회원 상세정보
 	@GetMapping("/company/myInfo")
-	@PreAuthorize("hasAnyRole('COMPANY', 'ADMIN')")
+	@PreAuthorize("hasRole('COMPANY')")
 	public ResponseEntity<CompanyDetailDTO> companyInfo() {
 		String memId = JWTFilter.getMemId();
-		System.out.println(memId);
 		return ResponseEntity.ok(memberService.readCompanyInfo(memId));
 	}
 
@@ -142,6 +140,7 @@ public class MemberController {
 	@PreAuthorize("hasRole('COMPANY')")
 	public ResponseEntity<String> modifyCompany(@RequestBody @Valid CompanyModifyDTO companyModifyDTO) {
 		String memId = JWTFilter.getMemId();
+		System.out.println(memId);
 		memberService.modifyCompanyInfo(memId, companyModifyDTO);
 		return ResponseEntity.ok("회원정보가 수정되었습니다.");
 	}
