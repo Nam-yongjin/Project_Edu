@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +40,6 @@ import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
-import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -62,6 +62,9 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	FileUtil fileUtil;
 	@Autowired
 	MemberRepository memberRepository;
+	@Autowired
+	ModelMapper modelMapper;
+
 	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search, Integer pageCount) {
@@ -218,8 +221,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
 		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
 
-		if(ResState==null||ResState.isEmpty())
-		{
+		if (ResState == null || ResState.isEmpty()) {
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
 					.startDate(demonstrationReservationDTO.getStartDate())
 					.endDate(demonstrationReservationDTO.getEndDate()).state(DemonstrationState.WAIT)
@@ -233,15 +235,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			for (LocalDate date = demonstrationReservationDTO.getStartDate(); !date
 					.isAfter(demonstrationReservationDTO.getEndDate()); date = date.plusDays(1)) {
 				DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date).state(true)
-						.demonstration(
-								Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
+						.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
 						.build();
 				demonstrationTimeList.add(demonstrationTime);
 			} // 변경 전 날짜로 부터 변경 후 까지의 날짜의 예약 상태 추가
 				// time 리스트를 저장
 			demonstrationTimeRepository.saveAll(demonstrationTimeList);
-		}
-		else {
+		} else {
 			System.out.println("예약된 날짜가 겹쳐 있습니다.");
 		}
 	}
@@ -285,7 +285,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO,String memId) {
+	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO, String memId) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -295,16 +295,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Long demNum = demonstration.getDemNum();
 
 		System.out.println(memId);
-		Member member = memberRepository.findById(memId)
-			    .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
+		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		DemonstrationRegistration demonstrationRegistration = DemonstrationRegistration.builder()
 				.regDate(LocalDate.now()).expDate(demonstrationFormDTO.getExpDate()).state(DemonstrationState.WAIT)
-				.demonstration(Demonstration.builder().demNum(demNum).build())
-				.member(member).build();
-		
+				.demonstration(Demonstration.builder().demNum(demNum).build()).member(member).build();
+
 		// 실증 등록
 		demonstrationRegistrationRepository.save(demonstrationRegistration);
-		 System.out.println("저장된 Demonstration ID: " + demonstration.getDemNum());
+		System.out.println("저장된 Demonstration ID: " + demonstration.getDemNum());
 		// 폴더에 이미지 저장 (demImages라는 폴더에)
 		List<Object> files = fileUtil.saveFiles(demonstrationFormDTO.getImageList(), "demImages");
 
@@ -371,5 +369,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		// 즉, 엔티티의 cascade 실행하지 않아서 오류가 생김
 		demonstrationRepository.deleteById(demNum);
 
+	}
+
+	// 실증 번호를 받아서 실증 상품의 정보를 받아오는 기능
+	@Override
+	public DemonstrationFormDTO selectOne(Long demNum) {
+		Demonstration entity = demonstrationRepository.findById(demNum)
+				.orElseThrow(() -> new RuntimeException("해당 번호의 실증 정보가 없습니다: " + demNum));
+		DemonstrationFormDTO dto = modelMapper.map(entity, DemonstrationFormDTO.class);
+		return dto;
 	}
 }
