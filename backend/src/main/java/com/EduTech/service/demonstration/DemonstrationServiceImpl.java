@@ -379,7 +379,9 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 				.orElseThrow(() -> new RuntimeException("해당 번호의 실증 정보가 없습니다: " + demNum));
 		DemonstrationFormResDTO dto = modelMapper.map(entity, DemonstrationFormResDTO.class);
 		List<String> imageList=demonstrationImageRepository.selectDemImageUrl(demNum);
+		List<String> imageNameList=demonstrationImageRepository.selectDemImageName(demNum);
 		dto.setImageUrlList(imageList);
+		dto.setImageNameList(imageNameList);
 		dto.setExpDate(demonstrationRegistrationRepository.selectDemRegExpDate(demNum));
 		
 		return dto;
