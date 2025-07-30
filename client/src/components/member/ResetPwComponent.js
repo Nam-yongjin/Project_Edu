@@ -16,7 +16,7 @@ const ResetPwComponent = () => {
         if (!memId) {
             alert('아이디를 입력해주세요.');
             return;
-        }
+        };
 
         checkDuplicateId({ memId })
             .then((res) => {
@@ -24,7 +24,7 @@ const ResetPwComponent = () => {
                     setStep('verifyPhone');
                 } else {
                     alert('존재하지 않는 아이디입니다.');
-                }
+                };
             })
             .catch(() => {
                 alert('아이디 확인 중 오류가 발생했습니다.');
@@ -40,7 +40,7 @@ const ResetPwComponent = () => {
         if (newPassword !== pwCheck) {
             alert('비밀번호가 일치하지 않습니다.');
             return;
-        }
+        };
 
         resetPw({
             memId,
@@ -56,7 +56,7 @@ const ResetPwComponent = () => {
                     alert(error.response.data);
                 } else {
                     alert('비밀번호 재설정 실패: ' + error.message);
-                }
+                };
             });
     };
 

@@ -4,24 +4,26 @@ import useMove from '../../hooks/useMove';
 import { registerMember, checkDuplicateId } from '../../api/memberApi';
 import AddressSearch from './AddressSearch';
 
+const initState = {
+    memId: '',
+    pw: '',
+    pwCheck: '',
+    name: '',
+    email: '',
+    birthDate: '',
+    gender: '',
+    addr: '',
+    addrDetail: '',
+    checkSms: false,
+    checkEmail: false,
+    role: 'MEMBER'
+};
+
 const MemberRegisterComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
     const { moveToLogin } = useMove();
     const [idCheck, setIdCheck] = useState(false);
-    const [form, setForm] = useState({
-        memId: '',
-        pw: '',
-        pwCheck: '',
-        name: '',
-        email: '',
-        birthDate: '',
-        gender: '',
-        addr: '',
-        addrDetail: '',
-        checkSms: false,
-        checkEmail: false,
-        role: 'MEMBER'
-    });
+    const [form, setForm] = useState({ ...initState });
 
     const [errors, setErrors] = useState({});
 
@@ -33,7 +35,7 @@ const MemberRegisterComponent = () => {
             [name]: type === 'checkbox' ? checked : value
         }));
 
-        if (name==='memId'){
+        if (name === 'memId') {
             setIdCheck(false);
         };
     };
@@ -97,7 +99,7 @@ const MemberRegisterComponent = () => {
             ...form,
             phone: verifiedPhone
         };
-        if(!idCheck){
+        if (!idCheck) {
             alert("아이디 중복 확인을 해야합니다.");
             return;
         };
@@ -105,19 +107,7 @@ const MemberRegisterComponent = () => {
         registerMember(dataToSubmit).then((response) => {
             alert('회원가입 완료');
             // 초기화
-            setForm({
-                memId: '',
-                pw: '',
-                pwCheck: '',
-                name: '',
-                email: '',
-                birthDate: '',
-                gender: '',
-                addr: '',
-                addrDetail: '',
-                checkSms: false,
-                checkEmail: false
-            });
+            setForm({ ...initState });
             setVerifiedPhone(null);
             setErrors({});
             moveToLogin();
@@ -138,15 +128,15 @@ const MemberRegisterComponent = () => {
             .then((isDuplicated) => {
                 if (isDuplicated) {
                     alert('이미 사용 중인 아이디입니다.');
-                    setIdCheck(false)
+                    setIdCheck(false);
                 } else {
                     alert('사용 가능한 아이디입니다.');
-                    setIdCheck(true)
+                    setIdCheck(true);
                 };
             })
             .catch((err) => {
                 alert('중복 확인 중 오류 발생');
-                setIdCheck(false)
+                setIdCheck(false);
             });
     };
 

@@ -2,22 +2,24 @@ import { useState, useEffect } from 'react';
 import useMove from '../../../hooks/useMove';
 import { readTeacher } from '../../../api/memberApi';
 
+const initState = {
+    memId: '',
+    name: '',
+    email: '',
+    phone: '',
+    birthDate: '',
+    gender: '',
+    addr: '',
+    addrDetail: '',
+    checkSms: false,
+    checkEmail: false,
+    role: 'TEACHER',
+    schoolName: ''
+};
+
 const TeacherInfoComponent = () => {
     const { moveToPath } = useMove();
-    const [form, setForm] = useState({
-        memId: '',
-        name: '',
-        email: '',
-        phone: '',
-        birthDate: '',
-        gender: '',
-        addr: '',
-        addrDetail: '',
-        checkSms: false,
-        checkEmail: false,
-        role: 'TEACHER',
-        schoolName: ''
-    });
+    const [form, setForm] = useState({ ...initState });
 
     useEffect(() => {
         const fetchCompanyInfo = async () => {
@@ -38,24 +40,24 @@ const TeacherInfoComponent = () => {
                 }));
             } catch (err) {
                 console.error("회원 정보 조회 실패:", err);
-            }
+            };
         };
 
         fetchCompanyInfo();
     }, []);
 
     const handleMoveModify = () => {
-        moveToPath(`/teacher/modify`)
-    }
+        moveToPath(`/teacher/modify`);
+    };
     const handleMoveLeave = () => {
         if (window.confirm("정말 탈퇴하시겠습니까?")) {
-            alert("탈퇴 처리 되었습니다.")
-            moveToPath(`/leave`)
+            alert("탈퇴 처리 되었습니다.");
+            moveToPath(`/leave`);
         } else {
-            alert("탈퇴를 취소했습니다.")
-        }
+            alert("탈퇴를 취소했습니다.");
+        };
 
-    }
+    };
 
     return (
         <div className='space-y-5 mt-10 mx-2 pl-4'>

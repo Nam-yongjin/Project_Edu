@@ -1,11 +1,11 @@
-import TeacherModifyComponent from "../../../components/member/teacher/TeacherModifyComponent"
+import TeacherModifyComponent from "../../../components/member/teacher/TeacherModifyComponent";
 
 const teacherModifyPage = () => {
     return (
         <div>
             <TeacherModifyComponent/>
         </div>
-    )
-}
+    );
+};
 
-export default teacherModifyPage
+export default teacherModifyPage;

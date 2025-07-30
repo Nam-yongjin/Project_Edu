@@ -4,12 +4,7 @@ import useMove from '../../../hooks/useMove';
 import { registerStudent, checkDuplicateId } from '../../../api/memberApi';
 import AddressSearch from '../AddressSearch';
 
-const StudentRegisterComponent = () => {
-    const [verifiedPhone, setVerifiedPhone] = useState(null);
-    const { moveToLogin } = useMove();
-    const [idCheck, setIdCheck] = useState(false);
-    const [form, setForm] = useState({
-        memId: '',
+const initState = {        memId: '',
         pw: '',
         pwCheck: '',
         name: '',
@@ -21,8 +16,13 @@ const StudentRegisterComponent = () => {
         checkSms: false,
         checkEmail: false,
         schoolName: '',
-        role: 'STUDENT'
-    });
+        role: 'STUDENT'};
+
+const StudentRegisterComponent = () => {
+    const [verifiedPhone, setVerifiedPhone] = useState(null);
+    const { moveToLogin } = useMove();
+    const [idCheck, setIdCheck] = useState(false);
+    const [form, setForm] = useState({...initState});
 
     const [errors, setErrors] = useState({});
 
@@ -111,25 +111,13 @@ const StudentRegisterComponent = () => {
         registerStudent(dataToSubmit).then((response) => {
             alert('회원가입 완료');
             // 초기화
-            setForm({
-                memId: '',
-                pw: '',
-                pwCheck: '',
-                name: '',
-                email: '',
-                birthDate: '',
-                gender: '',
-                addr: '',
-                addrDetail: '',
-                checkSms: false,
-                checkEmail: false
-            });
+            setForm({...initState});
             setVerifiedPhone(null);
             setErrors({});
             moveToLogin();
         }).catch((error) => {
             alert('회원가입 실패');
-        })
+        });
 
     };
 
@@ -145,15 +133,15 @@ const StudentRegisterComponent = () => {
             .then((isDuplicated) => {
                 if (isDuplicated) {
                     alert('이미 사용 중인 아이디입니다.');
-                    setIdCheck(false)
+                    setIdCheck(false);
                 } else {
                     alert('사용 가능한 아이디입니다.');
-                    setIdCheck(true)
+                    setIdCheck(true);
                 };
             })
             .catch((err) => {
                 alert('중복 확인 중 오류 발생');
-                setIdCheck(false)
+                setIdCheck(false);
             });
     };
 

@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom"
-import BasicLayout from "../../../layouts/BasicLayout"
+import { Outlet } from "react-router-dom";
+import BasicLayout from "../../../layouts/BasicLayout";
 
 const StudentPage = () => {
     return (
@@ -8,6 +8,6 @@ const StudentPage = () => {
                 <Outlet />
             </BasicLayout>
         </div>
-    )
-}
-export default StudentPage
+    );
+};
+export default StudentPage;

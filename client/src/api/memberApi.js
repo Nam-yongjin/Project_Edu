@@ -29,7 +29,7 @@ export const loginPost = async (loginParam) => {
 
 // 회원가입전 이용약관 및 사용자 역할
 export const registerUser = async () => {
-    const res = await axios.post(`${host}/register`);
+    const res = await axios.get(`${host}/register`);
     return res.data;
 };
 

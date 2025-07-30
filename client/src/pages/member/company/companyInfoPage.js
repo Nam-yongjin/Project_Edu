@@ -1,4 +1,4 @@
-import CompanyInfoComponent from "../../../components/member/company/CompanyInfoComponent"
+import CompanyInfoComponent from "../../../components/member/company/CompanyInfoComponent";
 
 
 const companyInfoPage = () => {
@@ -6,7 +6,7 @@ const companyInfoPage = () => {
         <div>
             <CompanyInfoComponent/>
         </div>
-    )
-}
+    );
+};
 
-export default companyInfoPage
+export default companyInfoPage;

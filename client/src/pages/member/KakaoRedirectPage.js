@@ -8,17 +8,17 @@ import useMove from "../../hooks/useMove";
 // 인가 코드의 페이지 처리
 const KakaoRedirectPage = () => {
 
-    const [searchParams] = useSearchParams()
-    const authCode = searchParams.get("code")
-    const dispatch = useDispatch()
-    const { moveToPath } = useMove()
+    const [searchParams] = useSearchParams();
+    const authCode = searchParams.get("code");
+    const dispatch = useDispatch();
+    const { moveToPath } = useMove();
 
     // 인가 코드가 변경되었을 때 getAccessToken()을 호출
     useEffect(() => {
         if (!authCode) {
             console.warn("authCode 없음");
             return;
-        }
+        };
         getAccessToken(authCode).then(accessToken => {
             getMemberWithAccessToken(accessToken).then(memberInfo => {
                 dispatch(login(memberInfo));
@@ -35,7 +35,7 @@ const KakaoRedirectPage = () => {
         <div>
             카카오 로그인 중입니다...
         </div>
-    )
-}
+    );
+};
 
-export default KakaoRedirectPage
+export default KakaoRedirectPage;

@@ -1,4 +1,4 @@
-import StudentModifyComponent from "../../../components/member/student/StudentModifyComponent"
+import StudentModifyComponent from "../../../components/member/student/StudentModifyComponent";
 
 
 const studentModifyPage = () => {
@@ -6,7 +6,7 @@ const studentModifyPage = () => {
         <div>
             <StudentModifyComponent/>
         </div>
-    )
-}
+    );
+};
 
-export default studentModifyPage
+export default studentModifyPage;

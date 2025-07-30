@@ -1,8 +1,8 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 
-const Info = lazy(() => import("../pages/member/company/companyInfoPage"))
-const Modify = lazy(() => import("../pages/member/company/companyModifyPage"))
+const Info = lazy(() => import("../pages/member/company/companyInfoPage"));
+const Modify = lazy(() => import("../pages/member/company/companyModifyPage"));
 
 const companyRouter = () => {
 
@@ -16,8 +16,8 @@ const companyRouter = () => {
             element: <Suspense fallback={<Loading />}><Modify /></Suspense>,
         },
 
-    ]
+    ];
 
-}
+};
 
-export default companyRouter
+export default companyRouter;

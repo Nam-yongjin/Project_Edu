@@ -4,26 +4,28 @@ import useMove from '../../../hooks/useMove';
 import { registerCompany, checkDuplicateId } from '../../../api/memberApi';
 import AddressSearch from '../AddressSearch';
 
+const initState = {
+    memId: '',
+    pw: '',
+    pwCheck: '',
+    name: '',
+    email: '',
+    birthDate: '',
+    gender: '',
+    addr: '',
+    addrDetail: '',
+    checkSms: false,
+    checkEmail: false,
+    companyName: '',
+    position: '',
+    role: 'STUDENT'
+};
+
 const CompanyRegisterComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
     const { moveToLogin } = useMove();
     const [idCheck, setIdCheck] = useState(false);
-    const [form, setForm] = useState({
-        memId: '',
-        pw: '',
-        pwCheck: '',
-        name: '',
-        email: '',
-        birthDate: '',
-        gender: '',
-        addr: '',
-        addrDetail: '',
-        checkSms: false,
-        checkEmail: false,
-        companyName: '',
-        position: '',
-        role: 'STUDENT'
-    });
+    const [form, setForm] = useState({ ...initState });
 
     const [errors, setErrors] = useState({});
 
@@ -115,19 +117,7 @@ const CompanyRegisterComponent = () => {
         registerCompany(dataToSubmit).then((response) => {
             alert('회원가입 완료');
             // 초기화
-            setForm({
-                memId: '',
-                pw: '',
-                pwCheck: '',
-                name: '',
-                email: '',
-                birthDate: '',
-                gender: '',
-                addr: '',
-                addrDetail: '',
-                checkSms: false,
-                checkEmail: false
-            });
+            setForm({ ...initState });
             setVerifiedPhone(null);
             setErrors({});
             moveToLogin();

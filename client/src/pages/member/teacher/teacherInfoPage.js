@@ -1,11 +1,11 @@
-import TeacherInfoComponent from "../../../components/member/teacher/TeacherInfoComponent"
+import TeacherInfoComponent from "../../../components/member/teacher/TeacherInfoComponent";
 
 const teacherInfoPage = () => {
     return (
         <div>
             <TeacherInfoComponent/>
         </div>
-    )
-}
+    );
+};
 
-export default teacherInfoPage
+export default teacherInfoPage;

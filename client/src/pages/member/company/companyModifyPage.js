@@ -1,4 +1,4 @@
-import CompanyModifyComponents from "../../../components/member/company/CompanyModifyComponent"
+import CompanyModifyComponents from "../../../components/member/company/CompanyModifyComponent";
 
 
 const companyModifyPage = () => {
@@ -6,7 +6,7 @@ const companyModifyPage = () => {
         <div>
             <CompanyModifyComponents/>
         </div>
-    )
-}
+    );
+};
 
-export default companyModifyPage
+export default companyModifyPage;

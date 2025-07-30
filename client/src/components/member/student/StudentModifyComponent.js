@@ -1,4 +1,4 @@
 const StudentModifyComponent = () => {
 
-}
-export default StudentModifyComponent
+};
+export default StudentModifyComponent;

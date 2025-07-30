@@ -1,4 +1,4 @@
-import StudentInfoComponent from "../../../components/member/student/StudentInfoComponent"
+import StudentInfoComponent from "../../../components/member/student/StudentInfoComponent";
 
 
 const studentInfoPage = () => {
@@ -6,7 +6,7 @@ const studentInfoPage = () => {
         <div>
             <StudentInfoComponent/>
         </div>
-    )
-}
+    );
+};
 
-export default studentInfoPage
+export default studentInfoPage;

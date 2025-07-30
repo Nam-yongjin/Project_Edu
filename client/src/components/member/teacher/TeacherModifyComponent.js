@@ -1,4 +1,4 @@
 const TeacherModifyComponent = () => {
 
-}
-export default TeacherModifyComponent
+};
+export default TeacherModifyComponent;
