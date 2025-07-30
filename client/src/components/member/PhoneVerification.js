@@ -62,7 +62,7 @@ const PhoneVerification = ({ onVerified }) => {
             const confirmationResult = await signInWithPhoneNumber(auth, e164Phone, appVerifier);
             window.confirmationResult = confirmationResult;
             setStep(1);
-            setCooldown(180);
+            setCooldown(120);
             alert('인증번호가 전송되었습니다.');
         } catch (error) {
             if (error.code === 'auth/cancelled') {
@@ -107,12 +107,13 @@ const PhoneVerification = ({ onVerified }) => {
             )}
 
             <button
-                type="button"
                 onClick={sendOTP}
+                className="border border-black px-1 bg-gray-300 active:bg-gray-400" 
                 disabled={cooldown > 0 || disable || !isValidPhone(phone)}
             >
                 {cooldown > 0 ? `${cooldown}초 후 재요청 가능` : '인증번호 전송'}
             </button>
+            
 
             {step === 1 && (
                 <>
@@ -123,7 +124,7 @@ const PhoneVerification = ({ onVerified }) => {
                         onChange={e => setOtp(e.target.value)}
                         disabled={disable}
                     />
-                    <button type="button" onClick={verifyOTP} disabled={disable}>
+                    <button className="border border-black px-1 bg-gray-300 active:bg-gray-400" onClick={verifyOTP} disabled={disable}>
                         인증번호 확인
                     </button>
                 </>

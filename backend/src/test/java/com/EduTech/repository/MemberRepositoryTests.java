@@ -104,8 +104,8 @@ public class MemberRepositoryTests {
 		
 	}
 	
-	// 관리자계정
-	@Test
+//	 관리자계정
+//	@Test
 	@Transactional
 	@Commit
 	public void testInsertAdmin() {
@@ -129,6 +129,57 @@ public class MemberRepositoryTests {
 		memberRepository.flush();
 		
 	}
+	
+	// 블랙리스트 계정
+//		@Test
+		@Transactional
+		@Commit
+		public void testInsertBen() {
+
+			Member member = Member.builder()
+					.memId("black")
+					.pw(passwordEncoder.encode("black"))
+					.name("블랙리스트")
+					.email("black@test.com")
+					.birthDate(LocalDate.of(2000, 7, 5))
+					.gender(MemberGender.MALE)
+					.phone("01099999999")
+					.addr("블랙")
+					.addrDetail("리스트")
+					.checkSms(true)
+					.checkEmail(false)
+					.state(MemberState.BEN)
+					.role(MemberRole.STUDENT)
+					.build();
+			memberRepository.save(member);
+			memberRepository.flush();
+			
+		}
+		// 탈퇴 계정
+		@Test
+		@Transactional
+		@Commit
+		public void testInsertLeave() {
+
+			Member member = Member.builder()
+					.memId("leave")
+					.pw(passwordEncoder.encode("leave"))
+					.name("탈퇴")
+					.email("leave@test.com")
+					.birthDate(LocalDate.of(2000, 7, 5))
+					.gender(MemberGender.FEMALE)
+					.phone("01088888888")
+					.addr("탈퇴")
+					.addrDetail("회원")
+					.checkSms(true)
+					.checkEmail(false)
+					.state(MemberState.LEAVE)
+					.role(MemberRole.COMPANY)
+					.build();
+			memberRepository.save(member);
+			memberRepository.flush();
+			
+		}
 	
 //	@Test
 	@Transactional

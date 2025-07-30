@@ -2,12 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { loginPost, readMember } from "../api/memberApi";
 import { setCookie, getCookie, removeCookie } from "../util/cookieUtil";
 import jwtAxios from "../util/jwtUtil";
-
 import { getMemberWithAccessToken, getAccessToken } from "../api/kakaoApi";
+
 const initState = {
     memId: '',
     email: '',
     role: '',
+    state: '',
     accessToken: '',
     refreshToken: ''
 };
@@ -38,10 +39,22 @@ export const loginPostAsync = createAsyncThunk(
 
             // JWT 헤더로 사용자 정보 요청
             const basicInfo = await readMember();
+            console.log(basicInfo.state);
+            // 블랙리스트 또는 탈퇴 회원 처리
+            if (basicInfo.state === 'BEN') {
+                removeCookie("member");
+                return rejectWithValue({ error: true, message: "블랙리스트 회원은 로그인이 불가능합니다." });
+            }
+            if (basicInfo.state === 'LEAVE') {
+                removeCookie("member");
+                return rejectWithValue({ error: true, message: "탈퇴처리된 회원은 로그인이 불가능합니다." });
+            }
+
             const userData = {
                 memId: basicInfo.memId,
                 email: basicInfo.email,
                 role: basicInfo.role,
+                state: basicInfo.state,
                 accessToken,
                 refreshToken
             };
@@ -52,7 +65,7 @@ export const loginPostAsync = createAsyncThunk(
             // 필요한 정보 리턴
             return userData;
         } catch (error) {
-            return rejectWithValue({ error: true, message: "로그인 실패" });
+            return rejectWithValue({ error: true, message: "로그인에 실패했습니다." });
         }
     }
 );
@@ -65,13 +78,25 @@ export const loginSocialAsync = createAsyncThunk(
             const accessToken = await getAccessToken(authCode);
             const memberInfo = await getMemberWithAccessToken(accessToken);
 
+            // 블랙리스트 또는 탈퇴 회원 처리
+            if (memberInfo.state === 'BEN') {
+                removeCookie("member");
+                return rejectWithValue({ error: true, message: "블랙리스트 회원은 로그인이 불가능합니다." });
+            }
+            if (memberInfo.state === 'LEAVE') {
+                removeCookie("member");
+                return rejectWithValue({ error: true, message: "탈퇴처리된 회원은 로그인이 불가능합니다." });
+            }
+
             const userData = {
                 memId: memberInfo.memId,
                 email: memberInfo.email,
                 role: memberInfo.role,
+                state: memberInfo.state,
                 accessToken: memberInfo.accessToken,
                 refreshToken: memberInfo.refreshToken,
             };
+
 
             setCookie("member", JSON.stringify(userData), 1);
             jwtAxios.defaults.headers.common['Authorization'] = `Bearer ${userData.accessToken}`;
@@ -88,7 +113,7 @@ const loginSlice = createSlice({
     name: 'login',
     initialState: loadMemberCookie(),
     reducers: {
-        logout: (state) => {
+        logout: (State) => {
             alert("로그아웃 되었습니다.");
             removeCookie("member");
             return { ...initState };
@@ -96,11 +121,11 @@ const loginSlice = createSlice({
     },
     extraReducers: (builder) => {   // 비동기 호출의 상태에 따라 동작
         builder
-            .addCase(loginPostAsync.fulfilled, (state, action) => {
-                const { memId, email, role, accessToken, refreshToken } = action.payload;
-                Object.assign(state, { memId, email, role, accessToken, refreshToken });
+            .addCase(loginPostAsync.fulfilled, (State, action) => {
+                const { memId, email, role, state, accessToken, refreshToken } = action.payload;
+                Object.assign(State, { memId, email, role, state, accessToken, refreshToken });
             })
-            .addCase(loginPostAsync.rejected, (state, action) => {
+            .addCase(loginPostAsync.rejected, (State, action) => {
                 console.error("로그인 실패", action.payload?.message);
             });
     }

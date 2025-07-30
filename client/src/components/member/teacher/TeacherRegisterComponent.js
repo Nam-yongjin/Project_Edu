@@ -147,7 +147,7 @@ const TeacherRegisterComponent = () => {
     };
 
     return (
-        <div className='space-y-5 mt-10 mx-2 pl-4'>
+        <div className='space-y-5 mt-10 mx-2 pl-4 text-center'>
             <div className='text-3xl'>회원가입</div>
             <div>
                 <input
@@ -217,14 +217,27 @@ const TeacherRegisterComponent = () => {
             </div>
 
             <div>
-                <select
-                    name="gender"
-                    value={form.gender}
-                    onChange={handleChange}>
-                    <option value="">성별 선택</option>
-                    <option value="MALE">남성</option>
-                    <option value="FEMALE">여성</option>
-                </select>
+                <div>성별 선택</div>
+                <label>
+                    <input
+                        type="radio"
+                        name="gender"
+                        value="MALE"
+                        checked={form.gender === 'MALE'}
+                        onChange={handleChange}
+                    />
+                    남성
+                </label>
+                <label className="ml-4">
+                    <input
+                        type="radio"
+                        name="gender"
+                        value="FEMALE"
+                        checked={form.gender === 'FEMALE'}
+                        onChange={handleChange}
+                    />
+                    여성
+                </label>
                 {errors.gender && <div style={{ color: 'red' }}>{errors.gender}</div>}
             </div>
 
