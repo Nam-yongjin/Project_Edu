@@ -5,7 +5,7 @@ const studentRegisterPage = () => {
         <div>
             <StudentRegisterComponent/>
         </div>
-    )
-}
+    );
+};
 
-export default studentRegisterPage
+export default studentRegisterPage;

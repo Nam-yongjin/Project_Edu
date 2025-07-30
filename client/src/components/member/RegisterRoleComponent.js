@@ -2,7 +2,7 @@ import useMove from "../../hooks/useMove";
 import { useState } from "react";
 
 const RegisterRoleComponent = () => {
-    const { moveToPath } = useMove()
+    const { moveToPath } = useMove();
     const [userType, setUserType] = useState('');
 
     const handleSubmit = (e) => {
@@ -10,7 +10,7 @@ const RegisterRoleComponent = () => {
         if (!userType) {
             alert('회원 유형을 선택해주세요.');
             return;
-        }
+        };
         moveToPath(`/register/${userType}`);
     };
     return (
@@ -60,7 +60,7 @@ const RegisterRoleComponent = () => {
             </button>
 
         </div>
-    )
-}
+    );
+};
 
-export default RegisterRoleComponent
+export default RegisterRoleComponent;
