@@ -15,7 +15,7 @@ const demonstrationRouter = () => {
             element: <Suspense fallback={<Loading />}><AddDem /></Suspense>,
         },
         {
-            path: "update",
+            path: "update/:demNum",
             element: <Suspense fallback={<Loading />}><UpdateDem /></Suspense>,
         },
         {

@@ -129,9 +129,9 @@ public class DemonstrationController {
 	@PostMapping("/addDem")
 	public ResponseEntity<String> DemAdd( @Valid @ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
 		System.out.println("컨트롤러 진입");
-		String memId = JWTFilter.getMemId();
+		//String memId = JWTFilter.getMemId();
 		System.out.println(demonstrationFormDTO);
-		demonstrationService.addDemonstration(demonstrationFormDTO,memId);
+		demonstrationService.addDemonstration(demonstrationFormDTO);
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
 
@@ -152,9 +152,10 @@ public class DemonstrationController {
 	
 	// 실증 등록 수정 페이지에서 실증번호를 받아와 실증 상품의 정보를 받아오는 기능
 	@GetMapping("/SelectOne")
-	public ResponseEntity<String> SelectOne(@RequestParam("demNum") Long demNum) {
-		demonstrationService.deleteDemonstration(demNum);
-		return ResponseEntity.ok("실증 물품 삭제 완료");
+	public DemonstrationFormDTO SelectOne(@RequestParam("demNum") Long demNum) {
+		System.out.println("컨트롤러 왓다.");
+		DemonstrationFormDTO dto=demonstrationService.selectOne(demNum);
+		return dto;
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
 	}
 
