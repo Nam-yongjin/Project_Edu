@@ -25,6 +25,10 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(reg.demRegNum,reg.regDate, reg.expDate, reg.state, reg.member.memId, c.companyName, c.position )FROM DemonstrationRegistration reg, Demonstration dem, Company c  WHERE reg.demonstration.demNum=dem.demNum AND reg.member.memId=c.memId AND c.companyName LIKE %:search%")
 	Page<DemonstrationListRegistrationDTO> selectPageDemRegSearch( Pageable pageable,@Param("search") String search);
 	
+	// 실증 기업 신청 페이지에서 반납 날짜를 불러오는 쿼리문
+	@Query("SELECT reg.expDate FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum=:demNum")
+	LocalDate selectDemRegExpDate(@Param("demNum") Long demNum);
+	
 	// 실증 기업 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Modifying 
 	@Transactional

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
@@ -285,7 +286,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO, String memId) {
+	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -294,8 +295,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationRepository.save(demonstration);
 		Long demNum = demonstration.getDemNum();
 
-		System.out.println(memId);
-		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
+		//System.out.println(memId);
+		Member member = memberRepository.findById("tee1694").orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		DemonstrationRegistration demonstrationRegistration = DemonstrationRegistration.builder()
 				.regDate(LocalDate.now()).expDate(demonstrationFormDTO.getExpDate()).state(DemonstrationState.WAIT)
 				.demonstration(Demonstration.builder().demNum(demNum).build()).member(member).build();
@@ -377,6 +378,10 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Demonstration entity = demonstrationRepository.findById(demNum)
 				.orElseThrow(() -> new RuntimeException("해당 번호의 실증 정보가 없습니다: " + demNum));
 		DemonstrationFormDTO dto = modelMapper.map(entity, DemonstrationFormDTO.class);
+		List<MultipartFile> imageList=demonstrationImageRepository.selectDemImageUrl(demNum);
+		dto.setImageList(imageList);
+		dto.setExpDate(demonstrationRegistrationRepository.selectDemRegExpDate(demNum));
+		
 		return dto;
 	}
 }

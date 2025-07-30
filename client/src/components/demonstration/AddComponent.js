@@ -8,43 +8,42 @@ import "react-datepicker/dist/react-datepicker.css";
 const AddComponent = () => {
     const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date() }; // form에서 받을 데이터 초기값
 
-    const [fileInputs, setFileInputs] = useState([Date.now()]); // fileInput의 값을 현재 시간으로 하여 구별할것 (처음 input은 잇어야 하므로)
     const [images, setImages] = useState([]); // 이미지 배열 공백 지정
     const [dem, setDem] = useState({ ...initState }); // from받을 데이터 초기값 지정
     const [returnDate, setReturnDate] = useState(new Date()); // react datepicker 상태값 저장
     const { moveToPath, moveToReturn } = useMove(); // useMove에서 가져온 모듈들
+    const [errors, setErrors] = useState({});
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
 
-    const handleFileChange = (id, e) => { // 파일 선택이 됬을 경우, 
-        const files = Array.from(e.target.files); // 현재 파일을 files에 담고
-        if (files.length === 0) {
-            setFileInputs((prev) => {
-                if (prev.length > 1) {
-                    setImages(prevImages => {
-                        const removeIndex = prev.findIndex(inputId => inputId === id);
-                        return prevImages.filter((_, index) => index !== removeIndex);
-                    });
-                    return prev.filter((inputId) => inputId !== id);
-                }
-                return prev;
-            });
-            return;
-        }
-
-        const newPreviews = files.map((file) => ({ // Images에 저장할 객체들
-            file,
-            url: URL.createObjectURL(file), // 브라우저에서 업로드한 파일의 임시 URL을 만들어주는 함수
-            name: file.name,
-            inputId: id
-        }));
-
-        setImages((prev) => [...prev, ...newPreviews]); // 기존 이미지 배열+새로 만든 이미지 추가
-
-        if (fileInputs[fileInputs.length - 1] === id) { // fileInputs가 현재 input의 id라면 input태그 추가
-            setFileInputs((prev) => [...prev, Date.now()]);
-        }
-    };
 
     const addDem = () => {
+
+        const newErrors = {};
+        if (!dem.demName.trim()) newErrors.demName = "물품명은 필수입니다.";
+        if (!dem.demMfr.trim()) newErrors.demMfr = "제조사는 필수입니다.";
+        if (!dem.demInfo.trim()) newErrors.demInfo = "물품 설명은 필수입니다.";
+        // 이미지 1개 이상 체크
+        if (images.length === 0) newErrors.images = "이미지는 최소 1장 등록해야 합니다.";
+        // 수량 1 이상 정수 체크
+        if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 1) {
+            newErrors.itemNum = "수량은 0이상이여야 합니다.";
+        }
+
+        // 날짜가 오늘 이후인지 체크
+        const today = new Date();
+        // 비교할 때 시간 제거 (00:00:00으로 맞춤)
+        const selectedDate = new Date(dem.expDate);
+        selectedDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate <= today) {
+            newErrors.expDate = "반납 날짜는 오늘 이후여야 합니다.";
+        }
+
+        setErrors(newErrors);
+
+        // 2) 오류가 있으면 submit 중단
+        if (Object.keys(newErrors).length > 0) return;
         const formData = new FormData();
         for (let i = 0; i < images.length; i++) {
             formData.append("imageList", images[i].file);
@@ -71,24 +70,23 @@ const AddComponent = () => {
         setDem((prev) => ({ ...prev, expDate: date }));
     };
 
-    const fileDelete = (indexToRemove) => {
+     const handleFileChange = (e) => { // 파일 선택이 됬을 경우, 
+        const files = Array.from(e.target.files); // 현재 파일을 files에 담고
+        const filePreviews = files.map(file => ({
+            file,
+            url: URL.createObjectURL(file),
+            name: file.name
+        }));
+        setImages(filePreviews);
+    };
+
+    const fileDelete = (imgToDelete) => {
         setImages((prevImages) => {
-            const removedInputId = prevImages[indexToRemove]?.inputId;
-
-            // 삭제할 이미지 제외
-            const newImages = prevImages.filter((_, idx) => idx !== indexToRemove);
-
-            // 해당 inputId와 연결된 이미지가 더 이상 없으면 fileInputs에서도 제거
-            const stillHasInputId = newImages.some(img => img.inputId === removedInputId);
-
-            setFileInputs((prevInputs) => {
-                if (!stillHasInputId) {
-                    const filteredInputs = prevInputs.filter(id => id !== removedInputId);
-                    return filteredInputs.length > 0 ? filteredInputs : [Date.now()];
-                }
-                return prevInputs;
-            });
-
+            const newImages = prevImages.filter(img => img.url !== imgToDelete.url);
+            // 만약 삭제 후 이미지가 하나도 없으면 input 리셋용 key 변경
+            if (newImages.length === 0) {
+                setFileInputKey(Date.now()); // input 태그 재렌더링 유도
+            }
             return newImages;
         });
     };
@@ -100,13 +98,14 @@ const AddComponent = () => {
                     <label className="text-xl font-semibold w-[120px]">물품명:</label>
                     <input
                         type="text"
-                        placeholder="제품 이름을 입력해주세요."
+                        placeholder="물품 이름을 입력해주세요."
                         className="border p-3 text-lg flex-1 min-w-0 box-border"
                         name="demName"
                         value={dem.demName}
                         onChange={handleChangeDem}
                     />
                 </div>
+                {errors.demName && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.demName}</p>}
                 <div className="flex items-center">
                     <label className="text-xl font-semibold w-[120px]">제조사:</label>
                     <input
@@ -118,6 +117,7 @@ const AddComponent = () => {
                         onChange={handleChangeDem}
                     />
                 </div>
+                {errors.demMfr && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.demMfr}</p>}
                 <div className="flex items-center">
                     <label className="text-xl font-semibold w-[120px]">개수:</label>
                     <input
@@ -129,17 +129,19 @@ const AddComponent = () => {
                         onChange={handleChangeDem}
                     />
                 </div>
+                {errors.itemNum && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.itemNum}</p>}
                 <div className="flex items-start">
                     <label className="text-xl font-semibold w-[120px] pt-3">소개:</label>
                     <textarea
                         rows={5}
-                        placeholder="제품 소개를 입력해주세요."
+                        placeholder="물품 소개를 입력해주세요."
                         className="border p-3 text-lg flex-1 resize-y min-w-0 box-border"
                         name="demInfo"
                         value={dem.demInfo}
                         onChange={handleChangeDem}
                     />
                 </div>
+                {errors.demInfo && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.demInfo}</p>}
 
                 <div className="flex items-center">
                     <label className="text-xl font-semibold w-[120px]">반납 날짜:</label>
@@ -154,20 +156,21 @@ const AddComponent = () => {
                         locale={ko}
                     />
                 </div>
-
+                {errors.expDate && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.expDate}</p>}
                 <div>
-                    {fileInputs.map((id, index) => (
-                        <div key={id} className="flex items-center mt-3">
-                            <label className="text-xl font-semibold w-[120px]">이미지{index + 1}:</label>
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={(e) => handleFileChange(id, e)}
-                                className="border p-2 text-base flex-1 cursor-pointer min-w-0 box-border"
-                            />
-                        </div>
-                    ))}
+                    <div className="flex items-center mt-3">
+                        <label className="text-xl font-semibold w-[120px]">이미지:</label>
+                        <input
+                            key={fileInputKey}
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => handleFileChange(e)}
+                            className="border p-2 text-base flex-1 cursor-pointer min-w-0 box-border"
+                        />
+                        {errors.images && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.images}</p>}
+                    </div>
+
 
                     <div className="mt-4 flex justify-end gap-4 pr-2">
                         <button
@@ -185,12 +188,11 @@ const AddComponent = () => {
             </div>
 
             <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
-                {images.map((img, index) => (
-                    <div key={index} className="flex flex-col items-start">
-                        <button className="w-full text-right" onClick={() => fileDelete(index)}>x</button>
+                {images.map((img) => (
+                    <div className="flex flex-col items-start">
+                        <button className="w-full text-right" onClick={() => fileDelete(img)}>x</button>
                         <img
                             src={img.url}
-                            alt={`선택된 이미지 ${index + 1}`}
                             className="w-32 h-32 object-cover rounded-md border shadow mb-1"
                         />
                         <p className="text-sm text-gray-600 break-all">{img.name}</p>
