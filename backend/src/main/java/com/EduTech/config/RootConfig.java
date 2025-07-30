@@ -30,10 +30,11 @@ public class RootConfig {
         		mapper.skip(EventInfo::setApplyAt);     // 등록일은 null로 덮어쓰지 않도록 방지
         	});
 
+		// Demonstration -> DemonstrationFormResDTO 매핑 간에 오류가 잇어 충돌나는 칼럼에 대해 skip 처리
 		modelMapper.typeMap(Demonstration.class, DemonstrationFormResDTO.class)
 	    .addMappings(mapper -> {
 	        mapper.skip(DemonstrationFormResDTO::setImageUrlList);
-	        mapper.skip(DemonstrationFormResDTO::setExpDate);
+	        mapper.skip(DemonstrationFormResDTO::setImageNameList);
 	    });
 		return modelMapper;
 	}
