@@ -1,114 +1,110 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginPost, readMember, readStudent, readTeacher, readCompany } from "../api/memberApi";
+import { loginPost, readMember } from "../api/memberApi";
 import { setCookie, getCookie, removeCookie } from "../util/cookieUtil";
 import jwtAxios from "../util/jwtUtil";
 
+import { getMemberWithAccessToken, getAccessToken } from "../api/kakaoApi";
 const initState = {
     memId: '',
     email: '',
-    role: ''
+    role: '',
+    accessToken: '',
+    refreshToken: ''
 };
+
 const loadMemberCookie = () => {
     const memberInfo = getCookie("member");
-
-    // 이미 객체일 경우 대비 처리
     if (!memberInfo) return initState;
-
-    if (typeof memberInfo === 'object') {
-        return memberInfo;
-    };
-
     try {
-        return JSON.parse(memberInfo);
-    } catch (e) {
-        console.error("쿠키 파싱 실패", e);
+        return typeof memberInfo === 'object' ? memberInfo : JSON.parse(memberInfo);
+    } catch {
         return initState;
     };
 };
 
-// 역할별 myInfo 호출
-const fetchUserInfoByRole = async (role) => {
-    switch (role) {
-        case "STUDENT":
-            return await readStudent();
-        case "TEACHER":
-            return await readTeacher();
-        case "COMPANY":
-            return await readCompany();
-        default:
-            return await readMember();
-    };
-};
-
-// 로그인 후 토큰 저장 및 사용자 정보(메인 + 상세) 가져오기
+// 로그인 후 토큰 저장 및 사용자 정보 가져오기
 export const loginPostAsync = createAsyncThunk(
-    'loginPostAsync',
-    async (loginParam) => {
-        // 1) 로그인 요청 및 accessToken 받기
-        const loginRes = await loginPost(loginParam);
-        const token = loginRes.accessToken;
+    'login/loginPostAsync',
+    async (loginParam, { rejectWithValue }) => {
+        try {
+            // 로그인 요청 및 accessToken 받기
+            const loginRes = await loginPost(loginParam);
+            const { accessToken, refreshToken } = loginRes;
 
-        // 2) 토큰 쿠키에 저장 및 axios 헤더 설정
-        setCookie("accessToken", token, 1);
-        jwtAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            // 토큰만 저장
+            setCookie("member", JSON.stringify({ accessToken, refreshToken }), 1);
+            // readMember()를 위해 jwtAxios에 Authorization 헤더 설정
+            jwtAxios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-        // 3) 기본 회원정보 조회 (role 포함)
-        const basicInfo = await readMember();
-        const role = basicInfo.role;
+            // JWT 헤더로 사용자 정보 요청
+            const basicInfo = await readMember();
+            const userData = {
+                memId: basicInfo.memId,
+                email: basicInfo.email,
+                role: basicInfo.role,
+                accessToken,
+                refreshToken
+            };
 
-        // 4) role별 상세 정보 조회 함수 호출
-        const detailedInfo = await fetchUserInfoByRole(role);
+            // 전체 유저 데이터로 다시 저장
+            setCookie("member", JSON.stringify(userData), 1);
 
-        // 5) 필요한 정보 리턴
-        return {
-            memId: detailedInfo.memId,
-            email: detailedInfo.email,
-            role: role,
-        };
+            // 필요한 정보 리턴
+            return userData;
+        } catch (error) {
+            return rejectWithValue({ error: true, message: "로그인 실패" });
+        }
     }
 );
 
-const loginSlice = createSlice({
-    name: 'loginSlice',
-    initialState: loadMemberCookie() || initState, // 쿠키가 없다면 초기값 사용 초기 상태(state)를 설정
-    reducers: {
-        login: (state, action) => { //  dispatch(login(memberInfo)) 여기서 action 호출
-            // action.payload로 데이터 받은 후 return 시 ,state에 값 저장
-            alert("로그인 되었습니다.")
-            const payload = action.payload;
+// 소셜 로그인 (카카오 등)
+export const loginSocialAsync = createAsyncThunk(
+    'login/loginSocialAsync',
+    async (authCode, { rejectWithValue }) => {
+        try {
+            const accessToken = await getAccessToken(authCode);
+            const memberInfo = await getMemberWithAccessToken(accessToken);
 
-            if (!payload.error) {
-                setCookie("member", JSON.stringify(payload), 1);    // 쿠키 저장
-                state.memId = payload.memId || '';
-                state.email = payload.email || '';
-                state.role = payload.role || '';
-            }
-        },
-        logout: (state, action) => {
-            alert("로그아웃 되었습니다.")
-            removeCookie("member")
+            const userData = {
+                memId: memberInfo.memId,
+                email: memberInfo.email,
+                role: memberInfo.role,
+                accessToken: memberInfo.accessToken,
+                refreshToken: memberInfo.refreshToken,
+            };
+
+            setCookie("member", JSON.stringify(userData), 1);
+            jwtAxios.defaults.headers.common['Authorization'] = `Bearer ${userData.accessToken}`;
+
+            return userData;
+        } catch (error) {
+            return rejectWithValue({ error: true, message: "소셜 로그인 실패" });
+        }
+    }
+);
+
+
+const loginSlice = createSlice({
+    name: 'login',
+    initialState: loadMemberCookie(),
+    reducers: {
+        logout: (state) => {
+            alert("로그아웃 되었습니다.");
+            removeCookie("member");
             return { ...initState };
         }
     },
-    extraReducers: (builder) => { // 비동기 호출의 상태에 따라 동작하는 extraReducers
+    extraReducers: (builder) => {   // 비동기 호출의 상태에 따라 동작
         builder
-            .addCase(loginPostAsync.pending, (state, action) => {
-                console.log("pending"); // 비동기 요청 시작
-            })
             .addCase(loginPostAsync.fulfilled, (state, action) => {
-                const payload = action.payload;
-
-                setCookie('member', JSON.stringify(payload), 1);
-
-                state.memId = payload.memId;
-                state.email = payload.email;
-                state.role = payload.role;
+                const { memId, email, role, accessToken, refreshToken } = action.payload;
+                Object.assign(state, { memId, email, role, accessToken, refreshToken });
             })
-            .addCase(loginPostAsync.rejected, () => {
-                console.log("로그인 실패");
+            .addCase(loginPostAsync.rejected, (state, action) => {
+                console.error("로그인 실패", action.payload?.message);
             });
     }
 });
 
-export const { login, logout } = loginSlice.actions;
+export const { logout } = loginSlice.actions;
 export default loginSlice.reducer;

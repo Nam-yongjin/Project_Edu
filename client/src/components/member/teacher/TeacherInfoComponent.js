@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useMove from '../../../hooks/useMove';
-import { readTeacher } from '../../../api/memberApi';
+import { readTeacher, leaveMember } from '../../../api/memberApi';
 
 const initState = {
     memId: '',
@@ -52,7 +52,7 @@ const TeacherInfoComponent = () => {
     const handleMoveLeave = () => {
         if (window.confirm("정말 탈퇴하시겠습니까?")) {
             alert("탈퇴 처리 되었습니다.");
-            moveToPath(`/leave`);
+            leaveMember();
         } else {
             alert("탈퇴를 취소했습니다.");
         };

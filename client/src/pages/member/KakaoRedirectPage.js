@@ -1,41 +1,36 @@
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { getAccessToken, getMemberWithAccessToken } from "../../api/kakaoApi";
-import { login } from "../../slices/loginSlice";
 import { useDispatch } from "react-redux";
 import useMove from "../../hooks/useMove";
+import { loginSocialAsync } from "../../slices/loginSlice";
 
 // 인가 코드의 페이지 처리
 const KakaoRedirectPage = () => {
-
     const [searchParams] = useSearchParams();
     const authCode = searchParams.get("code");
     const dispatch = useDispatch();
     const { moveToPath } = useMove();
 
-    // 인가 코드가 변경되었을 때 getAccessToken()을 호출
+    // 인가 코드가 변경되었을 때 loginSocialAsync안의 getAccessToken() 호출
     useEffect(() => {
         if (!authCode) {
-            console.warn("authCode 없음");
+            alert("인가 코드가 존재하지 않습니다.");
             return;
-        };
-        getAccessToken(authCode).then(accessToken => {
-            getMemberWithAccessToken(accessToken).then(memberInfo => {
-                dispatch(login(memberInfo));
+        }
+
+        dispatch(loginSocialAsync(authCode))
+            .unwrap()
+            .then(() => {
+                alert("카카오 계정으로 로그인 되었습니다.");
                 moveToPath("/");
-            }).catch(err => {
-                console.error("memberInfo 조회 실패", err);
+            })
+            .catch((err) => {
+                alert("카카오 로그인 실패.");
+                moveToPath("/login");
             });
-        }).catch(err => {
-            console.error("accessToken 발급 실패", err);
-        });
     }, [authCode]);
 
-    return (
-        <div>
-            카카오 로그인 중입니다...
-        </div>
-    );
+    return <div>카카오 로그인 중입니다...</div>;
 };
 
 export default KakaoRedirectPage;
