@@ -104,8 +104,11 @@ public class FacilityController {
 */    
     //관치자 에약 취소
     @PatchMapping("/admin/reservation/{facRevNum}/cancel")
-    public ResponseEntity<?> adminCancel(@PathVariable Long facRevNum) {
-        boolean success = facilityService.cancelReservation(facRevNum, true, null);
+    public ResponseEntity<?> adminCancel(
+            @PathVariable Long facRevNum,
+            @RequestParam String requesterId  // 예: 로그인한 관리자 ID
+    ) {
+        boolean success = facilityService.cancelReservation(facRevNum, requesterId);
         return ResponseEntity.ok(success ? "강제 취소 완료" : "취소 실패");
     }
     
