@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ko } from "date-fns/locale";
 import { getOne, putUpdate } from "../../api/demApi";
+import { urlListToFileList } from "../../api/urlToFileApi";
 import useMove from "../../hooks/useMove";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,21 +14,20 @@ const UpdateComponent = ({ demNum }) => {
     const [returnDate, setReturnDate] = useState(new Date()); // react datepicker 상태값 저장
     const [errors, setErrors] = useState({}); // 폼창 예외 처리 메시지를 띄우기 위한 상태값
     const { moveToPath, moveToReturn } = useMove(); // useMove에서 가져온 모듈들
-    
-    useEffect(() => {
-    getOne(demNum).then(data => {
-        setDem(data);
-        setReturnDate(new Date(data.expDate + "T00:00:00"));
-        console.log(data.imageUrlList);
-        if (data.imageUrlList && data.imageUrlList.length > 0) {
-            const existingImages = data.imageUrlList.map((img, index) => ({
-                file: null,           // 기존 파일 객체가 없으므로 null
-                 url: img,            // img가 이미지 URL이라 가정
-                name: `기존 이미지 ${index + 1}` // 필요하면 실제 이름이 있으면 대체 가능
-            }));
-            setImages(existingImages);
-        }
-    })
+    const serverHost = "http://localhost:8090/";
+   useEffect(() => {
+  const loadData = async () => {
+    const data = await getOne(demNum);
+    setDem(data);
+    setReturnDate(new Date(data.expDate + "T00:00:00"));
+
+    if (data.imageUrlList && data.imageUrlList.length > 0) {
+        const fullUrls = data.imageUrlList.map(img => serverHost + img);
+      const fileList = await urlListToFileList(fullUrls,data.imageNameList);
+      setImages(fileList); // file, name, url 포함됨
+    }
+  };
+  loadData();
 }, [demNum]);
  // useEffect를 사용하면 최초 1회, 그리고 의존성 배열이 있을경우,
     // 의존성 배열 변경 시 실행된다.
