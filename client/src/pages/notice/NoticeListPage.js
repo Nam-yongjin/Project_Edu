@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import useMove from "../../hooks/useMove";
 import NoticeListComponent from "../../components/notice/NoticeListComponent";
 import NoticeTitleComponent from "../../components/notice/NoticeTitleComponent";
+import { NoticeList, NoticeAllList } from "../../api/noticeApi";
 
 const NoticeListPage = () => {
   const loginState = useSelector((state) => state.loginState);
@@ -13,6 +14,11 @@ const NoticeListPage = () => {
   const [selectedNotices, setSelectedNotices] = useState([]);
   const [search, setSearch] = useState("");
   const [searchType, setSearchType] = useState("title");
+  const [searchValues, setSearchValues] = useState({
+    title: "",
+    content: "",
+    name: "",
+  })
 
   const fetchNotices = async () => {
     try {
@@ -39,6 +45,18 @@ const NoticeListPage = () => {
     moveToPath("/notice/add");
   };
 
+  const handleTypeChange = (e) => {
+    setSearchType(e.target.value);
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchValues((prev) => ({
+      ...prev,
+      [searchType]: value, // 현재 선택된 타입에 따라 값 저장
+    }));
+  };
+
   const handleDelete = async () => {
     if (selectedNotices.length === 0) {
       alert("삭제할 공지를 선택해 주세요.");
@@ -60,7 +78,11 @@ const NoticeListPage = () => {
   };
 
   useEffect(() => {
-    fetchNotices();
+    // fetchNotices();
+     NoticeAllList()
+      .then(data => {
+        console.log(data);
+      })
   }, []);
 
   return (
@@ -69,7 +91,7 @@ const NoticeListPage = () => {
 
       {/* 검색창 */}
       <div>
-        <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+        <select value={searchType} onChange={handleInputChange}>
           <option value="title">제목</option>
           <option value="content">내용</option>
           <option value="name">작성자</option>

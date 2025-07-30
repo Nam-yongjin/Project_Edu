@@ -87,7 +87,7 @@ public class NoiceServiceTests {
                 .title("상세 조회 테스트")
                 .content("상세 조회 테스트 내용")
                 .isPinned(false)
-                .view(0L)
+                .viewCount(0L)
                 .member(adminMember)
                 .build();
         
@@ -103,7 +103,7 @@ public class NoiceServiceTests {
         System.out.println("제목: " + detailDTO.getTitle());
         System.out.println("내용: " + detailDTO.getContent());
         System.out.println("작성자: " + detailDTO.getName());
-        System.out.println("조회수: " + detailDTO.getView());
+        System.out.println("조회수: " + detailDTO.getViewCount());
 
         System.out.println("작성일: " + detailDTO.getCreatedAt());
         
@@ -135,7 +135,7 @@ public class NoiceServiceTests {
                     .title("공지사항 " + i)
                     .content("내용 " + i)
                     .isPinned(i % 2 == 0) // 짝수번째만 고정
-                    .view(10L)
+                    .viewCount(10L)
                     .member(adminMember)
                     .build();
             noticeRepository.save(notice);
@@ -145,7 +145,7 @@ public class NoiceServiceTests {
         // When - 목록 조회
         NoticeSearchDTO searchDTO = new NoticeSearchDTO();
         Pageable pageable = PageRequest.of(0, 3); //페이지 크기 3
-        Page<NoticeListDTO> result = noticeService.getNoticeList(searchDTO, pageable);
+        Page<NoticeListDTO> result = noticeService.getNoticeList(searchDTO);
 
         // Then - 결과 확인
         System.out.println("=== 페이징 결과 ===");
@@ -159,7 +159,7 @@ public class NoiceServiceTests {
             NoticeListDTO dto = result.getContent().get(i);
             System.out.println((i+1) + ". " + dto.getTitle() + 
                              " (작성자: " + dto.getName() + 
-                             ", 조회수: " + dto.getView() + 
+                             ", 조회수: " + dto.getViewCount() + 
                              ", 고정: " + dto.isPinned() + ")");
         }
         
@@ -179,7 +179,7 @@ public class NoiceServiceTests {
                 .title("고정 공지 1")
                 .content("첫 번째 고정 공지")
                 .isPinned(true)
-                .view(100L)
+                .viewCount(100L)
                 .member(adminMember)
                 .build();
         
@@ -187,7 +187,7 @@ public class NoiceServiceTests {
                 .title("일반 공지")
                 .content("일반 공지사항")
                 .isPinned(false)
-                .view(50L)
+                .viewCount(50L)
                 .member(adminMember)
                 .build();
         
@@ -195,7 +195,7 @@ public class NoiceServiceTests {
                 .title("고정 공지 2")
                 .content("두 번째 고정 공지")
                 .isPinned(true)
-                .view(200L)
+                .viewCount(200L)
                 .member(adminMember)
                 .build();
         
@@ -204,7 +204,7 @@ public class NoiceServiceTests {
         noticeRepository.save(pinnedNotice2);
 
         // When - 고정 공지사항만 조회
-        List<NoticeListDTO> pinnedList = noticeService.findPinned();
+        List<NoticeListDTO> pinnedList = noticeService.getPinnedNotices();
 
         // Then - 결과 확인
         System.out.println("=== 고정 공지사항 조회 결과 ===");
@@ -238,28 +238,28 @@ public class NoiceServiceTests {
                 .title("조회수 테스트")
                 .content("조회수 증가 테스트")
                 .isPinned(false)
-                .view(0L)
+                .viewCount(0L)
                 .member(adminMember)
                 .build();
         
         Notice savedNotice = noticeRepository.save(notice);
         Long noticeNum = savedNotice.getNoticeNum();
-        System.out.println("초기 조회수: " + savedNotice.getView());
+        System.out.println("초기 조회수: " + savedNotice.getViewCount());
 
         // When & Then - 조회수 증가 테스트
         for (int i = 1; i <= 3; i++) {
-            noticeService.increaseView(noticeNum);
+            noticeService.increaseViewCount(noticeNum);
             
             Notice updated = noticeRepository.findById(noticeNum).orElse(null);
             if (updated != null) {
-                System.out.println(i + "번째 증가 후 조회수: " + updated.getView());
+                System.out.println(i + "번째 증가 후 조회수: " + updated.getViewCount());
             }
         }
 
         // 최종 확인
         Notice finalNotice = noticeRepository.findById(noticeNum).orElse(null);
-        System.out.println("최종 조회수: " + finalNotice.getView());
-        System.out.println("총 증가량: " + finalNotice.getView() + "회");
+        System.out.println("최종 조회수: " + finalNotice.getViewCount());
+        System.out.println("총 증가량: " + finalNotice.getViewCount() + "회");
         
         System.out.println("===== 조회수 증가 테스트 완료 =====\n");
     }
@@ -277,7 +277,7 @@ public class NoiceServiceTests {
                 .title("삭제 테스트")
                 .content("삭제될 공지사항")
                 .isPinned(false)
-                .view(0L)
+                .viewCount(0L)
                 .member(adminMember)
                 .build();
         
@@ -315,7 +315,7 @@ public class NoiceServiceTests {
                     .title("일괄 삭제 테스트 " + i)
                     .content("삭제될 공지사항 " + i)
                     .isPinned(false)
-                    .view(0L)
+                    .viewCount(0L)
                     .member(adminMember)
                     .build();
             
@@ -378,7 +378,7 @@ public class NoiceServiceTests {
                 .title("존재하는 공지사항")
                 .content("실제 존재하는 공지사항")
                 .isPinned(false)
-                .view(0L)
+                .viewCount(0L)
                 .member(adminMember)
                 .build();
         

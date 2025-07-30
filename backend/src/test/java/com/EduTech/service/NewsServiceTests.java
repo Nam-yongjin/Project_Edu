@@ -87,7 +87,7 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("상세 조회 테스트")
 	                .content("상세 조회 테스트 내용")
-	                .view(0L)
+	                .viewCount(0L)
 	                .member(adminMember)
 	                .build();
 	        
@@ -103,7 +103,7 @@ public class NewsServiceTests {
 	        System.out.println("제목: " + detailDTO.getTitle());
 	        System.out.println("내용: " + detailDTO.getContent());
 	        System.out.println("작성자: " + detailDTO.getName());
-	        System.out.println("조회수: " + detailDTO.getView());
+	        System.out.println("조회수: " + detailDTO.getViewCount());
 
 	        System.out.println("작성일: " + detailDTO.getCreatedAt());
 	        
@@ -134,7 +134,7 @@ public class NewsServiceTests {
 	            News news = News.builder()
 	                    .title("언론보도 " + i)
 	                    .content("내용 " + i)
-	                    .view(10L)
+	                    .viewCount(10L)
 	                    .member(adminMember)
 	                    .build();
 	            newsRepository.save(news);
@@ -144,7 +144,7 @@ public class NewsServiceTests {
 	        // When - 목록 조회
 	        NewsSearchDTO searchDTO = new NewsSearchDTO();
 	        Pageable pageable = PageRequest.of(0, 3); //페이지 크기 3
-	        Page<NewsListDTO> result = newsService.getNewsList(searchDTO, pageable);
+	        Page<NewsListDTO> result = newsService.getNewsList(searchDTO);
 
 	        // Then - 결과 확인
 	        System.out.println("=== 페이징 결과 ===");
@@ -158,7 +158,7 @@ public class NewsServiceTests {
 	            NewsListDTO dto = result.getContent().get(i);
 	            System.out.println((i+1) + ". " + dto.getTitle() + 
 	                             " 작성자: " + dto.getName() + 
-	                             ", 조회수: " + dto.getView());
+	                             ", 조회수: " + dto.getViewCount());
 	        }
 	        
 	        System.out.println("===== 목록 조회 테스트 완료 =====\n");
@@ -176,29 +176,29 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("조회수 테스트")
 	                .content("조회수 증가 테스트")
-	                .view(0L)
+	                .viewCount(0L)
 	                .member(adminMember)
 	                .build();
 	        
 	        News savedNews = newsRepository.save(news);
 	        newsRepository.flush();
 	        Long newsNum = savedNews.getNewsNum();
-	        System.out.println("초기 조회수: " + savedNews.getView());
+	        System.out.println("초기 조회수: " + savedNews.getViewCount());
 
 	        // When & Then - 조회수 증가 테스트
 	        for (int i = 1; i <= 3; i++) {
-	            newsService.increaseView(newsNum);
+	            newsService.increaseViewCount(newsNum);
 	            
 	            News updated = newsRepository.findById(newsNum).orElse(null);
 	            if (updated != null) {
-	                System.out.println(i + "번째 증가 후 조회수: " + updated.getView());
+	                System.out.println(i + "번째 증가 후 조회수: " + updated.getViewCount());
 	            }
 	        }
 
 	        // 최종 확인
 	        News finalNews = newsRepository.findById(newsNum).orElse(null);
-	        System.out.println("최종 조회수: " + finalNews.getView());
-	        System.out.println("총 증가량: " + finalNews.getView() + "회");
+	        System.out.println("최종 조회수: " + finalNews.getViewCount());
+	        System.out.println("총 증가량: " + finalNews.getViewCount() + "회");
 	        
 	        System.out.println("===== 조회수 증가 테스트 완료 =====\n");
 	    }
@@ -215,7 +215,7 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("삭제 테스트")
 	                .content("삭제될 보도자료")
-	                .view(0L)
+	                .viewCount(0L)
 	                .member(adminMember)
 	                .build();
 
@@ -260,7 +260,7 @@ public class NewsServiceTests {
 	            News news = News.builder()
 	                    .title("일괄 삭제 테스트 " + i)
 	                    .content("삭제될 보도자료 " + i)
-	                    .view(0L)
+	                    .viewCount(0L)
 	                    .member(adminMember)
 	                    .build();
 	            
@@ -322,7 +322,7 @@ public class NewsServiceTests {
 	        News news = News.builder()
 	                .title("존재하는 보도자료")
 	                .content("실제 존재하는 보도자료")
-	                .view(0L)
+	                .viewCount(0L)
 	                .member(adminMember)
 	                .build();
 	        

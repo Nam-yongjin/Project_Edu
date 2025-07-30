@@ -17,6 +17,8 @@ public class NoticeListDTO { //목록조회용
 	
 	private LocalDateTime createdAt; //작성일
 	
-	private Long view; //조회수
+	private Long viewCount; //조회수
+	
+	private Integer fileCount; //파일 개수
 
 }

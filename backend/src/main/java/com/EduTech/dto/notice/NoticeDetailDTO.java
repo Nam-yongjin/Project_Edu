@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class NoticeDetailDTO { //상세페이지
 	
+	private Long noticeNum; //공지사항 번호 (기본 키)
+	
 	private String title; //제목
 	
 	private String content; //내용
@@ -16,15 +18,15 @@ public class NoticeDetailDTO { //상세페이지
 	
 	private String name; //이름
 	
-	private String writerMemid; //작성자id
+	private String mem_id; //회원id
 	
-	private Long view; //조회수
+	private Long viewCount; //조회수
 	
 	private LocalDateTime createdAt; //작성일
 	
 	private LocalDateTime updatedAt; //수정일
 	
-	private List<NoticeFileDTO> fileDTO; //첨부파일목록
+	private List<NoticeFileDTO> files; //첨부파일 목록
 	
 
 }
