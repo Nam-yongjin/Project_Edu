@@ -24,7 +24,7 @@ public interface DemonstrationImageRepository extends JpaRepository<Demonstratio
 	
 	// 실증 상품 수정 페이지에서 url만 받아오는 쿼리문
 	@Query("SELECT di.imageUrl FROM DemonstrationImage di WHERE di.demonstration.demNum=:demNum")
-	List<MultipartFile> selectDemImageUrl(@Param("demNum") Long demNum); 
+	List<String> selectDemImageUrl(@Param("demNum") Long demNum); 
 	
 	// 실증 상품 번호를 받아서 해당하는 이미지를 전부 삭제하는 쿼리문
 	@Modifying 
