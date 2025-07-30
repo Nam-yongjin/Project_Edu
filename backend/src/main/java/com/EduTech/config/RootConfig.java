@@ -5,7 +5,9 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.event.EventInfo;
 
 @Configuration
@@ -28,7 +30,11 @@ public class RootConfig {
         		mapper.skip(EventInfo::setApplyAt);     // 등록일은 null로 덮어쓰지 않도록 방지
         	});
 
-		
+		modelMapper.typeMap(Demonstration.class, DemonstrationFormResDTO.class)
+	    .addMappings(mapper -> {
+	        mapper.skip(DemonstrationFormResDTO::setImageUrlList);
+	        mapper.skip(DemonstrationFormResDTO::setExpDate);
+	    });
 		return modelMapper;
 	}
 }

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
-import com.EduTech.dto.demonstration.DemonstrationFormDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
@@ -286,7 +286,7 @@ public class DemonstrationServiceTests {
 	@DisplayName("실증 물품 등록")
 	void addDem() {
 
-		DemonstrationFormDTO demonstrationFormDTO = new DemonstrationFormDTO();
+		DemonstrationFormReqDTO demonstrationFormDTO = new DemonstrationFormReqDTO();
 		demonstrationFormDTO.setDemInfo("힘들");
 		demonstrationFormDTO.setDemMfr("다");
 		demonstrationFormDTO.setDemName("그만");
@@ -324,7 +324,7 @@ public class DemonstrationServiceTests {
 	@DisplayName("실증 상품 등록 수정")
 	public void DemDelete()
 	{
-		DemonstrationFormDTO demonstrationFormDTO=new DemonstrationFormDTO();
+		DemonstrationFormReqDTO demonstrationFormDTO=new DemonstrationFormReqDTO();
 		demonstrationFormDTO.setDemInfo("이 상품은 멋진 상품이 아닙니다.");
 		demonstrationFormDTO.setDemMfr("아주 못생긴 상품을 만든 제조사 입니다.");
 		demonstrationFormDTO.setDemName("멋지지 않은 상품임");

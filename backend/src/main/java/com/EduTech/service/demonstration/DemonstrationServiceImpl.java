@@ -13,11 +13,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
-import com.EduTech.dto.demonstration.DemonstrationFormDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
@@ -286,7 +286,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
+	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -321,7 +321,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	@Override
 	@Transactional
-	public void updateDemonstration(DemonstrationFormDTO demonstrationFormDTO) {
+	public void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO) {
 		// 실증 상품 정보 업데이트
 		demonstrationRepository.updateDem(demonstrationFormDTO.getDemName(), demonstrationFormDTO.getDemMfr(),
 				demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum());
@@ -374,12 +374,12 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 번호를 받아서 실증 상품의 정보를 받아오는 기능
 	@Override
-	public DemonstrationFormDTO selectOne(Long demNum) {
+	public DemonstrationFormResDTO selectOne(Long demNum) {
 		Demonstration entity = demonstrationRepository.findById(demNum)
 				.orElseThrow(() -> new RuntimeException("해당 번호의 실증 정보가 없습니다: " + demNum));
-		DemonstrationFormDTO dto = modelMapper.map(entity, DemonstrationFormDTO.class);
-		List<MultipartFile> imageList=demonstrationImageRepository.selectDemImageUrl(demNum);
-		dto.setImageList(imageList);
+		DemonstrationFormResDTO dto = modelMapper.map(entity, DemonstrationFormResDTO.class);
+		List<String> imageList=demonstrationImageRepository.selectDemImageUrl(demNum);
+		dto.setImageUrlList(imageList);
 		dto.setExpDate(demonstrationRegistrationRepository.selectDemRegExpDate(demNum));
 		
 		return dto;

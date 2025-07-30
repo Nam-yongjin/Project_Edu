@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
-import com.EduTech.dto.demonstration.DemonstrationFormDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
+import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
@@ -25,7 +26,6 @@ import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
-import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.service.demonstration.DemonstrationService;
 
 import jakarta.validation.Valid;
@@ -127,7 +127,7 @@ public class DemonstrationController {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@PostMapping("/addDem")
-	public ResponseEntity<String> DemAdd( @Valid @ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
+	public ResponseEntity<String> DemAdd( @Valid @ModelAttribute DemonstrationFormReqDTO demonstrationFormDTO) {
 		System.out.println("컨트롤러 진입");
 		//String memId = JWTFilter.getMemId();
 		System.out.println(demonstrationFormDTO);
@@ -137,7 +137,7 @@ public class DemonstrationController {
 
 	// 실증 상품 수정하는 기능
 	@PutMapping("/UpdateDem")
-	public ResponseEntity<String> DemUpdate(@Valid @ModelAttribute DemonstrationFormDTO demonstrationFormDTO) {
+	public ResponseEntity<String> DemUpdate(@Valid @ModelAttribute DemonstrationFormReqDTO demonstrationFormDTO) {
 		demonstrationService.updateDemonstration(demonstrationFormDTO);
 		return ResponseEntity.ok("실증 물품 수정 완료");
 	}
@@ -152,9 +152,9 @@ public class DemonstrationController {
 	
 	// 실증 등록 수정 페이지에서 실증번호를 받아와 실증 상품의 정보를 받아오는 기능
 	@GetMapping("/SelectOne")
-	public DemonstrationFormDTO SelectOne(@RequestParam("demNum") Long demNum) {
+	public DemonstrationFormResDTO SelectOne(@RequestParam("demNum") Long demNum) {
 		System.out.println("컨트롤러 왓다.");
-		DemonstrationFormDTO dto=demonstrationService.selectOne(demNum);
+		DemonstrationFormResDTO dto=demonstrationService.selectOne(demNum);
 		return dto;
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
 	}
