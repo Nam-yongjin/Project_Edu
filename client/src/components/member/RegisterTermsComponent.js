@@ -1,5 +1,5 @@
 import useMove from "../../hooks/useMove";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const initialChecked = { register: false, agree: false, process: false };
 
@@ -7,8 +7,41 @@ const RegisterTermsComponent = () => {
     const { moveToPath } = useMove();
     const [userType, setUserType] = useState('');
     const [checkedItems, setCheckedItems] = useState({ ...initialChecked });
+    const [registerText, setRegisterText] = useState("");
+    const [agreeText, setAgreeText] = useState("");
+    const [processText, setProcessText] = useState("");
 
     const isAllChecked = Object.values(checkedItems).every(Boolean);
+
+    useEffect(() => {
+        fetch('/terms/register.txt')
+            .then((res) => res.text())
+            .then((text) => setRegisterText(text))
+            .catch((err) => {
+                console.error("이용약관 로드 실패", err);
+                setRegisterText("이용약관을 불러올 수 없습니다.");
+            });
+    }, []);
+
+    useEffect(() => {
+        fetch('/terms/agree.txt')
+            .then((res) => res.text())
+            .then((text) => setAgreeText(text))
+            .catch((err) => {
+                console.error("이용약관 로드 실패", err);
+                setAgreeText("이용약관을 불러올 수 없습니다.");
+            });
+    }, []);
+
+    useEffect(() => {
+        fetch('/terms/process.txt')
+            .then((res) => res.text())
+            .then((text) => setProcessText(text))
+            .catch((err) => {
+                console.error("이용약관 로드 실패", err);
+                setProcessText("이용약관을 불러올 수 없습니다.");
+            });
+    }, []);
 
     const handleCheckAll = (e) => {
         const checked = e.target.checked;
@@ -44,13 +77,16 @@ const RegisterTermsComponent = () => {
     };
 
     return (
-        <div className="text-center">
-            <div>
-                <h2 className="text-xl font-bold mb-4">이용 약관 동의</h2>
+        <div className="mx-10 w-3/4">
+            <div className="py-4 ">
+                <h2 className="text-center text-xl font-bold mb-4">이용 약관 동의</h2>
 
-                <div>
-                    
-                    <label>
+                <div className="mt-10">
+                    <div className="text-lg font-bold mb-4">서울 에듀테크 소프트랩 이용약관</div>
+                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100">
+                        {registerText}
+                    </div>
+                    <label className="float-right">
                         <input
                             type="checkbox"
                             name="register"
@@ -60,8 +96,12 @@ const RegisterTermsComponent = () => {
                         서비스 이용약관 동의 <strong className="text-red-600">[필수]</strong>
                     </label>
                 </div>
-                <div>
-                    <label>
+                <div className="mt-10">
+                    <div className="text-lg font-bold mb-4">개인 정보 수집 및 이용 동의</div>
+                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100">
+                        {agreeText}
+                    </div>
+                    <label className="float-right">
                         <input
                             type="checkbox"
                             name="agree"
@@ -71,8 +111,12 @@ const RegisterTermsComponent = () => {
                         개인정보 수집 동의 <strong className="text-red-600">[필수]</strong>
                     </label>
                 </div>
-                <div>
-                    <label>
+                <div className="mt-10">
+                    <div className="text-lg font-bold mb-4">개인정보 처리 방침</div>
+                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100">
+                        {processText}
+                    </div>
+                    <label className="float-right">
                         <input
                             type="checkbox"
                             name="process"
@@ -82,8 +126,8 @@ const RegisterTermsComponent = () => {
                         개인정보 처리 동의 <strong className="text-red-600">[필수]</strong>
                     </label>
                 </div>
-                <div className="mt-2">
-                    <label>
+                <div className="py-10">
+                    <label className="float-right">
                         <input
                             type="checkbox"
                             checked={isAllChecked}
@@ -94,7 +138,7 @@ const RegisterTermsComponent = () => {
                 </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 text-center">
                 <h2 className="text-xl font-bold mb-4">회원 유형 선택</h2>
                 <div className="flex flex-row gap-2 justify-center">
                     {['member', 'student', 'teacher', 'company'].map((type) => (
@@ -107,19 +151,20 @@ const RegisterTermsComponent = () => {
                             />
                             {type === 'member' ? '일반'
                                 : type === 'student' ? '학생'
-                                : type === 'teacher' ? '교사'
-                                : '기업'}
+                                    : type === 'teacher' ? '교사'
+                                        : '기업'}
                         </label>
                     ))}
                 </div>
             </div>
-
-            <button
-                className="mt-4 p-2 bg-blue-500 text-white rounded active:bg-blue-600"
-                onClick={handleSubmit}
-            >
-                다음
-            </button>
+            <div className="text-center">
+                <button
+                    className="mt-4 p-2 bg-blue-500 text-white rounded active:bg-blue-600"
+                    onClick={handleSubmit}
+                >
+                    다음
+                </button>
+            </div>
         </div>
     );
 };

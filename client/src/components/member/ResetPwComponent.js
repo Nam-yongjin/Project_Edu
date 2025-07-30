@@ -21,6 +21,7 @@ const ResetPwComponent = () => {
         checkDuplicateId({ memId })
             .then((res) => {
                 if (res) {
+                    alert('가입된 아이디입니다.');
                     setStep('verifyPhone');
                 } else {
                     alert('존재하지 않는 아이디입니다.');

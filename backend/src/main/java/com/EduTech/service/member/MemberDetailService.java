@@ -26,10 +26,6 @@ public class MemberDetailService implements UserDetailsService{
         Member member = memberRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
         
-        if(member.getState() == MemberState.LEAVE) {
-        	throw new UsernameNotFoundException("LEAVE_MEMBER");
-        }
-        
         MemberDTO memberDTO = memberService.entityToDTO(member);
         return memberDTO;
     }
