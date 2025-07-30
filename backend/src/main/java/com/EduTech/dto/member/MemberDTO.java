@@ -18,14 +18,17 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 	private String pw;
 
 	private String email;
+	
+	private String state;
 
 	private String role;
 
 	// 생성자
-	public MemberDTO(String memId, String pw, String email, String role) {
+	public MemberDTO(String memId, String pw, String email, String state, String role) {
 		super(memId, pw, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 		this.memId = memId;
 		this.email = email;
+		this.state = state;
 		this.role = role;
 	}
 	
@@ -34,6 +37,7 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 		Map<String, Object> dataMap = new HashMap<>();
 		dataMap.put("memId", memId);
 		dataMap.put("email", email);
+		dataMap.put("state", state);
 		dataMap.put("role", role);
 		return dataMap;
 	}
