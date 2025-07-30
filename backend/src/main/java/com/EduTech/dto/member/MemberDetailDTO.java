@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.EduTech.entity.member.MemberGender;
 import com.EduTech.entity.member.MemberRole;
+import com.EduTech.entity.member.MemberState;
 
 import lombok.Data;
 
@@ -22,5 +23,6 @@ public class MemberDetailDTO {
 	private boolean	checkSms;	// SMS수신동의
 	private boolean checkEmail;	// 이메일수신동의
 	private MemberRole role;
+	private MemberState state;
 	private String kakao;	// 카카오 계정
 }

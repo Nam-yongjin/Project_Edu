@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import useMove from '../../hooks/useMove';
 import { readMember, leaveMember } from '../../api/memberApi';
+import useLogin from '../../hooks/useLogin';
 
 const initState = {
     memId: '',
@@ -20,6 +21,7 @@ const initState = {
 const MemberInfoComponent = () => {
     const { moveToPath } = useMove();
     const [form, setForm] = useState({ ...initState });
+    const { doLogout } = useLogin();
 
     useEffect(() => {
         const fetchCompanyInfo = async () => {
@@ -56,6 +58,8 @@ const MemberInfoComponent = () => {
         if (window.confirm("정말 탈퇴하시겠습니까?")) {
             alert("탈퇴 처리 되었습니다.");
             leaveMember();
+            doLogout();
+            moveToPath('/');
         } else {
             alert("탈퇴를 취소했습니다.");
         };

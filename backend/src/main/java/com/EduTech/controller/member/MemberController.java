@@ -145,10 +145,12 @@ public class MemberController {
 	}
 
 	// 회원 탈퇴
-	@DeleteMapping("/member/leave")
+	@DeleteMapping("/leave")
 	public ResponseEntity<String> leaveMember() {
+		System.out.println("컨트롤러");
 		String memId = JWTFilter.getMemId();
 		memberService.leaveMember(memId);
+		System.out.println("탈퇴");
 		return ResponseEntity.ok("회원탈퇴가 완료되었습니다. 일주일뒤 재가입 가능합니다.");
 	}
 

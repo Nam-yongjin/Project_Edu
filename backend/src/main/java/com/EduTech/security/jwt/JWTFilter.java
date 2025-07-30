@@ -34,9 +34,10 @@ public class JWTFilter extends OncePerRequestFilter {
 
 			String memId = (String) claims.get("memId");
 			String email = (String) claims.get("email");
+			String state = (String) claims.get("state");
 			String role = (String) claims.get("role");
 
-			MemberDTO memberDTO = new MemberDTO(memId, "", email, role);
+			MemberDTO memberDTO = new MemberDTO(memId, "", email, state, role);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
 					null, memberDTO.getAuthorities());
@@ -45,7 +46,7 @@ public class JWTFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 
 		} catch (Exception e) {
-			String json = new Gson().toJson(Map.of("error", "TOKEN_ERROR", "message", e.getMessage()));
+			String json = new Gson().toJson(Map.of("error", "ERROR_ACCESS_TOKEN", "message", e.getMessage()));
 			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().println(json);
 
