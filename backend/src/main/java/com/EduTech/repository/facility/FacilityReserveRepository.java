@@ -62,7 +62,7 @@ public interface FacilityReserveRepository extends JpaRepository<FacilityReserve
         UPDATE FacilityReserve r
         SET r.state = 'CANCELLED'
         WHERE r.facRevNum = :facRevNum
-          AND (:isAdmin = true OR r.memId = :memId) 
+          AND (:isAdmin = true OR r.member.memId = :memId) 
           AND r.state IN ('WAITING', 'APPROVED')
     """)
     int cancelReservation(
