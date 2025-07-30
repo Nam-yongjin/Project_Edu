@@ -14,7 +14,7 @@ const FindIdComponent = () => {
                     setFoundId(memId);
                 } else {
                     alert("아이디를 찾을 수 없습니다.");
-                }
+                };
             })
             .catch((error) => {
                 alert("아이디 찾기 실패: " + (error.response?.data || error.message));
