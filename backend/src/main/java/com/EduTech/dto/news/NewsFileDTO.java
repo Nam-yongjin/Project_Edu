@@ -1,8 +1,14 @@
 package com.EduTech.dto.news;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewsFileDTO {
 	
 	private String originalName; //원본파일명

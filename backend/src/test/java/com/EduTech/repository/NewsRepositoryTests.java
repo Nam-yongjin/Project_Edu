@@ -92,13 +92,13 @@ public class NewsRepositoryTests {
                 .news(news)
                 .build();
 
-        news.getNewsFile().add(file);
+        news.getNewsFiles().add(file);
         News saved = newsRepository.save(news);
         newsRepository.flush(); //영속성 컨텍스트 변경 내용을 DB에 저장
         
         assertThat(saved.getNewsNum()).isNotNull(); //Null이 아닐경우
-        assertThat(saved.getNewsFile()).hasSize(1); //크기 설정 확인
-        assertThat(saved.getNewsFile().get(0).getOriginalName()).isEqualTo("create.png");
+        assertThat(saved.getNewsFiles()).hasSize(1); //크기 설정 확인
+        assertThat(saved.getNewsFiles().get(0).getOriginalName()).isEqualTo("create.png");
 	}
 	
 //	@Test
@@ -120,14 +120,14 @@ public class NewsRepositoryTests {
                 .news(news)
                 .build();
 
-        news.getNewsFile().add(file);
+        news.getNewsFiles().add(file);
         News saved = newsRepository.save(news);
         newsRepository.flush();
         
         News found = newsRepository.findById(saved.getNewsNum()).orElseThrow();
         assertThat(saved.getNewsNum()).isNotNull();
         assertThat(found.getTitle()).isEqualTo("readTest");
-        assertThat(found.getNewsFile()).hasSize(1);
+        assertThat(found.getNewsFiles()).hasSize(1);
 	}
 	
 //	@Test
@@ -149,11 +149,11 @@ public class NewsRepositoryTests {
                 .news(news)
                 .build();
 
-        news.getNewsFile().add(file);
+        news.getNewsFiles().add(file);
         News saved = newsRepository.save(news);
         newsRepository.flush();
         
-        saved.getNewsFile().clear(); // 기존 파일 제거
+        saved.getNewsFiles().clear(); // 기존 파일 제거
                 
         saved.setTitle("수정한 제목"); //제목 수정
         saved.setContent("수정한 내용"); //내용 수정
@@ -164,14 +164,14 @@ public class NewsRepositoryTests {
                 .fileType("jpg")
                 .news(saved)
                 .build();
-        saved.getNewsFile().add(newfile);
+        saved.getNewsFiles().add(newfile);
                
         News update = newsRepository.save(saved);
         
         assertThat(update.getNewsNum()).isNotNull();
         assertThat(update.getTitle()).isEqualTo("수정한 제목");
-        assertThat(update.getNewsFile()).hasSize(1);						//파일이름 잘 맞추기
-        assertThat(update.getNewsFile().get(0).getOriginalName()).isEqualTo("new.jpg");
+        assertThat(update.getNewsFiles()).hasSize(1);						//파일이름 잘 맞추기
+        assertThat(update.getNewsFiles().get(0).getOriginalName()).isEqualTo("new.jpg");
 	}
 	
 	@Test
@@ -193,12 +193,12 @@ public class NewsRepositoryTests {
                 .news(news)
                 .build();
 
-        news.getNewsFile().add(file);
+        news.getNewsFiles().add(file);
         News saved = newsRepository.save(news);
         newsRepository.flush();
         
         Long newsNum = saved.getNewsNum(); //게시물 번호
-        Long newsFileNum = saved.getNewsFile().get(0).getNewsFileNum(); //첨부파일 번호
+        Long newsFileNum = saved.getNewsFiles().get(0).getNewsFileNum(); //첨부파일 번호
         
         newsRepository.deleteById(newsNum);
         newsRepository.flush();

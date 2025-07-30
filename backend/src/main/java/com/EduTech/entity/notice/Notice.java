@@ -1,5 +1,6 @@
 package com.EduTech.entity.notice;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,17 +46,35 @@ public class Notice extends BaseEntity{
 	private boolean isPinned = false; //고정여부
 	
 	@Builder.Default
-	private Long view = 0L;	//조회수, 0으로 초기화 해서 Null값 방지
+	private Long viewCount = 0L;	//조회수, 0으로 초기화 해서 Null값 방지
 	
 	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 공지사항 게시글을 한 명의 Admin이 작성 가능, 지연로딩
-	@JoinColumn(name = "memId", nullable = false) //회원아이디
+	@JoinColumn(name = "mem_id", nullable = false) //회원아이디
 	private Member member;
 	
 	//하나의 공지글에 여러 개의 파일 첨부 가능, 공지글이 삭제되면 파일도 같이 삭제
 	@Builder.Default
-	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
-	private List<NoticeFile> noticeFile = new ArrayList<>();
+	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<NoticeFile> noticeFiles = new ArrayList<>();
+	
+	public void increaseViewCount() { //조회수 증가
+        this.viewCount++;
+    }
+	//비즈니스 로직  
+    public void updateContent(String title, String content, boolean isPinned) {
+        this.title = title;
+        this.content = content;
+        this.isPinned = isPinned;
+        this.setUpdatedAt(LocalDateTime.now()); //현재 시간
+    }
+    
+    public void addNoticeFile(NoticeFile noticeFile) { //새로운 첨부파일 공지사항과 연결
+        this.noticeFiles.add(noticeFile);
+        noticeFile.setNotice(this);
+    }
+    
+    public void clearNoticeFiles() { //첨부파일 목록 초기화
+        this.noticeFiles.clear();
+    }
 
-	
-	
 }
