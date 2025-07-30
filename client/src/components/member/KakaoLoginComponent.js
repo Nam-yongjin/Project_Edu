@@ -14,6 +14,6 @@ const KakaoLoginComponent = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 export default KakaoLoginComponent;

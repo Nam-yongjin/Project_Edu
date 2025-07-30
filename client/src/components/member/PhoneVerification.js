@@ -31,7 +31,7 @@ const PhoneVerification = ({ onVerified }) => {
                 { size: 'invisible' },
             );
             window.recaptchaVerifier.render().catch(console.error);
-        }
+        };
 
         // 컴포넌트 언마운트 시 reCAPTCHA 제거 로직 추가 (선택 사항이지만 문제 방지에 도움)
         return () => {
@@ -39,9 +39,9 @@ const PhoneVerification = ({ onVerified }) => {
                 const container = document.getElementById('recaptcha-container');
                 if (container) {
                     container.innerHTML = ''; // 내용을 비워줌
-                }
+                };
                 window.recaptchaVerifier = null; // 인스턴스 참조 제거
-            }
+            };
         };
     }, []);
 
@@ -49,11 +49,11 @@ const PhoneVerification = ({ onVerified }) => {
         if (cooldown > 0) {
             alert(`${cooldown}초 후에 다시 시도해주세요.`);
             return;
-        }
+        };
         if (!isValidPhone(phone)) {
             alert('유효한 휴대폰번호를 입력해주세요.');
             return;
-        }
+        };
 
         const e164Phone = formatToE164(phone);
         const appVerifier = window.recaptchaVerifier;
@@ -71,8 +71,8 @@ const PhoneVerification = ({ onVerified }) => {
                 alert('요청이 너무 많습니다. 나중에 다시 시도해주세요.');
             } else {
                 alert('인증번호 전송 실패: ' + error.message);
-            }
-        }
+            };
+        };
     };
 
     const verifyOTP = async () => {
@@ -88,8 +88,8 @@ const PhoneVerification = ({ onVerified }) => {
                 alert('인증번호가 만료되었습니다. 다시 전송해주세요.');
             } else {
                 alert('인증 실패: ' + error.message);
-            }
-        }
+            };
+        };
     };
 
     return (

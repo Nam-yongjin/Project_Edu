@@ -1,4 +1,4 @@
 const MemberModifyComponent = () => {
 
-}
-export default MemberModifyComponent
+};
+export default MemberModifyComponent;

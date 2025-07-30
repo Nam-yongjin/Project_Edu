@@ -1,6 +1,6 @@
-import { Outlet } from "react-router-dom"
-import LoginComponent from "../../components/member/LoginComponent"
-import BasicLayout from "../../layouts/BasicLayout"
+import { Outlet } from "react-router-dom";
+import LoginComponent from "../../components/member/LoginComponent";
+import BasicLayout from "../../layouts/BasicLayout";
 
 const LoginPage = () => {
     return (
@@ -14,6 +14,6 @@ const LoginPage = () => {
                 </div>
             </BasicLayout>
         </div>
-    )
-}
-export default LoginPage
+    );
+};
+export default LoginPage;

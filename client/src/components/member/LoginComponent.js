@@ -25,10 +25,10 @@ const LoginComponent = () => {
         doLogin(loginParam)
             .then(data => {
                 if (data.error) {
-                    alert("아이디와 패스워드를 다시 확인하세요")
+                    alert("아이디와 패스워드를 다시 확인하세요");
                 } else {
-                    moveToPath('/')
-                }
+                    moveToPath('/');
+                };
             });
     };
     const handleKeydown = (e) => {
@@ -67,14 +67,14 @@ const LoginComponent = () => {
                 <div className="relative mb-4 flex w-full justify-center">
                     <div className="p-6 flex justify-center font-bold">
                         <div className="hover:text-gray-400 cursor-pointer active:text-gray-600"><Link to={'/findId'}>아이디찾기</Link></div>
-                        <div> | </div>
+                        <div className="px-2"> | </div>
                         <div className="hover:text-gray-400 cursor-pointer active:text-gray-600"><Link to={'/resetPw'}>비밀번호 찾기(재설정)</Link></div>
                     </div>
                 </div>
             </div>
             <KakaoLoginComponent />
         </div>
-    )
+    );
 
-}
+};
 export default LoginComponent;

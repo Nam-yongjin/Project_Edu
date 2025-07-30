@@ -1,4 +1,4 @@
 const CompanyModifyComponent = () => {
 
-}
-export default CompanyModifyComponent
+};
+export default CompanyModifyComponent;

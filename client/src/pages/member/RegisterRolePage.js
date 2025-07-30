@@ -1,11 +1,11 @@
-import RegisterRoleComponent from "../../components/member/RegisterRoleComponent"
+import RegisterRoleComponent from "../../components/member/RegisterRoleComponent";
 
 const RegisterRolePage = () => {
     return(
         <div>
             <RegisterRoleComponent />
         </div>
-    )
-}
+    );
+};
 
-export default RegisterRolePage
+export default RegisterRolePage;

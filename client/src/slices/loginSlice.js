@@ -16,14 +16,14 @@ const loadMemberCookie = () => {
 
     if (typeof memberInfo === 'object') {
         return memberInfo;
-    }
+    };
 
     try {
         return JSON.parse(memberInfo);
     } catch (e) {
         console.error("쿠키 파싱 실패", e);
         return initState;
-    }
+    };
 };
 
 // 역할별 myInfo 호출
@@ -37,7 +37,7 @@ const fetchUserInfoByRole = async (role) => {
             return await readCompany();
         default:
             return await readMember();
-    }
+    };
 };
 
 // 로그인 후 토큰 저장 및 사용자 정보(메인 + 상세) 가져오기

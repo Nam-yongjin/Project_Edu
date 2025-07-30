@@ -1,5 +1,5 @@
-import FindIdComponent from "../../components/member/FindIdComponent"
-import BasicLayout from "../../layouts/BasicLayout"
+import FindIdComponent from "../../components/member/FindIdComponent";
+import BasicLayout from "../../layouts/BasicLayout";
 
 
 const FindIdPage = () => {
@@ -7,6 +7,6 @@ const FindIdPage = () => {
         <BasicLayout>
             <FindIdComponent />
         </BasicLayout>
-    )
-}
-export default FindIdPage
+    );
+};
+export default FindIdPage;
