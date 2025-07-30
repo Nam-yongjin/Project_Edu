@@ -4,8 +4,20 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Data;
+import com.EduTech.dto.notice.NoticeUpdateDTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor //기본 생성자 생성
+@AllArgsConstructor //모든 필드를 매개변수로 받는 생성자 자동 생성
+@Builder
 @Data
 public class NewsUpdateDTO {
 	
@@ -13,11 +25,7 @@ public class NewsUpdateDTO {
 	
 	private String content; //내용
 	
-	private String name; //이름
-	
-	private String memId; //회원아이디
-	
-	private List<String> oldFiles; //기존 파일목록
+	private List<String> deleteFileIds; // 삭제할 파일 ID 목록
 	
 	private List<MultipartFile> newFiles; //새로 업로드 할 파일
 

@@ -16,17 +16,13 @@ public class NoticeUpdateRegisterDTO {
 	private String title; //제목
 	
 	@NotBlank(message = "내용을 입력하세요.")
-	@Size(max = 2000, message = "내용은 최대 2000자까지 입력 가능합니다.")
+	@Size(max = 3000, message = "내용은 최대 3000자까지 입력 가능합니다.")
 	private String content; //내용
 	
 	private boolean isPinned; //게시판 고정
 	
-	private String name; //이름
-	
-	private String memId; //아이디
-	
-	private List<String> oldFiles; //기존 파일목록
-	
 	private List<MultipartFile> newFiles; //새로 업로드 할 파일
+
+	private List<String> deleteFileIds; // 삭제할 파일 ID 목록
 
 }
