@@ -2,7 +2,7 @@ package com.EduTech.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.EduTech.controller.formatter.LocalDateFormatter;
@@ -19,6 +19,13 @@ public class WebConfig implements WebMvcConfigurer{
 		registry.addFormatter(new LocalDateFormatter());
 		registry.addFormatter(new LocalDateTimeFormatter());
 		registry.addFormatter(new LocalTimeFormatter());
+	}
+	
+	// 프론트에서 백 폴더에 접근할때 사용
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    registry.addResourceHandler("/demImages/**")
+	            .addResourceLocations("file:///C:/upload/demImages/");
 	}
 	
 }
