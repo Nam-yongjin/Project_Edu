@@ -13,16 +13,16 @@ const UpdateComponent = ({ demNum }) => {
     const [returnDate, setReturnDate] = useState(new Date()); // react datepicker 상태값 저장
     const [errors, setErrors] = useState({}); // 폼창 예외 처리 메시지를 띄우기 위한 상태값
     const { moveToPath, moveToReturn } = useMove(); // useMove에서 가져온 모듈들
-
+    
     useEffect(() => {
     getOne(demNum).then(data => {
         setDem(data);
         setReturnDate(new Date(data.expDate + "T00:00:00"));
-
-        if (data.imageList && data.imageList.length > 0) {
-            const existingImages = data.imageList.map((img, index) => ({
+        console.log(data.imageUrlList);
+        if (data.imageUrlList && data.imageUrlList.length > 0) {
+            const existingImages = data.imageUrlList.map((img, index) => ({
                 file: null,           // 기존 파일 객체가 없으므로 null
-                url: img,             // img가 이미지 URL이라 가정
+                 url: img,            // img가 이미지 URL이라 가정
                 name: `기존 이미지 ${index + 1}` // 필요하면 실제 이름이 있으면 대체 가능
             }));
             setImages(existingImages);
@@ -100,7 +100,7 @@ const UpdateComponent = ({ demNum }) => {
         formData.append("demMfr", dem.demMfr);
         formData.append("itemNum", dem.itemNum);
         formData.append("demInfo", dem.demInfo);
-        formData.append("expDate", dem.expDate.toISOString().split("T")[0]);
+        formData.append("expDate", returnDate.toISOString().split("T")[0]);
         formData.append("demNum", demNum);
         //"2025-07-28T06:00:00.000Z" 를 T로 나누면 yyyy-mm-dd 형태의 문자열로 받을수 잇음.
         putUpdate(formData).then(data => {
@@ -211,7 +211,7 @@ const UpdateComponent = ({ demNum }) => {
                     <div className="flex flex-col items-start">
                         <button className="w-full text-right" onClick={() => fileDelete(img)}>x</button>
                         <img
-                            src={img.url}
+                            src={img.file ? img.url : `http://localhost:8090/${img.url}`}
                             className="w-32 h-32 object-cover rounded-md border shadow mb-1"
                         />
                         <p className="text-sm text-gray-600 break-all">{img.name}</p>
