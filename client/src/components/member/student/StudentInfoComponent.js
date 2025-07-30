@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useMove from '../../../hooks/useMove';
-import { readStudent,leaveMember } from '../../../api/memberApi';
+import { readStudent, leaveMember } from '../../../api/memberApi';
 import useLogin from '../../../hooks/useLogin';
 
 const initState = {
@@ -51,16 +51,19 @@ const StudentInfoComponent = () => {
     const handleMoveModify = () => {
         moveToPath(`/student/modify`);
     };
-    const handleMoveLeave = () => {
+    const handleMoveLeave = async () => {
         if (window.confirm("정말 탈퇴하시겠습니까?")) {
-            alert("탈퇴 처리 되었습니다.");
-            leaveMember();
-            doLogout();
-            moveToPath('/');
+            try {
+                await leaveMember();
+                alert("탈퇴 처리 되었습니다.");
+                doLogout();
+                moveToPath('/');
+            } catch (err) {
+                alert("탈퇴에 실패했습니다.");
+            }
         } else {
             alert("탈퇴를 취소했습니다.");
-        };
-
+        }
     };
 
     return (

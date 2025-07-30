@@ -9,7 +9,7 @@ const useLogin = () => {
     const loginState = useSelector((state) => state.loginState);
     const isLogin = !!loginState?.memId;
 
-     const doLogin = async (loginParam) => {
+    const doLogin = async (loginParam) => {
         return dispatch(loginPostAsync(loginParam)).unwrap();
     };
 

@@ -39,7 +39,7 @@ export const loginPostAsync = createAsyncThunk(
 
             // JWT 헤더로 사용자 정보 요청
             const basicInfo = await readMember();
-            console.log(basicInfo.state);
+            
             // 블랙리스트 또는 탈퇴 회원 처리
             if (basicInfo.state === 'BEN') {
                 removeCookie("member");

@@ -346,12 +346,17 @@ public class MemberServiceImpl implements MemberService {
 		if (member.getState().equals("BEN")) {
 			throw new IllegalStateException("블랙리스트 회원은 탈퇴할 수 없습니다.");
 		}
+		
+		// 이미 탈퇴처리된 회원일시 탈퇴불가
+		if (member.getState().equals("LEAVE")) {
+			throw new IllegalStateException("이미 탈퇴 처리중 입니다.");
+		}
 
-		if (demonstrationStateReg.equals(DemonstrationState.ACCEPT)) {
+		if (demonstrationStateReg != null && demonstrationStateReg.equals(DemonstrationState.ACCEPT)) {
 			throw new IllegalStateException("실증 등록 중인 회원은 탈퇴할 수 없습니다.");
 		}
 
-		if (demonstrationStateRes.equals(DemonstrationState.ACCEPT)) {
+		if (demonstrationStateRes != null && demonstrationStateRes.equals(DemonstrationState.ACCEPT)) {
 			throw new IllegalStateException("실증 신청 중인 회원은 탈퇴할 수 없습니다.");
 		}
 

@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -33,7 +34,7 @@ public class SecurityConfig {
 		http.cors(httpSecurityCorsConfigurer -> {
 			httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
 		});
-
+        
 		// 세션을 사용하지 않도록 설정 (STATELESS)
 		http.sessionManagement(sessionConfig -> {
             sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
