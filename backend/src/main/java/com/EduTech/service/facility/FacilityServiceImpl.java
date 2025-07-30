@@ -21,6 +21,7 @@ import com.EduTech.entity.facility.FacilityHoliday;
 import com.EduTech.entity.facility.FacilityReserve;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberRole;
 import com.EduTech.repository.facility.FacilityHolidayRepository;
 import com.EduTech.repository.facility.FacilityImageRepository;
 import com.EduTech.repository.facility.FacilityRepository;
@@ -169,26 +170,27 @@ public class FacilityServiceImpl implements FacilityService {
     // 사용자/관리자 에약 취소 처리 
     @Override
     @Transactional
-    public boolean cancelReservation(Long facRevNum, boolean isAdmin, String requesterId) {
+    public boolean cancelReservation(Long facRevNum, String requesterId) {
         FacilityReserve reserve = facilityReserveRepository.findById(facRevNum)
             .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
 
-     // 사용자일 경우 본인 예약만 취소 가능
+        Member member = memberRepository.findById(requesterId)
+            .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+
+        boolean isAdmin = member.getRole() == MemberRole.ADMIN;
+
         if (!isAdmin && !reserve.getMember().getMemId().equals(requesterId)) {
             throw new SecurityException("본인의 예약만 취소할 수 있습니다.");
         }
 
-        // 이미 취소/거절된 예약은 중복 처리 불가
         if (reserve.getState() == FacilityState.CANCELLED || reserve.getState() == FacilityState.REJECTED) {
             throw new IllegalStateException("이미 취소되었거나 처리된 예약입니다.");
         }
 
-        // 시작 시간 지난 예약은 취소 불가 (선택적 조건)
         if (LocalDateTime.of(reserve.getFacDate(), reserve.getStartTime()).isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("이미 시작된 예약은 취소할 수 없습니다.");
         }
 
-        // 상태 변경
         reserve.setState(FacilityState.CANCELLED);
         return true;
     }
