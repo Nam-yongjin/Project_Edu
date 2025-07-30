@@ -93,13 +93,13 @@ public class NoticeRepositoryTests {
                 .notice(notice)
                 .build();
 
-        notice.getNoticeFile().add(file);
+        notice.getNoticeFiles().add(file);
         Notice saved = noticeRepository.save(notice);
         noticeRepository.flush(); //영속성 컨텍스트 변경 내용을 DB에 저장
         
         assertThat(saved.getNoticeNum()).isNotNull(); //Null이 아닐경우
-        assertThat(saved.getNoticeFile()).hasSize(1); //크기 설정 확인
-        assertThat(saved.getNoticeFile().get(0).getOriginalName()).isEqualTo("create.png");
+        assertThat(saved.getNoticeFiles()).hasSize(1); //크기 설정 확인
+        assertThat(saved.getNoticeFiles().get(0).getOriginalName()).isEqualTo("create.png");
 	}
 	
 //	@Test
@@ -122,14 +122,14 @@ public class NoticeRepositoryTests {
                 .notice(notice)
                 .build();
 
-        notice.getNoticeFile().add(file);
+        notice.getNoticeFiles().add(file);
         Notice saved = noticeRepository.save(notice);
         noticeRepository.flush();
         
         Notice found = noticeRepository.findById(saved.getNoticeNum()).orElseThrow();
         assertThat(saved.getNoticeNum()).isNotNull();
         assertThat(found.getTitle()).isEqualTo("readTest");
-        assertThat(found.getNoticeFile()).hasSize(1);
+        assertThat(found.getNoticeFiles()).hasSize(1);
 	}
 	
 //	@Test
@@ -152,11 +152,11 @@ public class NoticeRepositoryTests {
                 .notice(notice)
                 .build();
 
-        notice.getNoticeFile().add(file);
+        notice.getNoticeFiles().add(file);
         Notice saved = noticeRepository.save(notice);
         noticeRepository.flush();
         
-        saved.getNoticeFile().clear(); // 기존 파일 제거
+        saved.getNoticeFiles().clear(); // 기존 파일 제거
                 
         saved.setTitle("수정한 제목"); //제목 수정
         saved.setContent("수정한 내용"); //내용 수정
@@ -167,14 +167,14 @@ public class NoticeRepositoryTests {
                 .fileType("png")
                 .notice(saved)
                 .build();
-        saved.getNoticeFile().add(newfile);
+        saved.getNoticeFiles().add(newfile);
                
         Notice update = noticeRepository.save(saved);
         
         assertThat(update.getNoticeNum()).isNotNull();
         assertThat(update.getTitle()).isEqualTo("수정한 제목");
-        assertThat(update.getNoticeFile()).hasSize(1);
-        assertThat(update.getNoticeFile().get(0).getOriginalName()).isEqualTo("new.png");
+        assertThat(update.getNoticeFiles()).hasSize(1);
+        assertThat(update.getNoticeFiles().get(0).getOriginalName()).isEqualTo("new.png");
 	}
 	
 	@Test
@@ -197,12 +197,12 @@ public class NoticeRepositoryTests {
                 .notice(notice)
                 .build();
 
-        notice.getNoticeFile().add(file);
+        notice.getNoticeFiles().add(file);
         Notice saved = noticeRepository.save(notice);
         noticeRepository.flush();
         
         Long noticeNum = saved.getNoticeNum(); //게시물 번호
-        Long notFileNum = saved.getNoticeFile().get(0).getNotFileNum(); //첨부파일 번호
+        Long notFileNum = saved.getNoticeFiles().get(0).getNotFileNum(); //첨부파일 번호
         
         noticeRepository.deleteById(noticeNum);
         noticeRepository.flush();

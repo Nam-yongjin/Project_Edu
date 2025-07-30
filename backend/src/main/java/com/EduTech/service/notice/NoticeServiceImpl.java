@@ -1,12 +1,10 @@
 package com.EduTech.service.notice;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,250 +29,283 @@ import com.EduTech.repository.notice.NoticeSpecifications;
 import com.EduTech.security.jwt.JWTFilter;
 import com.EduTech.util.FileUtil;
 
-import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor // final 필드에 대한 생성자를 자동으로 생성
+@RequiredArgsConstructor
 @Transactional
 public class NoticeServiceImpl implements NoticeService {
-
-	private final NoticeRepository noticeRepository;
-	private final NoticeFileRepository noticeFileRepository;
-	private final MemberRepository memberRepository; // MemberEntity 가져오려면 필요
-	private final ModelMapper modelMapper; // DTO <-> Entity 매핑을 위해 필요
-	private final FileUtil fileUtil; // 파일 처리를 위해 필요
-	
-	@PostConstruct //Test 돌릴 때 ModelMapper가 혼동할 때 넣어줌
-	public void setupModelMapper() {
-	    modelMapper.getConfiguration().setAmbiguityIgnored(true);
-	    modelMapper.typeMap(Notice.class, NoticeDetailDTO.class)
-	        .addMapping(src -> src.getMember().getMemId(), NoticeDetailDTO::setWriterMemid);
-	}
-
-	// 공지사항 등록
-	@Override // 상위 타입 메서드 재정의
-	public void createNotice(NoticeCreateRegisterDTO dto, List<MultipartFile> file) {
-		// JWT에서 사용자 조회(Controller에서 관리자만 작성하게 하려면 필요)
-		Member member = memberRepository.findById(JWTFilter.getMemId())
-				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
-				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
-		if (!member.getRole().equals("ADMIN")) {
-			throw new AccessDeniedException("공지사항 작성 권한이 없습니다.");
-	    }
-		// DTO를 Notice Entity로 변환(ModelMapper 사용)
-		Notice notice = modelMapper.map(dto, Notice.class);
-		notice.setCreatedAt(LocalDateTime.now()); // 작성 시간 설정
-		notice.setMember(member); // 작성자 설정
-		notice.setView(0L); // 조회수 기본값 0으로 설정
-
-		if (file != null && !file.isEmpty() && !file.get(0).isEmpty()) { // 파일이 실제로 업로드 되어있는지 확인
-			// 파일 저장
-			String dirName = "noticeFile"; // 저장할 디렉토리 이름
-			List<Object> fileMapList = fileUtil.saveFiles(file, dirName); // Map 형태의 리스트로 반환
-
-			if (fileMapList != null && !fileMapList.isEmpty()) { // 실제로 업로드 된 파일이 존재할 때
-				// List<object>형식으로 반환된 fileMapList를 List<NoticeFile로 변환
-				List<NoticeFile> noticeFiles = fileMapList.stream()
-						// fileMapList는 List<object>타입 --> 안에 들어있는 객체는 Map<String, String>타입이라 변환
-						.map(obj -> (Map<String, String>) obj).filter(fileData -> {
-							String type = fileData.get("fileType");
-							// 확장자 검증 --> 특정 문자열이 포함되어있는지 확인(대소문자 구분을 없애기 위해 소문자로 변환)
-							return type != null && List.of("jpg", "png", "hwp", "pdf").contains(type.toLowerCase());
-						})// null제외 file타입 없으면 필터링, 리스트에 포함된 확장자만 통과
-						.map(fileData -> { // Map을 Notice Entity로 변환
-							NoticeFile noticeFile = new NoticeFile();
-							noticeFile.setOriginalName(fileData.get("originalName"));
-							noticeFile.setFilePath(fileData.get("filePath"));
-							noticeFile.setFileType(fileData.get("fileType").toLowerCase());
-							noticeFile.setNotice(notice); // 공지사항과 연관관계 설정
-
-							return noticeFile;
-						}).collect(Collectors.toList()); // stream을 List<NoticeFile>로 수집
-
-				notice.setNoticeFile(noticeFiles); // Notice에 파일 리스트 연결(연관관계 설정)
-				noticeRepository.save(notice); // DB에 저장
-				// cascade 사용 + 중복 방지로 나눠서 작성
-			}
-
-		}
-
-	}
-
-	// 공지사항 수정
-	@Override
-	public void updateNotice(NoticeUpdateRegisterDTO dto, List<MultipartFile> file, Long noticeNum) {
-		Member member = memberRepository.findById(JWTFilter.getMemId())
-				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
-				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
-		if (!member.getRole().equals("ADMIN")) {
-			throw new AccessDeniedException("공지사항 수정 권한이 없습니다.");
-	    }
-		Notice notice = noticeRepository.findById(noticeNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다. 번호: " + noticeNum));
-		// ModelMapper로 DTO데이터를 Entity에 매핑
-		modelMapper.map(dto, notice);
-		notice.setUpdatedAt(LocalDateTime.now());
-
-		// 기존 파일 처리
-		if (file != null && !file.isEmpty() && !file.get(0).isEmpty()) {
-			// 기존 파일 삭제
-			deleteExistingFile(notice.getNoticeNum());
-
-			// 새 파일 저장(createNotice랑 동일)
-			String dirName = "noticeFile";
-			List<Object> fileMapList = fileUtil.saveFiles(file, dirName);
-
-			if (fileMapList != null && !fileMapList.isEmpty()) {
-
-				List<NoticeFile> noticeFiles = fileMapList.stream()
-
-						.map(obj -> (Map<String, String>) obj).filter(fileData -> {
-							String type = fileData.get("fileType");
-
-							return type != null && List.of("jpg", "png", "hwp", "pdf").contains(type.toLowerCase());
-						}).map(fileData -> {
-							NoticeFile noticeFile = new NoticeFile();
-							noticeFile.setOriginalName(fileData.get("originalName"));
-							noticeFile.setFilePath(fileData.get("filePath"));
-							noticeFile.setFileType(fileData.get("fileType").toLowerCase());
-							noticeFile.setNotice(notice);
-
-							return noticeFile;
-						}).collect(Collectors.toList());
-
-				notice.setNoticeFile(noticeFiles);
-				noticeRepository.save(notice);
-			}
-
-		}
-
-	}
-
-	// Helper Method(재귀함수가 복잡해질 때 사용)
-	private void deleteExistingFile(Long noticeNum) { // 해당 공지사항에 연결된 파일목록 가져옴
-		List<NoticeFile> existingFile = noticeFileRepository.findByNotice_NoticeNum(noticeNum);
-		// 각 파일의 저장경로만 추출해서 리스트로 변환
-		List<String> filePaths = existingFile.stream().map(NoticeFile::getFilePath) // NoticeFile에 속한 경로
-				.collect(Collectors.toList());
-		// 경로들을 deleteFiles메서드에 넘겨서 실제 파일 삭제
-		fileUtil.deleteFiles(filePaths);
-		// DB에서도 NoticeFile 데이터들을 삭제
-		noticeFileRepository.deleteAll(existingFile);
-	};
-
-	// 공지사항 삭제(단일)
-	@Override
-	public void deleteNotice(Long noticeNum) {
-		Member member = memberRepository.findById(JWTFilter.getMemId())
-				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
-				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
-		if (!member.getRole().equals("ADMIN")) {
-			throw new AccessDeniedException("공지사항 삭제 권한이 없습니다.");
-	    }
-		Notice notice = noticeRepository.findById(noticeNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다. 번호: " + noticeNum));
-
-		deleteExistingFile(noticeNum);
-		noticeRepository.delete(notice);
-	}
-
-	// 공지사항 삭제(일괄)
-	@Override
-	public void deleteNotices(List<Long> noticeNums) {
-		Member member = memberRepository.findById(JWTFilter.getMemId())
-				// 해당 아이디로 사용자를 찾지 못한 경우 예외 발생
-				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다." + JWTFilter.getMemId()));
-		if (!member.getRole().equals("ADMIN")) {
-			throw new AccessDeniedException("공지사항 삭제 권한이 없습니다.");
-	    }
-		
-		List<Notice> noticeList = noticeRepository.findAllById(noticeNums);
-
-		if (noticeList.size() != noticeNums.size()) {
-			// 어떤 번호가 존재하지 않는지 찾아내기
-			List<Long> foundIds = noticeList.stream().map(Notice::getNoticeNum).collect(Collectors.toList());
-			List<Long> notFoundIds = noticeNums.stream().filter(id -> !foundIds.contains(id))
-					.collect(Collectors.toList());
-
-			throw new IllegalArgumentException("존재하지 않는 공지사항 번호: " + notFoundIds);
-		}
-
-		noticeNums.forEach(this::deleteExistingFile);
-		noticeRepository.deleteAll(noticeList);
-	}
-
-	// 공지사항 상세 조회
-	@Override
-	@Transactional(readOnly = true) // 읽기 전용
-	public NoticeDetailDTO getNoticeDetail(Long noticeNum) {
-		Notice notice = noticeRepository.findById(noticeNum)
-				.orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다. 번호: " + noticeNum));
-
-		// ModelMapper로 기본 매핑
-		NoticeDetailDTO noticeDetailDTO = modelMapper.map(notice, NoticeDetailDTO.class);
-
-		// 첨부파일 정보 매핑
-		List<NoticeFileDTO> file = notice.getNoticeFile().stream()
-				.map(noticeFile -> modelMapper.map(noticeFile, NoticeFileDTO.class)).collect(Collectors.toList());
-
-		noticeDetailDTO.setFileDTO(file);
-		return noticeDetailDTO;
-	}
-
-	// 공지사항 전체 조회
-	@Override
-	@Transactional(readOnly = true)
-	public Page<NoticeListDTO> getNoticeList(NoticeSearchDTO dto, Pageable pageable) {
-		// 검색 조건을 Specification으로 변환
-		Specification<Notice> spec = NoticeSpecifications.fromDTO(dto);
-
-		// 조건에 맞는 공지사항 페이징 조회
-		Page<Notice> noticeList = noticeRepository.findAll(spec, pageable);
-
-		// 엔티티 -> DTO 변환
-		Page<NoticeListDTO> result = noticeList.map(notice -> {
-			NoticeListDTO noticeListDTO = new NoticeListDTO();
-
-			// ModelMapper로 기본 매핑
-			modelMapper.map(notice, noticeListDTO);
-
-			// 작성자 이름 설정
-			noticeListDTO.setName(notice.getMember().getName());
-
-			return noticeListDTO;
-		});
-
-		return result;
-
-	}
-
-	// 고정된 공지만 조회
-	@Override
-	@Transactional(readOnly = true)
-	public List<NoticeListDTO> findPinned() {
-		Sort sort = Sort.by("createdAt").descending(); // 작성일 기준으로 내림차순
-		List<Notice> noticeList = noticeRepository.findAllByIsPinned(true, sort); // 고정된 공지 -> 작성일 기준 내림차순으로 리스트
-
-		List<NoticeListDTO> dtoList = noticeList.stream().map(notice -> {
-			NoticeListDTO noticeListDTO = modelMapper.map(notice, NoticeListDTO.class); // 엔티티를 DTO로 매핑
-			if (notice.getMember() != null) { // member가 null이 아닐 때
-				noticeListDTO.setName(notice.getMember().getName()); // 작성자 설정
-			}
-			return noticeListDTO; // noticeListDTO로 반환
-		}).collect(Collectors.toList()); // 리스트로 수집
-
-		return dtoList; // dtoList로 반환
-
-	}
-
-	// 상세 공지 조회 시 조회수 증가
-	@Override
-	public void increaseView(Long noticeNum) {
-		Notice notice = noticeRepository.findById(noticeNum)
-		        .orElseThrow(() -> new IllegalArgumentException("해당 공지사항이 존재하지 않습니다. 번호: " + noticeNum));
-		notice.setView(notice.getView() + 1);
-
-	}
-
+    
+    private final NoticeRepository noticeRepository;
+    private final NoticeFileRepository noticeFileRepository;
+    private final MemberRepository memberRepository;
+    private final FileUtil fileUtil;
+    
+    private static final List<String> ALLOWED_FILE_TYPES = //파일 유형
+            List.of("jpg", "jpeg", "png", "pdf", "hwp", "doc", "docx");
+    
+    @Override
+    public Long createNotice(NoticeCreateRegisterDTO registerDto) {
+        // 권한 검증(현재 로그인한 사용자)
+        Member currentMember = getCurrentMember();
+        validateAdminRole(currentMember);
+        
+        // Notice 엔티티 생성
+        Notice notice = Notice.builder()
+                .title(registerDto.getTitle())
+                .content(registerDto.getContent())
+                .isPinned(registerDto.isPinned())
+                .member(currentMember)
+                .build();
+        
+        // 파일 처리
+        if (hasValidFiles(registerDto.getFiles())) {
+            List<NoticeFile> noticeFiles = processFiles(registerDto.getFiles(), notice);
+            noticeFiles.forEach(notice::addNoticeFile);
+        }
+        
+        Notice savedNotice = noticeRepository.save(notice);
+        return savedNotice.getNoticeNum();
+    }
+    
+    @Override
+    public void updateNotice(Long noticeNum, NoticeUpdateRegisterDTO registerDto) {
+        // 권한 검증
+        Member currentMember = getCurrentMember();
+        validateAdminRole(currentMember);
+        
+        // 기존 공지사항 조회
+        Notice notice = noticeRepository.findById(noticeNum)
+                .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
+        
+        // 내용 업데이트
+        notice.updateContent(registerDto.getTitle(), registerDto.getContent(), registerDto.isPinned());
+        
+        // 파일 처리
+        handleFileUpdates(notice, registerDto);
+        
+        noticeRepository.save(notice);
+    }
+    
+    @Override
+    public void deleteNotice(Long noticeNum) {
+        Member currentMember = getCurrentMember();
+        validateAdminRole(currentMember);
+        
+        Notice notice = noticeRepository.findById(noticeNum)
+                .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
+        
+        // 파일 삭제 (orphanRemoval = true로 인해 자동으로 삭제되지만, 물리적 파일은 직접 삭제 필요)
+        deleteNoticeFiles(notice.getNoticeNum());
+        
+        // 공지사항 삭제
+        noticeRepository.delete(notice);
+    }
+    
+    @Override
+    public void deleteNotices(List<Long> noticeNums) {
+        Member currentMember = getCurrentMember();
+        validateAdminRole(currentMember);
+        
+        // 존재하는 공지사항들 조회
+        List<Notice> notices = noticeRepository.findAllById(noticeNums);
+        
+        if (notices.size() != noticeNums.size()) {
+            List<Long> foundIds = notices.stream()
+                    .map(Notice::getNoticeNum)
+                    .toList();
+            List<Long> notFoundIds = noticeNums.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .toList();
+            throw new EntityNotFoundException("존재하지 않는 공지사항: " + notFoundIds);
+        }
+        
+        // 파일들 삭제
+        noticeNums.forEach(this::deleteNoticeFiles);
+        
+        // 공지사항들 삭제
+        noticeRepository.deleteAll(notices);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public NoticeDetailDTO getNoticeDetail(Long noticeNum) {
+        Notice notice = noticeRepository.findById(noticeNum)
+                .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
+        
+        return mapToDetailDTO(notice);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NoticeListDTO> getNoticeList(NoticeSearchDTO searchDto) {
+        // 정렬 설정
+        Sort sort = Sort.by(
+                Sort.Direction.fromString(searchDto.getSortDirection()),
+                searchDto.getSortBy()
+        );
+        
+        Pageable pageable = PageRequest.of(searchDto.getPage(), searchDto.getSize(), sort);
+        
+        // 검색 조건 생성
+        Specification<Notice> spec = NoticeSpecifications.createSpecification(searchDto);
+        
+        // 조회 및 변환
+        Page<Notice> notices = noticeRepository.findAll(spec, pageable);
+        
+        return notices.map(this::mapToListDTO);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<NoticeListDTO> getPinnedNotices() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<Notice> pinnedNotices = noticeRepository.findAllByIsPinned(true, sort);
+        
+        return pinnedNotices.stream()
+                .map(this::mapToListDTO)
+                .toList();
+    }
+    
+    @Override
+    public void increaseViewCount(Long noticeNum) {
+        Notice notice = noticeRepository.findById(noticeNum)
+                .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
+        
+        notice.increaseViewCount();
+        noticeRepository.save(notice);
+    }
+    
+// 헬퍼메소드
+    
+    private Member getCurrentMember() {
+        return memberRepository.findById(JWTFilter.getMemId())
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + JWTFilter.getMemId()));
+    }
+    
+    private void validateAdminRole(Member member) {
+        if (!"ADMIN".equals(member.getRole())) {
+            throw new AccessDeniedException("관리자 권한이 필요합니다.");
+        }
+    }
+    
+    private boolean hasValidFiles(List<MultipartFile> files) {
+        return files != null && !files.isEmpty() && 
+               files.stream().anyMatch(file -> !file.isEmpty());
+    }
+    
+    private List<NoticeFile> processFiles(List<MultipartFile> files, Notice notice) {
+        String dirName = "notice-files";
+        List<Object> fileDataList = fileUtil.saveFiles(files, dirName);
+        
+        return fileDataList.stream()
+                .map(obj -> (Map<String, String>) obj)
+                .filter(this::isAllowedFileType)
+                .map(fileData -> NoticeFile.builder()
+                        .originalName(fileData.get("originalName"))
+                        .filePath(fileData.get("filePath"))
+                        .fileType(fileData.get("fileType").toLowerCase())
+                        .notice(notice)
+                        .build())
+                .toList();
+    }
+    
+    private boolean isAllowedFileType(Map<String, String> fileData) {
+        String fileType = fileData.get("fileType");
+        return fileType != null && ALLOWED_FILE_TYPES.contains(fileType.toLowerCase());
+    }
+    
+    private void handleFileUpdates(Notice notice, NoticeUpdateRegisterDTO requestDto) {
+        // 기존 파일 삭제 (요청에 따라)
+        if (requestDto.getDeleteFileIds() != null && !requestDto.getDeleteFileIds().isEmpty()) {
+            deleteSpecificFiles(requestDto.getDeleteFileIds());
+        }
+        
+        // 새 파일 추가
+        if (hasValidFiles(requestDto.getNewFiles())) {
+            List<NoticeFile> newFiles = processFiles(requestDto.getNewFiles(), notice);
+            newFiles.forEach(notice::addNoticeFile);
+        }
+    }
+    
+    private void deleteNoticeFiles(Long noticeNum) {
+        List<NoticeFile> files = noticeFileRepository.findByNotice_NoticeNum(noticeNum);
+        
+        if (!files.isEmpty()) {
+            // 물리적 파일 삭제
+            List<String> filePaths = files.stream()
+                    .map(NoticeFile::getFilePath)
+                    .toList();
+            
+            fileUtil.deleteFiles(filePaths);
+            
+            // DB에서 파일 정보 삭제 (orphanRemoval = true로 인해 자동 삭제되지만 명시적으로 처리)
+            noticeFileRepository.deleteAll(files);
+        }
+    }
+    
+    private void deleteSpecificFiles(List<String> fileIds) {
+        List<Long> fileIdLongs = fileIds.stream()
+                .map(Long::valueOf)
+                .toList();
+        
+        List<NoticeFile> filesToDelete = noticeFileRepository.findAllById(fileIdLongs);
+        
+        if (!filesToDelete.isEmpty()) {
+            // 물리적 파일 삭제
+            List<String> filePaths = filesToDelete.stream()
+                    .map(NoticeFile::getFilePath)
+                    .toList();
+            
+            fileUtil.deleteFiles(filePaths);
+            
+            // DB에서 파일 정보 삭제
+            noticeFileRepository.deleteAll(filesToDelete);
+        }
+    }
+    
+    // DTO 매핑 메서드들
+    private NoticeDetailDTO mapToDetailDTO(Notice notice) {
+        List<NoticeFileDTO> files = notice.getNoticeFiles().stream()
+                .map(this::mapToFileDTO)
+                .toList();
+        
+        NoticeDetailDTO detailDTO = new NoticeDetailDTO();
+        detailDTO.setNoticeNum(notice.getNoticeNum());
+        detailDTO.setTitle(notice.getTitle());
+        detailDTO.setContent(notice.getContent());
+        detailDTO.setPinned(notice.isPinned());
+        detailDTO.setViewCount(notice.getViewCount());
+        detailDTO.setName(notice.getMember().getName());
+        detailDTO.setMem_id(notice.getMember().getMemId());
+        detailDTO.setCreatedAt(notice.getCreatedAt());
+        detailDTO.setUpdatedAt(notice.getUpdatedAt());
+        detailDTO.setFiles(files);
+        
+        return detailDTO;
+    }
+    
+    private NoticeListDTO mapToListDTO(Notice notice) {
+        NoticeListDTO listDTO = new NoticeListDTO();
+        listDTO.setNoticeNum(notice.getNoticeNum());
+        listDTO.setTitle(notice.getTitle());
+        listDTO.setPinned(notice.isPinned());
+        listDTO.setName(notice.getMember().getName());
+        listDTO.setViewCount(notice.getViewCount());
+        listDTO.setCreatedAt(notice.getCreatedAt());
+        listDTO.setFileCount(notice.getNoticeFiles().size());
+        
+        return listDTO;
+    }
+    
+    private NoticeFileDTO mapToFileDTO(NoticeFile noticeFile) {
+        NoticeFileDTO fileDTO = new NoticeFileDTO();
+        fileDTO.setOriginalName(noticeFile.getOriginalName());
+        fileDTO.setFilePath(noticeFile.getFilePath());
+        fileDTO.setFileType(noticeFile.getFileType());
+        fileDTO.setDownloadUrl("/api/notices/files/" + noticeFile.getNotFileNum() + "/download");
+        
+        return fileDTO;
+    }
 }

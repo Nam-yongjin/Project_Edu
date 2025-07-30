@@ -2,12 +2,18 @@ package com.EduTech.dto.news;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewsListDTO {
 	
-	private Long noticeNum; //공지사항번호
+	private Long newsNum; //뉴스번호
 	
 	private String title; //제목
 	
@@ -15,6 +21,6 @@ public class NewsListDTO {
 	
 	private LocalDateTime createdAt; //작성일
 	
-	private Long view; //조회수
+	private Long viewCount; //조회수
 
 }
