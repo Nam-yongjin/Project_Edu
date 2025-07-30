@@ -93,7 +93,7 @@ export const modifyCompany = async (params) => {
     return res.data;
 };
 
-// 회원정보삭제
+// 회원탈퇴
 export const leaveMember = async () => {
     const res = await jwtAxios.delete(`${host}/leave`);
     return res.data;

@@ -4,25 +4,27 @@ import useMove from '../../../hooks/useMove';
 import { registerStudent, checkDuplicateId } from '../../../api/memberApi';
 import AddressSearch from '../AddressSearch';
 
-const initState = {        memId: '',
-        pw: '',
-        pwCheck: '',
-        name: '',
-        email: '',
-        birthDate: '',
-        gender: '',
-        addr: '',
-        addrDetail: '',
-        checkSms: false,
-        checkEmail: false,
-        schoolName: '',
-        role: 'STUDENT'};
+const initState = {
+    memId: '',
+    pw: '',
+    pwCheck: '',
+    name: '',
+    email: '',
+    birthDate: '',
+    gender: '',
+    addr: '',
+    addrDetail: '',
+    checkSms: false,
+    checkEmail: false,
+    schoolName: '',
+    role: 'STUDENT'
+};
 
 const StudentRegisterComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
     const { moveToLogin } = useMove();
     const [idCheck, setIdCheck] = useState(false);
-    const [form, setForm] = useState({...initState});
+    const [form, setForm] = useState({ ...initState });
 
     const [errors, setErrors] = useState({});
 
@@ -111,7 +113,7 @@ const StudentRegisterComponent = () => {
         registerStudent(dataToSubmit).then((response) => {
             alert('회원가입 완료');
             // 초기화
-            setForm({...initState});
+            setForm({ ...initState });
             setVerifiedPhone(null);
             setErrors({});
             moveToLogin();
@@ -146,7 +148,7 @@ const StudentRegisterComponent = () => {
     };
 
     return (
-        <div className='space-y-5 mt-10 mx-2 pl-4'>
+        <div className='space-y-5 mt-10 mx-2 pl-4 text-center'>
             <div className='text-3xl'>회원가입</div>
             <div>
                 <input
@@ -216,14 +218,27 @@ const StudentRegisterComponent = () => {
             </div>
 
             <div>
-                <select
-                    name="gender"
-                    value={form.gender}
-                    onChange={handleChange}>
-                    <option value="">성별 선택</option>
-                    <option value="MALE">남성</option>
-                    <option value="FEMALE">여성</option>
-                </select>
+                <div>성별 선택</div>
+                <label>
+                    <input
+                        type="radio"
+                        name="gender"
+                        value="MALE"
+                        checked={form.gender === 'MALE'}
+                        onChange={handleChange}
+                    />
+                    남성
+                </label>
+                <label className="ml-4">
+                    <input
+                        type="radio"
+                        name="gender"
+                        value="FEMALE"
+                        checked={form.gender === 'FEMALE'}
+                        onChange={handleChange}
+                    />
+                    여성
+                </label>
                 {errors.gender && <div style={{ color: 'red' }}>{errors.gender}</div>}
             </div>
 

@@ -2,7 +2,7 @@ import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
 
-const Role = lazy(() => import("../pages/member/RegisterRolePage"));
+const Terms = lazy(() => import("../pages/member/registerTermsPage"));
 const Member = lazy(() => import("../pages/member/memberRegisterPage"));
 const Student = lazy(() => import("../pages/member/student/studentRegisterPage"));
 const Teacher = lazy(() => import("../pages/member/teacher/teacherRegisterPage"));
@@ -12,13 +12,13 @@ const registerRouter = () => {
 
     return [
         {
-            path: "role",
-            element: <Suspense fallback={<Loading />}><Role /></Suspense>,
+            path: "terms",
+            element: <Suspense fallback={<Loading />}><Terms /></Suspense>,
         },
         {
             // 자동 리다이렉션
             path: "",
-            element: <Navigate replace to="role" />
+            element: <Navigate replace to="terms" />
         },
         {
             path: "member",

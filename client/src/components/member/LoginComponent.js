@@ -18,13 +18,11 @@ const LoginComponent = () => {
 
     const handleClickLogin = () => {
         doLogin(loginParam).then(res => {
-            if (res.error) {
-                alert("아이디와 비밀번호를 다시 확인하세요.");
-                removeCookie("member");
-            } else {
-                alert("로그인 되었습니다.");
-                moveToPath('/');
-            };
+            alert("로그인 되었습니다.");
+            moveToPath('/');
+        }).catch(err => {
+            alert(err.message || "로그인에 실패했습니다.");
+            removeCookie("member");
         });
     };
 
