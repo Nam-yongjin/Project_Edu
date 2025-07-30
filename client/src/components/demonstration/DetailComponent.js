@@ -14,7 +14,12 @@ const DetailComponent = () => {
                         <h3>물품소개: 물품소개 입니다.</h3>
                     </div>
                 </div>
-
+            <div> 
+                <h2>날짜 선택</h2> (신청기간은 연속으로 최소 30일부터 신청 가능합니다.(최대90일)) 
+                <div className="w-10 h-5 rounded-full bg-purple-400 flex items-center justify-center border-2 border-black">불가</div>
+                <div className="w-10 h-5 rounded-full bg-red-400 flex items-center justify-center border-2 border-black">가능</div>
+                <div className="w-10 h-5 rounded-full bg-blue-400 flex items-center justify-center border-2 border-black">선택</div>
+            </div>
             </div>
             <CalendarComponent />
         </>
