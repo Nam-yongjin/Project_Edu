@@ -1,80 +1,82 @@
 import { useState } from "react";
 import useLogin from "../../hooks/useLogin";
-import KakaoLoginComponent from "./KakaoLoginComponent";
 import useMove from "../../hooks/useMove";
 import { Link } from "react-router-dom";
+import KakaoLoginComponent from "./KakaoLoginComponent";
+import { removeCookie } from "../../util/cookieUtil";
 
-const initState = {
-    memId: '',
-    pw: ''
-};
+const initState = { memId: '', pw: '' };
 
 const LoginComponent = () => {
     const [loginParam, setLoginParam] = useState({ ...initState });
-
     const { doLogin } = useLogin();
     const { moveToPath } = useMove();
 
     const handleChange = (e) => {
-        loginParam[e.target.name] = e.target.value;
-
-        setLoginParam({ ...loginParam });
+        setLoginParam(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleClickLogin = () => {
-        doLogin(loginParam)
-            .then(data => {
-                if (data.error) {
-                    alert("아이디와 패스워드를 다시 확인하세요");
-                } else {
-                    moveToPath('/');
-                };
-            });
+        doLogin(loginParam).then(res => {
+            if (res.error) {
+                alert("아이디와 비밀번호를 다시 확인하세요.");
+                removeCookie("member");
+            } else {
+                alert("로그인 되었습니다.");
+                moveToPath('/');
+            };
+        });
     };
-    const handleKeydown = (e) => {
-        if (e.key === "Enter")
-            handleClickLogin();
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") handleClickLogin();
     };
 
     return (
-        <div className="border-2 border-sky-200 mt-10 m-2 p-4">
-            <div className="flex justify-center">
-                <div className="text-4xl m-4 p-4 font-extrabold text-blue-500">Login Component</div>
+        <div className="p-4 border-2 border-blue-300 mt-10">
+            <h2 className="text-4xl text-center text-blue-600 font-bold mb-6">Login</h2>
+
+            <div className="mb-4">
+                <label className="font-bold block">ID</label>
+                <input
+                    name="memId"
+                    value={loginParam.memId}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    className="w-full p-3 border rounded"
+                    autoFocus
+                />
             </div>
-            <div className="flex justify-center">
-                <div className="relative mb-4 flex w-full flex-wrap items-center">
-                    <div className="w-full p-3 text-left font-bold">ID</div>
-                    <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md" autoFocus
-                        name="memId" type={'text'} value={loginParam.memId} onChange={handleChange} onKeyDown={handleKeydown} /> </div>
+
+            <div className="mb-4">
+                <label className="font-bold block">Password</label>
+                <input
+                    name="pw"
+                    type="password"
+                    value={loginParam.pw}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    className="w-full p-3 border rounded"
+                />
             </div>
+
             <div className="flex justify-center">
-                <div className="relative mb-4 flex w-full flex-wrap items-center">
-                    <div className="w-full p-3 text-left font-bold">Password</div>
-                    <input className="w-full p-3 rounded-r border border-solid border-neutral-500 shadow-md"
-                        name="pw" type={'password'} value={loginParam.pw} onChange={handleChange} onKeyDown={handleKeydown} /> </div>
+                <button
+                    onClick={handleClickLogin}
+                    className="bg-blue-500 text-white font-bold p-3 w-36 rounded hover:bg-blue-600"
+                >
+                    LOGIN
+                </button>
             </div>
-            <div className="flex justify-center">
-                <div className="relative mb-4 flex w-full justify-center">
-                    <div className="w-2/5 p-6 flex justify-center font-bold">
-                        <button className="rounded p-4 w-36 bg-blue-500 text-xl	text-white active:bg-blue-600"
-                            onClick={handleClickLogin}>
-                            LOGIN
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="flex justify-center">
-                <div className="relative mb-4 flex w-full justify-center">
-                    <div className="p-6 flex justify-center font-bold">
-                        <div className="hover:text-gray-400 cursor-pointer active:text-gray-600"><Link to={'/findId'}>아이디찾기</Link></div>
-                        <div className="px-2"> | </div>
-                        <div className="hover:text-gray-400 cursor-pointer active:text-gray-600"><Link to={'/resetPw'}>비밀번호 찾기(재설정)</Link></div>
-                    </div>
-                </div>
+
+            <div className="text-center mt-4">
+                <Link to="/findId" className="text-sm text-gray-600 hover:underline">아이디 찾기</Link>
+                <span className="mx-2">|</span>
+                <Link to="/resetPw" className="text-sm text-gray-600 hover:underline">비밀번호 재설정</Link>
             </div>
             <KakaoLoginComponent />
         </div>
     );
-
 };
+
 export default LoginComponent;

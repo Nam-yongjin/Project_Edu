@@ -7,6 +7,7 @@ const useMove = () => {
     // 해당 경로로 이동
     const moveToPath = (path) => {
         navigate({ pathname: path }, { replace: true });
+        window.location.reload();   // 새로고침
     };
 
     // 뒤로가기
@@ -17,6 +18,7 @@ const useMove = () => {
     // 로그인 페이지로 이동
     const moveToLogin = () => {
         navigate({ pathname: '/login' }, { replace: true });
+        window.location.reload();
     };
     return { moveToPath, moveToReturn, moveToLogin };
 };

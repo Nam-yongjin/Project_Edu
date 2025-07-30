@@ -78,7 +78,7 @@ public class MemberController {
 
 	// 일반회원 상세정보
 	@GetMapping("/member/myInfo")
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")	// role 불러오기위한 인증된 사용자 접근
 	public ResponseEntity<MemberDetailDTO> memberInfo() {
 		String memId = JWTFilter.getMemId();
 		return ResponseEntity.ok(memberService.readMemberInfo(memId));
