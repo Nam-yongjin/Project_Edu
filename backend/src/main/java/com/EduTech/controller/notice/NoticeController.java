@@ -40,16 +40,16 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/notice")
 public class NoticeController {
 
-    private final NoticeService noticeService;
-    private final NoticeFileRepository noticeFileRepository;
-    private final FileUtil fileUtil;
+	private final NoticeService noticeService;
+	private final NoticeFileRepository noticeFileRepository;
+	private final FileUtil fileUtil;
 
-    // 일반 회원
+	// 일반 회원
 
-    // 공지사항 전체 조회(검색, 페이징)
-    @GetMapping("/NoticeList")
+	// 공지사항 전체 조회(검색, 페이징)
+	@GetMapping("/NoticeList")
     public ResponseEntity<Page<NoticeListDTO>> getNoticeList(@ModelAttribute NoticeSearchDTO searchDTO) {
-    	System.out.println("리스트");
+    	System.out.println("콘솔에 나오는지 체크");
     	
         return ResponseEntity.ok(noticeService.getNoticeList(searchDTO));
     }
@@ -143,4 +143,5 @@ public class NoticeController {
             throw new RuntimeException("파일 다운로드 중 오류가 발생했습니다.", e);
         }
     }
+    
 }
