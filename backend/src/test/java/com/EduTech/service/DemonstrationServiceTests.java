@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -287,7 +288,7 @@ public class DemonstrationServiceTests {
 	void addDem() {
 
 		DemonstrationFormReqDTO demonstrationFormDTO = new DemonstrationFormReqDTO();
-		demonstrationFormDTO.setDemInfo("힘들");
+		demonstrationFormDTO.setDemInfo("힘들ddsadsadsad");
 		demonstrationFormDTO.setDemMfr("다");
 		demonstrationFormDTO.setDemName("그만");
 		demonstrationFormDTO.setExpDate(LocalDate.parse("2025-10-20"));
@@ -310,8 +311,26 @@ public class DemonstrationServiceTests {
 					"image/jpg", // content type
 					imageBytes2 // 실제 파일 내용 (byte 배열)
 			);
+			MockMultipartFile mockFile3 = new MockMultipartFile("file", // form field name
+					"바지1.jpg", // 원래 파일명
+					"image/jpg", // content type
+					imageBytes2 // 실제 파일 내용 (byte 배열)
+			);
+			MockMultipartFile mockFile4 = new MockMultipartFile("file", // form field name
+					"바지1.jpg", // 원래 파일명
+					"image/jpg", // content type
+					imageBytes2 // 실제 파일 내용 (byte 배열)
+			);
+			MockMultipartFile mockFile5 = new MockMultipartFile("file", // form field name
+					"바지1.jpg", // 원래 파일명
+					"image/jpg", // content type
+					imageBytes2 // 실제 파일 내용 (byte 배열)
+			);
 			imageList.add(mockFile);
 			imageList.add(mockFile2);
+			imageList.add(mockFile3);
+			imageList.add(mockFile4);
+			imageList.add(mockFile5);
 			demonstrationFormDTO.setImageList(imageList);
 		} catch (Exception e) {
 

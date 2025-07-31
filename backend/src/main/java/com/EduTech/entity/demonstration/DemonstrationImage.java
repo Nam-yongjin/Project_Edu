@@ -32,6 +32,8 @@ public class DemonstrationImage {
 	@Column(nullable = false)
 	private String imageUrl; // 이미지 URL
 
+	@Column(nullable=false)
+	private Boolean isMain; // 대표 이미지 여부
 	
 	// joincolumn으로 외래키 설정 (Demonstration_image와 demonstration은 다 대 일 관계이다.) demonstration에도 mappedby 사용해서 양방향으로 구현할 것임.
 	@ManyToOne
