@@ -51,7 +51,7 @@ public class JWTProvider {
                     .parseClaimsJws(token)	// 파싱 및 검증, 실패 시 에러
                     .getBody();
 		} catch (ExpiredJwtException e) {
-			throw new JWTException("Expired");
+			throw new JWTException("Expired");	// 액세스 토큰 만료 시 "Expired" 예외 발생
 		} catch (JwtException e) {
 			throw new JWTException("Invalid Token");
 		} catch (Exception e) {
