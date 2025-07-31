@@ -9,6 +9,7 @@ import companyRouter from "./companyRouter";
 import demonstrationRouter from "./demonstrationRouter";
 import noticeRouter from "./noticeRouter";
 import eventRouter from "./eventRouter";
+import aboutRouter from "./aboutRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
@@ -23,6 +24,7 @@ const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
 const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
 const Notice = lazy(() => import("../pages/notice/noticePage"))
 const Event = lazy(() => import("../pages/event/eventPage"))
+const About = lazy(() => import("../pages/about/AboutPage"))
 
 
 const root = createBrowserRouter([
@@ -85,8 +87,13 @@ const root = createBrowserRouter([
     },
     {
         path: "event",
-        element: <Suspense fallbackk={<Loading />}><Event /></Suspense>,
+        element: <Suspense fallback={<Loading />}><Event /></Suspense>,
         children: eventRouter()
+    },
+    {
+        path: "about",
+        element: <Suspense fallback={<Loading />}><About /></Suspense>,
+        children: aboutRouter()
     }
 
 ])
