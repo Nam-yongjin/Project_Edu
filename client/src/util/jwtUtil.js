@@ -20,14 +20,19 @@ const beforeReq = (config) => {
 // 응답을 받은 후 실행
 const beforeRes = async (res) => {
     const data = res.data;
-    if (data?.error === "ERROR_ACCESS_TOKEN") {
+    if (data && data?.error === "ERROR_ACCESS_TOKEN") {
         const member = getCookie("member");
         // accessToken 재발급 요청
         const result = await refreshJWT(member.accessToken, member.refreshToken);
 
-        const updated = { ...member, ...result };
+        // const updated = { ...member, ...result };
+
+        member.accessToken = result.accessToken
+        member.refreshToken = result.refreshToken
+
         // 새로 발급받은 토큰을 쿠키에 저장
-        setCookie("member", JSON.stringify(updated), 1);
+        // setCookie("member", JSON.stringify(updated), 1);
+        setCookie("member", JSON.stringify(member), 1);
 
         // 원래 요청을 한 번 더 보냄
         res.config.headers.Authorization = `Bearer ${result.accessToken}`;
