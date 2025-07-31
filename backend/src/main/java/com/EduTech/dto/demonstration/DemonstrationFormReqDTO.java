@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.Min;
@@ -33,7 +34,9 @@ public class DemonstrationFormReqDTO { // 기업이 실증 물품 dto (프론트
 	private Long itemNum; // 개수
 	
 	@NotNull(message="반납 예정일은 필수입니다.")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate expDate; // 반납 예정일
+	
 	private Long demNum; // 실증 번호
 	private String memId; // 회원 아이디
 	@Size(max = 10, message = "이미지는 최대 10개까지 가능합니다.")
