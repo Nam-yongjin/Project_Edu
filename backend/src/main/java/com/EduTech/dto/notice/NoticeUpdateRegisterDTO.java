@@ -19,7 +19,7 @@ public class NoticeUpdateRegisterDTO {
 	@Size(max = 3000, message = "내용은 최대 3000자까지 입력 가능합니다.")
 	private String content; //내용
 	
-	private boolean isPinned; //게시판 고정
+	private Boolean isPinned; //게시판 고정
 	
 	private List<MultipartFile> newFiles; //새로 업로드 할 파일
 

@@ -20,7 +20,7 @@ public interface NoticeService {
 	void updateNotice(Long noticeNum, NoticeUpdateRegisterDTO requestDto);
 	
 	//공지사항 삭제(단일)
-	 void deleteNotice(Long noticeNum);
+	void deleteNotice(Long noticeNum);
 	
 	//공지사항 삭제(일괄)
 	void deleteNotices(List<Long> noticeNums);

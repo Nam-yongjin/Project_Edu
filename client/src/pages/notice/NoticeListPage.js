@@ -1,129 +1,184 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import useMove from "../../hooks/useMove";
+import { NoticeList } from "../../api/noticeApi";
+import NoticeSearchComponent from "../../components/notice/NoticeSearchComponent";
 import NoticeListComponent from "../../components/notice/NoticeListComponent";
+import NoticeButtonsComponent from "../../components/notice/NoticeButtonsComponent";
 import NoticeTitleComponent from "../../components/notice/NoticeTitleComponent";
-import { NoticeList, NoticeAllList } from "../../api/noticeApi";
 
+//공지 데이터를 서버에서 받아와서 화면에 보여주고 검색, 삭제 기능 담당
 const NoticeListPage = () => {
-  const loginState = useSelector((state) => state.loginState);
-  const { moveToPath } = useMove();
-
+  const loginState = useSelector((state) => state.loginState); //로그인 상태 확인
+  //상태변수들
+  //const [상태 변수, 상태 변경 함수] = useState(초기값);
   const [notices, setNotices] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [selectedNotices, setSelectedNotices] = useState([]);
-  const [search, setSearch] = useState("");
-  const [searchType, setSearchType] = useState("title");
-  const [searchValues, setSearchValues] = useState({
-    title: "",
-    content: "",
-    name: "",
-  })
 
-  const fetchNotices = async () => {
-    try {
-      const res = await axios.get("/api/notice", {
-        params: {
-          keyword: search,
-          searchType,
-          sort: "created_at",
-          orderBy: "desc",
-        },
-      });
-      setNotices(res.data.content || res.data);
+  const [searchParams, setSearchParams] = useState({
+    page: 0,
+    size: 10,
+    keyword: "",
+    searchType: "ALL",
+    startDate: "",
+    endDate: "",
+    isPinned: null,
+    sortBy: "createdAt",
+    sortDirection: "DESC"
+  });
+
+  //공지사항 목록 조회
+  const fetchNotices = async (params = searchParams) => {
+    setLoading(true);
+    try{
+      const response = await NoticeList(params);//컨트롤러에 전달되는 매개변수
+      setNotices(response.content || []);
+      setTotalPages(response.totalPages || 0);
+      setTotalElements(response.totalElements || 0);
+      setCurrentPage(response.number || 0);
     } catch (error) {
-      console.error("공지 불러오기 실패:", error);
+      console.error("공지사항 목록 조회 실패:", error);
+      setNotices([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSearch = () => {
-    fetchNotices();
-  };
-
-  const handleWrite = (e) => {
-    e.preventDefault();
-    moveToPath("/notice/add");
-  };
-
-  const handleTypeChange = (e) => {
-    setSearchType(e.target.value);
-  };
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchValues((prev) => ({
-      ...prev,
-      [searchType]: value, // 현재 선택된 타입에 따라 값 저장
-    }));
-  };
-
-  const handleDelete = async () => {
-    if (selectedNotices.length === 0) {
-      alert("삭제할 공지를 선택해 주세요.");
-      return;
-    }
-    if (!window.confirm("선택한 공지를 삭제하시겠습니까?")) return;
-
-    try {
-      await axios.post("/api/notice/deleteNotices", {
-        noticeNums: selectedNotices,
-      });
-
-      alert("삭제되었습니다.");
-      setSelectedNotices([]);
-      fetchNotices();
-    } catch (error) {
-      console.error("삭제 실패:", error);
-    }
-  };
-
+  //처음 페이지 들어오면 초기 데이터를 나타냄
   useEffect(() => {
-    // fetchNotices();
-     NoticeAllList()
-      .then(data => {
-        console.log(data);
-      })
+    fetchNotices();
   }, []);
 
-  return (
-    <div>
-      <NoticeTitleComponent title="공지사항" />
+  //검색 처리
+  const handleSearch = (newSearchParams) => {
+    const updatedParams = {
+      ...newSearchParams,
+      page: 0 //검색 시 첫 페이지로
+    };
+    setSearchParams(updatedParams);
+    fetchNotices(updatedParams);
+    setSelectedNotices([]); //선택 초기화
+  };
 
-      {/* 검색창 */}
+  //페이지 변경
+  const handlePageChange = (page) => {
+    const updatedParams = {
+      ...searchParams,
+      page: page
+    };
+    setSearchParams(updatedParams);
+    fetchNotices(updatedParams);
+    setSelectedNotices([]); //페이지 변경 시 선택 초기화
+  }
+
+  //페이지네이션
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const startPage = Math.max(0, currentPage - 2); //첫 페이지
+    const endPage = Math.min(totalPages - 1, currentPage + 2); //마지막 페이지
+
+    //이전 버튼
+    if (currentPage > 0) {
+      pages.push(
+        <button
+          key="prev"
+          onClick={() => handlePageChange(currentPage - 1)}
+          className="px-3 py-1 mx-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+        > 이전 </button>
+      );
+    }
+
+    //페이지 번호
+    for (let i = startPage; i  <= endPage; i++)  {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 mx-1 rounded ${
+            currentPage === i
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+          >
+            {i + 1}
+          </button>
+      );
+    }
+
+    //다음 버튼
+    if (currentPage < totalPages - 1) {
+      pages.push(
+        <button
+          key="next"
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="px-3 py-1 mx-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+        > 다음 </button>
+      );
+    }
+
+    return (
+      <div className="flex justify-center items-center mt-6">
+        {pages}
+      </div>
+    );
+  };
+
+  return (
       <div>
-        <select value={searchType} onChange={handleInputChange}>
-          <option value="title">제목</option>
-          <option value="content">내용</option>
-          <option value="name">작성자</option>
-          {loginState.role === 'ADMIN' ? (
-            <option value="isPinned">고정글</option>
-           ) : (<></>)}
-        </select>
-        <input
-          type="text"
-          placeholder="검색어입력"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button onClick={handleSearch} className="bg-gray-200">검색</button>
+        <NoticeTitleComponent title="공지사항" />
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">공지사항</h1>
+            <p className="text-gray-600 mt-1">
+              전체 {totalElements}건의 공지사항이 있습니다.
+            </p>
+          </div>
+
+          {/* 검색 컴포넌트 */}
+          <NoticeSearchComponent
+            onSearch={handleSearch}
+            initialValues={searchParams}
+          />
+
+          {/* 공지사항 리스트 컴포넌트 */}
+          <div className="bg-white shadow-sm border border-gray-200" rounded-lg overflow-hidden>
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <span className="ml-2 text-gray-600">로딩중...</span>
+              </div>
+            ) : (
+              <NoticeListComponent
+                notices={notices}
+                selectedNotices={selectedNotices}
+                setSelectedNotices={setSelectedNotices}
+                isAdmin={loginState.role === 'ADMIN'}
+              />
+            )}
+          </div>
+
+          {/* 페이지네이션 */}
+          {renderPagination()}
+
+          {/* 하단 버튼 */}
+          <NoticeButtonsComponent
+            isAdmin={loginState.role === 'ADMIN'}
+            selectedNotices={selectedNotices}
+            onDelete={() => {
+              //삭제 후 목록 새로고침
+              fetchNotices();
+              selectedNotices([]);
+            }}
+          />
+        </div>
       </div>
 
-      <h2>공지사항</h2>
-      <NoticeListComponent
-        notices={notices}
-        selectedNotices={selectedNotices}
-        setSelectedNotices={setSelectedNotices}
-        loginState={loginState}
-      />
-
-      {loginState.role === 'ADMIN' ? (
-        <div>
-          <button onClick={handleWrite}>글쓰기</button>
-          <button onClick={handleDelete}>삭제하기</button>
-        </div>
-       ) : (<></>)}
-    </div>
-  );
+    );
 };
 
 export default NoticeListPage;

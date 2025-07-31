@@ -11,7 +11,7 @@ public class NoticeListDTO { //목록조회용
 	
 	private String title; //제목
 	
-	private boolean isPinned; //게시판 고정
+	private Boolean isPinned; //게시판 고정
 	
 	private String name; //이름
 	
