@@ -160,7 +160,7 @@ public class NoiceServiceTests {
             System.out.println((i+1) + ". " + dto.getTitle() + 
                              " (작성자: " + dto.getName() + 
                              ", 조회수: " + dto.getViewCount() + 
-                             ", 고정: " + dto.isPinned() + ")");
+                             ", 고정: " + dto.getIsPinned() + ")");
         }
         
         System.out.println("===== 목록 조회 테스트 완료 =====\n");
@@ -213,7 +213,7 @@ public class NoiceServiceTests {
         for (int i = 0; i < pinnedList.size(); i++) {
             NoticeListDTO dto = pinnedList.get(i);
             System.out.println((i+1) + ". " + dto.getTitle() + 
-                             " 고정: " + dto.isPinned());
+                             " 고정: " + dto.getIsPinned());
         }
         
         // 정렬 확인 (최신순)

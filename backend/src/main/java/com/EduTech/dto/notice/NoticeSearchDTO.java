@@ -23,7 +23,7 @@ public class NoticeSearchDTO { //검색
 	
 	private String sortDirection = "DESC"; //정렬 순서
 
-	private boolean isPinned; //게시판 고정
+	private Boolean isPinned; //게시판 고정(null값을 받을 수 있도록)
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate startDate; //검색 기간 설정

@@ -11,16 +11,21 @@ import com.EduTech.entity.notice.Notice;
 public class NoticeSpecifications {
     
     public static Specification<Notice> createSpecification(NoticeSearchDTO searchDto) {
-        return Specification
+        Specification<Notice> spec = Specification
                 .where(keywordFilter(searchDto.getSearchType(), searchDto.getKeyword()))
-                .and(pinnedFilter(searchDto.isPinned()))
                 .and(dateRangeFilter(searchDto.getStartDate(), searchDto.getEndDate()));
+        //isPinned가 null이 아닐 때만 필터 적용
+        if (searchDto.getIsPinned() != null) {
+        	spec = spec.and(pinnedFilter(searchDto.getIsPinned()));
+        }
+        
+        return spec;
     }
     
     private static Specification<Notice> keywordFilter(String searchType, String keyword) {
         return (root, query, cb) -> {
             if (keyword == null || keyword.trim().isEmpty()) {
-                return null;
+                return null; //필터 적용 안 함
             }
             
             String likePattern = "%" + keyword.trim() + "%";
@@ -39,7 +44,7 @@ public class NoticeSpecifications {
         };
     }
     
-    private static Specification<Notice> pinnedFilter(boolean isPinned) {
+    private static Specification<Notice> pinnedFilter(Boolean isPinned) {
         return (root, query, cb) -> cb.equal(root.get("isPinned"), isPinned);
     }
     

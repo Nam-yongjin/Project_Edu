@@ -9,7 +9,7 @@ const notice = `${host}${mapping.notice}`
 
 //공지사항 전체(검색 + 페이징)
 export const NoticeList = async (params) => {
-    const res = await axios.get(`${notice}/NoticeList`, {params}); //쿼리스트링(검색, 페이지)
+    const res = await axios.get(`${host}/notice/NoticeList`, {params}); //쿼리스트링(검색, 페이지)
     return res.data;
 }
 
