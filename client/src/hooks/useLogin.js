@@ -15,8 +15,8 @@ const useLogin = () => {
 
     const doLogout = () => dispatch(logout());
 
-    const exceptionHandle = (ex) => {
-        const errorMsg = ex.response?.data?.error;
+    const exceptionHandle = (e) => {
+        const errorMsg = e.response?.data?.error;
         const errorStr = createSearchParams({ error: errorMsg }).toString();
 
         if (errorMsg === 'REQUIRE_LOGIN') {

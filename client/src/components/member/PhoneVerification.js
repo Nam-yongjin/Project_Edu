@@ -108,12 +108,12 @@ const PhoneVerification = ({ onVerified }) => {
 
             <button
                 onClick={sendOTP}
-                className="border border-black px-1 bg-gray-300 active:bg-gray-400" 
+                className="border border-black px-1 bg-gray-300 active:bg-gray-400"
                 disabled={cooldown > 0 || disable || !isValidPhone(phone)}
             >
                 {cooldown > 0 ? `${cooldown}초 후 재요청 가능` : '인증번호 전송'}
             </button>
-            
+
 
             {step === 1 && (
                 <>
@@ -130,7 +130,7 @@ const PhoneVerification = ({ onVerified }) => {
                 </>
             )}
 
-            
+
         </div>
     );
 };

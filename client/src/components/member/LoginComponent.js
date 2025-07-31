@@ -20,8 +20,8 @@ const LoginComponent = () => {
         doLogin(loginParam).then(res => {
             alert("로그인 되었습니다.");
             moveToPath('/');
-        }).catch(err => {
-            alert(err.message || "로그인에 실패했습니다.");
+        }).catch(error => {
+            alert(error.message || "로그인에 실패했습니다.");
             removeCookie("member");
         });
     };

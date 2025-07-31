@@ -17,7 +17,7 @@ const initState = {
     checkSms: false,
     checkEmail: false,
     schoolName: '',
-    role: 'STUDENT'
+    role: 'TEACHER'
 };
 
 const TeacherRegisterComponent = () => {
@@ -140,7 +140,7 @@ const TeacherRegisterComponent = () => {
                     setIdCheck(true)
                 };
             })
-            .catch((err) => {
+            .catch((error) => {
                 alert('중복 확인 중 오류 발생');
                 setIdCheck(false)
             });
@@ -293,7 +293,7 @@ const TeacherRegisterComponent = () => {
             </div>
 
             <div>
-                <button className='rounded p-1 w-18 bg-blue-500	text-white active:bg-blue-600' onClick={handleSubmit}>회원가입</button>
+                <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600' onClick={handleSubmit}>회원가입</button>
             </div>
         </div>
     );

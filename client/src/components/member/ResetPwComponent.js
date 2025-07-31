@@ -27,7 +27,7 @@ const ResetPwComponent = () => {
                     alert('존재하지 않는 아이디입니다.');
                 };
             })
-            .catch(() => {
+            .catch((error) => {
                 alert('아이디 확인 중 오류가 발생했습니다.');
             });
     };
@@ -96,7 +96,7 @@ const ResetPwComponent = () => {
                     />
                     <input
                         type="password"
-                        placeholder="비밀번호 확인"
+                        placeholder="새 비밀번호 확인"
                         value={pwCheck}
                         onChange={(e) => setPwCheck(e.target.value)}
                     />
