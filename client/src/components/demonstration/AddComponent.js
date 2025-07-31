@@ -48,8 +48,8 @@ const AddComponent = () => {
         for (let i = 0; i < images.length; i++) {
             formData.append("imageList", images[i].file);
         }
-        const mainIndex = images.findIndex(img => img.isMain === 1); // 메인 이미지여부를 배열로 보낼땐 매칭 오류가 잇어 해당 인덱스만 보냄
-        formData.append("mainImageIndex", mainIndex);
+       const mainIndex = images.findIndex(img => img.isMain === 1);
+formData.append("mainImageIndex", mainIndex === -1 ? 0 : mainIndex);
 
 
         formData.append("demName", dem.demName);
@@ -213,7 +213,7 @@ const AddComponent = () => {
 
             <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
                 {images.map((img, index) => (
-                    <div className="flex flex-col items-start">
+                    <div className=" key={img.url} flex flex-col items-start">
                         <h6>대표 이미지설정</h6>
                         <input
                             type="checkbox"
@@ -232,5 +232,6 @@ const AddComponent = () => {
         </div>
     );
 };
+
 
 export default AddComponent;
