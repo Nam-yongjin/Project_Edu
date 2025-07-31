@@ -25,13 +25,9 @@ const beforeRes = async (res) => {
         // accessToken 재발급 요청
         const result = await refreshJWT(member.accessToken, member.refreshToken);
 
-        // const updated = { ...member, ...result };
-
         member.accessToken = result.accessToken
-        member.refreshToken = result.refreshToken
 
         // 새로 발급받은 토큰을 쿠키에 저장
-        // setCookie("member", JSON.stringify(updated), 1);
         setCookie("member", JSON.stringify(member), 1);
 
         // 원래 요청을 한 번 더 보냄
@@ -42,12 +38,30 @@ const beforeRes = async (res) => {
 };
 
 // 현재 accessToken과 refreshToken을 사용하여 서버에서 새 토큰 발급
- // accessToken의 유효기간이 지낫을 경우 서버 호출
+// accessToken의 유효기간이 지낫을 경우 서버 호출
 const refreshJWT = async (accessToken, refreshToken) => {
-    const header = { headers: { Authorization: `Bearer ${accessToken}` } };
-    const res = await axios.get(`${API_SERVER_HOST}/api/refresh?refreshToken=${refreshToken}`, header);
-    return res.data;
+    const header = {
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+    };
+    const params = new URLSearchParams();
+    params.append("refreshToken", refreshToken);
+
+    const result = await axios.post(
+        `${API_SERVER_HOST}/api/refresh`,
+        params,
+        header
+    ).then(res => res.data)
+        .catch(error => {
+            console.error(error)
+            return null;
+        });
+    return result;
+
 };
+
 
 jwtAxios.interceptors.request.use(beforeReq, err => Promise.reject(err));   // 요청을 보내기 직전 실행
 jwtAxios.interceptors.response.use(beforeRes, err => Promise.reject(err));  // 응답을 받은 직후 실행
