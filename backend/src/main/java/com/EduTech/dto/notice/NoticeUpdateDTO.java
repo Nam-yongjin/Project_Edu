@@ -23,7 +23,7 @@ public class NoticeUpdateDTO { //수정
 	
 	private String content; //내용
 	
-	private boolean isPinned; //게시판 고정
+	private Boolean isPinned; //게시판 고정
 	
 	private List<String> deleteFileIds; // 삭제할 파일 ID 목록
 	

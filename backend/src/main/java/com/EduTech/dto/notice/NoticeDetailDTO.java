@@ -14,7 +14,7 @@ public class NoticeDetailDTO { //상세페이지
 	
 	private String content; //내용
 	
-	private boolean isPinned; //게시판 고정
+	private Boolean isPinned; //게시판 고정
 	
 	private String name; //이름
 	
