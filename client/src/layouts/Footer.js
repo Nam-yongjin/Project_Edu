@@ -1,8 +1,8 @@
 
 const Footer = () => {
     return(
-        <footer className="bg-gray-700 px-8 py-6 text-[14px]">
-            <div className="flex justify-between items-start flex-wrap px-10">
+        <footer className="bg-gray-600 px-8 py-6 text-[14px]"> 
+            <div className="max-w-[1200px] mx-auto flex justify-between items-start flex-wrap px-10">
                 {/* 왼쪽: 정책 + 주소 */}
                 <div className='space-y-4 max-w-xl'>
                     {/* 정책 */}
