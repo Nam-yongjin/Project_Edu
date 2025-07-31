@@ -25,7 +25,7 @@ const AddComponent = () => {
         // 이미지 1개 이상 체크
         if (images.length === 0) newErrors.images = "이미지는 최소 1장 등록해야 합니다.";
         // 수량 1 이상 정수 체크
-        if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 1) {
+        if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 0) {
             newErrors.itemNum = "수량은 0이상이여야 합니다.";
         }
 
@@ -48,6 +48,10 @@ const AddComponent = () => {
         for (let i = 0; i < images.length; i++) {
             formData.append("imageList", images[i].file);
         }
+        const mainIndex = images.findIndex(img => img.isMain === 1); // 메인 이미지여부를 배열로 보낼땐 매칭 오류가 잇어 해당 인덱스만 보냄
+        formData.append("mainImageIndex", mainIndex);
+
+
         formData.append("demName", dem.demName);
         formData.append("demMfr", dem.demMfr);
         formData.append("itemNum", dem.itemNum);
@@ -57,7 +61,7 @@ const AddComponent = () => {
         postAdd(formData).then(data => {
         });
         alert("상품 등록 완료");
-        moveToPath("/")
+        //moveToPath("/")
     };
 
     const handleChangeDem = (e) => {
@@ -70,12 +74,13 @@ const AddComponent = () => {
         setDem((prev) => ({ ...prev, expDate: date }));
     };
 
-     const handleFileChange = (e) => { // 파일 선택이 됬을 경우, 
+    const handleFileChange = (e) => { // 파일 선택이 됬을 경우, 
         const files = Array.from(e.target.files); // 현재 파일을 files에 담고
-        const filePreviews = files.map(file => ({
+        const filePreviews = files.map((file, index) => ({
             file,
-            url: URL.createObjectURL(file),
-            name: file.name
+            url: URL.createObjectURL(file), // 이 파일을 메모리 내 임시 URL로 만들어서 보여줌
+            name: file.name,
+            isMain: index === 0 // 디폴트로 첫번째 이미지를 대표이미지로 설정
         }));
         setImages(filePreviews);
     };
@@ -89,6 +94,25 @@ const AddComponent = () => {
             }
             return newImages;
         });
+    };
+
+    const handleCheckboxChange = (selectedIndex) => {
+        const currentMainIndex = images.findIndex(img => img.isMain === 1); // 메인 이미지 인덱스 가져오기
+
+        if (currentMainIndex === selectedIndex) {
+            // 같은 대표 이미지 클릭 시 체크 해제
+            setImages(images.map((img, idx) => ({
+                ...img,
+                isMain: 0
+            })));
+            return;
+        }
+
+        // 다른 이미지 클릭 시 대표 이미지 변경
+        setImages(images.map((img, idx) => ({
+            ...img,
+            isMain: idx === selectedIndex ? 1 : 0
+        })));
     };
 
     return (
@@ -188,8 +212,14 @@ const AddComponent = () => {
             </div>
 
             <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
-                {images.map((img) => (
+                {images.map((img, index) => (
                     <div className="flex flex-col items-start">
+                        <h6>대표 이미지설정</h6>
+                        <input
+                            type="checkbox"
+                            checked={Boolean(img.isMain)}
+                            onChange={() => handleCheckboxChange(index)}
+                            className="w-3 h-3"></input>
                         <button className="w-full text-right" onClick={() => fileDelete(img)}>x</button>
                         <img
                             src={img.url}

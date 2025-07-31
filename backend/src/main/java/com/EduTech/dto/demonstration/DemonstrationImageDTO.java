@@ -19,6 +19,9 @@ public class DemonstrationImageDTO { // 실증 이미지 등록 DTO
 	@NotNull
 	private Long demNum; // 실증 번호 (실증 번호 등록시에는 먼저 실증 제품을 save하고 demNum을 값을 받아와서 set 후 이미지를 저장하면 될듯)
 
+	@NotNull
+	private Boolean isMain;
+	
 	public DemonstrationImageDTO(String imageName, String imageUrl) {
 		this.imageName = imageName;
 		this.imageUrl = imageUrl;

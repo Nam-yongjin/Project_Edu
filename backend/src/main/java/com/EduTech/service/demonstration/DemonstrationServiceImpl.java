@@ -286,7 +286,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO) {
+	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO,String memId) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -296,27 +296,37 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Long demNum = demonstration.getDemNum();
 
 		//System.out.println(memId);
-		Member member = memberRepository.findById("tee1694").orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
+		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		DemonstrationRegistration demonstrationRegistration = DemonstrationRegistration.builder()
 				.regDate(LocalDate.now()).expDate(demonstrationFormDTO.getExpDate()).state(DemonstrationState.WAIT)
 				.demonstration(Demonstration.builder().demNum(demNum).build()).member(member).build();
 
 		// 실증 등록
 		demonstrationRegistrationRepository.save(demonstrationRegistration);
-		System.out.println("저장된 Demonstration ID: " + demonstration.getDemNum());
+		
 		// 폴더에 이미지 저장 (demImages라는 폴더에)
 		List<Object> files = fileUtil.saveFiles(demonstrationFormDTO.getImageList(), "demImages");
 
-		// 이미지 파일 등록
-		for (Object obj : files) {
-			if (obj instanceof Map) {
-				Map<String, String> map = (Map<String, String>) obj;
-				DemonstrationImage demonstrationimage = DemonstrationImage.builder().imageName(map.get("originalName"))
-						.imageUrl(map.get("filePath")).demonstration(Demonstration.builder().demNum(demNum).build())
-						.build();
-				demonstrationImageRepository.save(demonstrationimage);
-			}
+		Integer mainIndex = demonstrationFormDTO.getMainImageIndex(); // ex) 0, 1, 2 중 하나
+
+		for (int i = 0; i < files.size(); i++) {
+		    Object obj = files.get(i);
+		    if (obj instanceof Map) {
+		        Map<String, String> map = (Map<String, String>) obj;
+
+		        boolean isMain = (mainIndex != null && mainIndex == i); // 현재 인덱스가 mainIndex면 true
+
+		        DemonstrationImage demonstrationImage = DemonstrationImage.builder()
+		                .imageName(map.get("originalName"))
+		                .imageUrl(map.get("filePath"))
+		                .demonstration(Demonstration.builder().demNum(demNum).build())
+		                .isMain(isMain)
+		                .build();
+
+		        demonstrationImageRepository.save(demonstrationImage);
+		    }
 		}
+
 	}
 
 	@Override
@@ -378,10 +388,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Demonstration entity = demonstrationRepository.findById(demNum)
 				.orElseThrow(() -> new RuntimeException("해당 번호의 실증 정보가 없습니다: " + demNum));
 		DemonstrationFormResDTO dto = modelMapper.map(entity, DemonstrationFormResDTO.class);
-		List<String> imageList=demonstrationImageRepository.selectDemImageUrl(demNum);
-		List<String> imageNameList=demonstrationImageRepository.selectDemImageName(demNum);
-		dto.setImageUrlList(imageList);
-		dto.setImageNameList(imageNameList);
+		List<DemonstrationImageDTO> imageDtoList=demonstrationImageRepository.selectDemImage(demNum);
+		// 각 리스트 분리해서 dto에 세팅
+		for (DemonstrationImageDTO imageDto : imageDtoList) {
+			dto.getImageUrlList().add(imageDto.getImageUrl());
+			dto.getImageNameList().add(imageDto.getImageName());
+			dto.getIsMain().add(String.valueOf(imageDto.getIsMain())); // boolean을 string으로
+		}
+		
 		dto.setExpDate(demonstrationRegistrationRepository.selectDemRegExpDate(demNum));
 		
 		return dto;
