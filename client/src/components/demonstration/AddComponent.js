@@ -48,6 +48,7 @@ const AddComponent = () => {
         for (let i = 0; i < images.length; i++) {
             formData.append("imageList", images[i].file);
         }
+        
        const mainIndex = images.findIndex(img => img.isMain === 1);
 formData.append("mainImageIndex", mainIndex === -1 ? 0 : mainIndex);
 
