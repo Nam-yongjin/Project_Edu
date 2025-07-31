@@ -126,7 +126,6 @@ const loginSlice = createSlice({
                 Object.assign(State, { memId, email, role, state, accessToken, refreshToken });
             })
             .addCase(loginPostAsync.rejected, (State, action) => {
-                console.error("로그인 실패", action.payload?.message);
             });
     }
 });
