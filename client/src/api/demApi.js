@@ -6,6 +6,9 @@ const demonstration = `${host}${API_MAPPING.demonstration}`;
 
 // 실증 상품 등록하는 요청 jwtAxios에서는 헤더를 직접 달아줘야 한다.
 export const postAdd = async (formData) => {
+    for (const pair of formData.entries()) {
+  console.log(pair[0] + ':', pair[1]);
+}
     const res = await jwtAxios.post(`${demonstration}/addDem`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
