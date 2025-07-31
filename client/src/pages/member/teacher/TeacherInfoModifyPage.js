@@ -1,6 +1,6 @@
 import TeacherInfoModifyComponent from "../../../components/member/teacher/TeacherInfoModifyComponent";
 
-const teacherInfoModifyPage = () => {
+const TeacherInfoModifyPage = () => {
     return (
         <div>
             <TeacherInfoModifyComponent/>
@@ -8,4 +8,4 @@ const teacherInfoModifyPage = () => {
     );
 };
 
-export default teacherInfoModifyPage;
+export default TeacherInfoModifyPage;

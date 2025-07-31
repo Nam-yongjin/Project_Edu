@@ -1,7 +1,7 @@
 import CompanyInfoModifyComponent from "../../../components/member/company/CompanyInfoModifyComponent";
 
 
-const companyInfoModifyPage = () => {
+const CompanyInfoModifyPage = () => {
     return (
         <div>
             <CompanyInfoModifyComponent/>
@@ -9,4 +9,4 @@ const companyInfoModifyPage = () => {
     );
 };
 
-export default companyInfoModifyPage;
+export default CompanyInfoModifyPage;

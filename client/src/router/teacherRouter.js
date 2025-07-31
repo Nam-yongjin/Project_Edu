@@ -1,7 +1,7 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 
-const InfoModify = lazy(() => import("../pages/member/teacher/teacherInfoModifyPage"));
+const InfoModify = lazy(() => import("../pages/member/teacher/TeacherInfoModifyPage"));
 
 const teacherRouter = () => {
 

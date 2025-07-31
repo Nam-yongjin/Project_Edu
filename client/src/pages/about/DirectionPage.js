@@ -1,6 +1,6 @@
 import DirectionComponent from "../../components/about/DirectionComponent";
 
-const directionPage = () => {
+const DirectionPage = () => {
     return (
         <div>
             <DirectionComponent/>
@@ -8,4 +8,4 @@ const directionPage = () => {
     );
 };
 
-export default directionPage;
+export default DirectionPage;

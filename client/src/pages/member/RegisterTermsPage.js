@@ -1,6 +1,6 @@
 import RegisterTermsComponent from "../../components/member/RegisterTermsComponent";
 
-const registerTermsPage = () => {
+const RegisterTermsPage = () => {
     return(
         <div>
             <RegisterTermsComponent />
@@ -8,4 +8,4 @@ const registerTermsPage = () => {
     );
 };
 
-export default registerTermsPage;
+export default RegisterTermsPage;
