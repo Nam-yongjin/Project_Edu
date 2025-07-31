@@ -1,5 +1,6 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
+import { Navigate } from "react-router-dom";
 
 const Greeting = lazy(() => import("../pages/about/greetingPage"));
 const Business = lazy(() => import("../pages/about/businessPage"));
@@ -13,11 +14,16 @@ const aboutRouter = () => {
             element: <Suspense fallback={<Loading />}><Greeting /></Suspense>,
         },
         {
+            // 자동 리다이렉션
+            path: "",
+            element: <Navigate replace to="greeting" />
+        },
+        {
             path: "business",
             element: <Suspense fallback={<Loading />}><Business /></Suspense>,
         },
         {
-            path:"direction",
+            path: "direction",
             element: <Suspense fallback={<Loading />}><Direction /></Suspense>
         }
     ];
