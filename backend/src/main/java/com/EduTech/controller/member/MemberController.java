@@ -78,7 +78,7 @@ public class MemberController {
 
 	// 일반회원 상세정보
 	@GetMapping("/member/myInfo")
-	@PreAuthorize("isAuthenticated()")	// role 불러오기위한 인증된 사용자 접근
+	@PreAuthorize("isAuthenticated()") // role 불러오기위한 인증된 사용자 접근
 	public ResponseEntity<MemberDetailDTO> memberInfo() {
 		String memId = JWTFilter.getMemId();
 		return ResponseEntity.ok(memberService.readMemberInfo(memId));
@@ -172,13 +172,13 @@ public class MemberController {
 
 	// 카카오 로그인
 	@GetMapping("/login/kakao")
-	public Map<String, Object> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
+	public ResponseEntity<Map<String, Object>> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
 		MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
 		Map<String, Object> claims = memberDTO.getClaims();
 		String jwtAccessToken = JWTProvider.generateToken(claims, 10);
 		String jwtRefreshToken = JWTProvider.generateToken(claims, 60 * 24);
 		claims.put("accessToken", jwtAccessToken);
 		claims.put("refreshToken", jwtRefreshToken);
-		return claims;
+		return ResponseEntity.ok(claims);
 	}
 }
