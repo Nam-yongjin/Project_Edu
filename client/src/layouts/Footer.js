@@ -1,4 +1,4 @@
-
+import logo from '../assets/logo.png';
 const Footer = () => {
     return(
         <footer className="bg-gray-600 px-8 py-6 text-[14px]"> 
@@ -26,8 +26,9 @@ const Footer = () => {
                 </div>
                 {/* 오른쪽 */}
                 <div className='text-right mt-6 md:mt-0'>
-                    {/* 저작권 */}
-                    <p className='pt-40 text-xs font-light text-gray-300'>
+                    <img src={logo} alt="로고" className="ml-8 w-[240px] h-[100px] flex-shrink-0"/>
+                    {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
+                    <p className='pt-5 text-xs font-light text-gray-300'>
                         Copyright © 2024 서울에듀테크소프트랩 All Right Reserved.
                     </p>
                 </div>
