@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
@@ -131,7 +132,7 @@ public class DemonstrationController {
 	public ResponseEntity<String> DemAdd( @Valid @ModelAttribute DemonstrationFormReqDTO demonstrationFormDTO) {
 		System.out.println("컨트롤러 도착");
 		String memId = JWTFilter.getMemId();
-		demonstrationService.addDemonstration(demonstrationFormDTO,memId);
+		//demonstrationService.addDemonstration(demonstrationFormDTO,memId);
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
 
