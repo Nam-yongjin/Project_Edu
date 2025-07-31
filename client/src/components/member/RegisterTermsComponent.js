@@ -17,8 +17,8 @@ const RegisterTermsComponent = () => {
         fetch('/terms/register.txt')
             .then((res) => res.text())
             .then((text) => setRegisterText(text))
-            .catch((err) => {
-                console.error("이용약관 로드 실패", err);
+            .catch((error) => {
+                console.error("이용약관 로드 실패", error);
                 setRegisterText("이용약관을 불러올 수 없습니다.");
             });
     }, []);
@@ -27,8 +27,8 @@ const RegisterTermsComponent = () => {
         fetch('/terms/agree.txt')
             .then((res) => res.text())
             .then((text) => setAgreeText(text))
-            .catch((err) => {
-                console.error("이용약관 로드 실패", err);
+            .catch((error) => {
+                console.error("이용약관 로드 실패", error);
                 setAgreeText("이용약관을 불러올 수 없습니다.");
             });
     }, []);
@@ -37,8 +37,8 @@ const RegisterTermsComponent = () => {
         fetch('/terms/process.txt')
             .then((res) => res.text())
             .then((text) => setProcessText(text))
-            .catch((err) => {
-                console.error("이용약관 로드 실패", err);
+            .catch((error) => {
+                console.error("이용약관 로드 실패", error);
                 setProcessText("이용약관을 불러올 수 없습니다.");
             });
     }, []);
@@ -159,7 +159,7 @@ const RegisterTermsComponent = () => {
             </div>
             <div className="text-center">
                 <button
-                    className="mt-4 p-2 bg-blue-500 text-white rounded active:bg-blue-600"
+                    className="mt-4 p-1 w-[70px] bg-blue-500 text-white rounded active:bg-blue-600"
                     onClick={handleSubmit}
                 >
                     다음
