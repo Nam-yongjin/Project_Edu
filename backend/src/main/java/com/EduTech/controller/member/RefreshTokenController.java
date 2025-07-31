@@ -3,8 +3,9 @@ package com.EduTech.controller.member;
 import java.util.Date;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.EduTech.security.jwt.JWTException;
@@ -17,11 +18,10 @@ import lombok.RequiredArgsConstructor;
 public class RefreshTokenController {
 
 	// Access Token 재발급
-	@RequestMapping("/api/refresh")
-	public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
-		System.out.println("/api/refresh 호출됨");
-	    System.out.println("authHeader = " + authHeader);
-	    System.out.println("refreshToken = " + refreshToken);
+	@PostMapping("/api/refresh")
+	public ResponseEntity<Map<String, Object>> refresh(@RequestHeader("Authorization") String authHeader,
+			String refreshToken) {
+
 		// 유효성 검사
 		if (refreshToken == null) {
 			throw new JWTException("NULL_REFRASH");
@@ -35,7 +35,7 @@ public class RefreshTokenController {
 		String accessToken = authHeader.substring(7);
 		// Access 토큰이 만료되지 않았다면 기존 토큰 그대로 반환
 		if (checkExpiredToken(accessToken) == false) {
-			return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
+			return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken));
 		}
 
 		// Refresh토큰 검증
@@ -47,7 +47,7 @@ public class RefreshTokenController {
 		String newRefreshToken = checkTime((Integer) claims.get("exp")) == true
 				? JWTProvider.generateToken(claims, 60 * 24)
 				: refreshToken;
-		return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
+		return ResponseEntity.ok(Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken));
 
 	}
 
