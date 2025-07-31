@@ -2,7 +2,7 @@ import BasicLayout from "../layouts/BasicLayout";
 
 const MainPage = () => {
     return (
-        <div className=" text-3xl">
+        <div>
             <BasicLayout>
                 <div>Main Page</div>
             </BasicLayout>
