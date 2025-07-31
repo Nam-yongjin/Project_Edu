@@ -41,14 +41,144 @@ const Header = () => {
 
             {/* 메뉴 */}
             <nav className="flex-1 mr-12">
-                <ul className="flex justify-center text-lg font-medium">
-                    <li className="mx-11 hover:text-blue-400 cursor-pointer active:text-blue-600"> 소개 </li>
-                    <li className="mx-11 hover:text-blue-400 cursor-pointer active:text-blue-600">프로그램</li>
-                    <li className="mx-11 hover:text-blue-400 cursor-pointer active:text-blue-600">공간운영</li>
-                    <li className="mx-11 hover:text-blue-400 cursor-pointer active:text-blue-600">지원사업</li>
-                    <li className="mx-11 hover:text-blue-400 cursor-pointer active:text-blue-600">알림마당</li>
+                <ul className="flex justify-center text-lg font-medium relative">
+                    <li className="mx-11 relative group cursor-pointer">
+                        <span className="hover:text-blue-400 active:text-blue-600"><Link to="/">소개</Link></span>
+                        <ul className="
+                            absolute left-1/2 transform -translate-x-1/2 mt-2 w-36
+                            bg-white shadow-lg rounded-md border
+                            opacity-0 translate-y-2 invisible
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
+                            transition-all duration-300 ease-in-out z-50
+                            text-sm text-gray-700 text-center
+                            "
+                        >
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">인사말</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">사업소개</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">오시는길</Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li className="mx-11 relative group cursor-pointer">
+                        <span className="hover:text-blue-400 active:text-blue-600"><Link to="/">프로그램</Link></span>
+                        <ul className="
+                            absolute left-1/2 transform -translate-x-1/2 mt-2 w-36
+                            bg-white shadow-lg rounded-md border
+                            opacity-0 translate-y-2 invisible
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
+                            transition-all duration-300 ease-in-out z-50
+                            text-sm text-gray-700 text-center
+                            "
+                        >
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴1</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴2</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴3</Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li className="mx-11 relative group cursor-pointer">
+                        <span className="hover:text-blue-400 active:text-blue-600"><Link to="/">공간운영</Link></span>
+                        <ul className="
+                            absolute left-1/2 transform -translate-x-1/2 mt-2 w-36
+                            bg-white shadow-lg rounded-md border
+                            opacity-0 translate-y-2 invisible
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
+                            transition-all duration-300 ease-in-out z-50
+                            text-sm text-gray-700 text-center
+                            "
+                        >
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴4</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴5</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴6</Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li className="mx-11 relative group cursor-pointer">
+                        <span className="hover:text-blue-400 active:text-blue-600"><Link to="/">지원사업</Link></span>
+                        <ul className="
+                            absolute left-1/2 transform -translate-x-1/2 mt-2 w-36
+                            bg-white shadow-lg rounded-md border
+                            opacity-0 translate-y-2 invisible
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
+                            transition-all duration-300 ease-in-out z-50
+                            text-sm text-gray-700 text-center
+                            "
+                        >
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴7</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴8</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">메뉴9</Link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li className="mx-11 relative group cursor-pointer">
+                        <span className="hover:text-blue-400 active:text-blue-600"><Link to="/">알림마당</Link></span>
+                        <ul className="
+                            absolute left-1/2 transform -translate-x-1/2 mt-2 w-36
+                            bg-white shadow-lg rounded-md border
+                            opacity-0 translate-y-2 invisible
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
+                            transition-all duration-300 ease-in-out z-50
+                            text-sm text-gray-700 text-center
+                            "
+                        >
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">공지사항</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">문의사항</Link>
+                            </li>
+                            <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                <Link to="/">언론보도</Link>
+                            </li>
+                        </ul>
+                    </li>
                     {loginState.role === 'ADMIN' ? (
-                        <li className="mx-11 hover:text-blue-400 cursor-pointer active:text-blue-600">관리자</li>
+                        <li className="mx-11 relative group cursor-pointer">
+                            <span className="hover:text-blue-400 active:text-blue-600"><Link to="/">관리자</Link></span>
+                            <ul className="
+                            absolute left-1/2 transform -translate-x-1/2 mt-2 w-36
+                            bg-white shadow-lg rounded-md border
+                            opacity-0 translate-y-2 invisible
+                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible
+                            transition-all duration-300 ease-in-out z-50
+                            text-sm text-gray-700 text-center
+                            "
+                            >
+                                <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                    <Link to="/">관리1</Link>
+                                </li>
+                                <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                    <Link to="/">관리2</Link>
+                                </li>
+                                <li className="group-hover:rounded-md hover:bg-blue-100 active:bg-blue-200 px-3 py-3">
+                                    <Link to="/">관리3</Link>
+                                </li>
+                            </ul>
+                        </li>
                     ) : (<></>)}
                 </ul>
             </nav>
