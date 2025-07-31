@@ -154,7 +154,8 @@ const TeacherRegisterComponent = () => {
                     name="memId"
                     placeholder="아이디"
                     value={form.memId}
-                    onChange={handleChange} />
+                    onChange={handleChange}
+                    autoFocus />
                 <button className="border border-black px-1 bg-gray-300 active:bg-gray-400"
                     onClick={handleCheckDuplicateId}>
                     아이디 중복 체크
