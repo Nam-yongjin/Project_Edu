@@ -1,6 +1,6 @@
 import BusinessComponent from "../../components/about/BusinessComponent";
 
-const businessPage = () => {
+const BusinessPage = () => {
     return (
         <div>
             <BusinessComponent/>
@@ -8,4 +8,4 @@ const businessPage = () => {
     );
 };
 
-export default businessPage;
+export default BusinessPage;

@@ -1,6 +1,6 @@
 import GreetingComponent from "../../components/about/GreetingComponent";
 
-const greetingPage = () => {
+const GreetingPage = () => {
     return (
         <div>
             <GreetingComponent/>
@@ -8,4 +8,4 @@ const greetingPage = () => {
     );
 };
 
-export default greetingPage;
+export default GreetingPage;

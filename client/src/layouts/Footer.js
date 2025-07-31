@@ -1,4 +1,6 @@
 import logo from '../assets/logo.png';
+import { Link } from 'react-router-dom';
+
 const Footer = () => {
     return(
         <footer className="bg-gray-600 px-8 py-6 text-[14px]"> 
@@ -8,13 +10,13 @@ const Footer = () => {
                     {/* 정책 */}
                     <nav className='space-x-2 text-m text-white font-medium'>
                         {/* 페이지 링크 삽입해야 함 */}
-                        <a href="#" className='hover:underline cursor-pointer'>개인정보처리방침</a>
+                        <a className='hover:underline cursor-pointer'><Link to="">개인정보처리방침</Link></a>
                         <span>|</span>
-                        <a href="#" className='hover:underline cursor-pointer'>저작권보호정책</a>
+                        <a className='hover:underline cursor-pointer'><Link to="">저작권보호정책</Link></a>
                         <span>|</span>
-                        <a href="#" className='hover:underline cursor-pointer'>이메일주소수집거부</a>
+                        <a className='hover:underline cursor-pointer'><Link to="">이메일주소수집거부</Link></a>
                         <span>|</span>
-                        <a href="#" className='hover:underline cursor-pointer'>오시는 길</a>
+                        <a className='hover:underline cursor-pointer'><Link to="/about/direction">오시는길</Link></a>
                     </nav>
                     {/* 주소 */}
                     <address className="not-italic space-y-1 text-gray-400">

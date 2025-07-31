@@ -1,6 +1,6 @@
 import MemberRegisterComponent from "../../components/member/MemberRegisterComponent";
 
-const memberRegisterPage = () => {
+const MemberRegisterPage = () => {
     return(
         <div>
             <MemberRegisterComponent />
@@ -8,4 +8,4 @@ const memberRegisterPage = () => {
     );
 };
 
-export default memberRegisterPage;
+export default MemberRegisterPage;

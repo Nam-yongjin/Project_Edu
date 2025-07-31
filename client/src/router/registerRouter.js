@@ -2,11 +2,11 @@ import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
 
-const Terms = lazy(() => import("../pages/member/registerTermsPage"));
-const Member = lazy(() => import("../pages/member/memberRegisterPage"));
-const Student = lazy(() => import("../pages/member/student/studentRegisterPage"));
-const Teacher = lazy(() => import("../pages/member/teacher/teacherRegisterPage"));
-const Company = lazy(() => import("../pages/member/company/companyRegisterPage"));
+const Terms = lazy(() => import("../pages/member/RegisterTermsPage"));
+const Member = lazy(() => import("../pages/member/MemberRegisterPage"));
+const Student = lazy(() => import("../pages/member/student/StudentRegisterPage"));
+const Teacher = lazy(() => import("../pages/member/teacher/TeacherRegisterPage"));
+const Company = lazy(() => import("../pages/member/company/CompanyRegisterPage"));
 
 const registerRouter = () => {
 

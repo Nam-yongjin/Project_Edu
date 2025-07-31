@@ -1,7 +1,7 @@
 import MemberInfoModifyComponent from "../../components/member/MemberInfoModifyComponent";
 
 
-const memberInfoModifyPage = () => {
+const MemberInfoModifyPage = () => {
     return (
         <div>
             <MemberInfoModifyComponent/>
@@ -9,4 +9,4 @@ const memberInfoModifyPage = () => {
     );
 };
 
-export default memberInfoModifyPage;
+export default MemberInfoModifyPage;

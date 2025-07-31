@@ -1,6 +1,6 @@
 import StudentInfoModifyComponent from "../../../components/member/student/StudentInfoModifyComponent";
 
-const studentInfoModifyPage = () => {
+const StudentInfoModifyPage = () => {
     return (
         <div>
             <StudentInfoModifyComponent/>
@@ -8,4 +8,4 @@ const studentInfoModifyPage = () => {
     );
 };
 
-export default studentInfoModifyPage;
+export default StudentInfoModifyPage;

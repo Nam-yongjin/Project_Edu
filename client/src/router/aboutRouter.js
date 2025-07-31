@@ -2,9 +2,9 @@ import Loading from "./Loading";
 import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
 
-const Greeting = lazy(() => import("../pages/about/greetingPage"));
-const Business = lazy(() => import("../pages/about/businessPage"));
-const Direction = lazy(() => import("../pages/about/directionPage"));
+const Greeting = lazy(() => import("../pages/about/GreetingPage"));
+const Business = lazy(() => import("../pages/about/BusinessPage"));
+const Direction = lazy(() => import("../pages/about/DirectionPage"));
 
 const aboutRouter = () => {
 

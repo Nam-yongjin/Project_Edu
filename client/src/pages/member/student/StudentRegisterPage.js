@@ -1,6 +1,6 @@
 import StudentRegisterComponent from "../../../components/member/student/StudentRegisterComponent";
 
-const studentRegisterPage = () => {
+const StudentRegisterPage = () => {
     return (
         <div>
             <StudentRegisterComponent/>
@@ -8,4 +8,4 @@ const studentRegisterPage = () => {
     );
 };
 
-export default studentRegisterPage;
+export default StudentRegisterPage;

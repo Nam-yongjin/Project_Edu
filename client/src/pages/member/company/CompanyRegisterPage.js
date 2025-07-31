@@ -1,6 +1,6 @@
 import CompanyRegisterComponent from "../../../components/member/company/CompanyRegisterComponent";
 
-const companyRegisterPage = () => {
+const CompanyRegisterPage = () => {
     return (
         <div>
             <CompanyRegisterComponent/>
@@ -8,4 +8,4 @@ const companyRegisterPage = () => {
     );
 };
 
-export default companyRegisterPage;
+export default CompanyRegisterPage;
