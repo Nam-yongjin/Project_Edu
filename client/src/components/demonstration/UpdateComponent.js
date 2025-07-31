@@ -246,7 +246,7 @@ useEffect(() => {
 
             <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
                 {images.map((img, index) => (
-                    <div className="flex flex-col items-start">
+                    <div key={img.url} className="flex flex-col items-start">
                         <h6>대표 이미지설정</h6>
                         <input
                             type="checkbox"
