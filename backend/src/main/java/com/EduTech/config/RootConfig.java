@@ -35,6 +35,7 @@ public class RootConfig {
 	    .addMappings(mapper -> {
 	        mapper.skip(DemonstrationFormResDTO::setImageUrlList);
 	        mapper.skip(DemonstrationFormResDTO::setImageNameList);
+	        mapper.skip(DemonstrationFormResDTO::setIsMain);
 	    });
 		return modelMapper;
 	}

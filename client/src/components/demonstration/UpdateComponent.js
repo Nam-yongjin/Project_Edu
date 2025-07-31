@@ -9,29 +9,44 @@ import "react-datepicker/dist/react-datepicker.css";
 const UpdateComponent = ({ demNum }) => {
     const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "" }; // form에서 받을 데이터 초기값
     const [fileInputKey, setFileInputKey] = useState(Date.now()); // input 태그 리랜더링 위한 초기값
-    const [images, setImages] = useState([]); // 이미지 배열 공백 지정
+    const [images, setImages] = useState([]); // 이미지 정보를 담을 상태 배열 지정
     const [dem, setDem] = useState({ ...initState }); // from받을 데이터 초기값 지정
     const [returnDate, setReturnDate] = useState(new Date()); // react datepicker 상태값 저장
     const [errors, setErrors] = useState({}); // 폼창 예외 처리 메시지를 띄우기 위한 상태값
     const { moveToPath, moveToReturn } = useMove(); // useMove에서 가져온 모듈들
     const serverHost = "http://localhost:8090/";
-   useEffect(() => {
-  const loadData = async () => {
-    const data = await getOne(demNum);
-    setDem(data);
-    setReturnDate(new Date(data.expDate + "T00:00:00"));
+    useEffect(() => {
+        // useEffect에서 비동기 처리를 위해 만든 loadData함수
+        /* Promise는 나중에 완료되는 비동기 작업 결과를 담은 객체이고, clean-up 함수는 React 컴포넌트가 사라질 때 실행되는 정리용 함수입니다.
+            db에 저장하는 행위는 비동기 처리이므로 await를 사용해야함(아니면 데이터 값이 아닌 그냥 promise객체 값이 할당 될 수잇음.)
+            참고로 then도 비동기 처리 방식이다. 어느 방식 사용해도 무방!
+        */
+        const loadData = async () => {
+            const data = await getOne(demNum);
+            setDem(data);
+            setReturnDate(new Date(data.expDate + "T00:00:00"));
 
-    if (data.imageUrlList && data.imageUrlList.length > 0) {
-        const fullUrls = data.imageUrlList.map(img => serverHost + img);
-      const fileList = await urlListToFileList(fullUrls,data.imageNameList);
-      setImages(fileList); // file, name, url 포함됨
-    }
-  };
-  loadData();
-}, [demNum]);
- // useEffect를 사용하면 최초 1회, 그리고 의존성 배열이 있을경우,
+            if (data.imageUrlList && data.imageUrlList.length > 0) {
+                const fullUrls = data.imageUrlList.map(img => serverHost + img); // 서버 측에서 요청할 경로 지정
+                const fileList = await urlListToFileList(fullUrls, data.imageNameList); // 파일 객체를 받아옴
+
+                const fileListWithIsMain = fileList.map((fileObj, index) => ({
+                    ...fileObj,
+                       isMain: data.isMain ? data.isMain[index] === 'true' : false  // data.isMainList가 있으면 해당 인덱스 값, 없으면 0으로 기본 설정
+                }));
+
+                setImages(fileListWithIsMain);
+            }
+            
+        };
+        loadData();
+    }, [demNum]);
+    // useEffect를 사용하면 최초 1회, 그리고 의존성 배열이 있을경우,
     // 의존성 배열 변경 시 실행된다.
 
+useEffect(() => {
+  console.log("렌더링 직후 images 상태: ", images);
+}, [images]);
 
     const handleChangeDem = (e) => {
         dem[e.target.name] = e.target.value;
@@ -45,13 +60,15 @@ const UpdateComponent = ({ demNum }) => {
 
     const handleFileChange = (e) => { // 파일 선택이 됬을 경우, 
         const files = Array.from(e.target.files); // 현재 파일을 files에 담고
-        const filePreviews = files.map(file => ({
+        const filePreviews = files.map((file, index) => ({
             file,
             url: URL.createObjectURL(file),
-            name: file.name
+            name: file.name,
+            isMain: index === 0 // 디폴트로 첫번째 이미지를 대표이미지로 설정
         }));
         setImages(filePreviews);
     };
+
 
     const fileDelete = (imgToDelete) => {
         setImages((prevImages) => {
@@ -73,7 +90,7 @@ const UpdateComponent = ({ demNum }) => {
         // 이미지 1개 이상 체크
         if (images.length === 0) newErrors.images = "이미지는 최소 1장 등록해야 합니다.";
         // 수량 1 이상 정수 체크
-        if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 1) {
+        if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 0) {
             newErrors.itemNum = "수량은 0이상이여야 합니다.";
         }
 
@@ -95,6 +112,7 @@ const UpdateComponent = ({ demNum }) => {
         const formData = new FormData();
         for (let i = 0; i < images.length; i++) {
             formData.append("imageList", images[i].file);
+            formData.append("isMain", images[i].isMain ? "true" : "false");
         }
         formData.append("demName", dem.demName);
         formData.append("demMfr", dem.demMfr);
@@ -106,8 +124,28 @@ const UpdateComponent = ({ demNum }) => {
         putUpdate(formData).then(data => {
         });
         alert("상품 수정 완료");
-        moveToPath("/")
+        // moveToPath("/")
     }
+
+
+    const handleCheckboxChange = (selectedIndex) => {
+        const currentMainIndex = images.findIndex(img => img.isMain === 1);
+
+        if (currentMainIndex === selectedIndex) {
+            // 같은 대표 이미지 클릭 시 체크 해제
+            setImages(images.map((img, idx) => ({
+                ...img,
+                isMain: 0
+            })));
+            return;
+        }
+
+        // 다른 이미지 클릭 시 대표 이미지 변경
+        setImages(images.map((img, idx) => ({
+            ...img,
+            isMain: idx === selectedIndex ? 1 : 0
+        })));
+    };
     return (
 
         <div className="flex mt-10 max-w-6xl mx-auto">
@@ -207,11 +245,17 @@ const UpdateComponent = ({ demNum }) => {
             </div>
 
             <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
-                {images.map((img) => (
+                {images.map((img, index) => (
                     <div className="flex flex-col items-start">
+                        <h6>대표 이미지설정</h6>
+                        <input
+                            type="checkbox"
+                            checked={Boolean(img.isMain)}
+                            onChange={() => handleCheckboxChange(index)}
+                            className="w-3 h-3"></input>
                         <button className="w-full text-right" onClick={() => fileDelete(img)}>x</button>
                         <img
-                            src={img.file ? img.url : `http://localhost:8090/${img.url}`}
+                            src={img.url}
                             className="w-32 h-32 object-cover rounded-md border shadow mb-1"
                         />
                         <p className="text-sm text-gray-600 break-all">{img.name}</p>

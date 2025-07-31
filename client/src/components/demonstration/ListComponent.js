@@ -7,18 +7,19 @@ import { getList } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 const ListComponent = () => {
     const initState = { // 페이지 초기화
-        content: [], totalPages: 95, currentPage: 0
+        content: [], totalPages: 125, currentPage: 0
     }
 
     const [current, setCurrent] = useState(0)
     const [listData, setListData] = useState(initState)
-    /*
-    useEffect(()=> {
-        getList({current}).then(data=> {
+
+    useEffect(() => {
+        getList(current).then(data => {
+
             setListData(data)
         })
-    },[current])
-    */
+    }, [current])
+
     return (
         <div className="w-3/4">
             <div className="flex gap-2">
