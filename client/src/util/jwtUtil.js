@@ -25,7 +25,8 @@ const beforeRes = async (res) => {
         // accessToken 재발급 요청
         const result = await refreshJWT(member.accessToken, member.refreshToken);
 
-        member.accessToken = result.accessToken
+        member.accessToken = result.accessToken;
+        member.refreshToken = result.refreshToken;
 
         // 새로 발급받은 토큰을 쿠키에 저장
         setCookie("member", JSON.stringify(member), 1);
