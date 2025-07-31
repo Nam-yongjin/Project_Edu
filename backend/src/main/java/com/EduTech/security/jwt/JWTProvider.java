@@ -17,7 +17,7 @@ public class JWTProvider {
 
 	public static String KEY = "secretKey!@#accessToken!@#refreshToekn!@#generateToken!@#validateToken";
 
-	public static String generateToken(Map<String, Object> valueMap, int min) {
+	public static String generateToken(Map<String, Object> claims, int min) {
 
 		SecretKey key;
 
@@ -29,33 +29,27 @@ public class JWTProvider {
 			throw new RuntimeException(e.getMessage());
 		}
 
-		 return Jwts.builder()
-	                .setHeaderParam("typ", "JWT")
-	                .setClaims(valueMap)
-	                .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
-	                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
-	                .signWith(key)
-	                .compact();
+		return Jwts.builder().setHeaderParam("typ", "JWT").setClaims(claims)
+				.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+				.setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant())).signWith(key).compact();
 
 	}
 
 	public static Map<String, Object> validateToken(String token) {
-		Map<String, Object> claim = null;
+		Map<String, Object> claims = null;
 
 //		전달된 토큰을 검증하고, 유효하면 claim(Map) 반환
 		try {
 			SecretKey key = Keys.hmacShaKeyFor(JWTProvider.KEY.getBytes("UTF-8"));
-			return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)	// 파싱 및 검증, 실패 시 에러
-                    .getBody();
+			claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token) // 파싱 및 검증, 실패 시 에러
+					.getBody();
 		} catch (ExpiredJwtException e) {
-			throw new JWTException("Expired");	// 액세스 토큰 만료 시 "Expired" 예외 발생
+			throw new JWTException("Expired"); // 액세스 토큰 만료 시 "Expired" 예외 발생
 		} catch (JwtException e) {
 			throw new JWTException("Invalid Token");
 		} catch (Exception e) {
 			throw new JWTException("Error");
 		}
+		return claims;
 	}
 }

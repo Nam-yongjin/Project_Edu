@@ -24,10 +24,7 @@ public class JWTFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String authHeader = request.getHeader("Authorization");
-			if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			    filterChain.doFilter(request, response);
-			    return;  // 헤더 없거나 형식 안 맞으면 인증 안하고 다음 필터 실행
-			}
+
 			String accessToken = authHeader.substring(7);
 
 			Map<String, Object> claims = JWTProvider.validateToken(accessToken);
@@ -59,6 +56,12 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		String path = request.getRequestURI();
 
+		String authHeader = request.getHeader("Authorization");
+
+		if (path.equals("/favicon.ico") || path.startsWith("/api/refresh")) {
+			return true;
+		}
+
 		// 회원가입 경로 제외
 		if (path.startsWith("/register") && request.getMethod().equals("POST")) {
 			return true;
@@ -74,6 +77,14 @@ public class JWTFilter extends OncePerRequestFilter {
 		// 비밀번호 찾기(변경) 경로 제외
 		if (path.startsWith("/resetPw") && request.getMethod().equals("PUT")) {
 			return true;
+		}
+
+		// 회원 + 비회원
+		if (path.startsWith("/api/")) {
+			if (authHeader != null) {
+				return false; // 회원의 경우
+			}
+			return true; // 비회원의 경우
 		}
 
 		// 이미지 조회 경로는 제외 (/view)
