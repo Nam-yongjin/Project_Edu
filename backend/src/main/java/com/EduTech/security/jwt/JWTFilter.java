@@ -80,7 +80,7 @@ public class JWTFilter extends OncePerRequestFilter {
 		}
 
 		// 회원 + 비회원
-		if (path.startsWith("/api/")) {
+		if (path.startsWith("/api")) {
 			if (authHeader != null) {
 				return false; // 회원의 경우
 			}
