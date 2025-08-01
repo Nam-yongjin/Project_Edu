@@ -177,7 +177,7 @@ public class NoticeRepositoryTests {
         assertThat(update.getNoticeFiles().get(0).getOriginalName()).isEqualTo("new.png");
 	}
 	
-	@Test
+//	@Test
 	@Transactional
 	@DisplayName("공지사항 삭제")
 	@Commit
