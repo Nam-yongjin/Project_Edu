@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 const AboutPage = () => {
     return (
         <div>
-            <BasicLayout>
+            <BasicLayout isFullWidth = {true}>
                 <Outlet />
             </BasicLayout>
         </div>
