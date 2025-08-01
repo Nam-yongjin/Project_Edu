@@ -46,3 +46,19 @@ export const getList = async (current) => {
     });
     return res.data;
 }
+
+// 실증 상품 상세 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
+export const getDetail = async (demNum) => {
+    const res = await jwtAxios.get(`${demonstration}/demDetail`, {
+        params : {demNum: demNum}
+    });
+    return res.data;
+}
+
+// 현재 달의 시작일 / 마지막날 / 상품 정보를 받아가 현재 달의 예약된 날짜를 가져오기 위한 요청
+export const getResDate = async (startDate, endDate, demNum) => {
+    const res = await jwtAxios.get(`${demonstration}/demResCon`, {
+        params: { startDate, endDate, demNum }
+    });
+    return res.data;
+}
