@@ -29,7 +29,7 @@ const FindIdComponent = () => {
             ) : (
                 <>
                     <p>찾은 아이디: <strong>{foundId}</strong></p>
-                    <button className='rounded p-1 w-18 bg-blue-500	text-white active:bg-blue-600' onClick={moveToLogin}>로그인 페이지로 이동</button>
+                    <button className='rounded p-1 w-18 bg-blue-500	text-white active:bg-blue-600 font-bold' onClick={moveToLogin}>로그인 페이지로 이동</button>
                 </>
             )}
         </div>
