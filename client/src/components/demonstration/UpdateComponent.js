@@ -27,26 +27,26 @@ const UpdateComponent = ({ demNum }) => {
             setReturnDate(new Date(data.expDate + "T00:00:00"));
 
             if (data.imageUrlList && data.imageUrlList.length > 0) {
-                const fullUrls = data.imageUrlList.map(img => serverHost + img); // 서버 측에서 요청할 경로 지정
+                const fullUrls = data.imageUrlList.map(img => serverHost + 'view/' + img); // 서버 측에서 요청할 경로 지정
                 const fileList = await urlListToFileList(fullUrls, data.imageNameList); // 파일 객체를 받아옴
 
                 const fileListWithIsMain = fileList.map((fileObj, index) => ({
                     ...fileObj,
-                       isMain: data.isMain ? data.isMain[index] === 'true' : false  // data.isMainList가 있으면 해당 인덱스 값, 없으면 0으로 기본 설정
+                    isMain: data.isMain ? data.isMain[index] === 'true' : false  // data.isMainList가 있으면 해당 인덱스 값, 없으면 0으로 기본 설정
                 }));
 
                 setImages(fileListWithIsMain);
             }
-            
+
         };
         loadData();
     }, [demNum]);
     // useEffect를 사용하면 최초 1회, 그리고 의존성 배열이 있을경우,
     // 의존성 배열 변경 시 실행된다.
 
-useEffect(() => {
-  console.log("렌더링 직후 images 상태: ", images);
-}, [images]);
+    useEffect(() => {
+        console.log("렌더링 직후 images 상태: ", images);
+    }, [images]);
 
     const handleChangeDem = (e) => {
         dem[e.target.name] = e.target.value;
@@ -60,6 +60,11 @@ useEffect(() => {
 
     const handleFileChange = (e) => { // 파일 선택이 됬을 경우, 
         const files = Array.from(e.target.files); // 현재 파일을 files에 담고
+         if (files.length > 8) { // 한 번에 선택한 이미지가 9개 이상일 때
+            alert("이미지는 최대 8개까지만 업로드할 수 있습니다.");
+            e.target.value = ""; // 선택 초기화 (필요시)
+            return;
+        }
         const filePreviews = files.map((file, index) => ({
             file,
             url: URL.createObjectURL(file),
@@ -84,47 +89,61 @@ useEffect(() => {
 
     const update = () => {
         const newErrors = {};
+
+        // 검증 로직 (생략 가능)
         if (!dem.demName.trim()) newErrors.demName = "물품명은 필수입니다.";
         if (!dem.demMfr.trim()) newErrors.demMfr = "제조사는 필수입니다.";
         if (!dem.demInfo.trim()) newErrors.demInfo = "물품 설명은 필수입니다.";
-        // 이미지 1개 이상 체크
         if (images.length === 0) newErrors.images = "이미지는 최소 1장 등록해야 합니다.";
-        // 수량 1 이상 정수 체크
         if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 0) {
             newErrors.itemNum = "수량은 0이상이여야 합니다.";
         }
 
         // 날짜가 오늘 이후인지 체크
         const today = new Date();
-        // 비교할 때 시간 제거 (00:00:00으로 맞춤)
+        // 비교할 때 시간을 (00:00:00으로 맞춤)
+        today.setHours(0, 0, 0, 0); // 
         const selectedDate = new Date(dem.expDate);
         selectedDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
-
         if (selectedDate <= today) {
             newErrors.expDate = "반납 날짜는 오늘 이후여야 합니다.";
         }
 
         setErrors(newErrors);
-
-        // 2) 오류가 있으면 submit 중단
+        // object.key 객체의 key를 배열 형태로 변환 후, length로 오류가 잇다면 return 시킴
         if (Object.keys(newErrors).length > 0) return;
+
         const formData = new FormData();
-        for (let i = 0; i < images.length; i++) {
-            formData.append("imageList", images[i].file);
-            formData.append("isMain", images[i].isMain ? "true" : "false");
-        }
-        formData.append("demName", dem.demName);
-        formData.append("demMfr", dem.demMfr);
-        formData.append("itemNum", dem.itemNum);
-        formData.append("demInfo", dem.demInfo);
-        formData.append("expDate", returnDate.toISOString().split("T")[0]);
-        formData.append("demNum", demNum);
-        //"2025-07-28T06:00:00.000Z" 를 T로 나누면 yyyy-mm-dd 형태의 문자열로 받을수 잇음.
-        putUpdate(formData).then(data => {
+        const mainImageIndex = images.findIndex((img) => img.isMain === 1);
+        // dem 객체+반납일 객체 생성
+        const demCopy = {
+            ...dem,
+            expDate: selectedDate.toISOString().split("T")[0],
+            mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
+        };
+
+        // demCopy를 JSON 문자열로 만들고 Blob 생성해서 append (기존에 formdata에 한번에 보내는 것보다 업로드 가능한 파일갯수가 2배늘어남)
+        formData.append(
+            "demonstrationFormDTO",
+            new Blob([JSON.stringify(demCopy)], { type: "application/json" })
+        );
+
+        // formData에 이미지 넣기
+        images.forEach((img) => {
+            formData.append("imageList", img.file);
         });
-        alert("상품 수정 완료");
-        // moveToPath("/")
+
+        putUpdate(formData)
+            .then(() => {
+                alert("상품 수정 완료");
+                moveToPath("/");
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("상품 수정 실패");
+            });
+
+
     }
 
 
