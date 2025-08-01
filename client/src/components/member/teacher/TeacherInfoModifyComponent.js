@@ -320,22 +320,22 @@ const TeacherInfoModifyComponent = () => {
                     ?
                     <div className='flex'>
                         <div className='pr-4'>
-                            <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600' onClick={handleClickModify}>수정완료</button>
+                            <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600 font-bold' onClick={handleClickModify}>수정완료</button>
                         </div>
                         <div className='pr-4'>
-                            <button className='rounded p-1 w-[70px] bg-gray-200 active:bg-gray-300' onClick={handleModifyCancle}>취소</button>
+                            <button className='rounded p-1 w-[70px] bg-gray-200 active:bg-gray-300 font-bold' onClick={handleModifyCancle}>취소</button>
                         </div>
                         <div>
-                            <button className='rounded p-1 w-[70px] bg-red-500	text-white active:bg-red-600' onClick={handleMoveLeave}>회원탈퇴</button>
+                            <button className='rounded p-1 w-[70px] bg-red-500	text-white active:bg-red-600 font-bold' onClick={handleMoveLeave}>회원탈퇴</button>
                         </div>
                     </div>
                     :
                     <div className='flex'>
                         <div className='pr-4'>
-                            <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600' onClick={handleMoveModify}>정보수정</button>
+                            <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600 font-bold' onClick={handleMoveModify}>정보수정</button>
                         </div>
                         <div>
-                            <button className='rounded p-1 w-[70px] bg-gray-300 active:bg-gray-400' onClick={moveToReturn}>뒤로가기</button>
+                            <button className='rounded p-1 w-[70px] bg-gray-300 active:bg-gray-400 font-bold' onClick={moveToReturn}>뒤로가기</button>
                         </div>
                     </div>
                 }
