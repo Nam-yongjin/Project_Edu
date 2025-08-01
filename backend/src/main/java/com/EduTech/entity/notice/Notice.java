@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.EduTech.entity.BaseEntity;
 import com.EduTech.entity.member.Member;
 
@@ -56,6 +58,7 @@ public class Notice extends BaseEntity{
 	
 	//하나의 공지글에 여러 개의 파일 첨부 가능, 공지글이 삭제되면 파일도 같이 삭제
 	@Builder.Default
+	@BatchSize(size = 10)
 	@OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<NoticeFile> noticeFiles = new ArrayList<>(); //noticefiles -> notice 안에 있는 리스트
 	

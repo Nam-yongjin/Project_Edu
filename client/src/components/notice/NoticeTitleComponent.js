@@ -36,6 +36,7 @@ const NoticeTitleComponent = ({ title }) => {
         })}
       </div>
     </div>
+    
   );
 };
 
