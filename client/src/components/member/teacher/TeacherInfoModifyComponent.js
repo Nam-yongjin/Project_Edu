@@ -90,7 +90,7 @@ const TeacherInfoModifyComponent = () => {
         };
 
         if (!/^[가-힣]{1,6}$/.test(form.name)) {
-            errs.name = '이름은 한글 1~6자여야 합니다.';
+            errs.name = '이름은 한글 6자 이하여야 합니다.';
         };
 
         if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {

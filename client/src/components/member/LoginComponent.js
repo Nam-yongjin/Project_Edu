@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import useLogin from "../../hooks/useLogin";
 import useMove from "../../hooks/useMove";
 import { Link } from "react-router-dom";
-import KakaoLoginComponent from "./KakaoLoginComponent";
+import SocialLoginComponent from "./SocialLoginComponent";
 import { removeCookie } from "../../util/cookieUtil";
 
 const initState = { memId: '', pw: '' };
@@ -106,7 +106,7 @@ const LoginComponent = () => {
                 <span className="mx-2">|</span>
                 <Link to="/resetPw" className="text-sm text-gray-600 hover:underline">비밀번호 재설정</Link>
             </div>
-            <KakaoLoginComponent />
+            <SocialLoginComponent />
         </div>
     );
 };

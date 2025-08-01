@@ -77,49 +77,52 @@ const RegisterTermsComponent = () => {
     };
 
     return (
-        <div className="mx-10 w-3/4">
+        <div className="w-3/4 mx-auto">
             <div className="py-4 ">
                 <h2 className="text-center text-xl font-bold mb-4">이용 약관 동의</h2>
 
-                <div className="mt-10">
+                <div className="mt-20">
                     <div className="text-lg font-bold mb-4">서울 에듀테크 소프트랩 이용약관</div>
-                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100">
+                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-200 rounded">
                         {registerText}
                     </div>
-                    <label className="float-right">
+                    <label className="float-right pt-4">
                         <input
                             type="checkbox"
                             name="register"
                             checked={checkedItems.register}
                             onChange={handleIndividualCheck}
+                            className="mr-1"
                         />
                         서비스 이용약관 동의 <strong className="text-red-600">[필수]</strong>
                     </label>
                 </div>
-                <div className="mt-10">
+                <div className="mt-20">
                     <div className="text-lg font-bold mb-4">개인 정보 수집 및 이용 동의</div>
-                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100">
+                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-200 rounded">
                         {agreeText}
                     </div>
-                    <label className="float-right">
+                    <label className="float-right pt-4">
                         <input
                             type="checkbox"
                             name="agree"
                             checked={checkedItems.agree}
                             onChange={handleIndividualCheck}
+                            className="mr-1"
                         />
                         개인정보 수집 동의 <strong className="text-red-600">[필수]</strong>
                     </label>
                 </div>
-                <div className="mt-10">
+                <div className="mt-20">
                     <div className="text-lg font-bold mb-4">개인정보 처리 방침</div>
-                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100">
+                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-200 rounded">
                         {processText}
                     </div>
-                    <label className="float-right">
+                    <label className="float-right pt-4">
                         <input
                             type="checkbox"
                             name="process"
+                            className="mr-1"
                             checked={checkedItems.process}
                             onChange={handleIndividualCheck}
                         />
@@ -127,20 +130,21 @@ const RegisterTermsComponent = () => {
                     </label>
                 </div>
                 <div className="py-10">
-                    <label className="float-right">
+                    <label className="float-right pt-8">
                         <input
                             type="checkbox"
                             checked={isAllChecked}
                             onChange={handleCheckAll}
+                            className="mr-1"
                         />
                         전체 동의
                     </label>
                 </div>
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-10 py-2 text-center">
                 <h2 className="text-xl font-bold mb-4">회원 유형 선택</h2>
-                <div className="flex flex-row gap-2 justify-center">
+                <div className="flex flex-row gap-3 justify-center bg-gray-200 mx-auto w-1/3 p-2 rounded">
                     {['member', 'student', 'teacher', 'company'].map((type) => (
                         <label key={type}>
                             <input

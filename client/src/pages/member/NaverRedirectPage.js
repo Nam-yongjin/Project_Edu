@@ -5,9 +5,10 @@ import useMove from "../../hooks/useMove";
 import { loginSocialAsync } from "../../slices/loginSlice";
 
 // 인가 코드의 페이지 처리
-const KakaoRedirectPage = () => {
+const NaverRedirectPage = () => {
     const [searchParams] = useSearchParams();
     const authCode = searchParams.get("code");
+    const stateFromURL = searchParams.get("state");
     const dispatch = useDispatch();
     const { moveToPath } = useMove();
 
@@ -19,21 +20,22 @@ const KakaoRedirectPage = () => {
         }
 
         dispatch(loginSocialAsync({
-            provider: 'kakao',
+            provider: 'naver',
             code: authCode,
+            state: stateFromURL
         }))
             .unwrap()
             .then(() => {
-                alert("카카오 계정으로 로그인 되었습니다.");
+                alert("네이버 계정으로 로그인 되었습니다.");
                 moveToPath("/");
             })
             .catch((err) => {
-                alert("카카오 로그인 실패.");
+                alert("네이버 로그인 실패.");
                 moveToPath("/login");
             });
-    }, [authCode]);
+    }, [authCode, stateFromURL]);
 
     return <div></div>;
 };
 
-export default KakaoRedirectPage;
+export default NaverRedirectPage;

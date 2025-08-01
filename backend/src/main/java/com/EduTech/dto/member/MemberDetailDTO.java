@@ -24,5 +24,5 @@ public class MemberDetailDTO {
 	private boolean checkEmail;	// 이메일수신동의
 	private MemberRole role;
 	private MemberState state;
-	private String kakao;	// 카카오 계정
+	private String social;	// 소셜 계정
 }
