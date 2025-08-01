@@ -10,15 +10,15 @@ const eventRouter = () => {
 
     return [
         {
-             path:"List",
+             path:"list",
             element: <Suspense fallback={<Loading />}><EventList /></Suspense>,
         },
          {
-            path:"Detail",
+            path:"detail",
             element: <Suspense fallback={<Loading />}><EventDetail /></Suspense>,
         },
         {
-            path:"Add",
+            path:"add",
             element: <Suspense fallback={<Loading />}><EventAddPage /></Suspense>,
         }
 
