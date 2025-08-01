@@ -106,65 +106,28 @@ public class EventServiceImpl implements EventService {
 	
 	// 행사 등록
 	@Override
-	public void registerEvent(EventInfoDTO dto, List<MultipartFile> imageList, List<MultipartFile> attachList) {
-	    log.info("🟢 [행사 등록 시작] DTO: {}", dto);
-
+	public void registerEvent(EventInfoDTO dto, MultipartFile file) {
 	    EventInfo info = modelMapper.map(dto, EventInfo.class);
 
-	    log.info("✅ 모델 매핑 완료: {}", info);
+	    // 누락 필드 보정
+	    info.setCurrCapacity(0); // 새 등록 이벤트는 현재 인원 0
 
-	    info.setCurrCapacity(0);
-	    info.setApplyAt(LocalDateTime.now());
-	    info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
-	    log.info("📆 상태 계산 완료: {}", info.getState());
-
+	    // null 방지: daysOfWeek는 @ElementCollection이므로 null이면 오류 발생 가능
 	    if (info.getDaysOfWeek() == null) {
 	        info.setDaysOfWeek(new ArrayList<>());
-	        log.info("📌 요일 정보 초기화 (빈 리스트)");
 	    }
+	    
+	    // 작성시간
+	    info.setApplyAt(LocalDateTime.now());
 
-	    // ✅ 대표 이미지 처리
-	    if (imageList != null && !imageList.isEmpty()) {
-	        MultipartFile first = imageList.get(0);
-	        log.info("🖼 대표 이미지 파일 수신됨: {}", first.getOriginalFilename());
+	    // 상태 계산
+	    info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
 
-	        try {
-	            String savedPath = fileUtil.saveFile(first);
-	            info.setFilePath(savedPath);
-	            info.setOriginalName(first.getOriginalFilename());
-	            log.info("🧾 대표 이미지 저장 완료: {}", savedPath);
-	        } catch (Exception e) {
-	            log.error("❌ 대표 이미지 저장 실패", e);
-	        }
-	    } else {
-	        log.warn("⚠ 대표 이미지 없음 (imageList null 또는 empty)");
-	    }
+	    // 파일 처리
+	    setFileInfo(info, file);
 
-	    // ✅ 첨부파일 처리
-	    if (attachList != null && !attachList.isEmpty()) {
-	        for (MultipartFile file : attachList) {
-	            try {
-	                String savedPath = fileUtil.saveFile(file);
-	                log.info("📎 첨부파일 저장됨: {} ({})", file.getOriginalFilename(), savedPath);
-
-	                // 필요시 EventFile 엔티티로 별도 저장 구현 가능
-	            } catch (Exception e) {
-	                log.error("❌ 첨부파일 저장 실패: {}", file.getOriginalFilename(), e);
-	            }
-	        }
-	    } else {
-	        log.info("📂 첨부파일 없음 또는 비어 있음");
-	    }
-
-	    // ✅ 최종 저장
-	    try {
-	    	log.info("🔍 저장 전 info 확인: {}", info);
-	        EventInfo saved = infoRepository.save(info);
-	        log.info("🎉 행사 저장 완료: eventNum = {}", saved.getEventNum());
-	    } catch (Exception e) {
-	        log.error("🔥 행사 저장 실패", e);
-	        throw e; // 예외를 다시 던져서 클라이언트에 전달
-	    }
+	    // 저장
+	    infoRepository.save(info);
 	}
 
 	
