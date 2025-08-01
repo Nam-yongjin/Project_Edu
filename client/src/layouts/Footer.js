@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return(
-        <footer className="bg-gray-600 px-8 py-6 text-[14px]"> 
+        <footer className="mt-10 bg-gray-600 px-8 py-6 text-[14px]"> 
             <div className="max-w-screen-xl mx-auto flex justify-between items-start flex-wrap">
                 {/* 왼쪽: 정책 + 주소 */}
                 <div className='space-y-4 max-w-xl'>

@@ -51,7 +51,7 @@ const LoginComponent = () => {
     }, [cooldown]);
 
     return (
-        <div className="p-4 border-2 border-blue-300 mt-10">
+        <div className="">
             <h2 className="text-4xl text-center text-blue-600 font-bold mb-6">Login</h2>
 
             <div className="mb-4">

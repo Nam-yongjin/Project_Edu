@@ -77,8 +77,8 @@ const RegisterTermsComponent = () => {
     };
 
     return (
-        <div className="w-3/4 mx-auto">
-            <div className="py-4">
+        <div className="">
+            <div className="">
                 <h2 className="text-center text-xl font-bold mb-4">이용 약관 동의</h2>
 
                 <div className="mt-20">

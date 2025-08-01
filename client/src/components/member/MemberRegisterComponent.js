@@ -141,7 +141,7 @@ const MemberRegisterComponent = () => {
     };
 
     return (
-        <div className='space-y-5 mt-10 mx-2 pl-4 text-center'>
+        <div className='space-y-5 pl-4 text-center'>
             <div className='text-3xl'>회원가입</div>
             <div>
                 <input
