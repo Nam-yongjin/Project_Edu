@@ -172,7 +172,6 @@ public class MemberServiceTests {
 	@Test
 	public void testRegisterModifyCompanyInfo() {
 		CompanyModifyDTO companyModifyDTO = new CompanyModifyDTO();
-		companyModifyDTO.setMemId("companytest");
 		companyModifyDTO.setPw(passwordEncoder.encode("123456"));
 		companyModifyDTO.setName("수정정보");
 		companyModifyDTO.setEmail("test12@gmail.com");

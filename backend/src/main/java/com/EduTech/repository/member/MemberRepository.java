@@ -17,7 +17,7 @@ import com.EduTech.entity.member.Teacher;
 
 import jakarta.transaction.Transactional;
 
-public interface MemberRepository extends JpaRepository<Member, String>,JpaSpecificationExecutor<Member>{
+public interface MemberRepository extends JpaRepository<Member, String>, JpaSpecificationExecutor<Member> {
 
 	// 아이디 중복 체크
 	boolean existsById(String memId);
@@ -50,13 +50,10 @@ public interface MemberRepository extends JpaRepository<Member, String>,JpaSpeci
 
 	// 다른 회원의 이메일과 카카오 이메일이 중복되는지 확인
 	Optional<Member> findByEmail(String Email);
-	
-	// 카카오 회원인지 확인
-	Optional<Member> findByKakao(String kakao);
-	
+
 	// 관리자가 멤버 상태 수정하는 쿼리문
 	@Modifying
 	@Query("update Member m set m.state = :state where m.memId in :memId")
 	void updateMemberState(@Param("state") MemberState state, @Param("memId") List<String> memId);
-	
+
 }

@@ -105,7 +105,7 @@ public class MemberRepositoryTests {
 	}
 	
 //	 관리자계정
-//	@Test
+	@Test
 	@Transactional
 	@Commit
 	public void testInsertAdmin() {
@@ -156,7 +156,7 @@ public class MemberRepositoryTests {
 			
 		}
 		// 탈퇴 계정
-		@Test
+//		@Test
 		@Transactional
 		@Commit
 		public void testInsertLeave() {

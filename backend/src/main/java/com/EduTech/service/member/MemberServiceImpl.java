@@ -2,19 +2,25 @@ package com.EduTech.service.member;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -28,6 +34,7 @@ import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
 import com.EduTech.dto.member.MemberResetPwDTO;
+import com.EduTech.dto.member.NaverDTO;
 import com.EduTech.dto.member.StudentDetailDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
@@ -64,6 +71,15 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	private final DemonstrationReserveRepository demonstrationReserveRespository;
+
+	@Value("${naver.client-id}")
+	private String NAVER_CLIENT_ID;
+
+	@Value("${naver.client-secret}")
+	private String NAVER_CLIENT_SECRET;
+
+	@Value("${naver.redirect-uri}")
+	private String NAVER_REDIRECT_URI;
 
 	// 일반회원 회원가입
 	@Override
@@ -346,7 +362,7 @@ public class MemberServiceImpl implements MemberService {
 		if (member.getState().equals("BEN")) {
 			throw new IllegalStateException("블랙리스트 회원은 탈퇴할 수 없습니다.");
 		}
-		
+
 		// 이미 탈퇴처리된 회원일시 탈퇴불가
 		if (member.getState().equals("LEAVE")) {
 			throw new IllegalStateException("이미 탈퇴 처리중 입니다.");
@@ -462,12 +478,12 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	// 전화번호 유효성 검증
-	private String normalizePhoneNumber(String kakaoPhoneNumber) {
-		if (kakaoPhoneNumber == null)
+	private String normalizePhoneNumber(String phoneNumber) {
+		if (phoneNumber == null)
 			return null;
 
 		// +82 10-1234-5678 -> 01012345678
-		String normalized = kakaoPhoneNumber.replaceAll("[^0-9]", ""); // 숫자만 남김
+		String normalized = phoneNumber.replaceAll("[^0-9]", ""); // 숫자만 남김
 
 		if (normalized.startsWith("82")) {
 			normalized = "0" + normalized.substring(2); // 82 -> 0
@@ -481,9 +497,89 @@ public class MemberServiceImpl implements MemberService {
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone()); // 전화번호 유효성
 
-		return Member.builder().memId(kakaoDTO.getEmail()).pw(encodedPassword).name(kakaoDTO.getName()).email(kakaoDTO.getEmail())
-				.birthDate(kakaoDTO.getBirthDate()).gender(kakaoDTO.getGender()).phone(normalizedPhone)
-				.state(MemberState.NORMAL).role(MemberRole.USER).kakao(kakaoDTO.getEmail()).build();
+		return Member.builder().memId(kakaoDTO.getEmail()).pw(encodedPassword).name(kakaoDTO.getName())
+				.email(kakaoDTO.getEmail()).birthDate(kakaoDTO.getBirthDate()).gender(kakaoDTO.getGender())
+				.phone(normalizedPhone).state(MemberState.NORMAL).role(MemberRole.USER).social(kakaoDTO.getEmail())
+				.build();
 	}
 
+	// 네이버 로그인 (code: 인가코드, state: CSRF 공격 방지 문자열)
+	@Override
+	public MemberDTO getNaverMember(String code, String state) {
+		// 토큰 발급
+		RestTemplate rest = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", NAVER_CLIENT_ID);
+		params.add("client_secret", NAVER_CLIENT_SECRET);
+		params.add("code", code);
+		params.add("state", state);
+		params.add("redirect_uri", NAVER_REDIRECT_URI);
+
+		HttpEntity<MultiValueMap<String, String>> tokenReq = new HttpEntity<>(params, headers);
+		ResponseEntity<Map> tokenRes = rest.postForEntity("https://nid.naver.com/oauth2.0/token", tokenReq, Map.class);
+		String accessToken = (String) tokenRes.getBody().get("access_token");
+
+		// 프로필 조회
+		HttpHeaders profHeaders = new HttpHeaders();
+		profHeaders.set("Authorization", "Bearer " + accessToken);
+		HttpEntity<Void> profReq = new HttpEntity<>(profHeaders);
+		ResponseEntity<Map> profRes = rest.exchange("https://openapi.naver.com/v1/nid/me", HttpMethod.GET, profReq,
+				Map.class);
+
+		Map<String, Object> naverAccount = (Map<String, Object>) profRes.getBody().get("response");
+		String email = (String) naverAccount.get("email");
+		String name = (String) naverAccount.get("name");
+		String genderStr = (String) naverAccount.get("gender");
+		String birth = (String) naverAccount.get("birthday"); // MMDD
+		String birthYear = (String) naverAccount.get("birthyear"); // YYYY
+		String phoneNumber = (String) naverAccount.get("mobile"); // +82 10-XXXX-XXXX
+
+		LocalDate birthDate = null;
+		if (birthYear != null && birth != null) {
+		    // 숫자가 아닌 모든 문자 제거
+		    String mmdd = birth.replaceAll("\\D", "");  // "\\D" == [^0-9]
+		    String yyyymmdd = birthYear.trim() + mmdd;
+
+		    try {
+		        birthDate = LocalDate.parse(
+		            yyyymmdd,
+		            DateTimeFormatter.ofPattern("yyyyMMdd")
+		        );
+		    } catch (DateTimeParseException e) {
+		        birthDate = null;
+		    }
+		} else {
+			birthDate = null;
+		}
+		
+		MemberGender gender = genderStr != null && genderStr.equalsIgnoreCase("male") ? MemberGender.MALE
+				: MemberGender.FEMALE;
+
+		NaverDTO naver = NaverDTO.builder().email(email).name(name).gender(gender).birthDate(birthDate)
+				.phone(phoneNumber).build();
+
+		// DB 조회/가입
+		return makeNaverMember(naver);
+	}
+
+	private MemberDTO makeNaverMember(NaverDTO naverDTO) {
+		String rawPassword = generateRandomPassword(); // 랜덤 비밀번호
+		String encodedPassword = passwordEncoder.encode(rawPassword);
+		String normalizedPhone = normalizePhoneNumber(naverDTO.getPhone()); // 전화번호 유효성
+
+		Optional<Member> result = memberRepository.findByEmail(naverDTO.getEmail());
+
+		Member member = result.orElseGet(() -> {
+			Member newMember = Member.builder().memId(naverDTO.getEmail()).pw(encodedPassword)
+					.email(naverDTO.getEmail()).name(naverDTO.getName()).gender(naverDTO.getGender())
+					.birthDate(naverDTO.getBirthDate()).phone(normalizedPhone).state(MemberState.NORMAL)
+					.role(MemberRole.USER).social(naverDTO.getEmail()).build();
+			return memberRepository.save(newMember);
+		});
+		return entityToDTO(member);
+	}
 }

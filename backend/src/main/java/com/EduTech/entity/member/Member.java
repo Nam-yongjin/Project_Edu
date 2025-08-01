@@ -59,7 +59,7 @@ public class Member extends BaseEntity{
 	private MemberRole role;
 	
 	@Column(unique=true)
-	private String kakao;
+	private String social;
 	
 	// 회원 삭제시 연결된 추가정보 자동 삭제
 	@ToString.Exclude
