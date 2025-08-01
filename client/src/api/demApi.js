@@ -33,7 +33,7 @@ export const putUpdate = async (formData) => {
     return res.data;
 }
 
-// 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청
+// 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청 (임시)
 export const delDem = async (demNum) => {
     const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, demNum);
     return res.data;

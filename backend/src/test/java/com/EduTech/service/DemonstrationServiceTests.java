@@ -282,7 +282,7 @@ public class DemonstrationServiceTests {
 	}
 	
 	
-	
+	/*
 	//@Test
 	@DisplayName("실증 물품 등록")
 	void addDem() {
@@ -337,8 +337,9 @@ public class DemonstrationServiceTests {
 		}
 		//demonstrationService.addDemonstration(demonstrationFormDTO);
 	}
+	*/
 	
-	
+	/*
 	//@Test
 	@DisplayName("실증 상품 등록 수정")
 	public void DemDelete()
@@ -366,18 +367,18 @@ public class DemonstrationServiceTests {
 					"image/jpg", // content type
 					imageBytes // 실제 파일 내용 (byte 배열)
 			);
-			/*MockMultipartFile mockFile2 = new MockMultipartFile("file", // form field name
+			MockMultipartFile mockFile2 = new MockMultipartFile("file", // form field name
 					"바지이미지.jpg", // 원래 파일명
 					"image/jpg", // content type
 					imageBytes2 // 실제 파일 내용 (byte 배열)
-			); */
+			); 
 			MockMultipartFile mockFile3 = new MockMultipartFile("file", // form field name
 					"duke.png", // 원래 파일명
 					"image/png", // content type
 					imageBytes3 // 실제 파일 내용 (byte 배열)
 			);
 			imageList.add(mockFile);
-		//	imageList.add(mockFile2);
+			imageList.add(mockFile2);
 			imageList.add(mockFile3);
 			
 			demonstrationFormDTO.setImageList(imageList);
@@ -388,13 +389,15 @@ public class DemonstrationServiceTests {
 	
 		demonstrationService.updateDemonstration(demonstrationFormDTO); 
 	}
+	*/
 	
 	//@Test
 	@DisplayName("상품 삭제 테스트")
 	public void deleteDem() {
 		Long demNum=Long.valueOf(100);
 		
-		demonstrationService.deleteDemonstration(demNum);
+		//demonstrationService.deleteDemonstration(demNum);
+		 demonstrationRepository.deleteAll();
 	}
 	//@Test
 	public void test1() {
