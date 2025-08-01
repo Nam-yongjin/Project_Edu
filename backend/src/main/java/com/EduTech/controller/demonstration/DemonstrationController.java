@@ -83,7 +83,7 @@ public class DemonstrationController {
 	// 실증 장비 신청 상세 페이지
 	@GetMapping("/demDetail")
 	public DemonstrationDetailDTO getDemDetailList(@RequestParam("demNum") Long demNum) {
-		DemonstrationDetailDTO DemDetail = getDemDetailList(demNum);
+		DemonstrationDetailDTO DemDetail = demonstrationService.getDemDetailList(demNum);
 		return DemDetail;
 	}
 

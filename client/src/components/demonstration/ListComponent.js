@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { getList } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import ImageSliderModal from "./ImageSliderModal";
+import useMove from "../../hooks/useMove";
 const ListComponent = () => {
     const initState = { // 페이지 초기화
         content: [], totalPages: 0, currentPage: 0
@@ -13,12 +14,11 @@ const ListComponent = () => {
     const [listData, setListData] = useState([]); // 받아올 content 값
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedImages, setSelectedImages] = useState([]);
-
+     const { moveToPath} = useMove();
     useEffect(() => {
         getList(current).then(data => {
             setPageData(data);
             setListData(data);
-            console.log(data);
         })
     }, [current])
 
@@ -27,7 +27,7 @@ const ListComponent = () => {
             <div className="w-full">
                 <div className="flex gap-2">
                     {listData.content?.map((item) => {
-                        const mainImageObj = item.imageList.find(img => String(img.isMain) === "true" || img.isMain === true);
+                        const mainImageObj = item.imageList.find(img => String(img.isMain) === "true");
                         const mainImageUrl = mainImageObj ? `http://localhost:8090/view/${mainImageObj.imageUrl}` : defaultImg;
                         return (
                             <div
@@ -37,7 +37,6 @@ const ListComponent = () => {
                                 <img
                                     onClick={() => {
                                         const urlList = item.imageList.map(img => `http://localhost:8090/view/${img.imageUrl}`);
-                                        console.log(urlList);
                                         setSelectedImages(urlList);
                                         setModalOpen(true);
                                     }}
@@ -66,6 +65,7 @@ const ListComponent = () => {
                                         ? "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
                                         : "bg-gray-400 cursor-not-allowed"
                                         }`}
+                                   onClick={() => moveToPath(`../detail/${item.demNum}`)}
                                 >
                                     {item.itemNum!==0 ? "대여 가능" : "대여 불가능"}
                                 </button>
