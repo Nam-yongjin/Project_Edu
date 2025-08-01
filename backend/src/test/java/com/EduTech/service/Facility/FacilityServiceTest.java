@@ -318,7 +318,7 @@ class FacilityServiceTest {
                 .build());
 
         // [4] 예약 취소 요청 (user3 본인 요청)
-        boolean result = facilityService.cancelReservation(reserve.getFacRevNum(), false, "user3");
+        boolean result = facilityService.cancelReservation(reserve.getFacRevNum(), "user3");
         assertThat(result).isTrue();
 
         // [5] 상태 확인

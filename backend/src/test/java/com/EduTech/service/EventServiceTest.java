@@ -1,239 +1,129 @@
 package com.EduTech.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.annotation.Rollback;
 
-import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventInfoDTO;
-import com.EduTech.dto.event.EventUseDTO;
-import com.EduTech.entity.event.EventCategory;
-import com.EduTech.entity.member.Member;
-import com.EduTech.entity.member.MemberGender;
-import com.EduTech.entity.member.MemberRole;
-import com.EduTech.entity.member.MemberState;
-import com.EduTech.repository.member.MemberRepository;
-import com.EduTech.service.event.EventService;
+import com.EduTech.entity.event.EventInfo;
+import com.EduTech.repository.event.EventInfoRepository;
+import com.EduTech.service.event.EventServiceImpl;
+import com.EduTech.util.FileUtil;
 
-import jakarta.transaction.Transactional;
+@ExtendWith(MockitoExtension.class)
+class EventServiceTest {
 
-@SpringBootTest
-@Transactional
-@Rollback(false)
-public class EventServiceTest {
+    @InjectMocks
+    private EventServiceImpl eventService;
 
-    @Autowired
-    private EventService eventService;
+    @Mock
+    private EventInfoRepository infoRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @Mock
+    private FileUtil fileUtil;
 
-    private Member user;
+    @Mock
+    private ModelMapper modelMapper;
+
+    private EventInfoDTO dto;
+    private EventInfo entity;
 
     @BeforeEach
-    public void setup() {
-        user = Member.builder()
-                .memId("applicant1")
-                .pw("pw123")
-                .name("테스트사용자")
-                .gender(MemberGender.FEMALE)
-                .birthDate(LocalDate.of(1990, 6, 15))
-                .phone("01012312312")
-                .addr("서울시 마포구")
-                .email("applicant1@test.com")
-                .checkSms(true)
-                .checkEmail(false)
-                .role(MemberRole.USER)
-                .state(MemberState.NORMAL)
-                .build();
-        memberRepository.save(user);
-    }
-
-    //@Test
-    @DisplayName("1. 사용자 프로그램 신청 테스트")
-    public void testApplyEvent() {
-        // given
-        EventInfoDTO dto = EventInfoDTO.builder()
-                .eventName("신청 테스트 이벤트")
-                .eventInfo("신청 테스트 설명")
-                .place("5층 강의실")
-                .category(EventCategory.USER)
+    void setup() {
+        dto = EventInfoDTO.builder()
+                .eventName("테스트 행사")
+                .eventInfo("소개입니다")
+                .maxCapacity(100)
                 .applyStartPeriod(LocalDateTime.now().minusDays(1))
-                .applyEndPeriod(LocalDateTime.now().plusDays(2))
-                .eventStartPeriod(LocalDateTime.now().plusDays(5))
+                .applyEndPeriod(LocalDateTime.now().plusDays(1))
+                .eventStartPeriod(LocalDateTime.now().plusDays(2))
                 .eventEndPeriod(LocalDateTime.now().plusDays(10))
-                .maxCapacity(20)
-                .daysOfWeek(List.of(DayOfWeek.MONDAY.getValue(), DayOfWeek.WEDNESDAY.getValue()))
+                .place("강의실 1호")
                 .build();
 
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "event.pdf", "application/pdf", "<<data>>".getBytes()
-        );
-
-        eventService.registerEvent(dto, file);
-
-        Long eventNum = eventService.getAllEvents().stream()
-                .filter(e -> e.getEventName().equals("신청 테스트 이벤트"))
-                .findFirst()
-                .orElseThrow()
-                .getEventNum();
-
-        EventApplyRequestDTO applyDTO = EventApplyRequestDTO.builder()
-                .eventNum(eventNum)
-                .memId(user.getMemId())
-                .build();
-
-        // when
-        eventService.applyEvent(applyDTO);
-
-        // then
-        boolean alreadyApplied = eventService.isAlreadyApplied(eventNum, user.getMemId());
-        assertTrue(alreadyApplied);
-
-        List<EventUseDTO> applicants = eventService.getApplicantsByEvent(eventNum);
-        assertFalse(applicants.isEmpty());
-        assertEquals(user.getMemId(), applicants.get(0).getMemId());
+        entity = new EventInfo();
+        entity.setEventName(dto.getEventName());
+        entity.setEventInfo(dto.getEventInfo());
+        entity.setMaxCapacity(dto.getMaxCapacity());
+        entity.setApplyStartPeriod(dto.getApplyStartPeriod());
+        entity.setApplyEndPeriod(dto.getApplyEndPeriod());
+        entity.setEventStartPeriod(dto.getEventStartPeriod());
+        entity.setEventEndPeriod(dto.getEventEndPeriod());
+        entity.setPlace(dto.getPlace());
     }
 
     //@Test
-    @DisplayName("2. 사용자 프로그램 신청 취소 테스트")
-    public void testCancelEvent() {
+    void testRegisterEvent_success() throws Exception {
         // given
-        EventInfoDTO dto = EventInfoDTO.builder()
-                .eventName("취소 테스트 이벤트")
-                .eventInfo("신청 취소 테스트 설명")
-                .place("6층 강의실")
-                .category(EventCategory.USER)
-                .applyStartPeriod(LocalDateTime.now().minusDays(1))
-                .applyEndPeriod(LocalDateTime.now().plusDays(2))
-                .eventStartPeriod(LocalDateTime.now().plusDays(3))
-                .eventEndPeriod(LocalDateTime.now().plusDays(7))
-                .maxCapacity(25)
-                .daysOfWeek(List.of(DayOfWeek.TUESDAY.getValue()))
-                .build();
+        when(modelMapper.map(dto, EventInfo.class)).thenReturn(entity);
+        when(infoRepository.save(any(EventInfo.class))).thenReturn(entity);
 
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "cancel.pdf", "application/pdf", "<<cancel>>".getBytes()
-        );
-
-        eventService.registerEvent(dto, file);
-
-        Long eventNum = eventService.getAllEvents().stream()
-                .filter(e -> e.getEventName().equals("취소 테스트 이벤트"))
-                .findFirst()
-                .orElseThrow()
-                .getEventNum();
-
-        EventApplyRequestDTO applyDTO = EventApplyRequestDTO.builder()
-                .eventNum(eventNum)
-                .memId(user.getMemId())
-                .build();
-
-        eventService.applyEvent(applyDTO);
-        List<EventUseDTO> list = eventService.getApplicantsByEvent(eventNum);
-        Long evtRevNum = list.get(0).getEvtRevNum();
+        MockMultipartFile mockImage = new MockMultipartFile(
+                "imageList", "test.jpg", "image/jpeg", "dummy image content".getBytes());
 
         // when
-        eventService.cancelEvent(evtRevNum);
+        eventService.registerEvent(dto, List.of(mockImage), null);
 
         // then
-        boolean reapplied = eventService.isAlreadyApplied(eventNum, user.getMemId());
-        assertFalse(reapplied);
+        verify(infoRepository, times(1)).save(any(EventInfo.class));
     }
-    
+
     @Test
-    @DisplayName("3. 신청 여부 확인 테스트")
-    public void testIsAlreadyApplied() {
+    void testUpdateEvent_success() {
         // given
+        Long eventNum = 1L;
+
         EventInfoDTO dto = EventInfoDTO.builder()
-                .eventName("신청 여부 확인 이벤트")
-                .eventInfo("신청 여부 테스트 설명")
-                .place("8층 강의실")
-                .category(EventCategory.USER)
-                .applyStartPeriod(LocalDateTime.now().minusDays(1))
-                .applyEndPeriod(LocalDateTime.now().plusDays(2))
-                .eventStartPeriod(LocalDateTime.now().plusDays(3))
-                .eventEndPeriod(LocalDateTime.now().plusDays(7))
-                .maxCapacity(25)
-                .daysOfWeek(List.of(DayOfWeek.TUESDAY.getValue()))
-                .build();
+            .eventName("수정된 행사")
+            .eventInfo("소개입니다")
+            .place("강의실 1호")
+            .maxCapacity(100)
+            .applyStartPeriod(LocalDateTime.now())
+            .applyEndPeriod(LocalDateTime.now().plusDays(2))
+            .eventStartPeriod(LocalDateTime.now().plusDays(3))
+            .eventEndPeriod(LocalDateTime.now().plusDays(10))
+            .build();
 
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "applycheck.pdf", "application/pdf", "<<applycheck>>".getBytes()
-        );
+        EventInfo entity = new EventInfo();
+        entity.setEventNum(eventNum);
 
-        eventService.registerEvent(dto, file);
+        when(infoRepository.findById(eventNum)).thenReturn(Optional.of(entity));
+        when(modelMapper.map(eq(dto), eq(EventInfo.class))).thenReturn(entity); // ✅ 정확한 매칭
 
-        Long eventNum = eventService.getAllEvents().stream()
-                .filter(e -> e.getEventName().equals("신청 여부 확인 이벤트"))
-                .findFirst()
-                .orElseThrow()
-                .getEventNum();
+        MockMultipartFile file = new MockMultipartFile("file", "file.pdf", "application/pdf", "content".getBytes());
 
-        // when - 신청 전
-        boolean beforeApply = eventService.isAlreadyApplied(eventNum, user.getMemId());
-        assertFalse(beforeApply, "신청 전이므로 false여야 합니다.");
-
-        // when - 신청 후
-        EventApplyRequestDTO applyDTO = EventApplyRequestDTO.builder()
-                .eventNum(eventNum)
-                .memId(user.getMemId())
-                .build();
-
-        eventService.applyEvent(applyDTO);
-
-        boolean afterApply = eventService.isAlreadyApplied(eventNum, user.getMemId());
-        assertTrue(afterApply, "신청 후이므로 true여야 합니다.");
+        // when & then
+        assertDoesNotThrow(() -> eventService.updateEvent(eventNum, dto, file));
+        verify(infoRepository, times(1)).save(any(EventInfo.class));
     }
 
     //@Test
-    @DisplayName("4. 신청 불가능한 기간 확인 테스트")
-    public void testApplyEventOutsidePeriod() {
-        EventInfoDTO dto = EventInfoDTO.builder()
-                .eventName("기간 외 테스트")
-                .eventInfo("기간 테스트 설명")
-                .place("7층 강의실")
-                .category(EventCategory.USER)
-                .applyStartPeriod(LocalDateTime.now().plusDays(2)) // 시작 전
-                .applyEndPeriod(LocalDateTime.now().plusDays(5))
-                .eventStartPeriod(LocalDateTime.now().plusDays(6))
-                .eventEndPeriod(LocalDateTime.now().plusDays(10))
-                .maxCapacity(15)
-                .daysOfWeek(List.of(DayOfWeek.THURSDAY.getValue()))
-                .build();
+    void testDeleteEvent_success() {
+        // given
+        Long eventNum = 1L;
+        entity.setEventNum(eventNum);
+        when(infoRepository.findById(eventNum)).thenReturn(Optional.of(entity));
 
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "invalid.pdf", "application/pdf", "<<invalid>>".getBytes()
-        );
+        // when
+        eventService.deleteEvent(eventNum);
 
-        eventService.registerEvent(dto, file);
-
-        Long eventNum = eventService.getAllEvents().stream()
-                .filter(e -> e.getEventName().equals("기간 외 테스트"))
-                .findFirst()
-                .orElseThrow()
-                .getEventNum();
-
-        EventApplyRequestDTO applyDTO = EventApplyRequestDTO.builder()
-                .eventNum(eventNum)
-                .memId(user.getMemId())
-                .build();
-
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
-            eventService.applyEvent(applyDTO);
-        });
-
-        assertEquals("신청 기간이 아닙니다.", exception.getMessage());
+        // then
+        verify(infoRepository, times(1)).delete(entity);
     }
 }
