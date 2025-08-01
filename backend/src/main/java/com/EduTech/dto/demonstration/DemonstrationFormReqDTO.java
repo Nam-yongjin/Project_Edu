@@ -39,8 +39,8 @@ public class DemonstrationFormReqDTO { // 기업이 실증 물품 dto (프론트
 	
 	private Long demNum; // 실증 번호
 	private String memId; // 회원 아이디
-	@Size(max = 10, message = "이미지는 최대 10개까지 가능합니다.")
-	private List<MultipartFile> imageList = new ArrayList<>(); // 저장할 이미지 리스트
+	//@Size(max = 10, message = "이미지는 최대 10개까지 가능합니다.")
+	//private List<MultipartFile> imageList = new ArrayList<>(); // 저장할 이미지 리스트
 	private Integer mainImageIndex; // 이미지 대표 인덱스
 	
 }

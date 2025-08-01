@@ -24,7 +24,7 @@ public class WebConfig implements WebMvcConfigurer{
 	// 프론트에서 백 폴더에 접근할때 사용
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-	    registry.addResourceHandler("/demImages/**")
+	    registry.addResourceHandler("/view/demImages/**")
 	            .addResourceLocations("file:///C:/upload/demImages/");
 	}
 	

@@ -2,6 +2,7 @@ package com.EduTech.controller.demonstration;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -127,19 +129,26 @@ public class DemonstrationController {
 		return ResponseEntity.ok("예약 변경 성공");
 	}
 
-	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
-	@PostMapping("/addDem")
-	public ResponseEntity<String> DemAdd( @Valid @ModelAttribute DemonstrationFormReqDTO demonstrationFormDTO) {
-		System.out.println("컨트롤러 도착");
-		String memId = JWTFilter.getMemId();
-		//demonstrationService.addDemonstration(demonstrationFormDTO,memId);
-		return ResponseEntity.ok("실증 물품 등록 완료");
+	@PostMapping("/addDem") // 이미지 파일 업로드 관련해서 8개까지 밖에 컨트롤러에 도달 못함(아마 톰켓 서버 관련 설정일듯, 톰켓 서버 설정 바꿔도 안먹음)
+	public ResponseEntity<String> DemAdd(
+	    @RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
+	    @RequestPart("imageList") List<MultipartFile> imageList
+	) {
+	    String memId = JWTFilter.getMemId();
+	    
+	    demonstrationService.addDemonstration(demonstrationFormDTO, imageList, memId);
+	    
+	    return ResponseEntity.ok("실증 물품 등록 완료");
 	}
+
+
 
 	// 실증 상품 수정하는 기능
 	@PutMapping("/UpdateDem")
-	public ResponseEntity<String> DemUpdate(@Valid @ModelAttribute DemonstrationFormReqDTO demonstrationFormDTO) {
-		demonstrationService.updateDemonstration(demonstrationFormDTO);
+	public ResponseEntity<String> DemUpdate( @RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
+		    @RequestPart("imageList") List<MultipartFile> imageList) {
+		String memId = JWTFilter.getMemId();
+		demonstrationService.updateDemonstration(demonstrationFormDTO,imageList,memId);
 		return ResponseEntity.ok("실증 물품 수정 완료");
 	}
 
