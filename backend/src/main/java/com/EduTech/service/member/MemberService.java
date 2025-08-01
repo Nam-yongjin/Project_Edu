@@ -51,6 +51,8 @@ public interface MemberService {
 	void resetPw(String memId, MemberResetPwDTO memberResetPwDTO);
 	
 	MemberDTO getKakaoMember(String accessToken);
+	
+	MemberDTO getNaverMember(String code, String state);
 
 	default MemberDTO entityToDTO(Member member) {
 

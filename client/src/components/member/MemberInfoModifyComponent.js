@@ -19,7 +19,7 @@ const initState = {
     checkSms: false,
     checkEmail: false,
     role: 'MEMBER',
-    kakao: ''
+    social: ''
 };
 
 const MemberInfoModifyComponent = () => {
@@ -34,8 +34,6 @@ const MemberInfoModifyComponent = () => {
         try {
             const data = await readMember();
 
-            const translatedMemId = data.kakao ? "카카오회원" : data.memId;
-
             // gender 값 변환 처리
             const translatedGender = data.gender === "MALE"
                 ? "남성"
@@ -47,7 +45,6 @@ const MemberInfoModifyComponent = () => {
                 ...prev,
                 ...data,
                 pw: '',
-                memId: translatedMemId,
                 gender: translatedGender
             }));
         } catch (err) {
@@ -93,7 +90,7 @@ const MemberInfoModifyComponent = () => {
         };
 
         if (!/^[가-힣]{1,6}$/.test(form.name)) {
-            errs.name = '이름은 한글 1~6자여야 합니다.';
+            errs.name = '이름은 한글 6자 이하여야 합니다.';
         };
 
         if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -117,7 +114,7 @@ const MemberInfoModifyComponent = () => {
         };
 
         // dataToSubmit: MemberModifyDTO
-        const { memId, pwCheck, birthDate, gender, role, kakao, ...dataToSubmit } = {
+        const { memId, pwCheck, birthDate, gender, role, social, ...dataToSubmit } = {
             ...form,
             phone: verifiedPhone
         };

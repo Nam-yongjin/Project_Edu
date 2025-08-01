@@ -3,6 +3,7 @@ package com.EduTech.controller.member;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,7 @@ import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
 import com.EduTech.dto.member.MemberResetPwDTO;
+import com.EduTech.dto.member.NaverDTO;
 import com.EduTech.dto.member.StudentDetailDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
@@ -174,6 +176,20 @@ public class MemberController {
 	@GetMapping("/login/kakao")
 	public ResponseEntity<Map<String, Object>> getMemberFromKakao(@RequestParam("accessToken") String accessToken) {
 		MemberDTO memberDTO = memberService.getKakaoMember(accessToken);
+		Map<String, Object> claims = memberDTO.getClaims();
+		String jwtAccessToken = JWTProvider.generateToken(claims, 10);
+		String jwtRefreshToken = JWTProvider.generateToken(claims, 60 * 24);
+		claims.put("accessToken", jwtAccessToken);
+		claims.put("refreshToken", jwtRefreshToken);
+		return ResponseEntity.ok(claims);
+	}
+
+	// 네이버 로그인
+	@GetMapping("/login/naver")
+	public ResponseEntity<Map<String, Object>> getMemberFromNaver(@RequestParam("code") String code,
+			@RequestParam("state") String state) {
+
+		MemberDTO memberDTO = memberService.getNaverMember(code, state);
 		Map<String, Object> claims = memberDTO.getClaims();
 		String jwtAccessToken = JWTProvider.generateToken(claims, 10);
 		String jwtRefreshToken = JWTProvider.generateToken(claims, 60 * 24);
