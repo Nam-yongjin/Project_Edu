@@ -14,13 +14,12 @@ const ImageSliderModal = ({ open, onClose, imageList }) => {
                     ✕
                 </button>
 
-                {/* Swiper 슬라이더 시작 */}
                 <Swiper
                     spaceBetween={10}
                     slidesPerView={1}
                     navigation
                     pagination={{ clickable: true }}
-                    className="flex justify-center bg-white"
+                      className="w-[500px] h-[400px] bg-white flex justify-center items-center"
                 >
                     {imageList.map((url, idx) => (
                         <SwiperSlide key={idx}>
@@ -32,7 +31,7 @@ const ImageSliderModal = ({ open, onClose, imageList }) => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
-                {/* Swiper 슬라이더 끝 */}
+             
             </div>
         </div>
     );
