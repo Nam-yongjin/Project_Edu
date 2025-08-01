@@ -22,6 +22,7 @@ const EvtAddComponent = () => {
   const [evt, setEvt] = useState(initState);
   const [images, setImages] = useState([]);
   const [attachFiles, setAttachFiles] = useState([]);
+  const [mainFile, setMainFile] = useState(null);
   const [fileInputs, setFileInputs] = useState([Date.now()]);
   const { moveToPath, moveToReturn } = useMove();
 
@@ -81,22 +82,45 @@ const EvtAddComponent = () => {
     });
   };
 
+  const handleAttachChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setMainFile(files[0]);
+      setAttachFiles(files.slice(1));
+    }
+  };
+
+  const formatDateTime = (date) => {
+    if (!(date instanceof Date) || isNaN(date)) return "";
+    const yyyy = date.getFullYear();
+    const MM = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const HH = String(date.getHours()).padStart(2, "0");
+    const mm = String(date.getMinutes()).padStart(2, "0");
+    return `${yyyy}-${MM}-${dd} ${HH}:${mm}`;
+  };
+
   const register = () => {
     const formData = new FormData();
 
     for (const { file } of images) {
       formData.append("imageList", file);
     }
+
     for (const file of attachFiles) {
       formData.append("attachList", file);
     }
 
+    if (mainFile) {
+      formData.append("file", mainFile);
+    }
+
     const dto = {
       ...evt,
-      applyStartPeriod: evt.applyStartPeriod.toISOString(),
-      applyEndPeriod: evt.applyEndPeriod.toISOString(),
-      eventStartPeriod: evt.eventStartPeriod.toISOString(),
-      eventEndPeriod: evt.eventEndPeriod.toISOString(),
+      applyStartPeriod: formatDateTime(evt.applyStartPeriod),
+      applyEndPeriod: formatDateTime(evt.applyEndPeriod),
+      eventStartPeriod: formatDateTime(evt.eventStartPeriod),
+      eventEndPeriod: formatDateTime(evt.eventEndPeriod),
     };
 
     const jsonBlob = new Blob([JSON.stringify(dto)], {
@@ -233,6 +257,18 @@ const EvtAddComponent = () => {
           />
         </div>
 
+        {/* 첨부파일 (대표 + 기타 자동 분리) */}
+        <div className="flex items-center mt-3">
+          <label className="text-xl font-semibold w-[120px]">첨부파일:</label>
+          <input
+            type="file"
+            multiple
+            accept=".pdf,.hwp,.doc,.docx"
+            onChange={handleAttachChange}
+            className="border p-2 text-base flex-1"
+          />
+        </div>
+
         {/* 이미지 업로드 */}
         {fileInputs.map((id, idx) => (
           <div key={id} className="flex items-center mt-3">
@@ -247,18 +283,6 @@ const EvtAddComponent = () => {
           </div>
         ))}
 
-        {/* 첨부파일 */}
-        <div className="flex items-center mt-3">
-          <label className="text-xl font-semibold w-[120px]">첨부파일:</label>
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.hwp,.doc,.docx"
-            onChange={(e) => setAttachFiles(Array.from(e.target.files))}
-            className="border p-2 text-base flex-1"
-          />
-        </div>
-
         {/* 버튼 */}
         <div className="mt-4 flex justify-end gap-4">
           <button onClick={register} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
@@ -272,6 +296,20 @@ const EvtAddComponent = () => {
 
       {/* 미리보기 */}
       <div className="w-1/3 pl-10 flex flex-col gap-4">
+        {mainFile && (
+          <div className="border rounded p-2 shadow">
+            <p className="text-sm font-semibold text-blue-600">대표 첨부파일</p>
+            <p className="text-sm break-words">{mainFile.name}</p>
+          </div>
+        )}
+
+        {attachFiles.map((file, index) => (
+          <div key={index} className="border rounded p-2 shadow">
+            <p className="text-sm text-gray-700">기타 첨부파일</p>
+            <p className="text-sm break-words">{file.name}</p>
+          </div>
+        ))}
+
         {images.map((img, index) => (
           <div key={index} className="flex flex-col items-start">
             <button className="text-red-500 self-end" onClick={() => fileDelete(index)}>x</button>

@@ -83,6 +83,11 @@ public class EventServiceImpl implements EventService {
 	// 현재 행사 신청 가능여부
 	private EventState calculateState(LocalDateTime applyStartPeriod, LocalDateTime applyEndPeriod) {
 	    LocalDateTime now = LocalDateTime.now();
+
+	    if (applyStartPeriod == null || applyEndPeriod == null) {
+	        return EventState.BEFORE; // 기본값 혹은 null-safe 상태로 반환
+	    }
+
 	    if (now.isBefore(applyStartPeriod)) return EventState.BEFORE;
 	    else if (now.isAfter(applyEndPeriod)) return EventState.CLOSED;
 	    else return EventState.OPEN;
@@ -222,13 +227,15 @@ public class EventServiceImpl implements EventService {
 	// 전체 행사 조회
 	@Override
 	public List<EventInfoDTO> getAllEvents() {
-		LocalDate today = LocalDate.now();
-		return infoRepository.findAll().stream().filter(info -> !info.getApplyEndPeriod().toLocalDate().isBefore(today))
-				.map(info -> {
-					EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
-					//dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
-					return dto;
-				}).collect(Collectors.toList());
+	    LocalDate today = LocalDate.now();
+	    return infoRepository.findAll().stream()
+	        .filter(info -> info.getApplyEndPeriod() != null &&
+	                        !info.getApplyEndPeriod().toLocalDate().isBefore(today))
+	        .map(info -> {
+	            EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
+	            return dto;
+	        })
+	        .collect(Collectors.toList());
 	}
 	
 	// 프로그램 상세 조회
@@ -463,6 +470,10 @@ public class EventServiceImpl implements EventService {
 
 	    LocalDateTime now = LocalDateTime.now();
 
+	    if (event.getApplyStartPeriod() == null || event.getApplyEndPeriod() == null) {
+	        throw new IllegalStateException("신청 기간 정보가 없습니다.");
+	    }
+
 	    if (now.isBefore(event.getApplyStartPeriod())) {
 	        throw new IllegalStateException("신청 기간이 아닙니다.");
 	    }
@@ -522,7 +533,9 @@ public class EventServiceImpl implements EventService {
 	public boolean isAvailable(Long eventNum) {
 	    EventInfo event = infoRepository.findById(eventNum)
 	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
-	    return event.getApplyEndPeriod().toLocalDate().isAfter(LocalDate.now());
+
+	    LocalDateTime end = event.getApplyEndPeriod();
+	    return end != null && end.toLocalDate().isAfter(LocalDate.now());
 	}
 	
 	// ========================================

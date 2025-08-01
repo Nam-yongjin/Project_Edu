@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,6 +40,7 @@ import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.event.EventService;
 import com.EduTech.util.FileUtil;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 	
 	@RestController
@@ -133,11 +135,21 @@ import lombok.RequiredArgsConstructor;
 	
 			// 5. 행사 등록(파일 업로드 포함)
 			@PostMapping("/register")
-			public ResponseEntity<String> registerEvent(@ModelAttribute EventInfoDTO dto,
-					@RequestParam(value = "file", required = false) MultipartFile file) {
+			@PreAuthorize("hasRole('ADMIN')") // 관리자만 등록 가능
+			public ResponseEntity<?> registerEvent(
+					@Valid @RequestPart("dto") EventInfoDTO dto,
+					@RequestPart(value = "file", required = false) MultipartFile file,
+					BindingResult bindingResult) {
 
-				eventService.registerEvent(dto, file);
-				return ResponseEntity.ok("등록 완료");
+			    // 유효성 오류가 존재하면 400 응답 반환
+			    if (bindingResult.hasErrors()) {
+			        log.warn("❌ 유효성 검사 실패: {}", bindingResult.getAllErrors());
+			        return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+			    }
+
+			    // 등록 처리
+			    eventService.registerEvent(dto, file);
+			    return ResponseEntity.ok("✅ 행사 등록이 완료되었습니다.");
 			}
 	
 			// 6. 수정(파일 업데이트 포함)
