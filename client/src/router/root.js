@@ -21,6 +21,7 @@ const Company = lazy(() => import("../pages/member/company/CompanyPage"))
 const FindId = lazy(() => import("../pages/member/FindIdPage"))
 const ResetPw = lazy(() => import("../pages/member/ResetPwPage"))
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"))
+const NaverRedirect = lazy(() => import("../pages/member/NaverRedirectPage"))
 const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
 const Notice = lazy(() => import("../pages/notice/noticePage"))
 const Event = lazy(() => import("../pages/event/eventPage"))
@@ -44,6 +45,10 @@ const root = createBrowserRouter([
             {
                 path: "kakao",
                 element: <Suspense fallback={<Loading />}><KakaoRedirect /></Suspense>,
+            },
+            {
+                path: "naver",
+                element: <Suspense fallback={<Loading />}><NaverRedirect /></Suspense>,
             },
         ]
     },

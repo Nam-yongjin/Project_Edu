@@ -3,6 +3,7 @@ import { loginPost, readMember } from "../api/memberApi";
 import { setCookie, getCookie, removeCookie } from "../util/cookieUtil";
 import jwtAxios from "../util/jwtUtil";
 import { getMemberWithAccessToken, getAccessToken } from "../api/kakaoApi";
+import { getMemberWithNaverCode } from "../api/naverApi";
 
 const initState = {
     memId: '',
@@ -39,7 +40,7 @@ export const loginPostAsync = createAsyncThunk(
 
             // JWT 헤더로 사용자 정보 요청
             const basicInfo = await readMember();
-            
+
             // 블랙리스트 또는 탈퇴 회원 처리
             if (basicInfo.state === 'BEN') {
                 removeCookie("member");
@@ -70,13 +71,19 @@ export const loginPostAsync = createAsyncThunk(
     }
 );
 
-// 소셜 로그인 (카카오 등)
+// 소셜 로그인
 export const loginSocialAsync = createAsyncThunk(
     'login/loginSocialAsync',
-    async (authCode, { rejectWithValue }) => {
+    async ({ provider, code, state }, { rejectWithValue }) => {
         try {
-            const accessToken = await getAccessToken(authCode);
-            const memberInfo = await getMemberWithAccessToken(accessToken);
+            let memberInfo;
+
+            if (provider === "kakao") {
+                const accessToken = await getAccessToken(code);
+                memberInfo = await getMemberWithAccessToken(accessToken);
+            } else if (provider === "naver") {
+                memberInfo = await getMemberWithNaverCode(code, state);
+            };
 
             // 블랙리스트 또는 탈퇴 회원 처리
             if (memberInfo.state === 'BEN') {
@@ -86,7 +93,7 @@ export const loginSocialAsync = createAsyncThunk(
             if (memberInfo.state === 'LEAVE') {
                 removeCookie("member");
                 return rejectWithValue({ error: true, message: "탈퇴처리된 회원은 로그인이 불가능합니다." });
-            }
+            };
 
             const userData = {
                 memId: memberInfo.memId,
