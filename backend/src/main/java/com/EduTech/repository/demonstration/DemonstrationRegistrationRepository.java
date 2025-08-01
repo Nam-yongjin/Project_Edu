@@ -33,7 +33,7 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Modifying 
 	@Transactional
     @Query("UPDATE DemonstrationRegistration SET state=:state WHERE member.memId=:memId AND demRegNum=:demRegNum")
-    int updateDemResChangeState(
+    int updateDemRegChangeState(
      @Param("state") DemonstrationState state,
      @Param("memId") String memId,
      @Param("demRegNum") Long demRegNum
@@ -42,7 +42,7 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Modifying 
 	@Transactional
     @Query("UPDATE DemonstrationRegistration SET expDate=:expDate WHERE member.memId=:memId AND demonstration.demNum=:demNum")
-    int updateDemResChangeExpDate(
+    int updateDemRegChangeExpDate(
      @Param("expDate") LocalDate expDate,
      @Param("demNum") Long demNum,
      @Param("memId") String memId

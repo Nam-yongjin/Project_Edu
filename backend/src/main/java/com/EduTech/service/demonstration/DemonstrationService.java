@@ -2,6 +2,8 @@ package com.EduTech.service.demonstration;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
@@ -29,8 +31,8 @@ public interface DemonstrationService {
 		void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO); // 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 		void demonstrationReservationCancel(DemonstrationReservationCancelDTO demonstrationReservationCancelDTO); // 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 		void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO); // 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 수정
-		void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO,String memId); // 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
-		void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO); // 실증 상품 수정하는 기능
+		void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,String memId); // 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
+		void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO,List<MultipartFile> imageList,String memId); // 실증 상품 수정하는 기능
 		void deleteDemonstration(Long demNum); // 실증 번호를 받아 실증 상품을 삭제하는 기능
 		DemonstrationFormResDTO selectOne(Long demNum); // 실증 번호를 받아 실증 상품 하나의 정보를 받아오는 기능
 		
