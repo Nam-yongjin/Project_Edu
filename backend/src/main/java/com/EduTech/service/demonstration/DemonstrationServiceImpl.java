@@ -155,7 +155,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeRepository.saveAll(dates);
 	}
 
-	// 실증 장비신청 페이지 (실증 물품 리스트 목록) - 이미지도 가져와야함
+	// 실증 장비신청 페이지 (실증 물품 리스트 목록)
 	@Override
 	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount) {
 		if (pageCount == null || pageCount < 0) {
