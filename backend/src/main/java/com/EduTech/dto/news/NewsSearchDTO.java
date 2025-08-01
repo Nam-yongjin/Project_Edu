@@ -9,9 +9,9 @@ import lombok.Data;
 @Data
 public class NewsSearchDTO {
 	
-	private int page; //현재 페이지
+	private int page = 0; //현재 페이지
 	
-	private int size; //한 페이지 당 게시글 수
+	private int size = 10; //한 페이지 당 게시글 수
 	
 	private String keyword; //검색어(제목/내용)에 포한된 단어
 	

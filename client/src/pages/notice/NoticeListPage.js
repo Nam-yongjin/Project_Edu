@@ -146,7 +146,7 @@ const NoticeListPage = () => {
           />
 
           {/* 공지사항 리스트 컴포넌트 */}
-          <div className="bg-white shadow-sm border border-gray-200" rounded-lg overflow-hidden>
+          <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
             {loading ? (
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
