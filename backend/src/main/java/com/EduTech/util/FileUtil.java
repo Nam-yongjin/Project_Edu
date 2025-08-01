@@ -162,4 +162,32 @@ public class FileUtil {	// 파일 데이터의 입출력
 	public boolean isImageFile(String filename) {
 		return filename != null && filename.toLowerCase().matches(".*\\.(jpg|jpeg|png|gif|bmp|webp|tiff|svg)$");
 	}
+	
+	//-------------------------------------------
+	
+	public String saveFile(MultipartFile file) {
+	    if (file == null || file.isEmpty()) {
+	        return null;
+	    }
+
+	    String originName = file.getOriginalFilename();
+	    String ext = originName.substring(originName.lastIndexOf("."));
+	    String savedName = UUID.randomUUID().toString() + ext;
+	    Path savePath = Paths.get(uploadPath, savedName);
+
+	    try {
+	        Files.copy(file.getInputStream(), savePath);
+
+	        // 이미지인 경우 썸네일 생성
+	        String contentType = file.getContentType();
+	        if (contentType != null && contentType.startsWith("image")) {
+	            Path thumbnailPath = Paths.get(uploadPath, "s_" + savedName);
+	            Thumbnails.of(savePath.toFile()).size(400, 400).toFile(thumbnailPath.toFile());
+	        }
+
+	        return savedName; // 저장된 파일명만 반환
+	    } catch (IOException e) {
+	        throw new RuntimeException("파일 저장 실패", e);
+	    }
+	}
 }
