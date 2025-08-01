@@ -163,7 +163,6 @@ public class DemonstrationController {
 	// 실증 등록 수정 페이지에서 실증번호를 받아와 실증 상품의 정보를 받아오는 기능
 	@GetMapping("/SelectOne")
 	public DemonstrationFormResDTO SelectOne(@RequestParam("demNum") Long demNum) {
-		System.out.println("컨트롤러 왓다.");
 		DemonstrationFormResDTO dto=demonstrationService.selectOne(demNum);
 		return dto;
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제

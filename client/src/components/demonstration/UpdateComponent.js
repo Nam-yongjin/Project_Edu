@@ -149,7 +149,6 @@ const UpdateComponent = ({ demNum }) => {
 
     const handleCheckboxChange = (selectedIndex) => {
         const currentMainIndex = images.findIndex(img => img.isMain === 1);
-
         if (currentMainIndex === selectedIndex) {
             // 같은 대표 이미지 클릭 시 체크 해제
             setImages(images.map((img, idx) => ({
@@ -264,7 +263,9 @@ const UpdateComponent = ({ demNum }) => {
             </div>
 
             <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
-                {images.map((img, index) => (
+                {images.map((img, index) => 
+                
+                (
                     <div key={img.url} className="flex flex-col items-start">
                         <h6>대표 이미지설정</h6>
                         <input
