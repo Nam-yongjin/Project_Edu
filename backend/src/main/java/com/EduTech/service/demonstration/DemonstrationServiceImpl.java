@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
@@ -286,7 +287,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO,String memId) {
+	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,String memId) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -305,7 +306,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationRegistrationRepository.save(demonstrationRegistration);
 		
 		// 폴더에 이미지 저장 (demImages라는 폴더에)
-		List<Object> files = fileUtil.saveFiles(demonstrationFormDTO.getImageList(), "demImages");
+		List<Object> files = fileUtil.saveFiles(imageList, "demImages");
 
 		Integer mainIndex = demonstrationFormDTO.getMainImageIndex(); // ex) 0, 1, 2 중 하나
 
@@ -331,47 +332,53 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	@Override
 	@Transactional
-	public void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO) {
-		// 실증 상품 정보 업데이트
-		demonstrationRepository.updateDem(demonstrationFormDTO.getDemName(), demonstrationFormDTO.getDemMfr(),
-				demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum());
+	public void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,String memId) {
+	    // 실증 상품 정보 업데이트
+	    demonstrationRepository.updateDem(demonstrationFormDTO.getDemName(), demonstrationFormDTO.getDemMfr(),
+	            demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum());
 
-		// 반납 예정일 수정
-		demonstrationRegistrationRepository.updateDemResChangeExpDate(demonstrationFormDTO.getExpDate(),
-				demonstrationFormDTO.getDemNum(), demonstrationFormDTO.getMemId());
+	    // 반납 예정일 수정
+	    demonstrationRegistrationRepository.updateDemRegChangeExpDate(demonstrationFormDTO.getExpDate(),
+	            demonstrationFormDTO.getDemNum(), memId);
 
-		// 기존 상품 이미지 불러옴(폴더에서 이미지 삭제 위해)
-		List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository
-				.selectDemImage(demonstrationFormDTO.getDemNum());
-		List<String> filePaths = new ArrayList<>();
-		for (DemonstrationImageDTO dto : deleteImageList) {
-			String path = dto.getImageUrl();
-			String s_path = "s_" + dto.getImageUrl();
-			filePaths.add(path);
-			filePaths.add(s_path);
-		}
+	    // 기존 상품 이미지 불러옴(폴더에서 이미지 삭제 위해)
+	    List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository
+	            .selectDemImage(demonstrationFormDTO.getDemNum());
+	    List<String> filePaths = new ArrayList<>();
+	    for (DemonstrationImageDTO dto : deleteImageList) {
+	        String path = dto.getImageUrl();
+	        String s_path = "s_" + dto.getImageUrl();
+	        filePaths.add(path);
+	        filePaths.add(s_path);
+	    }
 
-		// 폴더에서 이미지 삭제
-		fileUtil.deleteFiles(filePaths);
+	    // 폴더에서 이미지 삭제
+	    fileUtil.deleteFiles(filePaths);
 
-		// 기존 상품 이미지 삭제 후,
-		demonstrationImageRepository.deleteDemNumImage(demonstrationFormDTO.getDemNum());
-		if (demonstrationFormDTO.getImageList() != null && !demonstrationFormDTO.getImageList().isEmpty()) {
-			List<Object> files = fileUtil.saveFiles(demonstrationFormDTO.getImageList(), "demImages");
-			// 수정된 이미지로 추가
-			// 안전성을 위해서 이미지 동기화 작업 고려?
-			for (Object obj : files) {
-				if (obj instanceof Map) {
-					Map<String, String> map = (Map<String, String>) obj;
-					DemonstrationImage demonstrationimage = DemonstrationImage.builder()
-							.imageName(map.get("originalName")).imageUrl(map.get("filePath"))
-							.demonstration(Demonstration.builder().demNum(demonstrationFormDTO.getDemNum()).build())
-							.build();
-					demonstrationImageRepository.save(demonstrationimage);
-				}
-			}
-		}
+	    // 기존 상품 이미지 삭제 후,
+	    demonstrationImageRepository.deleteDemNumImage(demonstrationFormDTO.getDemNum());
+
+	    if (imageList != null && !imageList.isEmpty()) {
+	        List<Object> files = fileUtil.saveFiles(imageList, "demImages");
+
+	        int mainIndex = demonstrationFormDTO.getMainImageIndex() != null ? demonstrationFormDTO.getMainImageIndex() : 0;
+
+	        for (int i = 0; i < files.size(); i++) {
+	            Object obj = files.get(i);
+	            if (obj instanceof Map) {
+	                Map<String, String> map = (Map<String, String>) obj;
+	                DemonstrationImage demonstrationimage = DemonstrationImage.builder()
+	                        .imageName(map.get("originalName"))
+	                        .imageUrl(map.get("filePath"))
+	                        .isMain(i == mainIndex)  // mainImageIndex와 비교해서 true/false 설정
+	                        .demonstration(Demonstration.builder().demNum(demonstrationFormDTO.getDemNum()).build())
+	                        .build();
+	                demonstrationImageRepository.save(demonstrationimage);
+	            }
+	        }
+	    }
 	}
+
 
 	// 실증 번호를 받아서 실증 상품을 삭제하는 기능
 	@Override
