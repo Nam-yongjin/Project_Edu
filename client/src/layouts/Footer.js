@@ -4,19 +4,19 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
     return(
         <footer className="bg-gray-600 px-8 py-6 text-[14px]"> 
-            <div className="max-w-[1200px] mx-auto flex justify-between items-start flex-wrap px-10">
+            <div className="max-w-screen-xl mx-auto flex justify-between items-start flex-wrap">
                 {/* 왼쪽: 정책 + 주소 */}
                 <div className='space-y-4 max-w-xl'>
                     {/* 정책 */}
                     <nav className='space-x-2 text-m text-white font-medium'>
                         {/* 페이지 링크 삽입해야 함 */}
-                        <a className='hover:underline cursor-pointer'><Link to="">개인정보처리방침</Link></a>
+                        <span className='hover:underline cursor-pointer'><Link to="">개인정보처리방침</Link></span>
                         <span>|</span>
-                        <a className='hover:underline cursor-pointer'><Link to="">저작권보호정책</Link></a>
+                        <span className='hover:underline cursor-pointer'><Link to="">저작권보호정책</Link></span>
                         <span>|</span>
-                        <a className='hover:underline cursor-pointer'><Link to="">이메일주소수집거부</Link></a>
+                        <span className='hover:underline cursor-pointer'><Link to="">이메일주소수집거부</Link></span>
                         <span>|</span>
-                        <a className='hover:underline cursor-pointer'><Link to="/about/direction">오시는길</Link></a>
+                        <span className='hover:underline cursor-pointer'><Link to="/about/direction">오시는길</Link></span>
                     </nav>
                     {/* 주소 */}
                     <address className="not-italic space-y-1 text-gray-400">

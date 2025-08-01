@@ -45,7 +45,7 @@ const DirectionComponent = () => {
     return (
         <div className="text-center">
             <div className="text-xl font-bold mb-4">오시는 길</div>
-            <div className=" w-4/5 h-[400px] mt-4 mx-auto"
+            <div className="w-4/5 h-[400px] mt-4 mx-auto"
                 id="map"
             ></div>
             <div className="mt-4">{address}</div>
