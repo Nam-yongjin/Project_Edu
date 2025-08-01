@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import SubAboutHeader from "../../layouts/SubAboutHeader";
 
 const DirectionComponent = () => {
     useEffect(() => {
@@ -43,14 +44,23 @@ const DirectionComponent = () => {
     };
 
     return (
-        <div className="text-center">
-            <div className="text-xl font-bold mb-4">오시는 길</div>
-            <div className="max-w-screen-xl h-[400px] mt-4 mx-auto"
-                id="map"
-            ></div>
-            <div className="text-xl font-bold my-8">주소 및 연락처</div>
-            <div className="my-4">{address}</div>
-            <div className="text-xl font-bold my-8">교통 안내</div>
+        <div className="">
+
+            <SubAboutHeader />
+
+            <div className="mx-auto max-w-screen-xl">
+                <div className="text-xl font-bold mb-4">오시는 길</div>
+                <div className="h-[400px] mt-4"
+                    id="map"
+                ></div>
+            </div>
+            <div className="mx-auto max-w-screen-xl">
+                <div className="text-xl font-bold my-8">주소 및 연락처</div>
+                <div className="my-4">{address}</div>
+            </div>
+            <div className="mx-auto max-w-screen-xl">
+                <div className="text-xl font-bold my-8">교통 안내</div>
+            </div>
         </div>
     );
 };

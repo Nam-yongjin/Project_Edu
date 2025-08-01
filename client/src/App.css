@@ -1,7 +1,7 @@
 @charset "utf-8";
-/* 기본값: 스크린 - 헤더 - 푸터 */
+/* 기본값: 스크린  - 푸터 */
 .main-content {
-  min-height: calc(100vh - 80px - 224px);
+  min-height: calc(100vh - 224px);
 }
 
 /* 모바일 환경에서는 최소 높이를 500px로 고정 */
