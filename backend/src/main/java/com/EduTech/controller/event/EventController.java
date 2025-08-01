@@ -132,29 +132,12 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 5. 행사 등록(파일 업로드 포함)
-			@PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-			public ResponseEntity<String> registerEvent(
-			    @RequestPart("dto") EventInfoDTO dto,
-			    @RequestPart(value = "imageList", required = false) List<MultipartFile> imageList,
-			    @RequestPart(value = "attachList", required = false) List<MultipartFile> attachList
-			) {
-			    System.out.println("🔥🔥🔥🔥 컨트롤러 진입");
-			    log.info("🔥🔥🔥🔥 컨트롤러 진입");
+			@PostMapping("/register")
+			public ResponseEntity<String> registerEvent(@ModelAttribute EventInfoDTO dto,
+					@RequestParam(value = "file", required = false) MultipartFile file) {
 
-			    try {
-			        log.info("🚀 [Controller] /register 호출됨 - dto: {}", dto);
-
-			        // imageList/attachList 크기 로그로 확인
-			        log.info("📷 imageList size: {}", imageList != null ? imageList.size() : "null");
-			        log.info("📎 attachList size: {}", attachList != null ? attachList.size() : "null");
-
-			        eventService.registerEvent(dto, imageList, attachList);
-
-			        return ResponseEntity.ok("등록 완료");
-			    } catch (Exception e) {
-			        log.error("❌ 행사 등록 중 오류 발생: {}", e.getMessage(), e);
-			        return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
-			    }
+				eventService.registerEvent(dto, file);
+				return ResponseEntity.ok("등록 완료");
 			}
 	
 			// 6. 수정(파일 업데이트 포함)
