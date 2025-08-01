@@ -86,7 +86,7 @@ const LoginComponent = () => {
                         <button
                             className="bg-blue-500 text-white font-bold p-3 w-36 rounded active:bg-blue-600"
                         >
-                            LOGIN
+                            로그인
                         </button>
                     </div>
                 </>
@@ -96,7 +96,7 @@ const LoginComponent = () => {
                         onClick={handleClickLogin}
                         className="bg-blue-500 text-white font-bold p-3 w-36 rounded active:bg-blue-600"
                     >
-                        LOGIN
+                        로그인
                     </button>
                 </div>}
 

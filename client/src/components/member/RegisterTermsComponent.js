@@ -78,7 +78,7 @@ const RegisterTermsComponent = () => {
 
     return (
         <div className="w-3/4 mx-auto">
-            <div className="py-4 ">
+            <div className="py-4">
                 <h2 className="text-center text-xl font-bold mb-4">이용 약관 동의</h2>
 
                 <div className="mt-20">
@@ -163,7 +163,7 @@ const RegisterTermsComponent = () => {
             </div>
             <div className="text-center">
                 <button
-                    className="mt-4 p-1 w-[70px] bg-blue-500 text-white rounded active:bg-blue-600"
+                    className="mt-4 p-1 w-[70px] bg-blue-500 text-white rounded active:bg-blue-600 font-bold"
                     onClick={handleSubmit}
                 >
                     다음
