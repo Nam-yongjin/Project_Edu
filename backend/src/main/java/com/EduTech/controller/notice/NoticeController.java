@@ -49,15 +49,14 @@ public class NoticeController {
 	// 공지사항 전체 조회(검색, 페이징)
 	@GetMapping("/NoticeList")
     public ResponseEntity<Page<NoticeListDTO>> getNoticeList(@ModelAttribute NoticeSearchDTO searchDTO) {
-    	System.out.println("콘솔에 나오는지 체크");
     	
         return ResponseEntity.ok(noticeService.getNoticeList(searchDTO));
     }
 
     // 공지사항 상세 조회(조회수 증가)
-    @GetMapping("/NoticeDetail/{noticeNum}")
+    @GetMapping("/{noticeNum}")
     public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable Long noticeNum) {
-
+    	System.out.println("콘솔에 나오는지 체크(디테일)");
         noticeService.increaseViewCount(noticeNum);
         return ResponseEntity.ok(noticeService.getNoticeDetail(noticeNum));
     }

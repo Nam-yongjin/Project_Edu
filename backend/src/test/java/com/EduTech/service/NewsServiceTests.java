@@ -1,12 +1,12 @@
 package com.EduTech.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.dto.news.NewsDetailDTO;
@@ -111,7 +113,7 @@ public class NewsServiceTests {
 	        boolean titleMatches = detailDTO.getTitle().equals(news.getTitle());
 	        boolean contentMatches = detailDTO.getContent().equals(news.getContent());
 	        boolean writerMatches = detailDTO.getName().equals(adminMember.getName());
-	        
+	        //true 나오면 성공
 	        System.out.println("=== 매핑 검증 ===");
 	        System.out.println("제목 매핑 성공: " + titleMatches); //제목
 	        System.out.println("내용 매핑 성공: " + contentMatches); //내용
@@ -122,6 +124,7 @@ public class NewsServiceTests {
 	    
 //	    @Test
 	    @Transactional
+	    @Rollback(false)
 	    @Commit
 	    @DisplayName("언론보도 목록 조회 - 페이징 확인")
 	    void testGetNewsList() {
@@ -142,8 +145,12 @@ public class NewsServiceTests {
 	        System.out.println("테스트용 보도자료 5개 생성 완료");
 
 	        // When - 목록 조회
+	        //NewsService에서 Pageable을 직접 인자로 받지 않아서 page, size값을 직접 설정해줘야 함
+	        //service에 없는 대신 searchDTO, serviceImpl에는 있음
 	        NewsSearchDTO searchDTO = new NewsSearchDTO();
-	        Pageable pageable = PageRequest.of(0, 3); //페이지 크기 3
+	        searchDTO.setPage(0);
+	        searchDTO.setSize(3);
+	        
 	        Page<NewsListDTO> result = newsService.getNewsList(searchDTO);
 
 	        // Then - 결과 확인
@@ -166,6 +173,7 @@ public class NewsServiceTests {
 	    
 //	    @Test
 	    @Transactional
+	    @Rollback(false)
 	    @Commit
 	    @DisplayName("조회수 증가 로직")
 	    void testIncreaseView() {
@@ -205,11 +213,15 @@ public class NewsServiceTests {
 	    
 //	    @Test
 	    @Transactional
+	    @Rollback(false)
 	    @Commit
 	    @DisplayName("언론보도 삭제 (단일)")
 	    void testDeleteNews() {
 	        Member adminMember = memberRepository.findById("admin").orElseThrow();
-	        System.out.println("===== 단일 삭제 테스트 =====");
+	        UsernamePasswordAuthenticationToken authentication =
+		            new UsernamePasswordAuthenticationToken(adminMember, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+		        SecurityContextHolder.getContext().setAuthentication(authentication);
+	        System.out.println("===== 단일 삭제 테스트 =====");    
 
 	        // Given - 보도자료 생성
 	        News news = News.builder()
@@ -227,7 +239,9 @@ public class NewsServiceTests {
 
 	        try {
 	            // When - 삭제 실행
-	            newsService.deleteNews(newsNum);
+	            newsService.deleteNews(30L);
+	            newsRepository.delete(news);
+	            newsRepository.flush();
 
 	            // Then - 삭제 확인
 	            long afterCount = newsRepository.count();
@@ -243,6 +257,7 @@ public class NewsServiceTests {
 	            e.printStackTrace(); // 예외 전체 스택 출력
 	            fail("예외 발생: " + e.getMessage()); // 테스트 실패 처리
 	        }
+	        assertThat(newsRepository.findById(newsNum)).isEmpty();
 	    }
 	    
 	    

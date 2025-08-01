@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import useMove from "../../hooks/useMove";
 import { deleteNotices } from "../../api/noticeApi";
 
-const NoticeActionButtons = ({selectedNotices, onDelete }) => {
+const NoticeButtonsComponent = ({selectedNotices, onDelete }) => {
     const loginState = useSelector((state) => state.loginState);
     const { moveToPath } = useMove(); //경로 이동
 
@@ -84,4 +84,4 @@ const NoticeActionButtons = ({selectedNotices, onDelete }) => {
   );
 };
 
-export default NoticeActionButtons;
+export default NoticeButtonsComponent;

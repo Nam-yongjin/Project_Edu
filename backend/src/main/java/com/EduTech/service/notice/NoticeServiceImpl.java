@@ -89,6 +89,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
     // 공지사항 삭제(단일)
     @Override
+    @Transactional
     public void deleteNotice(Long noticeNum) {
         Member currentMember = getCurrentMember();
         validateAdminRole(currentMember);
@@ -104,6 +105,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
     // 공지사항 삭제(일괄)
     @Override
+    @Transactional
     public void deleteNotices(List<Long> noticeNums) {
     	//권한 검증
         Member currentMember = getCurrentMember();
@@ -126,7 +128,7 @@ public class NoticeServiceImpl implements NoticeService {
         noticeNums.forEach(this::deleteNoticeFiles);
         
         // 공지사항들 삭제
-        noticeRepository.deleteAll(notices);
+        noticeRepository.deleteByNoticeNumIn(noticeNums);
     }
     // 공지사항 상세조회
     @Override
