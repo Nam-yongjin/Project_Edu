@@ -14,7 +14,7 @@ import main4 from '../assets/main4.jpg';
 const MainPage = () => {
     return (
         <div className="">
-            <BasicLayout isFullWidth={true} marginY={false}>
+            <BasicLayout isFullWidth={true}>
                 <div className="mx-auto">
                     <Swiper
                         spaceBetween={30}

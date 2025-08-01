@@ -45,10 +45,12 @@ const DirectionComponent = () => {
     return (
         <div className="text-center">
             <div className="text-xl font-bold mb-4">오시는 길</div>
-            <div className="w-4/5 h-[400px] mt-4 mx-auto"
+            <div className="max-w-screen-xl h-[400px] mt-4 mx-auto"
                 id="map"
             ></div>
-            <div className="mt-4">{address}</div>
+            <div className="text-xl font-bold my-8">주소 및 연락처</div>
+            <div className="my-4">{address}</div>
+            <div className="text-xl font-bold my-8">교통 안내</div>
         </div>
     );
 };

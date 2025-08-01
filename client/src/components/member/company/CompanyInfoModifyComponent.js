@@ -169,7 +169,7 @@ const CompanyInfoModifyComponent = () => {
     };
 
     return (
-        <div className='space-y-5 mt-10 mx-2 pl-4'>
+        <div className='space-y-5 pl-4'>
             <div className='text-3xl'>회원상세정보</div>
             <div>
                 <input
