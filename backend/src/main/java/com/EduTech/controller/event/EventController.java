@@ -1,6 +1,6 @@
-package com.EduTech.controller.event;
-
-import java.io.IOException;
+	package com.EduTech.controller.event;
+	
+	import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,185 +40,244 @@ import com.EduTech.service.event.EventService;
 import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
-
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/event")
-public class EventController {
 	
-	private static final Logger log = LoggerFactory.getLogger(EventController.class);
-
-	private final EventService eventService;
-	private final MemberRepository memberRepository;
-	private final FileUtil fileUtil;
+	@RestController
+	@RequiredArgsConstructor
+	@RequestMapping("/api/event")
+	public class EventController {
+		
+		private static final Logger log = LoggerFactory.getLogger(EventController.class);
 	
-	@Value("${file.upload.path}")
-	private String uploadPath;
-
-	// 관리자용 Api
-		// 1. 배너 목록 조회
-		@GetMapping("/banners")
-		public ResponseEntity<List<EventBannerDTO>> getAllBanners() {
-			return ResponseEntity.ok(eventService.getAllBanners());
-		}
-
-		// 1-1. 배너 등록
-		@PostMapping("/banners/register")
-		@PreAuthorize("hasRole('ADMIN')") // 나중에 권한 ADMIN말고 더 있을시 hasRole('Role') or 이거 추가
-		public ResponseEntity<String> registerBanner(@ModelAttribute EventBannerDTO dto,
-				@RequestParam("file") MultipartFile file) {
-			eventService.registerBanner(dto, file);
-			return ResponseEntity.ok("배너 등록 완료");
-		}
-
-		// 1-2. 배너 삭제
-		@DeleteMapping("/banners/delete/{evtFileNum}")
-		@PreAuthorize("hasRole('ADMIN')") // 나중에 권한 ADMIN말고 더 있을시 hasRole('Role') or 이거 추가
-		public ResponseEntity<Void> deleteBanner(@PathVariable Long evtFileNum) {
-			eventService.deleteBanner(evtFileNum);
-			return ResponseEntity.noContent().build();
-		}
-
-		// 1-3. 배너 이미지 조회
-		@GetMapping("/banners/view")
-		public ResponseEntity<Resource> viewBannerImage(@RequestParam String filePath) {
-			if (filePath == null || filePath.isBlank()) {
-				return ResponseEntity.badRequest().build();
+		private final EventService eventService;
+		private final MemberRepository memberRepository;
+		private final FileUtil fileUtil;
+		
+		@Value("${file.upload.path}")
+		private String uploadPath;
+	
+		// 관리자용 Api
+			// 1. 배너 목록 조회
+			@GetMapping("/banners")
+			public ResponseEntity<List<EventBannerDTO>> getAllBanners() {
+				return ResponseEntity.ok(eventService.getAllBanners());
 			}
-
-			try {
-				Path basePath = Paths.get(uploadPath).toAbsolutePath().normalize();
-				Path fullPath = basePath.resolve(filePath).normalize();
-
-				if (!Files.exists(fullPath)) {
-					return ResponseEntity.notFound().build();
+	
+			// 1-1. 배너 등록
+			@PostMapping("/banners/register")
+			@PreAuthorize("hasRole('ADMIN')") // 나중에 권한 ADMIN말고 더 있을시 hasRole('Role') or 이거 추가
+			public ResponseEntity<String> registerBanner(@ModelAttribute EventBannerDTO dto,
+					@RequestParam("file") MultipartFile file) {
+				eventService.registerBanner(dto, file);
+				return ResponseEntity.ok("배너 등록 완료");
+			}
+	
+			// 1-2. 배너 삭제
+			@DeleteMapping("/banners/delete/{evtFileNum}")
+			@PreAuthorize("hasRole('ADMIN')") // 나중에 권한 ADMIN말고 더 있을시 hasRole('Role') or 이거 추가
+			public ResponseEntity<Void> deleteBanner(@PathVariable Long evtFileNum) {
+				eventService.deleteBanner(evtFileNum);
+				return ResponseEntity.noContent().build();
+			}
+	
+			// 1-3. 배너 이미지 조회
+			@GetMapping("/banners/view")
+			public ResponseEntity<Resource> viewBannerImage(@RequestParam String filePath) {
+				if (filePath == null || filePath.isBlank()) {
+					return ResponseEntity.badRequest().build();
 				}
-
-				Resource resource = new UrlResource(fullPath.toUri());
-				String contentType = Files.probeContentType(fullPath);
-
-				return ResponseEntity.ok()
-						.contentType(
-								MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
-						.body(resource);
-			} catch (IOException e) {
-				log.error("배너 이미지 조회 중 오류", e);
-				return ResponseEntity.internalServerError().build();
+	
+				try {
+					Path basePath = Paths.get(uploadPath).toAbsolutePath().normalize();
+					Path fullPath = basePath.resolve(filePath).normalize();
+	
+					if (!Files.exists(fullPath)) {
+						return ResponseEntity.notFound().build();
+					}
+	
+					Resource resource = new UrlResource(fullPath.toUri());
+					String contentType = Files.probeContentType(fullPath);
+	
+					return ResponseEntity.ok()
+							.contentType(
+									MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+							.body(resource);
+				} catch (IOException e) {
+					log.error("배너 이미지 조회 중 오류", e);
+					return ResponseEntity.internalServerError().build();
+				}
 			}
-		}
-		
+			
+	
+			// ----------------------------------------------------------------
+			// 2. 전체 행사 목록 조회 (신청 종료 기간 기준 필터링 없이 전체)
+			@GetMapping("/all")
+			public ResponseEntity<List<EventInfoDTO>> getAllEvent() {
+				return ResponseEntity.ok(eventService.getAllEvents());
+			}
+	
+			// 3. 페이지네이션 + 검색 조건 포함 목록 조회
+			@GetMapping("/admin/list")
+			public ResponseEntity<Page<EventInfoDTO>> getAdminProgramList(@RequestParam(required = false) String option,
+					@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
+					Pageable pageable) {
+	
+				Page<EventInfoDTO> result = eventService.searchAdminEventList(pageable, option, query, status);
+				return ResponseEntity.ok(result);
+			}
+	
+			// 4. 행사 상세 조회
+			@GetMapping("/{eventNum}")
+			public ResponseEntity<EventInfoDTO> getEvent(@PathVariable Long eventNum) {
+				return ResponseEntity.ok(eventService.getEvent(eventNum));
+			}
+	
+			// 5. 행사 등록(파일 업로드 포함)
+			@PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+			public ResponseEntity<String> registerEvent(
+			    @RequestPart("dto") EventInfoDTO dto,
+			    @RequestPart(value = "imageList", required = false) List<MultipartFile> imageList,
+			    @RequestPart(value = "attachList", required = false) List<MultipartFile> attachList
+			) {
+			    System.out.println("🔥🔥🔥🔥 컨트롤러 진입");
+			    log.info("🔥🔥🔥🔥 컨트롤러 진입");
 
-		// ----------------------------------------------------------------
-		// 2. 전체 행사 목록 조회 (신청 종료 기간 기준 필터링 없이 전체)
-		@GetMapping("/all")
-		public ResponseEntity<List<EventInfoDTO>> getAllEvent() {
-			return ResponseEntity.ok(eventService.getAllEvents());
-		}
+			    try {
+			        log.info("🚀 [Controller] /register 호출됨 - dto: {}", dto);
 
-		// 3. 페이지네이션 + 검색 조건 포함 목록 조회
-		@GetMapping("/admin/list")
-		public ResponseEntity<Page<EventInfoDTO>> getAdminProgramList(@RequestParam(required = false) String option,
-				@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
-				Pageable pageable) {
+			        // imageList/attachList 크기 로그로 확인
+			        log.info("📷 imageList size: {}", imageList != null ? imageList.size() : "null");
+			        log.info("📎 attachList size: {}", attachList != null ? attachList.size() : "null");
 
-			Page<EventInfoDTO> result = eventService.searchAdminEventList(pageable, option, query, status);
-			return ResponseEntity.ok(result);
-		}
+			        eventService.registerEvent(dto, imageList, attachList);
 
-		// 4. 행사 상세 조회
-		@GetMapping("/{eventNum}")
-		public ResponseEntity<EventInfoDTO> getEvent(@PathVariable Long eventNum) {
-			return ResponseEntity.ok(eventService.getEvent(eventNum));
-		}
+			        return ResponseEntity.ok("등록 완료");
+			    } catch (Exception e) {
+			        log.error("❌ 행사 등록 중 오류 발생: {}", e.getMessage(), e);
+			        return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
+			    }
+			}
+	
+			// 6. 수정(파일 업데이트 포함)
+			@PutMapping("/update/{eventNum}")
+			public ResponseEntity<Void> updateEvent(@PathVariable Long eventNum, @ModelAttribute EventInfoDTO dto,
+					@RequestParam(value = "file", required = false) MultipartFile file) {
+	
+				eventService.updateEvent(eventNum, dto, file);
+				return ResponseEntity.ok().build();
+			}
+	
+			// 7. 삭제
+			@DeleteMapping("/delete/{eventNum}")
+			public ResponseEntity<Void> deleteProgram(@PathVariable Long eventNum) {
+				eventService.deleteEvent(eventNum);
+				return ResponseEntity.noContent().build();
+			}
+	
+			// 8. 특정 행사의 신청 회원 리스트 조회
+			@GetMapping("/{progNo}/applicants")
+			public ResponseEntity<List<EventUseDTO>> getApplicantsByProgram(@PathVariable Long eventNum) {
+				return ResponseEntity.ok(eventService.getApplicantsByEvent(eventNum));
+			}
+	
+			// 파일 다운로드
+			@GetMapping("/file/{eventNum}")
+			public ResponseEntity<Resource> downloadFile(@PathVariable Long eventNum) {
+				EventInfo event = eventService.getEventEntity(eventNum);
+				return fileUtil.getFile(event.getFilePath(), event.getOriginalName());
+			}
+	
+			// 사용자용 API
+			// 1. 행사 신청
+			@PostMapping("/apply")
+			public ResponseEntity<String> applyEvent(@RequestBody EventApplyRequestDTO dto) {
+				eventService.applyEvent(dto);
+				return ResponseEntity.ok("신청이 완료되었습니다.");
+			}
+	
+			// 2. 신청 여부 확인(중복 신청 방지용)
+			@GetMapping("/applied")
+			public ResponseEntity<Boolean> isAlreadyApplied(@RequestParam Long eventNum, @RequestParam String memId) {
+				return ResponseEntity.ok(eventService.isAlreadyApplied(eventNum, memId));
+			}
+	
+			// 3. 신청 가능 여부 확인(신청 마감 확인용)
+			@GetMapping("/available/{eventNum}")
+			public ResponseEntity<Boolean> isAvailable(@PathVariable Long eventNum) {
+				return ResponseEntity.ok(eventService.isAvailable(eventNum));
+			}
+	
+			// 4. 사용자 신청 내역 조회 (페이징)
+			@GetMapping("/user/applied/page")
+			public ResponseEntity<Page<EventUseDTO>> getUseListByMemberPaged(@RequestParam String memId, Pageable pageable) {
+	
+				return ResponseEntity.ok(eventService.getUseListByMemberPaged(memId, pageable));
+			}
+	
+			// 5. 사용자 신청 취소
+			@DeleteMapping("/cancel/{eventUseNo}")
+			public ResponseEntity<Void> cancelEvent(@PathVariable Long eventUseNo) {
+				eventService.cancelEvent(eventUseNo);
+				return ResponseEntity.noContent().build();
+			}
+	
+			// 6. 사용자 행사 목록 조회
+			@GetMapping("/user/list")
+			public ResponseEntity<Page<EventInfoDTO>> getUserEventList(@RequestParam(required = false) String option,
+					@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
+					Pageable pageable) {
+				log.info("getUserEventList called with option: {}, query: {}, status: {}, pageable: {}", option, query,
+						status, pageable);
+				Page<EventInfoDTO> result = eventService.searchEventList(pageable, option, query, status);
+				log.info("Returned {} programs. Total elements: {}", result.getContent().size(), result.getTotalElements());
+				return ResponseEntity.ok(result);
+			}
+	
+			@GetMapping("/admin/notEnd")
+			public ResponseEntity<List<EventInfoDTO>> getUserProgramList() {
+				List<EventInfoDTO> result = eventService.searchNotEndEventList();
+				return ResponseEntity.ok(result);
+			}
+			//------------------------
+			
+			//@PostMapping("/test-form")
+			public ResponseEntity<String> testForm(@RequestParam("eventName") String eventName) {
+			    log.info("✅ eventName: {}", eventName);
+			    return ResponseEntity.ok("OK");
+			}
+			
+			//@PostMapping("/test-form")
+			public ResponseEntity<String> testFormUpload(
+			        @ModelAttribute EventInfoDTO dto,
+			        @RequestParam(value = "imageList", required = false) List<MultipartFile> imageList,
+			        @RequestParam(value = "attachList", required = false) List<MultipartFile> attachList
+			) {
+			    log.info("✅ 테스트용 컨트롤러 호출됨");
 
-		// 5. 행사 등록(파일 업로드 포함)
-		@PostMapping("/register")
-		public ResponseEntity<String> registerEvent(@ModelAttribute EventInfoDTO dto,
-				@RequestParam(value = "file", required = false) MultipartFile file) {
+			    log.info("▶️ eventName: {}", dto.getEventName());
+			    log.info("▶️ eventInfo: {}", dto.getEventInfo());
+			    log.info("▶️ applyStartPeriod: {}", dto.getApplyStartPeriod());
+			    log.info("▶️ applyEndPeriod: {}", dto.getApplyEndPeriod());
+			    log.info("▶️ eventStartPeriod: {}", dto.getEventStartPeriod());
+			    log.info("▶️ eventEndPeriod: {}", dto.getEventEndPeriod());
+			    log.info("▶️ category: {}", dto.getCategory());
+			    log.info("▶️ maxCapacity: {}", dto.getMaxCapacity());
+			    log.info("▶️ place: {}", dto.getPlace());
+			    log.info("▶️ daysOfWeek: {}", dto.getDaysOfWeek());
 
-			eventService.registerEvent(dto, file);
-			return ResponseEntity.ok("등록 완료");
-		}
+			    if (imageList != null) {
+			        log.info("🖼️ imageList count: {}", imageList.size());
+			        imageList.forEach(file -> log.info("🖼️ 이미지 파일명: {}", file.getOriginalFilename()));
+			    } else {
+			        log.info("🖼️ imageList: null");
+			    }
 
-		// 6. 수정(파일 업데이트 포함)
-		@PutMapping("/update/{eventNum}")
-		public ResponseEntity<Void> updateEvent(@PathVariable Long eventNum, @ModelAttribute EventInfoDTO dto,
-				@RequestParam(value = "file", required = false) MultipartFile file) {
+			    if (attachList != null) {
+			        log.info("📎 attachList count: {}", attachList.size());
+			        attachList.forEach(file -> log.info("📎 첨부파일명: {}", file.getOriginalFilename()));
+			    } else {
+			        log.info("📎 attachList: null");
+			    }
 
-			eventService.updateEvent(eventNum, dto, file);
-			return ResponseEntity.ok().build();
-		}
-
-		// 7. 삭제
-		@DeleteMapping("/delete/{eventNum}")
-		public ResponseEntity<Void> deleteProgram(@PathVariable Long eventNum) {
-			eventService.deleteEvent(eventNum);
-			return ResponseEntity.noContent().build();
-		}
-
-		// 8. 특정 행사의 신청 회원 리스트 조회
-		@GetMapping("/{progNo}/applicants")
-		public ResponseEntity<List<EventUseDTO>> getApplicantsByProgram(@PathVariable Long eventNum) {
-			return ResponseEntity.ok(eventService.getApplicantsByEvent(eventNum));
-		}
-
-		// 파일 다운로드
-		@GetMapping("/file/{eventNum}")
-		public ResponseEntity<Resource> downloadFile(@PathVariable Long eventNum) {
-			EventInfo event = eventService.getEventEntity(eventNum);
-			return fileUtil.getFile(event.getFilePath(), event.getOriginalName());
-		}
-
-		// 사용자용 API
-		// 1. 행사 신청
-		@PostMapping("/apply")
-		public ResponseEntity<String> applyEvent(@RequestBody EventApplyRequestDTO dto) {
-			eventService.applyEvent(dto);
-			return ResponseEntity.ok("신청이 완료되었습니다.");
-		}
-
-		// 2. 신청 여부 확인(중복 신청 방지용)
-		@GetMapping("/applied")
-		public ResponseEntity<Boolean> isAlreadyApplied(@RequestParam Long eventNum, @RequestParam String memId) {
-			return ResponseEntity.ok(eventService.isAlreadyApplied(eventNum, memId));
-		}
-
-		// 3. 신청 가능 여부 확인(신청 마감 확인용)
-		@GetMapping("/available/{eventNum}")
-		public ResponseEntity<Boolean> isAvailable(@PathVariable Long eventNum) {
-			return ResponseEntity.ok(eventService.isAvailable(eventNum));
-		}
-
-		// 4. 사용자 신청 내역 조회 (페이징)
-		@GetMapping("/user/applied/page")
-		public ResponseEntity<Page<EventUseDTO>> getUseListByMemberPaged(@RequestParam String memId, Pageable pageable) {
-
-			return ResponseEntity.ok(eventService.getUseListByMemberPaged(memId, pageable));
-		}
-
-		// 5. 사용자 신청 취소
-		@DeleteMapping("/cancel/{eventUseNo}")
-		public ResponseEntity<Void> cancelEvent(@PathVariable Long eventUseNo) {
-			eventService.cancelEvent(eventUseNo);
-			return ResponseEntity.noContent().build();
-		}
-
-		// 6. 사용자 행사 목록 조회
-		@GetMapping("/user/list")
-		public ResponseEntity<Page<EventInfoDTO>> getUserEventList(@RequestParam(required = false) String option,
-				@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
-				Pageable pageable) {
-			log.info("getUserEventList called with option: {}, query: {}, status: {}, pageable: {}", option, query,
-					status, pageable);
-			Page<EventInfoDTO> result = eventService.searchEventList(pageable, option, query, status);
-			log.info("Returned {} programs. Total elements: {}", result.getContent().size(), result.getTotalElements());
-			return ResponseEntity.ok(result);
-		}
-
-		@GetMapping("/admin/notEnd")
-		public ResponseEntity<List<EventInfoDTO>> getUserProgramList() {
-			List<EventInfoDTO> result = eventService.searchNotEndEventList();
-			return ResponseEntity.ok(result);
-		}
-		
-}
+			    return ResponseEntity.ok("✅ 테스트 완료");
+			}
+	}
