@@ -11,6 +11,7 @@ const EvtAddComponent = () => {
     maxCapacity: 0,
     eventInfo: "",
     place: "",
+    etc: "",
     category: "USER",
     daysOfWeek: [],
     applyStartPeriod: new Date(),
@@ -110,7 +111,7 @@ const EvtAddComponent = () => {
     postAddEvent(formData)
       .then(() => {
         alert("행사 등록 완료");
-        moveToPath("/event");
+        moveToPath("/event/list");
       })
       .catch((error) => {
         console.error("🔥 등록 실패", error);
@@ -233,6 +234,19 @@ const EvtAddComponent = () => {
             value={evt.maxCapacity}
             onChange={handleChangeEvt}
             className="border p-3 text-lg flex-1"
+          />
+        </div>
+
+        {/* 기타 유의사항 */}
+        <div className="flex items-start">
+          <label className="text-xl font-semibold w-[120px] pt-3">유의사항:</label>
+          <textarea
+            name="etc"
+            value={evt.etc}
+            onChange={handleChangeEvt}
+            rows={3}
+            className="border p-3 text-lg flex-1 resize-y"
+            placeholder="기타 유의사항 입력"
           />
         </div>
 

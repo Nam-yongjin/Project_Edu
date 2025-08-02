@@ -13,10 +13,10 @@ export const postAddEvent = async (formData) => {
 };
 
 // 행사 단건 조회 (JWT 필요)
-export const getEventById = async (evtNum) => {
-  const res = await jwtAxios.get(`${event}/SelectOne`, {
-    params: { evtNum }
-  });
+export const getEventById = async (eventNum) => {
+  const res = await jwtAxios.get(`${event}/eventDetail`, {
+        params : {eventNum: eventNum}
+    });
   return res.data;
 };
 

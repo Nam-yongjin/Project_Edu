@@ -26,34 +26,20 @@ const EventListComponent = () => {
   };
 
   const getApplyStatus = (event) => {
-  const now = new Date();
-  const start = new Date(event.applyStartPeriod);
-  const end = new Date(event.applyEndPeriod);
+    const now = new Date();
+    const start = new Date(event.applyStartPeriod);
+    const end = new Date(event.applyEndPeriod);
 
-  if (now < start) {
-    return {
-      text: "신청 시작 전",
-      style: "bg-gray-400 cursor-not-allowed",
-      disabled: true,
-    };
-  }
-
-  if (now >= start && now <= end) {
-    return {
-      text: "신청하기",
-      style: "bg-blue-600 hover:bg-blue-700",
-      disabled: false,
-    };
-  }
-
-  return {
-    text: "신청 종료",
-    style: "bg-gray-500 cursor-not-allowed",
-    disabled: true,
+    if (now < start) {
+      return { text: "신청 시작 전", style: "bg-gray-400" };
+    }
+    if (now >= start && now <= end) {
+      return { text: "신청 가능", style: "bg-blue-600" };
+    }
+    return { text: "신청 종료", style: "bg-gray-500" };
   };
-};
 
-  const handleApplyClick = (eventNum) => {
+  const handleCardClick = (eventNum) => {
     navigate(`/event/detail/${eventNum}`);
   };
 
@@ -61,12 +47,13 @@ const EventListComponent = () => {
     <div className="max-w-6xl mx-auto mt-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {events.map((event) => {
-          const btn = getApplyStatus(event);
+          const status = getApplyStatus(event);
 
           return (
             <div
               key={event.eventNum}
-              className="border rounded-lg shadow p-4 hover:shadow-lg transition"
+              className="border rounded-lg shadow p-4 hover:shadow-lg transition cursor-pointer"
+              onClick={() => handleCardClick(event.eventNum)}
             >
               {/* 모집 대상 */}
               <div className="text-sm bg-blue-100 text-blue-700 inline-block px-2 py-1 rounded-full mb-2">
@@ -103,14 +90,12 @@ const EventListComponent = () => {
                 모집인원: {event.maxCapacity}명
               </p>
 
-              {/* 신청 상태 버튼 */}
-              <button
-                className={`text-white px-4 py-1 rounded font-semibold text-sm ${btn.style}`}
-                onClick={() => handleApplyClick(event.eventNum)}
-                disabled={btn.disabled}
+              {/* 상태 표시 */}
+              <div
+                className={`text-white px-3 py-1 rounded font-semibold text-sm text-center w-full ${status.style}`}
               >
-                {btn.text}
-              </button>
+                {status.text}
+              </div>
             </div>
           );
         })}
