@@ -111,10 +111,15 @@ import lombok.RequiredArgsConstructor;
 			
 	
 			// ----------------------------------------------------------------
-			// 2. 전체 행사 목록 조회 (신청 종료 기간 기준 필터링 없이 전체)
-			@GetMapping("/all")
+			// 2. 전체 행사 목록 조회 (신청 가능한것만)
+			@GetMapping("/eventList")
 			public ResponseEntity<List<EventInfoDTO>> getAllEvent() {
 				return ResponseEntity.ok(eventService.getAllEvents());
+			}
+			//  2. 전체 행사 목록 조회 (신청 종료 기간 기준 필터링 없이 전체)
+			@GetMapping("/List")
+			public ResponseEntity<List<EventInfoDTO>> getAllEventsWithoutFilter() {
+			    return ResponseEntity.ok(eventService.getAllEventsWithoutFilter());
 			}
 	
 			// 3. 페이지네이션 + 검색 조건 포함 목록 조회
