@@ -1,8 +1,12 @@
+import EvtTitleComponent from "../../components/event/EvtTitleComponent";
+import "react-datepicker/dist/react-datepicker.css";
+import EvtListComponent from "../../components/event/EvtListComponent";
+
 const EventListPage = () => {
     return (
         <div>
-            <h1>행사 리스트 페이지</h1>
-            <br></br>
+            <EvtTitleComponent title="행사 신청" />
+            <EvtListComponent />
         </div>
     );
 }

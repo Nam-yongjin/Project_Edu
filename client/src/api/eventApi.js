@@ -1,40 +1,45 @@
+import axios from "axios";
 import jwtAxios from "../util/jwtUtil";
 import { API_SERVER_HOST } from "./config";
 import { API_MAPPING } from "./config";
-import axios from "axios";
-const host = `${API_SERVER_HOST}/api/event`
-const mapping = `${API_MAPPING}`
 
+const host = `${API_SERVER_HOST}/api`;
+const event = `${host}${API_MAPPING.event}`;
 
-//  행사 등록하는 요청
+// 행사 등록 요청 (JWT 필요)
 export const postAddEvent = async (formData) => {
-    const res = await jwtAxios.post(`${host}/register`,formData);
-    return res.data;
-}
+  const res = await jwtAxios.post(`${event}/register`, formData);
+  return res.data;
+};
 
-// 행사 수정 페이지에서 행사 정보를 불러오기 위한 요청
-export const getEventById=async(evtNum)=> {
-       const res=await jwtAxios.get(`${host}/SelectOne`,evtNum);
-    return res.data;
-}
-
-// 행사 수정 페이지에서 상품 정보를 수정하기 위한 요청
-export const updateEvent=async(formData)=> {
-    const res = await jwtAxios.get(`${host}/UpdateEvt`,formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return res.data;
-}
-
-// 행사 목록 페이지에서 행사 삭제하기 위한 요청
-export const delEvt = async (evtNum) => {
-  const res = await jwtAxios.delete(`${host}/DeleteEvt`, {
+// 행사 단건 조회 (JWT 필요)
+export const getEventById = async (evtNum) => {
+  const res = await jwtAxios.get(`${event}/SelectOne`, {
     params: { evtNum }
   });
   return res.data;
 };
 
-// 행사 리스트 페이지에서 행사 리스트를 얻어오기 위한 요청
-export const getList=async()=> {
-     const res=await jwtAxios.get(`${host}/evtList`)
-}
+// 행사 수정 요청 (JWT 필요)
+export const updateEvent = async (formData) => {
+  const res = await jwtAxios.get(`${event}/UpdateEvt`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return res.data;
+};
+
+// 행사 삭제 요청 (JWT 필요)
+export const delEvt = async (evtNum) => {
+  const res = await jwtAxios.delete(`${event}/DeleteEvt`, {
+    params: { evtNum }
+  });
+  return res.data;
+};
+
+// ✅ [수정됨] 행사 리스트 조회 요청 (비로그인 허용, 일반 axios 사용)
+export const getList = async (current) => {
+  const res = await axios.get(`${event}/List`, {
+    params: { page: current }
+  });
+  return res.data;
+};
