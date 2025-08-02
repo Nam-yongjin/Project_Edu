@@ -24,6 +24,13 @@ public class JWTFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		try {
 			String authHeader = request.getHeader("Authorization");
+			
+			// Authorization 헤더가 없거나 "Bearer "로 시작하지 않을 경우, JWT 검증을 생략하고 필터를 통과시키기 위해 사용중
+			// 삭제시 eventList 썸네일 안나옴
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            filterChain.doFilter(request, response);
+	            return;
+	        }
 
 			String accessToken = authHeader.substring(7);
 
