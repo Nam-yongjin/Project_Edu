@@ -238,6 +238,13 @@ public class EventServiceImpl implements EventService {
 	        .collect(Collectors.toList());
 	}
 	
+	@Override
+	public List<EventInfoDTO> getAllEventsWithoutFilter() {
+	    return infoRepository.findAll().stream()
+	            .map(info -> modelMapper.map(info, EventInfoDTO.class))
+	            .collect(Collectors.toList());
+	}
+	
 	// 프로그램 상세 조회
 	@Override
 	public EventInfoDTO getEvent(Long eventNum) {
@@ -570,23 +577,28 @@ public class EventServiceImpl implements EventService {
 	public void setFileInfo(EventInfo info, MultipartFile file) {
 	    if (file != null && !file.isEmpty()) {
 	        String originalFilename = file.getOriginalFilename();
-	        
+
 	        if (originalFilename == null || originalFilename.isEmpty()) {
 	            throw new IllegalArgumentException("파일 이름이 존재하지 않습니다.");
 	        }
 
 	        String lowerCaseFilename = originalFilename.toLowerCase();
-	        boolean isAllowedDocument = lowerCaseFilename.endsWith(".hwp") || lowerCaseFilename.endsWith(".pdf");
 
-	        if (!isAllowedDocument) {
-	            throw new IllegalArgumentException("hwp 또는 pdf 파일만 업로드 가능합니다.");
+	        // 허용 확장자 목록
+	        List<String> allowedExtensions = List.of(".hwp", ".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp");
+
+	        boolean isAllowed = allowedExtensions.stream().anyMatch(lowerCaseFilename::endsWith);
+	        if (!isAllowed) {
+	            throw new IllegalArgumentException("허용된 파일 형식(hwp, pdf, 이미지 파일)만 업로드 가능합니다.");
 	        }
 
+	        // 기존 파일 삭제
 	        String oldPath = info.getFilePath();
 	        if (oldPath != null && !oldPath.isEmpty()) {
 	            fileUtil.deleteFiles(List.of(oldPath));
 	        }
 
+	        // 새 파일 저장
 	        List<Object> uploaded = fileUtil.saveFiles(List.of(file), "event");
 	        if (!uploaded.isEmpty()) {
 	            @SuppressWarnings("unchecked")
