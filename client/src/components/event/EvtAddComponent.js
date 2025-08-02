@@ -20,10 +20,10 @@ const EvtAddComponent = () => {
   };
 
   const [evt, setEvt] = useState(initState);
-  const [images, setImages] = useState([]);
+  const [mainImage, setMainImage] = useState(null);
+  const [imageList, setImageList] = useState([]);
   const [attachFiles, setAttachFiles] = useState([]);
   const [mainFile, setMainFile] = useState(null);
-  const [fileInputs, setFileInputs] = useState([Date.now()]);
   const { moveToPath, moveToReturn } = useMove();
 
   const handleChangeEvt = (e) => {
@@ -35,51 +35,26 @@ const EvtAddComponent = () => {
     setEvt((prev) => ({ ...prev, [name]: date }));
   };
 
-  const handleFileChange = (id, e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length === 0) {
-      setFileInputs((prev) => {
-        if (prev.length > 1) {
-          setImages((prevImages) =>
-            prevImages.filter((img) => img.inputId !== id)
-          );
-          return prev.filter((inputId) => inputId !== id);
-        }
-        return prev;
-      });
-      return;
-    }
+    if (files.length === 0) return;
 
     const previews = files.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       name: file.name,
-      inputId: id,
     }));
 
-    setImages((prev) => [...prev, ...previews]);
-
-    if (fileInputs[fileInputs.length - 1] === id) {
-      setFileInputs((prev) => [...prev, Date.now()]);
-    }
+    setMainImage(previews[0]);
+    setImageList(previews.slice(1));
   };
 
-  const fileDelete = (indexToRemove) => {
-    setImages((prev) => {
-      const targetId = prev[indexToRemove]?.inputId;
-      const updated = prev.filter((_, idx) => idx !== indexToRemove);
-      const hasInput = updated.some((img) => img.inputId === targetId);
+  const deleteMainImage = () => {
+    setMainImage(null);
+  };
 
-      if (!hasInput) {
-        setFileInputs((prevInputs) =>
-          prevInputs.length > 1
-            ? prevInputs.filter((id) => id !== targetId)
-            : [Date.now()]
-        );
-      }
-
-      return updated;
-    });
+  const deleteSubImage = (index) => {
+    setImageList((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleAttachChange = (e) => {
@@ -103,16 +78,20 @@ const EvtAddComponent = () => {
   const register = () => {
     const formData = new FormData();
 
-    for (const { file } of images) {
-      formData.append("imageList", file);
+    if (mainImage) {
+      formData.append("file", mainImage.file);
     }
 
-    for (const file of attachFiles) {
-      formData.append("attachList", file);
+    for (const img of imageList) {
+      formData.append("imageList", img.file);
     }
 
     if (mainFile) {
       formData.append("file", mainFile);
+    }
+
+    for (const file of attachFiles) {
+      formData.append("attachList", file);
     }
 
     const dto = {
@@ -201,7 +180,7 @@ const EvtAddComponent = () => {
           </select>
         </div>
 
-        {/* 날짜들 */}
+        {/* 날짜 선택 */}
         {[
           { label: "모집 시작", name: "applyStartPeriod", value: evt.applyStartPeriod },
           { label: "모집 종료", name: "applyEndPeriod", value: evt.applyEndPeriod },
@@ -257,7 +236,19 @@ const EvtAddComponent = () => {
           />
         </div>
 
-        {/* 첨부파일 (대표 + 기타 자동 분리) */}
+        {/* 이미지 업로드 */}
+        <div className="flex items-center mt-3">
+          <label className="text-xl font-semibold w-[120px]">이미지:</label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            className="border p-2 text-base flex-1"
+          />
+        </div>
+
+        {/* 첨부파일 */}
         <div className="flex items-center mt-3">
           <label className="text-xl font-semibold w-[120px]">첨부파일:</label>
           <input
@@ -268,20 +259,6 @@ const EvtAddComponent = () => {
             className="border p-2 text-base flex-1"
           />
         </div>
-
-        {/* 이미지 업로드 */}
-        {fileInputs.map((id, idx) => (
-          <div key={id} className="flex items-center mt-3">
-            <label className="text-xl font-semibold w-[120px]">이미지{idx + 1}:</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={(e) => handleFileChange(id, e)}
-              className="border p-2 text-base flex-1"
-            />
-          </div>
-        ))}
 
         {/* 버튼 */}
         <div className="mt-4 flex justify-end gap-4">
@@ -296,25 +273,41 @@ const EvtAddComponent = () => {
 
       {/* 미리보기 */}
       <div className="w-1/3 pl-10 flex flex-col gap-4">
+        {/* 대표 이미지 */}
+        {mainImage && (
+          <div className="border rounded p-2 shadow">
+            <div className="flex justify-between items-center">
+              <p className="text-sm font-semibold text-blue-600">대표 이미지</p>
+              <button className="text-red-500 text-sm" onClick={deleteMainImage}>삭제</button>
+            </div>
+            <img src={mainImage.url} alt="대표이미지" className="w-32 h-32 object-cover rounded" />
+            <p className="text-sm break-words">{mainImage.name}</p>
+          </div>
+        )}
+
+        {/* 서브 이미지 */}
+        {imageList.map((img, idx) => (
+          <div key={idx} className="border rounded p-2 shadow">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-600">이미지 {idx + 1}</p>
+              <button className="text-red-500 text-sm" onClick={() => deleteSubImage(idx)}>삭제</button>
+            </div>
+            <img src={img.url} alt={`미리보기${idx}`} className="w-32 h-32 object-cover rounded" />
+            <p className="text-sm break-words">{img.name}</p>
+          </div>
+        ))}
+
+        {/* 첨부파일 */}
         {mainFile && (
           <div className="border rounded p-2 shadow">
             <p className="text-sm font-semibold text-blue-600">대표 첨부파일</p>
             <p className="text-sm break-words">{mainFile.name}</p>
           </div>
         )}
-
         {attachFiles.map((file, index) => (
           <div key={index} className="border rounded p-2 shadow">
             <p className="text-sm text-gray-700">기타 첨부파일</p>
             <p className="text-sm break-words">{file.name}</p>
-          </div>
-        ))}
-
-        {images.map((img, index) => (
-          <div key={index} className="flex flex-col items-start">
-            <button className="text-red-500 self-end" onClick={() => fileDelete(index)}>x</button>
-            <img src={img.url} alt={`미리보기${index}`} className="w-32 h-32 object-cover rounded border shadow" />
-            <p className="text-sm text-gray-600 break-all">{img.name}</p>
           </div>
         ))}
       </div>
