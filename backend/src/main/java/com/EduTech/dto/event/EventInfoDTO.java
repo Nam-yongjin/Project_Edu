@@ -71,7 +71,4 @@ public class EventInfoDTO {
 
     // 요일 목록
     private List<Integer> daysOfWeek;
-
-    // 상세 페이지에서만 사용됨 (리스트 응답에서는 비워둠)
-    private List<EventFileDTO> attachList;
 }
