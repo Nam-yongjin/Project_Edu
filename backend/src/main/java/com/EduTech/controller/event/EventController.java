@@ -183,11 +183,11 @@ import lombok.RequiredArgsConstructor;
 			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<Void> deleteEvent(@RequestParam("eventNum") Long eventNum) {
 			    try {
-			        log.info("🧹 삭제 요청: eventNum={}", eventNum);
+			        log.info("삭제 요청: eventNum={}", eventNum);
 			        eventService.deleteEvent(eventNum);
 			        return ResponseEntity.noContent().build();
 			    } catch (Exception e) {
-			        log.error("❌ 삭제 실패: {}", e.getMessage(), e);
+			        log.error("삭제 실패: {}", e.getMessage(), e);
 			        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 			    }
 			}
@@ -260,7 +260,7 @@ import lombok.RequiredArgsConstructor;
 			
 			//@PostMapping("/test-form")
 			public ResponseEntity<String> testForm(@RequestParam("eventName") String eventName) {
-			    log.info("✅ eventName: {}", eventName);
+			    log.info("eventName: {}", eventName);
 			    return ResponseEntity.ok("OK");
 			}
 			
@@ -270,7 +270,7 @@ import lombok.RequiredArgsConstructor;
 			        @RequestParam(value = "imageList", required = false) List<MultipartFile> imageList,
 			        @RequestParam(value = "attachList", required = false) List<MultipartFile> attachList
 			) {
-			    log.info("✅ 테스트용 컨트롤러 호출됨");
+			    log.info("테스트용 컨트롤러 호출됨");
 
 			    log.info("▶️ eventName: {}", dto.getEventName());
 			    log.info("▶️ eventInfo: {}", dto.getEventInfo());
@@ -284,10 +284,10 @@ import lombok.RequiredArgsConstructor;
 			    log.info("▶️ daysOfWeek: {}", dto.getDaysOfWeek());
 
 			    if (imageList != null) {
-			        log.info("🖼️ imageList count: {}", imageList.size());
+			        log.info("imageList count: {}", imageList.size());
 			        imageList.forEach(file -> log.info("🖼️ 이미지 파일명: {}", file.getOriginalFilename()));
 			    } else {
-			        log.info("🖼️ imageList: null");
+			        log.info("imageList: null");
 			    }
 
 			    if (attachList != null) {
@@ -297,6 +297,6 @@ import lombok.RequiredArgsConstructor;
 			        log.info("📎 attachList: null");
 			    }
 
-			    return ResponseEntity.ok("✅ 테스트 완료");
+			    return ResponseEntity.ok("테스트 완료");
 			}
 	}

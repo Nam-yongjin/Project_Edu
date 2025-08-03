@@ -135,32 +135,6 @@ public class EventServiceImpl implements EventService {
 	    infoRepository.save(info);
 	}
 
-	
-	// 행사 수정
-	/*
-	@Override
-    public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
-        EventInfo origin = infoRepository.findById(eventNum)
-        		.orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
-
-        String originalFilePath = origin.getFilePath();
-        String originalFileName = origin.getOriginalName();
-
-        modelMapper.map(dto, origin);
-
-        if (file != null && !file.isEmpty()) {
-            if (originalFilePath != null && !originalFilePath.isEmpty()) {
-                fileUtil.deleteFiles(List.of(originalFilePath));
-            }
-            setFileInfo(origin, file);
-        } else {
-            origin.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : originalFilePath);
-            origin.setOriginalName(dto.getOriginalName() != null ? dto.getOriginalName() : originalFileName);
-        }
-
-        infoRepository.save(origin);
-    }
-	*/
 	@Override
 	public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
 	    EventInfo origin = infoRepository.findById(eventNum)
@@ -608,34 +582,5 @@ public class EventServiceImpl implements EventService {
 	        }
 	    }
 	}
-	
-	
-	// 내너의 경우에는 위의 코드를 사용 못할수도 있으므오 다른 코드를 작성해야 할수도 있음 나중에 확인 해봄
-	
-	
-	
-	// 행사 목록 조회
-/*
-	public Page<EventInfoDTO> getEventList(Pageable pageable, String eventName, String content, String state) {
-        boolean noFilter = (eventName == null || eventName.isBlank()) && (content == null || content.isBlank());
-
-        Page<EventInfo> result = noFilter
-                ? infoRepository.findAll(pageable)
-                : infoRepository.searchEvent(eventName, content, pageable);
-
-        final String finalState = (state != null && !state.isBlank()) ? state : null;
-
-        List<EventInfoDTO> filteredList = result.getContent().stream().map(event -> {
-            EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
-            dto.setCurrCapacity(useRepository.countByEventInfo(event.getEventNum()));
-            dto.setOriginalName(event.getOriginalName());
-            dto.setState(calculateState(event.getApplyStartPeriod(), event.getApplyEndPeriod()));
-            dto.setDayNames(convertToDayNames(event.getDaysOfWeek()));
-            return dto;
-        }).filter(dto -> finalState == null || finalState.equals(dto.getState())).toList();
-
-        return new PageImpl<>(filteredList, pageable, filteredList.size());
-    }
-*/
 	
 }

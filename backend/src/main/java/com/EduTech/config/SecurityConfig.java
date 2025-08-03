@@ -63,8 +63,8 @@ public class SecurityConfig {
             auth
             .requestMatchers("/api/event/List").permitAll()       	// 누구나 접근 가능
             .requestMatchers("/event/**").permitAll()              	// 정적 리소스 (이미지 등) 접근 허용
-            .requestMatchers("/api/checkId").permitAll()
-            .requestMatchers("/api/register/member").permitAll()
+            .requestMatchers("/api/checkId").permitAll()			// 아이디 중복확인
+            .requestMatchers("/api/register/member").permitAll()	// 회원가입 처리
             .anyRequest().authenticated();                         	// 그 외는 로그인(인증) 필요
         });;
         

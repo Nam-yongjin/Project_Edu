@@ -34,12 +34,12 @@ const EvtDetailComponent = ({ eventNum }) => {
     if (!confirmed) return;
 
     try {
-      console.log("🧪 삭제 이벤트 번호:", event.eventNum);
+      console.log("삭제 이벤트 번호:", event.eventNum);
       await deleteEvent(event.eventNum);
-      alert("✅ 삭제가 완료되었습니다.");
+      alert("삭제가 완료되었습니다.");
       navigate("/event/list");
     } catch (err) {
-      console.error("❌ 삭제 실패:", err);
+      console.error("삭제 실패:", err);
       alert("삭제 실패: " + (err.response?.data?.message || err.message));
     }
   };
@@ -50,7 +50,7 @@ const EvtDetailComponent = ({ eventNum }) => {
         const data = await getEventById(eventNum);
         setEvent(data);
       } catch (err) {
-        console.error("❌ 행사 정보 조회 실패:", err);
+        console.error("행사 정보 조회 실패:", err);
       } finally {
         setLoading(false);
       }
@@ -65,7 +65,7 @@ const EvtDetailComponent = ({ eventNum }) => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow flex flex-col md:flex-row gap-8 mt-8">
-      {/* ✅ 이미지 영역 */}
+      {/* 이미지 영역 */}
       <div className="md:w-1/2 flex items-center justify-center">
         {event.filePath ? (
           <img
@@ -80,7 +80,7 @@ const EvtDetailComponent = ({ eventNum }) => {
         )}
       </div>
 
-      {/* ✅ 행사 정보 영역 */}
+      {/* 행사 정보 영역 */}
       <div className="md:w-1/2 space-y-4">
         <div className="text-sm inline-block border border-blue-400 text-blue-600 px-3 py-1 rounded-full">
           {categoryLabel}
@@ -99,13 +99,13 @@ const EvtDetailComponent = ({ eventNum }) => {
           <p><strong>기타 유의사항:</strong> {event.etc || "없음"}</p>
         </div>
 
-        {/* ✅ 버튼 영역 */}
+        {/* 버튼 영역 */}
         <div className="pt-6 space-y-4">
           <button className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 font-semibold">
             신청하기
           </button>
 
-          {/* 🔐 관리자 전용 버튼 */}
+          {/* 관리자 전용 버튼 */}
           {isAdmin && (
             <div className="flex gap-4">
               <button

@@ -114,7 +114,7 @@ const EvtAddComponent = () => {
         moveToPath("/event/list");
       })
       .catch((error) => {
-        console.error("🔥 등록 실패", error);
+        console.error("등록 실패", error);
         alert(
           "등록 실패: " +
             (error.response?.data?.message ||
