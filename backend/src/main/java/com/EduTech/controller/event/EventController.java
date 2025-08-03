@@ -135,11 +135,11 @@ import lombok.RequiredArgsConstructor;
 //				return ResponseEntity.ok(result);
 //			}
 //	
-//			// 4. 행사 상세 조회
-//			@GetMapping("/eventDetail")
-//			public ResponseEntity<EventInfoDTO> getEvent(@RequestParam("eventNum") Long eventNum) {
-//			    return ResponseEntity.ok(eventService.getEvent(eventNum));
-//			}
+			// 4. 행사 상세 조회
+			@GetMapping("/eventDetail")
+			public ResponseEntity<EventInfoDTO> getEvent(@RequestParam("eventNum") Long eventNum) {
+			    return ResponseEntity.ok(eventService.getEvent(eventNum));
+			}
 	
 			// 5. 행사 등록(파일 업로드 포함)
 			@PostMapping("/register")
