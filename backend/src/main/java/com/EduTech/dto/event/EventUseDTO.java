@@ -36,4 +36,5 @@ public class EventUseDTO {
 	private String name;	// 회원 이름
 	private String email;	// 회원 이메일
 	private String phone;	// 회원 전화번호
+	
 }
