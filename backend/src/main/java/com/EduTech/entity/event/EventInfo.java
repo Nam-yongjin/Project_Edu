@@ -88,9 +88,6 @@ public class EventInfo {
 	@Column(length = 200)
 	private String filePath; 	// 파일경로
 	
-	@Column(length = 200)
-	private String fileType;	// 파일 종류
-	
 	@PrePersist
 	public void prePersist() {
 	    if (this.state == null) {
