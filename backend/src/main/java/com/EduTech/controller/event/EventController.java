@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -112,31 +114,32 @@ import lombok.RequiredArgsConstructor;
 	
 			// ----------------------------------------------------------------
 			// 2. 전체 행사 목록 조회 (신청 가능한것만)
-			@GetMapping("/eventList")
-			public ResponseEntity<List<EventInfoDTO>> getAllEvent() {
-				return ResponseEntity.ok(eventService.getAllEvents());
-			}
+//			@GetMapping("/eventList")
+//			public ResponseEntity<List<EventInfoDTO>> getAllEvent() {
+//				return ResponseEntity.ok(eventService.getAllEvents());
+//			}
+			
 			//  2. 전체 행사 목록 조회 (신청 종료 기간 기준 필터링 없이 전체)
 			@GetMapping("/List")
 			public ResponseEntity<List<EventInfoDTO>> getAllEventsWithoutFilter() {
 			    return ResponseEntity.ok(eventService.getAllEventsWithoutFilter());
 			}
 	
-			// 3. 페이지네이션 + 검색 조건 포함 목록 조회
-			@GetMapping("/admin/list")
-			public ResponseEntity<Page<EventInfoDTO>> getAdminProgramList(@RequestParam(required = false) String option,
-					@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
-					Pageable pageable) {
-	
-				Page<EventInfoDTO> result = eventService.searchAdminEventList(pageable, option, query, status);
-				return ResponseEntity.ok(result);
-			}
-	
-			// 4. 행사 상세 조회
-			@GetMapping("/eventDetail")
-			public ResponseEntity<EventInfoDTO> getEvent(@RequestParam("eventNum") Long eventNum) {
-			    return ResponseEntity.ok(eventService.getEvent(eventNum));
-			}
+//			// 3. 페이지네이션 + 검색 조건 포함 목록 조회
+//			@GetMapping("/admin/list")
+//			public ResponseEntity<Page<EventInfoDTO>> getAdminProgramList(@RequestParam(required = false) String option,
+//					@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
+//					Pageable pageable) {
+//	
+//				Page<EventInfoDTO> result = eventService.searchAdminEventList(pageable, option, query, status);
+//				return ResponseEntity.ok(result);
+//			}
+//	
+//			// 4. 행사 상세 조회
+//			@GetMapping("/eventDetail")
+//			public ResponseEntity<EventInfoDTO> getEvent(@RequestParam("eventNum") Long eventNum) {
+//			    return ResponseEntity.ok(eventService.getEvent(eventNum));
+//			}
 	
 			// 5. 행사 등록(파일 업로드 포함)
 			@PostMapping("/register")
@@ -158,19 +161,35 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 6. 수정(파일 업데이트 포함)
-			@PutMapping("/update/{eventNum}")
-			public ResponseEntity<Void> updateEvent(@PathVariable Long eventNum, @ModelAttribute EventInfoDTO dto,
-					@RequestParam(value = "file", required = false) MultipartFile file) {
-	
-				eventService.updateEvent(eventNum, dto, file);
-				return ResponseEntity.ok().build();
+			@PutMapping("/update")
+			@PreAuthorize("hasRole('ADMIN')") // 관리자만 수정 가능
+			public ResponseEntity<?> updateEvent(
+			        @RequestParam("eventNum") Long eventNum,
+			        @Valid @RequestPart("dto") EventInfoDTO dto,
+			        @RequestPart(value = "file", required = false) MultipartFile file,
+			        BindingResult bindingResult) {
+
+			    if (bindingResult.hasErrors()) {
+			        log.warn("❌ 유효성 검사 실패: {}", bindingResult.getAllErrors());
+			        return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+			    }
+
+			    eventService.updateEvent(eventNum, dto, file);
+			    return ResponseEntity.ok("✅ 행사 수정이 완료되었습니다.");
 			}
 	
 			// 7. 삭제
-			@DeleteMapping("/delete/{eventNum}")
-			public ResponseEntity<Void> deleteProgram(@PathVariable Long eventNum) {
-				eventService.deleteEvent(eventNum);
-				return ResponseEntity.noContent().build();
+			@DeleteMapping("/delete")
+			@PreAuthorize("hasRole('ADMIN')")
+			public ResponseEntity<Void> deleteEvent(@RequestParam("eventNum") Long eventNum) {
+			    try {
+			        log.info("🧹 삭제 요청: eventNum={}", eventNum);
+			        eventService.deleteEvent(eventNum);
+			        return ResponseEntity.noContent().build();
+			    } catch (Exception e) {
+			        log.error("❌ 삭제 실패: {}", e.getMessage(), e);
+			        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			    }
 			}
 	
 			// 8. 특정 행사의 신청 회원 리스트 조회
