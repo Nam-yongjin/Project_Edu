@@ -12,7 +12,7 @@ export const postAddEvent = async (formData) => {
   return res.data;
 };
 
-// 행사 단건 조회 (JWT 필요)
+// 행사 상세정보 조회 (JWT 필요)
 export const getEventById = async (eventNum) => {
   const res = await jwtAxios.get(`${event}/eventDetail`, {
         params : {eventNum: eventNum}
@@ -21,22 +21,21 @@ export const getEventById = async (eventNum) => {
 };
 
 // 행사 수정 요청 (JWT 필요)
-export const updateEvent = async (formData) => {
-  const res = await jwtAxios.get(`${event}/UpdateEvt`, formData, {
+export const updateEvent = async (eventNum, formData) => {
+  const res = await jwtAxios.put(`${event}/update?eventNum=${eventNum}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
   return res.data;
 };
 
 // 행사 삭제 요청 (JWT 필요)
-export const delEvt = async (evtNum) => {
-  const res = await jwtAxios.delete(`${event}/DeleteEvt`, {
-    params: { evtNum }
+export const deleteEvent = async (eventNum) => {
+  return await jwtAxios.delete(`${event}/delete`, {
+    params: { eventNum },
   });
-  return res.data;
 };
 
-// ✅ [수정됨] 행사 리스트 조회 요청 (비로그인 허용, 일반 axios 사용)
+// 행사 리스트 조회 요청 (비로그인 허용, 일반 axios 사용)
 export const getList = async (current) => {
   const res = await axios.get(`${event}/List`, {
     params: { page: current }
