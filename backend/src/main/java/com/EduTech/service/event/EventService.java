@@ -22,7 +22,7 @@ public interface EventService {
 
     List<EventInfoDTO> getAllEvents(); // 전체 이벤트 조회
     
-    List<EventInfoDTO> getAllEventsWithoutFilter();
+    List<EventInfoDTO> getAllEventsWithoutFilter(int page);
     
     Page<EventInfoDTO> getEventList(Pageable pageable, String title, String eventInfo, EventState state); // 관리자/운영자용
     
