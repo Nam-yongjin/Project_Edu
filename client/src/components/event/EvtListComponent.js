@@ -7,7 +7,7 @@ const EventListComponent = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
-  const host = "http://localhost:8090";
+  const host = "http://localhost:8090/view";
 
   useEffect(() => {
     getList(page).then((data) => {

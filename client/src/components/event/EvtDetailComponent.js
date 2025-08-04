@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getEventById, deleteEvent } from "../../api/eventApi";
 
-const HOST = "http://localhost:8090"; // 백엔드 API 주소
+const HOST = "http://localhost:8090/view"; // 백엔드 API 주소
 
 const EvtDetailComponent = ({ eventNum }) => {
   const [event, setEvent] = useState(null);

@@ -57,16 +57,6 @@ public class SecurityConfig {
         http.exceptionHandling(config -> {
             config.accessDeniedHandler(new CustomAccessDeniedHandler());
         });
-		
-        // 일단은 없어도 이미지가 잘 뜨기는 하는데 URL별로 접근 권한을 명확히 지정하기위해 사용중
-        http.authorizeHttpRequests(auth -> {
-            auth
-            .requestMatchers("/api/event/List").permitAll()       	// 누구나 접근 가능
-            .requestMatchers("/event/**").permitAll()              	// 정적 리소스 (이미지 등) 접근 허용
-            .requestMatchers("/api/checkId").permitAll()			// 아이디 중복확인
-            .requestMatchers("/api/register/member").permitAll()	// 회원가입 처리
-            .anyRequest().authenticated();                         	// 그 외는 로그인(인증) 필요
-        });;
         
 		return http.build();
 	}
