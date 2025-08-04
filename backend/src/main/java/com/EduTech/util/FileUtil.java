@@ -163,4 +163,27 @@ public class FileUtil {   // 파일 데이터의 입출력
       return filename != null && filename.toLowerCase().matches(".*\\.(jpg|jpeg|png|gif|bmp|webp|tiff|svg)$");
    }
    
+   // 행사 파일 다운로드 코드
+   public ResponseEntity<Resource> getDownloadableFile(String filePath, String originalName) {
+	    Path path = Paths.get(uploadPath, filePath);
+	    Resource resource = new FileSystemResource(path.toFile());
+
+	    if (!resource.exists()) {
+	        Path noFilePath = Paths.get(uploadPath, "default.png");
+	        resource = new FileSystemResource(noFilePath.toFile());
+	        originalName = "default.png";
+	    }
+
+	    HttpHeaders headers = new HttpHeaders();
+	    try {
+	        headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
+	        headers.add("Content-Disposition", "attachment; filename=\"" +
+	                java.net.URLEncoder.encode(originalName, java.nio.charset.StandardCharsets.UTF_8) + "\"");
+	    } catch (IOException e) {
+	        return ResponseEntity.internalServerError().build();
+	    }
+
+	    return ResponseEntity.ok().headers(headers).body(resource);
+	}
+   
 }
