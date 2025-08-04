@@ -42,7 +42,11 @@ public interface EventService {
     // 2. 이벤트 등록/수정/삭제
     // =============================
 
-    void registerEvent(EventInfoDTO dto, MultipartFile file); // 파일 포함 등록
+    void registerEvent(EventInfoDTO dto,
+            MultipartFile mainImage,
+            List<MultipartFile> imageList,
+            MultipartFile mainFile,
+            List<MultipartFile> attachList); // 파일 포함 등록
     
     void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file); // 수정
     

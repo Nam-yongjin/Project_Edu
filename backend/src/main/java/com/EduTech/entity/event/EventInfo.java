@@ -88,6 +88,15 @@ public class EventInfo {
 	@Column(length = 200)
 	private String filePath; 	// 파일경로
 	
+	@Column(length = 200)
+	private String mainImagePath;
+
+	@OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<EventImage> imageList = new ArrayList<>();
+
+	@OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<EventFile> attachList = new ArrayList<>();
+	
 	@PrePersist
 	public void prePersist() {
 	    if (this.state == null) {
