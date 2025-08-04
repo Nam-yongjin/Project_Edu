@@ -1,4 +1,3 @@
-import React from "react";
 import NoticeTitleComponent from "../../components/notice/NoticeTitleComponent";
 import NoticeDetailComponent from "../../components/notice/NoticeDetailComponent";
 
