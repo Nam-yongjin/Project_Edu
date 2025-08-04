@@ -17,23 +17,29 @@ const EvtUpdateComponent = ({ eventNum }) => {
   // 이벤트 정보 불러오기
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    getEventById(eventNum)
-      .then((data) => {
-        setEvt({
-          ...data,
-          applyStartPeriod: new Date(data.applyStartPeriod),
-          applyEndPeriod: new Date(data.applyEndPeriod),
-          eventStartPeriod: new Date(data.eventStartPeriod),
-          eventEndPeriod: new Date(data.eventEndPeriod),
-          daysOfWeek: data.daysOfWeek || [],
-        });
-      })
-      .catch((err) => {
-        console.error("❌ 행사 조회 실패", err);
-        alert("행사 정보를 불러오는 데 실패했습니다.");
-        moveToReturn();
+  const fetchEvent = async () => {
+    try {
+      const data = await getEventById(eventNum);
+      setEvt({
+        ...data,
+        applyStartPeriod: new Date(data.applyStartPeriod),
+        applyEndPeriod: new Date(data.applyEndPeriod),
+        eventStartPeriod: new Date(data.eventStartPeriod),
+        eventEndPeriod: new Date(data.eventEndPeriod),
+        daysOfWeek: data.daysOfWeek || [],
       });
-  }, [eventNum]); // moveToReturn intentionally excluded
+    } catch (err) {
+      console.error("❌ 행사 조회 실패", err);
+      alert("행사 정보를 불러오는 데 실패했습니다.");
+      moveToReturn();
+    }
+  };
+
+  fetchEvent();
+
+  // ❗ moveToReturn을 의존성에서 제외
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [eventNum]);
 
   const handleChangeEvt = (e) => {
     const { name, value } = e.target;
