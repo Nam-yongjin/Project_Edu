@@ -36,7 +36,7 @@ const LoginComponent = () => {
     };
 
     useEffect(() => {
-        if(failCount >= 5){
+        if (failCount >= 5) {
             setCooldown(30);
             alert("로그인에 5회 이상 실패하셨습니다.")
         };
@@ -52,61 +52,63 @@ const LoginComponent = () => {
 
     return (
         <div className="">
-            <h2 className="text-4xl text-center text-blue-600 font-bold mb-6">Login</h2>
+            <div className="my-10 p-10 w-full shadow-2xl">
+                <div className="text-4xl text-center font-bold mb-6">로그인</div>
 
-            <div className="mb-4">
-                <label className="font-bold block">ID</label>
-                <input
-                    name="memId"
-                    value={loginParam.memId}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    className="w-full p-3 border rounded"
-                    autoFocus
-                />
-            </div>
+                <div className="mb-4">
+                    <label className="font-bold block">아이디</label>
+                    <input
+                        name="memId"
+                        value={loginParam.memId}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        autoFocus
+                    />
+                </div>
 
-            <div className="mb-4">
-                <label className="font-bold block">Password</label>
-                <input
-                    name="pw"
-                    type="password"
-                    value={loginParam.pw}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    className="w-full p-3 border rounded"
-                />
-            </div>
+                <div className="mb-4">
+                    <label className="font-bold block">비밀번호</label>
+                    <input
+                        name="pw"
+                        type="password"
+                        value={loginParam.pw}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
 
-            {cooldown > 0 ?
-                <>
-                    <div className="flex justify-center font-bold">{cooldown}초 후 로그인 재시도</div>
+                {cooldown > 0 ?
+                    <>
+                        <div className="flex justify-center font-bold">{cooldown}초 후 로그인 재시도</div>
+                        <div className="flex justify-center">
+
+                            <button
+                                className="bg-blue-500 text-white font-bold p-2 w-[400px] rounded-md active:bg-blue-600"
+                            >
+                                로그인
+                            </button>
+                        </div>
+                    </>
+                    :
                     <div className="flex justify-center">
-
                         <button
-                            className="bg-blue-500 text-white font-bold p-3 w-36 rounded active:bg-blue-600"
+                            onClick={handleClickLogin}
+                            className="bg-blue-500 text-white font-bold p-2 w-[400px] rounded-md hover:bg-blue-600 active:bg-blue-700"
                         >
                             로그인
                         </button>
-                    </div>
-                </>
-                :
-                <div className="flex justify-center">
-                    <button
-                        onClick={handleClickLogin}
-                        className="bg-blue-500 text-white font-bold p-3 w-36 rounded active:bg-blue-600"
-                    >
-                        로그인
-                    </button>
-                </div>}
+                    </div>}
 
 
-            <div className="text-center mt-4">
-                <Link to="/findId" className="text-sm text-gray-600 hover:underline">아이디 찾기</Link>
-                <span className="mx-2">|</span>
-                <Link to="/resetPw" className="text-sm text-gray-600 hover:underline">비밀번호 재설정</Link>
+                <div className="text-center mt-4">
+                    <Link to="/findId" className="text-sm text-gray-600 hover:underline">아이디 찾기</Link>
+                    <span className="mx-2">|</span>
+                    <Link to="/resetPw" className="text-sm text-gray-600 hover:underline">비밀번호 재설정</Link>
+                </div>
+                <SocialLoginComponent />
             </div>
-            <SocialLoginComponent />
         </div>
     );
 };

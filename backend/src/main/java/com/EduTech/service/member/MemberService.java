@@ -48,6 +48,8 @@ public interface MemberService {
 	
 	String findId(String phone);
 	
+	public boolean checkIdPhone(MemberResetPwDTO memberResetPwDTO);
+	
 	void resetPw(String memId, MemberResetPwDTO memberResetPwDTO);
 	
 	MemberDTO getKakaoMember(String accessToken);

@@ -53,7 +53,7 @@ export const registerCompany = async (params) => {
 
 // 아이디 중복 체크
 export const checkDuplicateId = async (params) => {
-    const res = await axios.get(`${host}/checkId`, {params: params});
+    const res = await axios.get(`${host}/checkId`, { params: params });
     return res.data;
 };
 
@@ -101,10 +101,17 @@ export const leaveMember = async () => {
 
 // 아이디 찾기
 export const findId = async (params) => {
-    const res = await axios.get(`${host}/findId`, {params: params} );
+    const res = await axios.get(`${host}/findId`, { params: params });
     return res.data;
 };
 
+// 아이디, 휴대폰번호 일치 확인
+export const checkIdPhone = async ({ memId, phone }) => {
+    const res = await axios.get(`${host}/checkIdPhone`, {
+        params: { memId, phone }
+    });
+    return res.data;
+};
 // 비밀번호 찾기(변경)
 export const resetPw = async (params) => {
     const res = await axios.put(`${host}/resetPw`, params);
