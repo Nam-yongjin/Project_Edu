@@ -180,19 +180,22 @@ import lombok.RequiredArgsConstructor;
 	
 			// 6. 수정(파일 업데이트 포함)
 			@PutMapping("/update")
-			@PreAuthorize("hasRole('ADMIN')") // 관리자만 수정 가능
+			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<?> updateEvent(
-			        @RequestParam("eventNum") Long eventNum,
-			        @Valid @RequestPart("dto") EventInfoDTO dto,
-			        @RequestPart(value = "file", required = false) MultipartFile file,
-			        BindingResult bindingResult) {
-
+			    @RequestParam("eventNum") Long eventNum,
+			    @Valid @RequestPart("dto") EventInfoDTO dto,
+			    @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,  // ✅ 수정됨
+			    @RequestPart(value = "imageList", required = false) List<MultipartFile> imageList,
+			    @RequestPart(value = "mainFile", required = false) MultipartFile mainFile,
+			    @RequestPart(value = "attachList", required = false) List<MultipartFile> attachList,
+			    BindingResult bindingResult
+			) {
 			    if (bindingResult.hasErrors()) {
 			        log.warn("❌ 유효성 검사 실패: {}", bindingResult.getAllErrors());
 			        return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
 			    }
 
-			    eventService.updateEvent(eventNum, dto, file);
+			    eventService.updateEvent(eventNum, dto, mainImage, imageList, mainFile, attachList);
 			    return ResponseEntity.ok("✅ 행사 수정이 완료되었습니다.");
 			}
 	

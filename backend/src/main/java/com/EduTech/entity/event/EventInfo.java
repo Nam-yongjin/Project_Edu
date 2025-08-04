@@ -31,77 +31,85 @@ import lombok.Setter;
 @Setter
 public class EventInfo {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long eventNum; // 프로그램번호
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long eventNum;
 
-	@Column(nullable = false, length = 200)
-	private String eventName; // 행사 이름
+    @Column(nullable = false, length = 200)
+    private String eventName;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String eventInfo; // 행사 상세 내용
-	
-	@Builder.Default
-	@Column(nullable = false)
-	private LocalDateTime applyAt = LocalDateTime.now(); // 동록일
-	
-	@Column(nullable = false)
-	private LocalDateTime applyStartPeriod; // 신청시작기간
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String eventInfo;
 
-	@Column(nullable = false)
-	private LocalDateTime applyEndPeriod; // 신청종료기간
-	
-	@Enumerated(EnumType.STRING)
-	private EventCategory category;	// 유저, 학생, 선생
+    @Builder.Default
+    @Column(nullable = false)
+    private LocalDateTime applyAt = LocalDateTime.now();
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false) // 신청전 / 신청중 / 신청마감 등
-	private EventState state;
+    @Column(nullable = false)
+    private LocalDateTime applyStartPeriod;
 
-	@Builder.Default
-	@ElementCollection
-	@CollectionTable(name = "event_days", joinColumns = @JoinColumn(name = "eventNum"))
-	@Column(nullable = false)
-	private List<Integer> daysOfWeek  = new ArrayList<>();
-	
-	@Column(nullable = false, length = 20)
-	private String place; // 장소
+    @Column(nullable = false)
+    private LocalDateTime applyEndPeriod;
 
-	@Column(nullable = false)
-	private LocalDateTime eventStartPeriod; // 행사시작기간
+    @Enumerated(EnumType.STRING)
+    private EventCategory category;
 
-	@Column(nullable = false)
-	private LocalDateTime eventEndPeriod; // 행사종료기간
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventState state;
 
-	@Column(nullable = false)
-	private int maxCapacity; // 모집인원
-	
-	@Column(nullable = false)
-	private int currCapacity; // 현재인원
-	
-	@Column(length = 1000)
-	private String etc; // 기타 유의사항
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "event_days", joinColumns = @JoinColumn(name = "eventNum"))
+    @Column(nullable = false)
+    private List<Integer> daysOfWeek = new ArrayList<>();
 
-	@Column(length = 100)
-	private String originalName; // 파일명
+    @Column(nullable = false, length = 20)
+    private String place;
 
-	@Column(length = 200)
-	private String filePath; 	// 파일경로
-	
-	@Column(length = 200)
-	private String mainImagePath;
+    @Column(nullable = false)
+    private LocalDateTime eventStartPeriod;
 
-	@OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<EventImage> imageList = new ArrayList<>();
+    @Column(nullable = false)
+    private LocalDateTime eventEndPeriod;
 
-	@OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<EventFile> attachList = new ArrayList<>();
-	
-	@PrePersist
-	public void prePersist() {
-	    if (this.state == null) {
-	        this.state = EventState.BEFORE; // 또는 기본 상태
-	    }
-	}
-	
+    @Column(nullable = false)
+    private int maxCapacity;
+
+    @Column(nullable = false)
+    private int currCapacity;
+
+    @Column(length = 1000)
+    private String etc;
+
+    // 대표 첨부파일
+    @Column(length = 100)
+    private String originalName;
+
+    @Column(length = 200)
+    private String filePath;
+
+    // 대표 이미지
+    @Column(length = 200)
+    private String mainImagePath;
+
+    @Column(length = 100)
+    private String mainImageOriginalName;
+
+    // 다중 첨부파일
+    @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<EventFile> attachList = new ArrayList<>();
+
+    // 다중 이미지
+    @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<EventImage> imageList = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        if (this.state == null) {
+            this.state = EventState.BEFORE;
+        }
+    }
 }

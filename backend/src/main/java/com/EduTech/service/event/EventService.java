@@ -48,7 +48,12 @@ public interface EventService {
             MultipartFile mainFile,
             List<MultipartFile> attachList); // 파일 포함 등록
     
-    void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file); // 수정
+    void updateEvent(Long eventNum,
+            EventInfoDTO dto,
+            MultipartFile mainImage,
+            List<MultipartFile> imageList,
+            MultipartFile mainFile,
+            List<MultipartFile> attachList); // 수정
     
     void deleteEvent(Long eventNum); // 삭제
 
