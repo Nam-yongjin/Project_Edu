@@ -174,13 +174,13 @@ const Header = () => {
           )}
 
         </div>
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 mx-3">
           <img src={searchIcon} alt="검색" className="h-6 cursor-pointer active:bg-gray-200" />
           {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
 Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
           <img src={sideIcon} alt="사이드" className="h-6 cursor-pointer active:bg-gray-200" />
           {/* <a href="https://www.flaticon.com/kr/free-icons/" title="햄버거 아이콘">햄버거 아이콘 제작자: Lizel Arina - Flaticon</a> */}
-          </div>
+        </div>
 
       </div>
 
