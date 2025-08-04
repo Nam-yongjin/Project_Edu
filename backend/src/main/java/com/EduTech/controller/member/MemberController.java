@@ -3,7 +3,6 @@ package com.EduTech.controller.member;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +22,6 @@ import com.EduTech.dto.member.MemberDetailDTO;
 import com.EduTech.dto.member.MemberModifyDTO;
 import com.EduTech.dto.member.MemberRegisterDTO;
 import com.EduTech.dto.member.MemberResetPwDTO;
-import com.EduTech.dto.member.NaverDTO;
 import com.EduTech.dto.member.StudentDetailDTO;
 import com.EduTech.dto.member.StudentModifyDTO;
 import com.EduTech.dto.member.StudentRegisterDTO;
@@ -165,6 +163,15 @@ public class MemberController {
 		}
 	}
 
+	// 아이디, 휴대폰번호 일치 확인
+	@GetMapping("/checkIdPhone")
+	public ResponseEntity<Boolean> checkIdPhone(@RequestParam(name = "memId") String memId, @RequestParam(name = "phone") String phone) {
+	    MemberResetPwDTO memberResetPwDTO = new MemberResetPwDTO();
+	    memberResetPwDTO.setMemId(memId);
+	    memberResetPwDTO.setPhone(phone);
+	    return ResponseEntity.ok(memberService.checkIdPhone(memberResetPwDTO));
+	}
+	
 	// 비밀번호 찾기(변경)
 	@PutMapping("/resetPw")
 	public ResponseEntity<String> resetPw(@RequestBody MemberResetPwDTO memberResetPwDTO) {

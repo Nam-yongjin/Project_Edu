@@ -386,6 +386,13 @@ public class MemberServiceImpl implements MemberService {
 	public String findId(String phone) {
 		return memberRepository.findMemIdByPhone(phone);
 	}
+	
+	// 아이디와 휴대폰번호 일치 확인
+	@Override
+	@Transactional
+	public boolean checkIdPhone(MemberResetPwDTO memberResetPwDTO) {
+		return memberRepository.existsByMemIdAndPhone(memberResetPwDTO.getMemId(), memberResetPwDTO.getPhone());
+	}
 
 	// 비밀번호 찾기(변경)
 	@Override

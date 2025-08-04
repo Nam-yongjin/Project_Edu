@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { auth } from '../../api/firebaseApi';
 import { signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
 
-const PhoneVerification = ({ onVerified }) => {
-    const [phone, setPhone] = useState('');
+const PhoneVerification = ({ onVerified, initialPhone }) => {
+    const [phone, setPhone] = useState(initialPhone || '');
     const [otp, setOtp] = useState('');
     const [step, setStep] = useState(0);
     const [cooldown, setCooldown] = useState(0);
@@ -15,6 +15,14 @@ const PhoneVerification = ({ onVerified }) => {
         const timer = setInterval(() => setCooldown(c => c - 1), 1000);
         return () => clearInterval(timer);
     }, [cooldown]);
+
+    // 비밀번호 찾기(변경)시 번호정보 가져왔을때 자동 인증 실행
+    useEffect(() => {
+        if (initialPhone && isValidPhone(initialPhone)) {
+            setPhone(initialPhone);
+            sendOTP();
+        }
+    }, [initialPhone]);
 
     // 전화번호 형식 변환 (국제번호 +82)
     const formatToE164 = raw => raw.startsWith('0') ? '+82' + raw.slice(1) : raw;
@@ -93,44 +101,63 @@ const PhoneVerification = ({ onVerified }) => {
     };
 
     return (
-        <div>
+        <div className="space-y-2 ">
             <div id="recaptcha-container"></div>
+
             <input
                 type="text"
                 placeholder="휴대폰번호 입력 ('-' 없이)"
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value)}
                 disabled={disable}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {!isValidPhone(phone) && phone.length > 0 && (
-                <p style={{ color: 'red' }}>유효한 전화번호를 입력해주세요.</p>
-            )}
+
+            {/* 에러 메시지 공간 고정 */}
+            <p
+                className={`text-sm min-h-[20px] transition-all duration-150 ${!isValidPhone(phone) && phone.length > 0 ? 'text-red-500' : 'invisible'
+                    }`}
+            >
+                유효한 전화번호를 입력해주세요.
+            </p>
 
             <button
                 onClick={sendOTP}
-                className="border border-black px-1 bg-gray-300 active:bg-gray-400"
                 disabled={cooldown > 0 || disable || !isValidPhone(phone)}
+                className={`float-left w-full p-2 rounded-md font-medium transition-colors duration-150 
+                    ${cooldown > 0 || disable || !isValidPhone(phone)
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white'
+                    }`}
             >
                 {cooldown > 0 ? `${cooldown}초 후 재요청 가능` : '인증번호 전송'}
             </button>
 
-
-            {step === 1 && (
-                <>
-                    <input
-                        type="text"
-                        placeholder="인증번호 입력"
-                        value={otp}
-                        onChange={e => setOtp(e.target.value)}
-                        disabled={disable}
-                    />
-                    <button className="border border-black px-1 bg-gray-300 active:bg-gray-400" onClick={verifyOTP} disabled={disable}>
-                        인증번호 확인
-                    </button>
-                </>
-            )}
-
-
+            <div
+                className={`
+                        space-y-2 py-2 w-full overflow-hidden
+                        ${step === 1 ? 'max-h-[300px] visible' : 'max-h-0  invisible'}
+                    `}
+            >
+                <input
+                    type="text"
+                    placeholder="인증번호 입력"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    disabled={disable}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                    onClick={verifyOTP}
+                    disabled={disable}
+                    className={`float-left w-full p-2 rounded-md font-medium transition-colors duration-150 ${disable
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-green-500 hover:bg-green-600 active:bg-green-700 text-white'
+                        }`}
+                >
+                    인증번호 확인
+                </button>
+            </div>
         </div>
     );
 };

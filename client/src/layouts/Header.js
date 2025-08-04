@@ -44,7 +44,7 @@ const Header = () => {
       name: "프로그램",
       link: "/event",
       sub: [
-        { name: "메뉴1", link: "/" },
+        { name: "메뉴1", link: "/event" },
         { name: "메뉴2", link: "/" },
         { name: "메뉴3", link: "/" },
       ],
@@ -53,7 +53,7 @@ const Header = () => {
       name: "공간운영",
       link: "/facility",
       sub: [
-        { name: "메뉴4", link: "/" },
+        { name: "메뉴4", link: "/facility" },
         { name: "메뉴5", link: "/" },
         { name: "메뉴6", link: "/" },
       ],
@@ -62,7 +62,7 @@ const Header = () => {
       name: "지원사업",
       link: "/demonstration",
       sub: [
-        { name: "메뉴7", link: "/" },
+        { name: "메뉴7", link: "/demonstration" },
         { name: "메뉴8", link: "/" },
         { name: "메뉴9", link: "/" },
       ],
@@ -83,18 +83,18 @@ const Header = () => {
       name: "관리자",
       link: "/admin",
       sub: [
-        { name: "관리1", link: "/admin/1" },
-        { name: "관리2", link: "/admin/2" },
-        { name: "관리3", link: "/admin/3" },
+        { name: "관리", link: "/admin" },
+        { name: "관리", link: "/" },
+        { name: "관리", link: "/" },
       ],
     });
   }
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-white shadow z-50">
+    <header className="fixed top-0 left-0 w-full bg-white shadow z-50 ">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between h-20">
         {/* 로고 */}
-        <div className="flex items-center">
+        <div className="flex items-center flex-none">
           <img
             src={logo}
             alt="로고"
@@ -105,13 +105,13 @@ const Header = () => {
         </div>
 
         {/* 메뉴 */}
-        <nav className="relative group flex-1 ml-8 hidden lg:block ">
-          <div className="grid grid-cols-5 justify-items-center ">
+        <nav className="relative group hidden lg:block flex-none w-[640px]">
+          <div className="flex justify-between">
             {mainMenus.map((menu, idx) => (
-              <div key={idx} className="relative text-center min-w-[100px]">
+              <div key={idx} className="relative text-center flex-1">
                 <Link
                   to={menu.link}
-                  className="text-lg font-semibold hover:text-blue-400 active:text-blue-600"
+                  className="text-lg font-semibold hover:text-blue-400 active:text-blue-600 block"
                 >
                   {menu.name}
                 </Link>
@@ -122,14 +122,14 @@ const Header = () => {
           {/* 드롭다운 영역 */}
           <div
             className="
-                absolute inset-x-0 top-full mt-2 bg-white shadow-lg border-t
-                opacity-0 invisible translate-y-2 rounded
-                group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
-                transition-all duration-300 ease-in-out
-                py-6
-                "
+              absolute inset-x-0 top-full mt-2 bg-white shadow-lg border-t
+              opacity-0 invisible translate-y-2 rounded
+              group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
+              transition-all duration-300 ease-in-out
+              py-6
+            "
           >
-            <div className="max-w-screen-xl mx-auto grid grid-cols-5 gap-6 text-sm text-gray-700 px-4">
+            <div className={`mx-auto grid gap-6 text-sm text-gray-700 px-4 ${loginState.role === "ADMIN" ? "grid-cols-6" : "grid-cols-5"}`}>
               {mainMenus.map((menu, idx) => (
                 <div key={idx} className="space-y-2 text-center">
                   {menu.sub.map((item, subIdx) => (
@@ -149,7 +149,7 @@ const Header = () => {
         </nav>
 
         {/* 로그인/검색/사이드 */}
-        <div className="flex items-center space-x-6 text-sm pl-8 ">
+        <div className="flex items-center space-x-6 text-sm pl-8 flex-none pr-3">
           {loginState && loginState.memId ? (
             <>
               <span
@@ -172,13 +172,18 @@ const Header = () => {
               </span>
             </>
           )}
+
+        </div>
+        <div className="flex space-x-3">
           <img src={searchIcon} alt="검색" className="h-6 cursor-pointer active:bg-gray-200" />
           {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
 Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
           <img src={sideIcon} alt="사이드" className="h-6 cursor-pointer active:bg-gray-200" />
           {/* <a href="https://www.flaticon.com/kr/free-icons/" title="햄버거 아이콘">햄버거 아이콘 제작자: Lizel Arina - Flaticon</a> */}
-        </div>
+          </div>
+
       </div>
+
     </header>
   );
 };
