@@ -6,13 +6,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +42,7 @@ import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.repository.event.EventFileRepository;
+import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.event.EventService;
 import com.EduTech.util.FileUtil;
@@ -54,8 +58,10 @@ import lombok.RequiredArgsConstructor;
 		private static final Logger log = LoggerFactory.getLogger(EventController.class);
 	
 		private final EventService eventService;
+		private final EventInfoRepository infoRepository;
 		private final MemberRepository memberRepository;
 		private final FileUtil fileUtil;
+		private final ModelMapper modelMapper;
 		
 		@Value("${file.upload.path}")
 		private String uploadPath;
@@ -122,8 +128,21 @@ import lombok.RequiredArgsConstructor;
 			
 			//  2. 전체 행사 목록 조회 (신청 종료 기간 기준 필터링 없이 전체)
 			@GetMapping("/List")
-			public ResponseEntity<List<EventInfoDTO>> getAllEventsWithoutFilter() {
-			    return ResponseEntity.ok(eventService.getAllEventsWithoutFilter());
+			public ResponseEntity<Page<EventInfoDTO>> getAllEventsWithoutFilter(
+			        @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
+
+				Pageable pageable = PageRequest.of(page - 1, 8, Sort.by(Sort.Direction.DESC, "applyAt"));
+			    Page<EventInfo> result = infoRepository.findAll(pageable);
+
+			    Page<EventInfoDTO> dtoPage = result.map(info -> {
+			        EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
+			        dto.setMainImagePath(info.getMainImagePath());
+			        dto.setFilePath(info.getFilePath());
+			        dto.setOriginalName(info.getOriginalName());
+			        return dto;
+			    });
+
+			    return ResponseEntity.ok(dtoPage);
 			}
 	
 //			// 3. 페이지네이션 + 검색 조건 포함 목록 조회

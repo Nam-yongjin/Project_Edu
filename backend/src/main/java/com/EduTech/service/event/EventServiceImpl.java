@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -372,22 +373,19 @@ public class EventServiceImpl implements EventService {
 	        .collect(Collectors.toList());
 	}
 	
-	public List<EventInfoDTO> getAllEventsWithoutFilter() {
-	    List<EventInfo> list = infoRepository.findAll();
-	    return list.stream()
+	@Override
+	public List<EventInfoDTO> getAllEventsWithoutFilter(int page) {
+	    Pageable pageable = PageRequest.of(page - 1, 8); // 0-based index
+	    Page<EventInfo> result = infoRepository.findAll(pageable);
+
+	    return result.getContent().stream()
 	            .map(info -> {
 	                EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
-
-	                // ✅ 대표 이미지 경로는 info.getMainImagePath()에서 직접 가져오기
 	                dto.setMainImagePath(info.getMainImagePath());
-
-	                // ✅ 대표 첨부파일도 별도로 처리
 	                dto.setFilePath(info.getFilePath());
 	                dto.setOriginalName(info.getOriginalName());
-
 	                return dto;
-	            })
-	            .collect(Collectors.toList());
+	            }).toList();
 	}
 
 	
