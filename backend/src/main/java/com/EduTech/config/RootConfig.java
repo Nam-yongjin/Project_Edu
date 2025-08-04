@@ -28,6 +28,9 @@ public class RootConfig {
         	.addMappings(mapper -> {
         		mapper.skip(EventInfo::setEventNum);    // EventNum null로 덮어쓰기 방지
         		mapper.skip(EventInfo::setApplyAt);     // 등록일은 null로 덮어쓰지 않도록 방지
+        		mapper.skip(EventInfo::setMainImagePath);     // null로 덮어쓰기 방지
+                mapper.skip(EventInfo::setFilePath);          // null로 덮어쓰기 방지
+                mapper.skip(EventInfo::setOriginalName);	  // null로 덮어쓰기 방지
         	});
 
 		// Demonstration -> DemonstrationFormResDTO 매핑 간에 오류가 잇어 충돌나는 칼럼에 대해 skip 처리
