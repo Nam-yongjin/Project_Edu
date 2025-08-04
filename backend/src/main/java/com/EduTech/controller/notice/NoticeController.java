@@ -54,8 +54,8 @@ public class NoticeController {
     }
 
     // 공지사항 상세 조회(조회수 증가)
-    @GetMapping("/NoticeDetail/{noticeNum}")
-    public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable Long noticeNum) {
+	@GetMapping("/NoticeDetail/{noticeNum}")
+	public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable("noticeNum") Long noticeNum) {
     	System.out.println("공지사항 상세 조회");
         noticeService.increaseViewCount(noticeNum);
         return ResponseEntity.ok(noticeService.getNoticeDetail(noticeNum));

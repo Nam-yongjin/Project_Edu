@@ -25,7 +25,7 @@ const NoticeDetailComponent = () => {
             setLoading(true);
             console.log("API 호출 시작 - noticeNum:", noticeNum);
 
-            const response = await NoticeDetail(noticeNum);
+            const response = await NoticeDetail(Number(noticeNum));
             console.log("API 응답:", response);
 
             setNotice(response);
@@ -56,7 +56,7 @@ const NoticeDetailComponent = () => {
     const handleDelete = async () => {
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
-                await axios.delete(`/notice/delete/${noticeNum}`);
+                await axios.delete(`/api/notice/${noticeNum}`);
                 alert("삭제되었습니다.");
                 navigate("/notice/list");
             } catch (err) {
@@ -136,7 +136,7 @@ const NoticeDetailComponent = () => {
                         </div>
                         <div>
                             <span>조회수:</span>
-                            <span>{notice.viewCount?.toLocaleDateString() || 0}</span>
+                            <span>{notice.viewCount || 0}</span>
                         </div>
                     </div>
                 </div>

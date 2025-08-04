@@ -14,7 +14,7 @@ export const NoticeList = async (params) => {
 
 //공지사항 상세(조회수 증가)
 export const NoticeDetail = async (noticeNum) => {
-    const res = await axios.get(`${notice}/DeleteNotice/${noticeNum}`); //식별자(상세조회, 수정, 삭제)
+    const res = await axios.get(`${notice}/NoticeDetail/${noticeNum}`); //식별자(상세조회, 수정, 삭제)
     return res.data;
 }
 
