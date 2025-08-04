@@ -77,52 +77,73 @@ const EvtAddComponent = () => {
   };
 
   const register = () => {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    if (mainImage) {
-      formData.append("file", mainImage.file);
-    }
+  // 디버깅 로그 - 대표 및 서브 이미지/파일 확인
+  console.log("== FormData 체크 ==");
+  console.log("대표 이미지:", mainImage);
+  console.log("대표 첨부파일:", mainFile);
+  console.log("서브 이미지 리스트:", imageList);
+  console.log("서브 첨부파일 리스트:", attachFiles);
+  console.log("DTO 내용:", evt);
 
-    for (const img of imageList) {
-      formData.append("imageList", img.file);
-    }
+  // 대표 이미지 추가
+  if (mainImage) {
+    formData.append("mainImage", mainImage.file);
+  }
 
-    if (mainFile) {
-      formData.append("file", mainFile);
-    }
+  // 서브 이미지 추가
+  imageList.forEach((img) => {
+    formData.append("imageList", img.file);
+  });
 
-    for (const file of attachFiles) {
-      formData.append("attachList", file);
-    }
+  // 대표 첨부파일 추가
+  if (mainFile) {
+    formData.append("mainFile", mainFile);
+  }
 
-    const dto = {
-      ...evt,
-      applyStartPeriod: formatDateTime(evt.applyStartPeriod),
-      applyEndPeriod: formatDateTime(evt.applyEndPeriod),
-      eventStartPeriod: formatDateTime(evt.eventStartPeriod),
-      eventEndPeriod: formatDateTime(evt.eventEndPeriod),
-    };
+  // 서브 첨부파일 추가
+  attachFiles.forEach((file) => {
+    formData.append("attachList", file);
+  });
 
-    const jsonBlob = new Blob([JSON.stringify(dto)], {
-      type: "application/json",
-    });
-    formData.append("dto", jsonBlob);
-
-    postAddEvent(formData)
-      .then(() => {
-        alert("행사 등록 완료");
-        moveToPath("/event/list");
-      })
-      .catch((error) => {
-        console.error("등록 실패", error);
-        alert(
-          "등록 실패: " +
-            (error.response?.data?.message ||
-              JSON.stringify(error.response?.data) ||
-              error.message)
-        );
-      });
+  // DTO 구성
+  const dto = {
+    ...evt,
+    applyStartPeriod: formatDateTime(evt.applyStartPeriod),
+    applyEndPeriod: formatDateTime(evt.applyEndPeriod),
+    eventStartPeriod: formatDateTime(evt.eventStartPeriod),
+    eventEndPeriod: formatDateTime(evt.eventEndPeriod),
   };
+
+  // JSON Blob으로 DTO 추가
+  const jsonBlob = new Blob([JSON.stringify(dto)], {
+    type: "application/json",
+  });
+  formData.append("dto", jsonBlob);
+
+  // 디버깅 로그 - 최종 FormData 확인
+  console.log("== FormData 최종 구성 확인 ==");
+  for (let pair of formData.entries()) {
+    console.log(pair[0], pair[1]);
+  }
+
+  // API 전송
+  postAddEvent(formData)
+    .then(() => {
+      alert("행사 등록 완료");
+      moveToPath("/event/list");
+    })
+    .catch((error) => {
+      console.error("등록 실패", error);
+      alert(
+        "등록 실패: " +
+          (error.response?.data?.message ||
+            JSON.stringify(error.response?.data) ||
+            error.message)
+      );
+    });
+};
 
   return (
     <div className="flex mt-10 max-w-6xl mx-auto">
