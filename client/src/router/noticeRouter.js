@@ -23,7 +23,7 @@ const noticeRouter = () => {
             element: <Suspense fallback={<Loading />}><UpdateNotice /></Suspense>,
         },    
         {
-            path:":noticeNum",
+            path:"detail/:noticeNum",
             element: <Suspense fallback={<Loading />}><NoticeDetail /></Suspense>,
         }
     ]
