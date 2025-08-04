@@ -9,7 +9,7 @@ const SocialLoginComponent = () => {
     const naverLink = getNaverLoginLink();
 
     return (
-        <div className="flex flex-col my-8">
+        <div className="flex flex-col mt-8">
             <div className="text-center text-blue-500">로그인시 자동 가입</div>
             <div className="flex justify-center	w-full">
                 <div className="m-3">

@@ -1,4 +1,9 @@
 @charset "utf-8";
+
+html, body, #root {
+  height: 100%;
+}
+
 /* 기본값: 스크린  - 푸터 */
 .main-content {
   min-height: calc(100vh - 224px);
@@ -10,3 +15,4 @@
     min-height: 500px;
   }
 }
+

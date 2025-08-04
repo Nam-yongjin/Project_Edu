@@ -147,154 +147,230 @@ const TeacherRegisterComponent = () => {
     };
 
     return (
-        <div className='space-y-5 pl-4 text-center'>
-            <div className='text-3xl'>회원가입</div>
-            <div>
-                <input
-                    name="memId"
-                    placeholder="아이디"
-                    value={form.memId}
-                    onChange={handleChange}
-                    autoFocus />
-                <button className="border border-black px-1 bg-gray-300 active:bg-gray-400"
-                    onClick={handleCheckDuplicateId}>
-                    아이디 중복 체크
-                </button>
-                {errors.memId && <div style={{ color: 'red' }}>{errors.memId}</div>}
-            </div>
+        <div>
+            <div className="my-10 p-10 w-full space-y-6 text-center shadow-2xl">
+                <div className="text-3xl font-bold">회원가입</div>
 
-            <div>
-                <input
-                    name="pw"
-                    type="password"
-                    placeholder="비밀번호"
-                    value={form.pw}
-                    onChange={handleChange} />
-                {errors.pw && <div style={{ color: 'red' }}>{errors.pw}</div>}
-            </div>
+                {/* 아이디 */}
+                <div>
+                    <div className="flex items-center gap-2">
+                        <label className="w-32 text-left font-medium">아이디</label>
+                        <input
+                            name="memId"
+                            placeholder="아이디"
+                            value={form.memId}
+                            onChange={handleChange}
+                            autoFocus
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                            className="text-center p-2 bg-gray-200 rounded-md hover:bg-gray-300 active:bg-gray-400 border border-gray-400 text-sm font-medium"
+                            onClick={handleCheckDuplicateId}
+                        >
+                            중복 체크
+                        </button>
+                    </div>
+                    {errors.memId && <div className="text-red-500 text-sm text-left ml-32">{errors.memId}</div>}
+                </div>
 
-            <div>
-                <input
-                    name="pwCheck"
-                    type="password"
-                    placeholder="비밀번호 확인"
-                    value={form.pwCheck}
-                    onChange={handleChange}
-                />
-                {errors.pwCheck && <div style={{ color: 'red' }}>{errors.pwCheck}</div>}
-            </div>
+                {/* 비밀번호 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">비밀번호</label>
+                        <input
+                            name="pw"
+                            type="password"
+                            placeholder="비밀번호"
+                            value={form.pw}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    {errors.pw && <div className="text-red-500 text-sm text-left ml-32">{errors.pw}</div>}
+                </div>
 
-            <div>
-                <input
-                    name="name"
-                    placeholder="이름"
-                    value={form.name}
-                    onChange={handleChange} />
-                {errors.name && <div style={{ color: 'red' }}>{errors.name}</div>}
-            </div>
+                {/* 비밀번호 확인 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">비밀번호 확인</label>
+                        <input
+                            name="pwCheck"
+                            type="password"
+                            placeholder="비밀번호 확인"
+                            value={form.pwCheck}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    {errors.pwCheck && <div className="text-red-500 text-sm text-left ml-32">{errors.pwCheck}</div>}
+                </div>
 
-            <div>
-                <PhoneVerification onVerified={setVerifiedPhone} />
-                {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
-            </div>
+                {/* 이름 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">이름</label>
+                        <input
+                            name="name"
+                            placeholder="이름"
+                            value={form.name}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    {errors.name && <div className="text-red-500 text-sm text-left ml-32">{errors.name}</div>}
+                </div>
 
-            <div>
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="이메일"
-                    value={form.email}
-                    onChange={handleChange} />
-                {errors.email && <div style={{ color: 'red' }}>{errors.email}</div>}
-            </div>
+                {/* 휴대폰 인증 */}
+                <div>
+                    <div className="flex items-start">
+                        <div className="w-32 text-left font-medium pt-4">휴대폰</div>
+                        <PhoneVerification onVerified={setVerifiedPhone} />
+                    </div>
+                    {errors.phone && <div className="text-red-500 text-sm text-left ml-32">{errors.phone}</div>}
+                </div>
 
-            <div>
-                <input
-                    name="birthDate"
-                    type="date"
-                    value={form.birthDate}
-                    onChange={handleChange} />
-                {errors.birthDate && <div style={{ color: 'red' }}>{errors.birthDate}</div>}
-            </div>
+                {/* 이메일 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">이메일</label>
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="이메일"
+                            value={form.email}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    {errors.email && <div className="text-red-500 text-sm text-left ml-32">{errors.email}</div>}
+                </div>
 
-            <div>
-                <div>성별 선택</div>
-                <label>
-                    <input
-                        type="radio"
-                        name="gender"
-                        value="MALE"
-                        checked={form.gender === 'MALE'}
-                        onChange={handleChange}
-                    />
-                    남성
-                </label>
-                <label className="ml-4">
-                    <input
-                        type="radio"
-                        name="gender"
-                        value="FEMALE"
-                        checked={form.gender === 'FEMALE'}
-                        onChange={handleChange}
-                    />
-                    여성
-                </label>
-                {errors.gender && <div style={{ color: 'red' }}>{errors.gender}</div>}
-            </div>
+                {/* 생년월일 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">생년월일</label>
+                        <input
+                            name="birthDate"
+                            type="date"
+                            value={form.birthDate}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    {errors.birthDate && <div className="text-red-500 text-sm text-left ml-32">{errors.birthDate}</div>}
+                </div>
 
-            <div>
-                <AddressSearch onAddressSelected={handleAddressSelected} />
-                <input
-                    name="addr"
-                    placeholder="주소"
-                    value={form.addr}
-                    readOnly
-                />
-            </div>
-            <div>
-                <input
-                    name="addrDetail"
-                    placeholder="상세 주소"
-                    value={form.addrDetail}
-                    onChange={handleChange} />
-            </div>
+                {/* 성별 */}
+                <div>
+                    <div className="flex items-center">
+                        <div className="w-32 text-left font-medium">성별</div>
+                        <div className="flex gap-6">
+                            <label className="inline-flex items-center gap-1">
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="MALE"
+                                    checked={form.gender === 'MALE'}
+                                    onChange={handleChange}
+                                    className="accent-blue-500"
+                                />
+                                남성
+                            </label>
+                            <label className="inline-flex items-center gap-1">
+                                <input
+                                    type="radio"
+                                    name="gender"
+                                    value="FEMALE"
+                                    checked={form.gender === 'FEMALE'}
+                                    onChange={handleChange}
+                                    className="accent-pink-500"
+                                />
+                                여성
+                            </label>
+                        </div>
+                    </div>
+                    {errors.gender && <div className="text-red-500 text-sm text-left ml-32">{errors.gender}</div>}
+                </div>
 
-            <div>
-                <input
-                    name="schoolName"
-                    type="text"
-                    placeholder="학교명"
-                    value={form.schoolName}
-                    onChange={handleChange} />
-                {errors.schoolName && <div style={{ color: 'red' }}>{errors.schoolName}</div>}
-            </div>
+                {/* 주소 */}
+                <div>
+                    <div className="flex items-start">
+                        <div className="w-32 text-left font-medium pt-2">주소</div>
+                        <div className="flex-1">
+                            <AddressSearch onAddressSelected={handleAddressSelected} />
+                            <input
+                                name="addr"
+                                placeholder="주소"
+                                value={form.addr}
+                                readOnly
+                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                </div>
 
-            <div>
-                <label>
+                {/* 상세 주소 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">상세 주소</label>
+                        <input
+                            name="addrDetail"
+                            placeholder="상세 주소"
+                            value={form.addrDetail}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+
+                {/* 학교명 */}
+                <div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-left font-medium">학교명</label>
+                        <input
+                            name="schoolName"
+                            placeholder="학교명"
+                            value={form.schoolName}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+
+                {/* 수신 동의 체크박스 */}
+                <div className="flex items-center">
+                    <label className="w-32 text-left font-medium">SMS 수신</label>
                     <input
                         name="checkSms"
                         type="checkbox"
                         checked={form.checkSms}
-                        onChange={handleChange} />
-                    SMS 수신 동의
-                </label>
-                {errors.checkSms && <div style={{ color: 'red' }}>{errors.checkSms}</div>}
-            </div>
+                        onChange={handleChange}
+                        className="mr-2 accent-blue-500"
+                    />
+                </div>
+                {errors.checkSms && <div className="text-red-500 text-sm text-left ml-32">{errors.checkSms}</div>}
 
-            <div>
-                <label>
+                <div className="flex items-center">
+                    <label className="w-32 text-left font-medium">이메일 수신</label>
                     <input
                         name="checkEmail"
                         type="checkbox"
                         checked={form.checkEmail}
-                        onChange={handleChange} />
-                    이메일 수신 동의
-                </label>
-                {errors.checkEmail && <div style={{ color: 'red' }}>{errors.checkEmail}</div>}
-            </div>
+                        onChange={handleChange}
+                        className="mr-2 accent-blue-500"
+                    />
+                </div>
+                {errors.checkEmail && <div className="text-red-500 text-sm text-left ml-32">{errors.checkEmail}</div>}
 
-            <div>
-                <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600 font-bold' onClick={handleSubmit}>회원가입</button>
+                {/* 제출 버튼 */}
+                <div>
+                    <button
+                        className="rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold"
+                        onClick={handleSubmit}
+                    >
+                        회원가입
+                    </button>
+                </div>
             </div>
         </div>
     );

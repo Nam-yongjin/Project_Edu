@@ -77,13 +77,15 @@ const RegisterTermsComponent = () => {
     };
 
     return (
-        <div className="">
-            <div className="">
-                <h2 className="text-center text-xl font-bold mb-4">이용 약관 동의</h2>
+        <div className="mb-20 pt-20">
+            <div className="max-w-screen-md">
+
+                <div className="text-center text-xl font-bold mb-4">이용 약관 동의</div>
 
                 <div className="mt-20">
                     <div className="text-lg font-bold mb-4">서울 에듀테크 소프트랩 이용약관</div>
-                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-200 rounded">
+
+                    <div className="p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
                         {registerText}
                     </div>
                     <label className="float-right pt-4">
@@ -99,7 +101,7 @@ const RegisterTermsComponent = () => {
                 </div>
                 <div className="mt-20">
                     <div className="text-lg font-bold mb-4">개인 정보 수집 및 이용 동의</div>
-                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-200 rounded">
+                    <div className="p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
                         {agreeText}
                     </div>
                     <label className="float-right pt-4">
@@ -115,7 +117,7 @@ const RegisterTermsComponent = () => {
                 </div>
                 <div className="mt-20">
                     <div className="text-lg font-bold mb-4">개인정보 처리 방침</div>
-                    <div className="p-4 border h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-200 rounded">
+                    <div className="p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
                         {processText}
                     </div>
                     <label className="float-right pt-4">
@@ -142,9 +144,9 @@ const RegisterTermsComponent = () => {
                 </div>
             </div>
 
-            <div className="mt-10 py-2 text-center">
+            <div className="mt-20 py-2 text-center">
                 <h2 className="text-xl font-bold mb-4">회원 유형 선택</h2>
-                <div className="flex flex-row gap-3 justify-center bg-gray-200 mx-auto w-1/3 p-2 rounded">
+                <div className="border border-gray-400 flex flex-row gap-3 justify-center bg-gray-200 mx-auto w-1/3 p-2 rounded">
                     {['member', 'student', 'teacher', 'company'].map((type) => (
                         <label key={type}>
                             <input
@@ -163,7 +165,7 @@ const RegisterTermsComponent = () => {
             </div>
             <div className="text-center">
                 <button
-                    className="mt-4 p-1 w-[70px] bg-blue-500 text-white rounded active:bg-blue-600 font-bold"
+                    className="mt-4 p-2 w-[60px] bg-blue-500 text-white rounded active:bg-blue-600 font-bold"
                     onClick={handleSubmit}
                 >
                     다음
