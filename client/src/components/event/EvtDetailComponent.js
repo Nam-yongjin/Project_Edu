@@ -34,7 +34,6 @@ const EvtDetailComponent = ({ eventNum }) => {
     if (!confirmed) return;
 
     try {
-      console.log("삭제 이벤트 번호:", event.eventNum);
       await deleteEvent(event.eventNum);
       alert("삭제가 완료되었습니다.");
       navigate("/event/list");
@@ -64,66 +63,89 @@ const EvtDetailComponent = ({ eventNum }) => {
   const categoryLabel = getCategoryLabel(event.category);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow flex flex-col md:flex-row gap-8 mt-8">
-      {/* 이미지 영역 */}
-      <div className="md:w-1/2 flex items-center justify-center">
-        {event.filePath ? (
-          <img
-            src={getFullUrl(event.filePath)}
-            alt="행사 이미지"
-            className="rounded-xl w-full h-auto object-cover"
-          />
-        ) : (
-          <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center text-gray-500">
-            이미지 없음
-          </div>
-        )}
-      </div>
-
-      {/* 행사 정보 영역 */}
-      <div className="md:w-1/2 space-y-4">
-        <div className="text-sm inline-block border border-blue-400 text-blue-600 px-3 py-1 rounded-full">
-          {categoryLabel}
-        </div>
-
-        <h2 className="text-2xl font-bold text-gray-800">{event.eventName}</h2>
-
-        <div className="space-y-2 text-gray-700 text-sm">
-          <p><strong>장소:</strong> {event.place || "미정"}</p>
-          <p><strong>소개:</strong> {event.description || "내용 없음"}</p>
-          <p><strong>신청기간:</strong> {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}</p>
-          <p><strong>진행기간:</strong> {formatDate(event.eventStartPeriod)} ~ {formatDate(event.eventEndPeriod)}</p>
-          <p><strong>모집대상:</strong> {categoryLabel}</p>
-          <p><strong>모집인원:</strong> {event.maxCapacity ? `${event.maxCapacity}명` : "미정"}</p>
-          <p><strong>현재인원:</strong> {event.currCapacity ?? 0}명</p>
-          <p><strong>기타 유의사항:</strong> {event.etc || "없음"}</p>
-        </div>
-
-        {/* 버튼 영역 */}
-        <div className="pt-6 space-y-4">
-          <button className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 font-semibold">
-            신청하기
-          </button>
-
-          {/* 관리자 전용 버튼 */}
-          {isAdmin && (
-            <div className="flex gap-4">
-              <button
-                className="flex-1 bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
-                onClick={() => navigate(`/event/update/${event.eventNum}`)}
-              >
-                수정
-              </button>
-              <button
-                className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
-                onClick={handleDelete}
-              >
-                삭제
-              </button>
+    <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow mt-8 space-y-10">
+      {/* 상단: 이미지 + 행사 정보 */}
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* 이미지 영역 */}
+        <div className="md:w-1/2 flex items-center justify-center">
+          {event.mainImagePath ? (
+            <img
+              src={getFullUrl(event.mainImagePath)}
+              alt="행사 이미지"
+              className="rounded-xl w-full h-auto object-cover"
+            />
+          ) : (
+            <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center text-gray-500">
+              이미지 없음
             </div>
           )}
         </div>
+
+        {/* 행사 정보 영역 */}
+        <div className="md:w-1/2 space-y-4">
+          <div className="text-sm inline-block border border-blue-400 text-blue-600 px-3 py-1 rounded-full">
+            {categoryLabel}
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800">{event.eventName}</h2>
+
+          <div className="space-y-2 text-gray-700 text-sm">
+            <p><strong>장소:</strong> {event.place || "미정"}</p>
+            <p><strong>소개:</strong> {event.description || "내용 없음"}</p>
+            <p><strong>신청기간:</strong> {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}</p>
+            <p><strong>진행기간:</strong> {formatDate(event.eventStartPeriod)} ~ {formatDate(event.eventEndPeriod)}</p>
+            <p><strong>모집대상:</strong> {categoryLabel}</p>
+            <p><strong>모집인원:</strong> {event.maxCapacity ? `${event.maxCapacity}명` : "미정"}</p>
+            <p><strong>현재인원:</strong> {event.currCapacity ?? 0}명</p>
+            <p><strong>기타 유의사항:</strong> {event.etc || "없음"}</p>
+          </div>
+
+          {/* 버튼 영역 */}
+          <div className="pt-6 space-y-4">
+            <button className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 font-semibold">
+              신청하기
+            </button>
+
+            {isAdmin && (
+              <div className="flex gap-4">
+                <button
+                  className="flex-1 bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
+                  onClick={() => navigate(`/event/update/${event.eventNum}`)}
+                >
+                  수정
+                </button>
+                <button
+                  className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+                  onClick={handleDelete}
+                >
+                  삭제
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* 첨부파일 다운로드 영역 */}
+      {event.attachList && event.attachList.length > 0 && (
+        <div className="w-full">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">첨부파일</h3>
+          <ul className="space-y-2 text-sm text-blue-600 underline pl-2">
+            {event.attachList.map((file) => (
+              <li key={file.id}>
+                <a
+                  href={`${HOST}/event/download/${file.id}`}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  📎 {file.originalName}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

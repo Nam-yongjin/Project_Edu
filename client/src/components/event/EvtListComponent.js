@@ -65,17 +65,17 @@ const EventListComponent = () => {
               </div>
 
               {/* 대표 이미지 */}
-              {event.filePath && event.filePath.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                <img
-                  src={`${host}/${event.filePath}`}
-                  alt="대표 이미지"
-                  className="w-full h-40 object-cover rounded mb-2"
-                />
-              ) : (
-                <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded mb-2 text-sm text-gray-500">
-                  이미지 없음
-                </div>
-              )}
+              {event.mainImagePath && event.mainImagePath.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+  <img
+    src={`${host}/${event.mainImagePath}`}
+    alt="대표 이미지"
+    className="w-full h-40 object-cover rounded mb-2"
+  />
+) : (
+  <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded mb-2 text-sm text-gray-500">
+    이미지 없음
+  </div>
+)}
 
               {/* 제목 */}
               <h3 className="text-lg font-semibold mb-1 line-clamp-2">{event.eventName}</h3>
