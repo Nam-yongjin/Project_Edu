@@ -56,7 +56,7 @@ const NoticeDetailComponent = () => {
     const handleDelete = async () => {
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
-                await axios.delete(`/api/notice/${noticeNum}`);
+                await axios.delete(`/notice/delete/${noticeNum}`);
                 alert("삭제되었습니다.");
                 navigate("/notice/list");
             } catch (err) {
