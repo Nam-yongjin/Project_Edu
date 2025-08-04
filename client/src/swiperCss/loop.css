@@ -33,3 +33,16 @@ body {
   height: 100%;
   object-fit: cover;
 }
+
+.swiper-pagination-bullet {
+  border: 2px solid #ffffff;
+  width: 20px;
+  height: 20px;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  width: 20px;
+  height: 20px;
+}
