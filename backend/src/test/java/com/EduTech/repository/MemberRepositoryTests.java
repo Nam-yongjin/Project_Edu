@@ -79,7 +79,7 @@ public class MemberRepositoryTests {
 	private EventUseRepository eventUseRepository;
 
 //	등록 테스트
-//	@Test
+	@Test
 	@Transactional
 	@Commit
 	public void testInsertMember() {

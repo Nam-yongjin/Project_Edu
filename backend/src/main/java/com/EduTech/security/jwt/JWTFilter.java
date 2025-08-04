@@ -18,84 +18,91 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JWTFilter extends OncePerRequestFilter {
 
-	// JWT를 검증하고, 인증 정보를 SecurityContext에 등록
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		try {
-			String authHeader = request.getHeader("Authorization");
-			
-			// Authorization 헤더가 없거나 "Bearer "로 시작하지 않을 경우, JWT 검증을 생략하고 필터를 통과시키기 위해 사용중
-			// 삭제시 eventList 썸네일 안나옴
-	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-	            filterChain.doFilter(request, response);
-	            return;
-	        }
+   // JWT를 검증하고, 인증 정보를 SecurityContext에 등록
+   @Override
+   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+         throws ServletException, IOException {
+      try {
+         String authHeader = request.getHeader("Authorization");
 
-			String accessToken = authHeader.substring(7);
+         String accessToken = authHeader.substring(7);
 
-			Map<String, Object> claims = JWTProvider.validateToken(accessToken);
+         Map<String, Object> claims = JWTProvider.validateToken(accessToken);
 
-			String memId = (String) claims.get("memId");
-			String email = (String) claims.get("email");
-			String state = (String) claims.get("state");
-			String role = (String) claims.get("role");
+         String memId = (String) claims.get("memId");
+         String email = (String) claims.get("email");
+         String state = (String) claims.get("state");
+         String role = (String) claims.get("role");
 
-			MemberDTO memberDTO = new MemberDTO(memId, "", email, state, role);
+         MemberDTO memberDTO = new MemberDTO(memId, "", email, state, role);
 
-			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
-					null, memberDTO.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO,
+               null, memberDTO.getAuthorities());
+         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-			filterChain.doFilter(request, response);
+         filterChain.doFilter(request, response);
 
-		} catch (Exception e) {
-			String json = new Gson().toJson(Map.of("error", "ERROR_ACCESS_TOKEN", "message", e.getMessage()));
-			response.setContentType("application/json;charset=UTF-8");
-			response.getWriter().println(json);
+      } catch (Exception e) {
+         String json = new Gson().toJson(Map.of("error", "ERROR_ACCESS_TOKEN", "message", e.getMessage()));
+         response.setContentType("application/json;charset=UTF-8");
+         response.getWriter().println(json);
 
-		}
-	}
+      }
+   }
 
-	// 필터로 체크하지 않을 경로나 메서드등을 지정
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-	    String path = request.getRequestURI();
-	    String method = request.getMethod();
-	    String authHeader = request.getHeader("Authorization");
+   // 필터로 체크하지 않을 경로나 메서드등을 지정
+   @Override
+   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
-	    // ✅ 정적 경로 or 이미지 조회
-	    if (path.equals("/favicon.ico") || path.matches("^.*/view(/.*)?$")) return true;
+      String path = request.getRequestURI();
 
-	    // ✅ 명시적 인증 제외 API
-	    if (isExcludedPath(path, method)) return true;
+      String authHeader = request.getHeader("Authorization");
 
-	    // ✅ /api 경로 중 토큰 없는 경우 비회원 → 필터 적용 안 함
-	    if (path.startsWith("/api")) {
-	        return authHeader == null;
-	    }
+      if (path.equals("/favicon.ico") || path.startsWith("/api/refresh")) {
+         return true;
+      }
 
-	    return false;
-	}
+      // 회원가입 경로 제외
+      if (path.startsWith("/register") && request.getMethod().equals("POST")) {
+         return true;
+      }
+      // 아이디 중복 체크 경로 제외
+      if (path.startsWith("/checkId") && request.getMethod().equals("GET")) {
+         return true;
+      }
+      // 아이디 찾기크 경로 제외
+      if (path.startsWith("/findId") && request.getMethod().equals("GET")) {
+         return true;
+      }
+      // 비밀번호 찾기(변경) 경로 제외
+      if (path.startsWith("/resetPw") && request.getMethod().equals("PUT")) {
+         return true;
+      }
 
-	// 인증 없이 접근 허용할 경로들 정의
-	private boolean isExcludedPath(String path, String method) {
-	    return
-	        (path.startsWith("/api/register") && method.equals("POST")) ||
-	        (path.startsWith("/api/checkId") && method.equals("GET")) ||
-	        (path.startsWith("/api/findId") && method.equals("GET")) ||
-	        (path.startsWith("/api/resetPw") && method.equals("PUT")) ||
-	        (path.startsWith("/api/refresh"));
-	}
+      // 회원 + 비회원
+      if (path.startsWith("/api")) {
+         if (authHeader != null) {
+            return false; // 회원의 경우
+         }
+         return true; // 비회원의 경우
+      }
 
-	public static String getMemId() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Object principal = authentication.getPrincipal();
-		if (principal == null || !(principal instanceof MemberDTO)) {
-			return null;
-		}
+      // 이미지 조회 경로는 제외 (/view)
+      if (path.matches("^.*/view(/.*)?$")) {
+         return true;
+      }
+      return false;
 
-		return ((MemberDTO) principal).getUsername();
-	}
+   }
+
+   public static String getMemId() {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      Object principal = authentication.getPrincipal();
+      if (principal == null || !(principal instanceof MemberDTO)) {
+         return null;
+      }
+
+      return ((MemberDTO) principal).getUsername();
+   }
 
 }
