@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor // ModelMapper 사용 시 필요
+@NoArgsConstructor
 @AllArgsConstructor
 public class EventInfoDTO {
 
@@ -36,13 +36,9 @@ public class EventInfoDTO {
     private Integer maxCapacity;
 
     private Integer currCapacity; // 현재 신청 인원
-
-    @NotNull(message = "행사 장소는 필수입니다.")
     private String place;
-
     private String etc;
 
-    // 상태 기본값 설정 (상세 페이지 신청 내역에서 사용 가능)
     @Builder.Default
     private RevState revState = RevState.WAITING;
 
@@ -62,20 +58,25 @@ public class EventInfoDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime eventEndPeriod;
 
-    // 등록일 (백엔드 자동 세팅)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime applyAt;
 
-    // 대표 이미지 또는 첨부파일
+    // 대표 첨부파일
     private String originalName;
     private String filePath;
-    
+
+    // 대표 이미지
     private String mainImagePath;
-    
+    private String mainImageOriginalName;
+
+    // 이미지 리스트
+    @Builder.Default
     private List<EventImageDTO> imageList = new ArrayList<>();
-    
+
+    // 첨부파일 리스트
+    @Builder.Default
     private List<EventFileDTO> attachList = new ArrayList<>();
 
-    // 요일 목록
+    // 요일 배열
     private List<Integer> daysOfWeek;
 }

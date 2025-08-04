@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -122,36 +123,30 @@ public class EventServiceImpl implements EventService {
 	                          List<MultipartFile> attachList) {
 
 	    String mainImagePath = null;
+	    String mainImageOriginalName = null;
 	    String mainFilePath = null;
 	    String mainFileOriginalName = null;
 
 	    // 1. 대표 이미지 저장
 	    if (mainImage != null && !mainImage.isEmpty()) {
-	        System.out.println(">>> 대표 이미지 업로드 시작");
 	        List<Object> results = fileUtil.saveFiles(List.of(mainImage), "Event/mainImage");
-	        System.out.println(">>> 대표 이미지 업로드 결과: " + results);
 	        if (!results.isEmpty()) {
 	            @SuppressWarnings("unchecked")
 	            Map<String, String> result = (Map<String, String>) results.get(0);
 	            mainImagePath = result.get("filePath");
+	            mainImageOriginalName = result.get("originalName");
 	        }
-	    } else {
-	        System.out.println(">>> 대표 이미지 없음 (null 또는 비어있음)");
 	    }
 
 	    // 2. 대표 첨부파일 저장
 	    if (mainFile != null && !mainFile.isEmpty()) {
-	        System.out.println(">>> 대표 첨부파일 업로드 시작");
 	        List<Object> results = fileUtil.saveFiles(List.of(mainFile), "Event/mainFile");
-	        System.out.println(">>> 대표 첨부파일 업로드 결과: " + results);
 	        if (!results.isEmpty()) {
 	            @SuppressWarnings("unchecked")
 	            Map<String, String> result = (Map<String, String>) results.get(0);
 	            mainFilePath = result.get("filePath");
 	            mainFileOriginalName = result.get("originalName");
 	        }
-	    } else {
-	        System.out.println(">>> 대표 첨부파일 없음 (null 또는 비어있음)");
 	    }
 
 	    // 3. DTO → Entity 변환 및 필드 세팅
@@ -160,21 +155,14 @@ public class EventServiceImpl implements EventService {
 	    event.setApplyAt(LocalDateTime.now());
 	    event.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
 	    event.setMainImagePath(mainImagePath);
+	    event.setMainImageOriginalName(mainImageOriginalName);
 	    event.setFilePath(mainFilePath);
 	    event.setOriginalName(mainFileOriginalName);
 
-	    // 4. 대표 이미지 → EventImage에 isMain(true)로 저장
-	    if (mainImagePath != null) {
-	        EventImage mainImgEntity = EventImage.builder()
-	                .filePath(mainImagePath)
-	                .originalName(mainImage.getOriginalFilename())
-	                .isMain(true)
-	                .eventInfo(event)
-	                .build();
-	        event.getImageList().add(mainImgEntity);
-	    }
+	    if (event.getImageList() == null) event.setImageList(new ArrayList<>());
+	    if (event.getAttachList() == null) event.setAttachList(new ArrayList<>());
 
-	    // 5. 서브 이미지 저장 (isMain = false)
+	    // 4. 서브 이미지 저장
 	    if (imageList != null) {
 	        for (MultipartFile file : imageList) {
 	            if (!file.isEmpty()) {
@@ -192,7 +180,7 @@ public class EventServiceImpl implements EventService {
 	        }
 	    }
 
-	    // 6. 첨부파일 저장
+	    // 5. 첨부파일 저장
 	    if (attachList != null) {
 	        for (MultipartFile file : attachList) {
 	            if (!file.isEmpty()) {
@@ -209,78 +197,162 @@ public class EventServiceImpl implements EventService {
 	        }
 	    }
 
-	    // 7. 저장 전 확인 로그
-	    System.out.println("== 저장 전 정보 출력 ==");
-	    System.out.println("mainImagePath: " + mainImagePath);
-	    System.out.println("mainFilePath: " + mainFilePath);
-	    System.out.println("mainFileOriginalName: " + mainFileOriginalName);
-
-	    System.out.println("event.getMainImagePath(): " + event.getMainImagePath());
-	    System.out.println("event.getFilePath(): " + event.getFilePath());
-	    System.out.println("event.getOriginalName(): " + event.getOriginalName());
-
-	    // 8. 저장
+	    // 6. 저장
 	    infoRepository.save(event);
 	}
-
+	
+	// 행사 수정
 	@Override
-	public void updateEvent(Long eventNum, EventInfoDTO dto, MultipartFile file) {
+	public void updateEvent(Long eventNum,
+	                        EventInfoDTO dto,
+	                        MultipartFile mainImage,
+	                        List<MultipartFile> imageList,
+	                        MultipartFile mainFile,
+	                        List<MultipartFile> attachList) {
+
 	    EventInfo origin = infoRepository.findById(eventNum)
-	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+	            .orElseThrow(() -> new IllegalArgumentException("해당 행사가 존재하지 않습니다."));
 
-	    // ⚠ ID 필드 덮어쓰기 방지를 위해 null로 설정하거나 수동 매핑
-	    dto.setEventNum(null); // ID를 덮어쓰지 않도록 방지
+	    if (origin.getAttachList() == null) origin.setAttachList(new ArrayList<>());
+	    if (origin.getImageList() == null) origin.setImageList(new ArrayList<>());
 
-	    String originalFilePath = origin.getFilePath();
-	    String originalFileName = origin.getOriginalName();
+	    dto.setEventNum(null);
+	    dto.setAttachList(null);
+	    dto.setImageList(null);
 
-	 // ★ 여기서 ID를 건드리지 않게 modelMapper 설정되어 있어야 함
+	    String oldImagePath = origin.getMainImagePath();
+	    String oldImageOriginalName = origin.getMainImageOriginalName();
+	    String oldFilePath = origin.getFilePath();
+	    String oldFileName = origin.getOriginalName();
+
 	    modelMapper.map(dto, origin);
+	    origin.setCurrCapacity(dto.getCurrCapacity() != null ? dto.getCurrCapacity() : 0);
+	    origin.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
 
-	    // 파일 업로드 처리
-	    if (file != null && !file.isEmpty()) {
-	        if (originalFilePath != null && !originalFilePath.isEmpty()) {
-	            fileUtil.deleteFiles(List.of(originalFilePath));
-	        }
-	        setFileInfo(origin, file);
+	    // 대표 이미지 수정
+	    if (mainImage != null && !mainImage.isEmpty()) {
+	        if (oldImagePath != null) fileUtil.deleteFiles(List.of(oldImagePath));
+	        Map<String, String> fileInfo = (Map<String, String>) fileUtil.saveFiles(List.of(mainImage), "Event/mainImage").get(0);
+	        origin.setMainImagePath(fileInfo.get("filePath"));
+	        origin.setMainImageOriginalName(fileInfo.get("originalName"));
 	    } else {
-	        origin.setFilePath(dto.getFilePath() != null ? dto.getFilePath() : originalFilePath);
-	        origin.setOriginalName(dto.getOriginalName() != null ? dto.getOriginalName() : originalFileName);
+	        origin.setMainImagePath(oldImagePath);
+	        origin.setMainImageOriginalName(oldImageOriginalName);
+	    }
+
+	    // 대표 파일 수정
+	    if (mainFile != null && !mainFile.isEmpty()) {
+	        if (oldFilePath != null) fileUtil.deleteFiles(List.of(oldFilePath));
+	        Map<String, String> fileInfo = (Map<String, String>) fileUtil.saveFiles(List.of(mainFile), "Event/mainFile").get(0);
+	        origin.setFilePath(fileInfo.get("filePath"));
+	        origin.setOriginalName(fileInfo.get("originalName"));
+	    } else {
+	        origin.setFilePath(oldFilePath);
+	        origin.setOriginalName(oldFileName);
+	    }
+
+	    // 서브 이미지 수정
+	    if (imageList != null && !imageList.isEmpty()) {
+	        List<String> deletePaths = origin.getImageList().stream()
+	                .map(EventImage::getFilePath)
+	                .filter(Objects::nonNull)
+	                .toList();
+	        fileUtil.deleteFiles(deletePaths);
+	        origin.getImageList().forEach(img -> img.setEventInfo(null));
+	        origin.getImageList().clear();
+
+	        for (MultipartFile image : imageList) {
+	            if (!image.isEmpty()) {
+	                Map<String, String> fileInfo = (Map<String, String>) fileUtil.saveFiles(List.of(image), "Event/images").get(0);
+	                EventImage img = EventImage.builder()
+	                        .filePath(fileInfo.get("filePath"))
+	                        .originalName(fileInfo.get("originalName"))
+	                        .isMain(false)
+	                        .eventInfo(origin)
+	                        .build();
+	                origin.getImageList().add(img);
+	            }
+	        }
+	    }
+
+	    // 서브 첨부파일 수정
+	    if (attachList != null && !attachList.isEmpty()) {
+	        for (EventFile ef : origin.getAttachList()) {
+	            if (ef.getFilePath() != null) fileUtil.deleteFiles(List.of(ef.getFilePath()));
+	            ef.setEventInfo(null);
+	        }
+	        origin.getAttachList().clear();
+
+	        for (MultipartFile file : attachList) {
+	            if (!file.isEmpty()) {
+	                Map<String, String> fileInfo = (Map<String, String>) fileUtil.saveFiles(List.of(file), "Event/files").get(0);
+	                EventFile ef = EventFile.builder()
+	                        .filePath(fileInfo.get("filePath"))
+	                        .originalName(fileInfo.get("originalName"))
+	                        .eventInfo(origin)
+	                        .build();
+	                origin.getAttachList().add(ef);
+	            }
+	        }
 	    }
 
 	    infoRepository.save(origin);
 	}
-	
+
 	// 행사 삭제
 	@Override
-    public void deleteEvent(Long eventNum) {
-        EventInfo eventToDelete = infoRepository.findById(eventNum)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+	public void deleteEvent(Long eventNum) {
+	    EventInfo eventToDelete = infoRepository.findById(eventNum)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
 
-        bannerRepository.findByEventInfo_EventNum(eventNum).ifPresent(banner -> {
-            String filePath = banner.getFilePath();
-            if (filePath != null) {
-                String fileName = Paths.get(filePath).getFileName().toString();
-                String parent = Paths.get(filePath).getParent().toString();
-                String thumbnailPath = parent + "/s_" + fileName;
-                fileUtil.deleteFiles(List.of(filePath, thumbnailPath));
-            }
-            bannerRepository.delete(banner);
-        });
+	    // 1. 배너 삭제
+	    bannerRepository.findByEventInfo_EventNum(eventNum).ifPresent(banner -> {
+	        String filePath = banner.getFilePath();
+	        if (filePath != null) {
+	            fileUtil.deleteFiles(List.of(filePath)); // 썸네일 포함 삭제는 fileUtil 내부에서 처리됨
+	        }
+	        bannerRepository.delete(banner);
+	    });
 
-        List<EventUse> uses = useRepository.findByEventInfo_EventNum(eventNum);
-        useRepository.deleteAll(uses);
+	    // 2. 신청자 삭제
+	    List<EventUse> uses = useRepository.findByEventInfo_EventNum(eventNum);
+	    useRepository.deleteAll(uses);
 
-        if (eventToDelete.getFilePath() != null && !eventToDelete.getFilePath().isEmpty()) {
-            try {
-                fileUtil.deleteFiles(List.of(eventToDelete.getFilePath()));
-            } catch (RuntimeException e) {
-                throw new RuntimeException("파일 삭제 중 문제가 발생했습니다. 관리자에게 문의해주세요.");
-            }
-        }
+	    // 3. 대표 이미지 삭제
+	    if (eventToDelete.getMainImagePath() != null && !eventToDelete.getMainImagePath().isEmpty()) {
+	        fileUtil.deleteFiles(List.of(eventToDelete.getMainImagePath()));
+	    }
 
-        infoRepository.delete(eventToDelete);
-    }
+	    // 4. 대표 첨부파일 삭제
+	    if (eventToDelete.getFilePath() != null && !eventToDelete.getFilePath().isEmpty()) {
+	        fileUtil.deleteFiles(List.of(eventToDelete.getFilePath()));
+	    }
+
+	    // 5. 서브 이미지들 삭제
+	    if (eventToDelete.getImageList() != null && !eventToDelete.getImageList().isEmpty()) {
+	        List<String> imagePaths = eventToDelete.getImageList().stream()
+	                .map(EventImage::getFilePath)
+	                .filter(Objects::nonNull)
+	                .toList();
+	        fileUtil.deleteFiles(imagePaths);
+	        eventToDelete.getImageList().forEach(img -> img.setEventInfo(null));
+	        eventToDelete.getImageList().clear();
+	    }
+
+	    // 6. 서브 첨부파일들 삭제
+	    if (eventToDelete.getAttachList() != null && !eventToDelete.getAttachList().isEmpty()) {
+	        List<String> filePaths = eventToDelete.getAttachList().stream()
+	                .map(EventFile::getFilePath)
+	                .filter(Objects::nonNull)
+	                .toList();
+	        fileUtil.deleteFiles(filePaths);
+	        eventToDelete.getAttachList().forEach(f -> f.setEventInfo(null));
+	        eventToDelete.getAttachList().clear();
+	    }
+
+	    // 7. 행사 정보 삭제
+	    infoRepository.delete(eventToDelete);
+	}
 	
 	// ========================================
     // 4. 행사 조회

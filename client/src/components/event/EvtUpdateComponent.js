@@ -14,6 +14,8 @@ const EvtUpdateComponent = ({ eventNum }) => {
   const [mainFile, setMainFile] = useState(null);
   const [attachFiles, setAttachFiles] = useState([]);
 
+  // 이벤트 정보 불러오기
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     getEventById(eventNum)
       .then((data) => {
@@ -23,6 +25,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
           applyEndPeriod: new Date(data.applyEndPeriod),
           eventStartPeriod: new Date(data.eventStartPeriod),
           eventEndPeriod: new Date(data.eventEndPeriod),
+          daysOfWeek: data.daysOfWeek || [],
         });
       })
       .catch((err) => {
@@ -30,7 +33,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
         alert("행사 정보를 불러오는 데 실패했습니다.");
         moveToReturn();
       });
-  }, [eventNum]);
+  }, [eventNum]); // moveToReturn intentionally excluded
 
   const handleChangeEvt = (e) => {
     const { name, value } = e.target;
@@ -43,7 +46,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length === 0) return;
+    if (!files.length) return;
 
     const previews = files.map((file) => ({
       file,
@@ -55,16 +58,17 @@ const EvtUpdateComponent = ({ eventNum }) => {
     setImageList(previews.slice(1));
   };
 
-  const deleteMainImage = () => setMainImage(null);
-  const deleteSubImage = (index) =>
-    setImageList((prev) => prev.filter((_, i) => i !== index));
-
   const handleAttachChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      setMainFile(files[0]);
-      setAttachFiles(files.slice(1));
-    }
+    if (!files.length) return;
+
+    setMainFile(files[0]);
+    setAttachFiles(files.slice(1));
+  };
+
+  const deleteMainImage = () => setMainImage(null);
+  const deleteSubImage = (index) => {
+    setImageList((prev) => prev.filter((_, i) => i !== index));
   };
 
   const formatDateTime = (date) => {
@@ -79,11 +83,9 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
   const handleUpdate = () => {
     const formData = new FormData();
-
-    if (mainImage) formData.append("file", mainImage.file);
+    if (mainImage) formData.append("mainImage", mainImage.file);
     imageList.forEach((img) => formData.append("imageList", img.file));
-
-    if (mainFile) formData.append("file", mainFile);
+    if (mainFile) formData.append("mainFile", mainFile);
     attachFiles.forEach((file) => formData.append("attachList", file));
 
     const dto = {
@@ -94,7 +96,9 @@ const EvtUpdateComponent = ({ eventNum }) => {
       eventEndPeriod: formatDateTime(evt.eventEndPeriod),
     };
 
-    const dtoBlob = new Blob([JSON.stringify(dto)], { type: "application/json" });
+    const dtoBlob = new Blob([JSON.stringify(dto)], {
+      type: "application/json",
+    });
     formData.append("dto", dtoBlob);
 
     updateEvent(eventNum, formData)
@@ -113,41 +117,30 @@ const EvtUpdateComponent = ({ eventNum }) => {
   return (
     <div className="flex mt-10 max-w-6xl mx-auto">
       <div className="space-y-6 w-2/3">
-        {/* 입력 필드들 (행사명, 소개, 장소 등) */}
-        <div className="flex items-center">
-          <label className="text-xl font-semibold w-[120px]">행사명:</label>
-          <input
-            type="text"
-            name="eventName"
-            value={evt.eventName}
-            onChange={handleChangeEvt}
-            className="border p-3 text-lg flex-1"
-          />
-        </div>
+        {[{ label: "행사명", name: "eventName" }, { label: "장소", name: "place" }].map(({ label, name }) => (
+          <div key={name} className="flex items-center">
+            <label className="text-xl font-semibold w-[120px]">{label}:</label>
+            <input
+              type="text"
+              name={name}
+              value={evt[name] || ""}
+              onChange={handleChangeEvt}
+              className="border p-3 text-lg flex-1"
+            />
+          </div>
+        ))}
 
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">소개:</label>
           <textarea
             name="eventInfo"
-            value={evt.eventInfo}
+            value={evt.eventInfo || ""}
             onChange={handleChangeEvt}
             rows={5}
             className="border p-3 text-lg flex-1 resize-y"
           />
         </div>
 
-        <div className="flex items-center">
-          <label className="text-xl font-semibold w-[120px]">장소:</label>
-          <input
-            type="text"
-            name="place"
-            value={evt.place}
-            onChange={handleChangeEvt}
-            className="border p-3 text-lg flex-1"
-          />
-        </div>
-
-        {/* 모집 대상 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">모집 대상:</label>
           <select
@@ -162,18 +155,14 @@ const EvtUpdateComponent = ({ eventNum }) => {
           </select>
         </div>
 
-        {/* 날짜 필드 */}
-        {[
-          { label: "모집 시작", name: "applyStartPeriod", value: evt.applyStartPeriod },
-          { label: "모집 종료", name: "applyEndPeriod", value: evt.applyEndPeriod },
-          { label: "행사 시작", name: "eventStartPeriod", value: evt.eventStartPeriod },
-          { label: "행사 종료", name: "eventEndPeriod", value: evt.eventEndPeriod },
-        ].map((item) => (
-          <div key={item.name} className="flex items-center">
-            <label className="text-xl font-semibold w-[120px]">{item.label}:</label>
+        {["applyStartPeriod", "applyEndPeriod", "eventStartPeriod", "eventEndPeriod"].map((name) => (
+          <div key={name} className="flex items-center">
+            <label className="text-xl font-semibold w-[120px]">
+              {name.includes("apply") ? "모집" : "행사"} {name.includes("Start") ? "시작" : "종료"}:
+            </label>
             <DatePicker
-              selected={item.value}
-              onChange={(date) => handleDateChange(item.name, date)}
+              selected={evt[name]}
+              onChange={(date) => handleDateChange(name, date)}
               showTimeSelect
               dateFormat="yyyy-MM-dd HH:mm"
               timeFormat="HH:mm"
@@ -184,7 +173,6 @@ const EvtUpdateComponent = ({ eventNum }) => {
           </div>
         ))}
 
-        {/* 요일 선택 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">요일 선택:</label>
           <div className="flex gap-2">
@@ -206,7 +194,6 @@ const EvtUpdateComponent = ({ eventNum }) => {
           </div>
         </div>
 
-        {/* 최대 인원 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">최대 인원:</label>
           <input
@@ -218,42 +205,30 @@ const EvtUpdateComponent = ({ eventNum }) => {
           />
         </div>
 
-        {/* 유의사항 */}
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">유의사항:</label>
           <textarea
             name="etc"
-            value={evt.etc}
+            value={evt.etc || ""}
             onChange={handleChangeEvt}
             rows={3}
             className="border p-3 text-lg flex-1 resize-y"
           />
         </div>
 
-        {/* 파일 업로드 */}
-        <div className="flex items-center mt-3">
-          <label className="text-xl font-semibold w-[120px]">이미지:</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="border p-2 text-base flex-1"
-          />
-        </div>
+        {[{ label: "이미지", accept: "image/*", onChange: handleImageChange }, { label: "첨부파일", accept: ".pdf,.hwp,.doc,.docx", onChange: handleAttachChange }].map(({ label, accept, onChange }) => (
+          <div key={label} className="flex items-center mt-3">
+            <label className="text-xl font-semibold w-[120px]">{label}:</label>
+            <input
+              type="file"
+              multiple
+              accept={accept}
+              onChange={onChange}
+              className="border p-2 text-base flex-1"
+            />
+          </div>
+        ))}
 
-        <div className="flex items-center mt-3">
-          <label className="text-xl font-semibold w-[120px]">첨부파일:</label>
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.hwp,.doc,.docx"
-            onChange={handleAttachChange}
-            className="border p-2 text-base flex-1"
-          />
-        </div>
-
-        {/* 버튼 */}
         <div className="mt-4 flex justify-end gap-4">
           <button
             onClick={handleUpdate}
@@ -270,45 +245,44 @@ const EvtUpdateComponent = ({ eventNum }) => {
         </div>
       </div>
 
-      {/* 우측 미리보기 영역 */}
       <div className="w-1/3 pl-10 flex flex-col gap-4">
         {mainImage && (
-          <div className="border rounded p-2 shadow">
-            <div className="flex justify-between items-center">
-              <p className="text-sm font-semibold text-blue-600">대표 이미지</p>
-              <button className="text-red-500 text-sm" onClick={deleteMainImage}>삭제</button>
-            </div>
-            <img src={mainImage.url} alt="대표이미지" className="w-32 h-32 object-cover rounded" />
-            <p className="text-sm break-words">{mainImage.name}</p>
-          </div>
+          <PreviewFile title="대표 이미지" name={mainImage.name} url={mainImage.url} onDelete={deleteMainImage} />
         )}
-
         {imageList.map((img, idx) => (
-          <div key={idx} className="border rounded p-2 shadow">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-600">이미지 {idx + 1}</p>
-              <button className="text-red-500 text-sm" onClick={() => deleteSubImage(idx)}>삭제</button>
-            </div>
-            <img src={img.url} alt={`미리보기${idx}`} className="w-32 h-32 object-cover rounded" />
-            <p className="text-sm break-words">{img.name}</p>
-          </div>
+          <PreviewFile
+            key={idx}
+            title={`이미지 ${idx + 1}`}
+            name={img.name}
+            url={img.url}
+            onDelete={() => deleteSubImage(idx)}
+          />
         ))}
-
-        {mainFile && (
-          <div className="border rounded p-2 shadow">
-            <p className="text-sm font-semibold text-blue-600">대표 첨부파일</p>
-            <p className="text-sm break-words">{mainFile.name}</p>
-          </div>
-        )}
+        {mainFile && <PreviewTextFile title="대표 첨부파일" name={mainFile.name} />}
         {attachFiles.map((file, index) => (
-          <div key={index} className="border rounded p-2 shadow">
-            <p className="text-sm text-gray-700">기타 첨부파일</p>
-            <p className="text-sm break-words">{file.name}</p>
-          </div>
+          <PreviewTextFile key={index} title="기타 첨부파일" name={file.name} />
         ))}
       </div>
     </div>
   );
 };
+
+const PreviewFile = ({ title, name, url, onDelete }) => (
+  <div className="border rounded p-2 shadow">
+    <div className="flex justify-between items-center">
+      <p className="text-sm font-semibold text-blue-600">{title}</p>
+      <button className="text-red-500 text-sm" onClick={onDelete}>삭제</button>
+    </div>
+    <img src={url} alt={title} className="w-32 h-32 object-cover rounded" />
+    <p className="text-sm break-words">{name}</p>
+  </div>
+);
+
+const PreviewTextFile = ({ title, name }) => (
+  <div className="border rounded p-2 shadow">
+    <p className="text-sm font-semibold text-blue-600">{title}</p>
+    <p className="text-sm break-words">{name}</p>
+  </div>
+);
 
 export default EvtUpdateComponent;
