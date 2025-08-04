@@ -21,10 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventBannerDTO;
+import com.EduTech.dto.event.EventFileDTO;
+import com.EduTech.dto.event.EventImageDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventBanner;
 import com.EduTech.entity.event.EventCategory;
+import com.EduTech.entity.event.EventFile;
+import com.EduTech.entity.event.EventImage;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.EventUse;
@@ -111,28 +115,112 @@ public class EventServiceImpl implements EventService {
 	
 	// 행사 등록
 	@Override
-	public void registerEvent(EventInfoDTO dto, MultipartFile file) {
-	    EventInfo info = modelMapper.map(dto, EventInfo.class);
+	public void registerEvent(EventInfoDTO dto,
+	                          MultipartFile mainImage,
+	                          List<MultipartFile> imageList,
+	                          MultipartFile mainFile,
+	                          List<MultipartFile> attachList) {
 
-	    // 누락 필드 보정
-	    info.setCurrCapacity(0); // 새 등록 이벤트는 현재 인원 0
+	    String mainImagePath = null;
+	    String mainFilePath = null;
+	    String mainFileOriginalName = null;
 
-	    // null 방지: daysOfWeek는 @ElementCollection이므로 null이면 오류 발생 가능
-	    if (info.getDaysOfWeek() == null) {
-	        info.setDaysOfWeek(new ArrayList<>());
+	    // 1. 대표 이미지 저장
+	    if (mainImage != null && !mainImage.isEmpty()) {
+	        System.out.println(">>> 대표 이미지 업로드 시작");
+	        List<Object> results = fileUtil.saveFiles(List.of(mainImage), "Event/mainImage");
+	        System.out.println(">>> 대표 이미지 업로드 결과: " + results);
+	        if (!results.isEmpty()) {
+	            @SuppressWarnings("unchecked")
+	            Map<String, String> result = (Map<String, String>) results.get(0);
+	            mainImagePath = result.get("filePath");
+	        }
+	    } else {
+	        System.out.println(">>> 대표 이미지 없음 (null 또는 비어있음)");
 	    }
-	    
-	    // 작성시간
-	    info.setApplyAt(LocalDateTime.now());
 
-	    // 상태 계산
-	    info.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
+	    // 2. 대표 첨부파일 저장
+	    if (mainFile != null && !mainFile.isEmpty()) {
+	        System.out.println(">>> 대표 첨부파일 업로드 시작");
+	        List<Object> results = fileUtil.saveFiles(List.of(mainFile), "Event/mainFile");
+	        System.out.println(">>> 대표 첨부파일 업로드 결과: " + results);
+	        if (!results.isEmpty()) {
+	            @SuppressWarnings("unchecked")
+	            Map<String, String> result = (Map<String, String>) results.get(0);
+	            mainFilePath = result.get("filePath");
+	            mainFileOriginalName = result.get("originalName");
+	        }
+	    } else {
+	        System.out.println(">>> 대표 첨부파일 없음 (null 또는 비어있음)");
+	    }
 
-	    // 파일 처리
-	    setFileInfo(info, file);
+	    // 3. DTO → Entity 변환 및 필드 세팅
+	    EventInfo event = modelMapper.map(dto, EventInfo.class);
+	    event.setCurrCapacity(0);
+	    event.setApplyAt(LocalDateTime.now());
+	    event.setState(calculateState(dto.getApplyStartPeriod(), dto.getApplyEndPeriod()));
+	    event.setMainImagePath(mainImagePath);
+	    event.setFilePath(mainFilePath);
+	    event.setOriginalName(mainFileOriginalName);
 
-	    // 저장
-	    infoRepository.save(info);
+	    // 4. 대표 이미지 → EventImage에 isMain(true)로 저장
+	    if (mainImagePath != null) {
+	        EventImage mainImgEntity = EventImage.builder()
+	                .filePath(mainImagePath)
+	                .originalName(mainImage.getOriginalFilename())
+	                .isMain(true)
+	                .eventInfo(event)
+	                .build();
+	        event.getImageList().add(mainImgEntity);
+	    }
+
+	    // 5. 서브 이미지 저장 (isMain = false)
+	    if (imageList != null) {
+	        for (MultipartFile file : imageList) {
+	            if (!file.isEmpty()) {
+	                @SuppressWarnings("unchecked")
+	                Map<String, String> result = (Map<String, String>) fileUtil.saveFiles(List.of(file), "Event/images").get(0);
+
+	                EventImage image = EventImage.builder()
+	                        .filePath(result.get("filePath"))
+	                        .originalName(result.get("originalName"))
+	                        .isMain(false)
+	                        .eventInfo(event)
+	                        .build();
+	                event.getImageList().add(image);
+	            }
+	        }
+	    }
+
+	    // 6. 첨부파일 저장
+	    if (attachList != null) {
+	        for (MultipartFile file : attachList) {
+	            if (!file.isEmpty()) {
+	                @SuppressWarnings("unchecked")
+	                Map<String, String> result = (Map<String, String>) fileUtil.saveFiles(List.of(file), "Event/files").get(0);
+
+	                EventFile ef = EventFile.builder()
+	                        .filePath(result.get("filePath"))
+	                        .originalName(result.get("originalName"))
+	                        .eventInfo(event)
+	                        .build();
+	                event.getAttachList().add(ef);
+	            }
+	        }
+	    }
+
+	    // 7. 저장 전 확인 로그
+	    System.out.println("== 저장 전 정보 출력 ==");
+	    System.out.println("mainImagePath: " + mainImagePath);
+	    System.out.println("mainFilePath: " + mainFilePath);
+	    System.out.println("mainFileOriginalName: " + mainFileOriginalName);
+
+	    System.out.println("event.getMainImagePath(): " + event.getMainImagePath());
+	    System.out.println("event.getFilePath(): " + event.getFilePath());
+	    System.out.println("event.getOriginalName(): " + event.getOriginalName());
+
+	    // 8. 저장
+	    infoRepository.save(event);
 	}
 
 	@Override
@@ -212,15 +300,35 @@ public class EventServiceImpl implements EventService {
 	        .collect(Collectors.toList());
 	}
 	
-	@Override
 	public List<EventInfoDTO> getAllEventsWithoutFilter() {
-	    return infoRepository.findAll().stream()
-	            .map(info -> modelMapper.map(info, EventInfoDTO.class))
+	    List<EventInfo> list = infoRepository.findAll();
+	    return list.stream()
+	            .map(info -> {
+	                EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
+
+	                // ✅ 대표 이미지 경로는 info.getMainImagePath()에서 직접 가져오기
+	                dto.setMainImagePath(info.getMainImagePath());
+
+	                // ✅ 대표 첨부파일도 별도로 처리
+	                dto.setFilePath(info.getFilePath());
+	                dto.setOriginalName(info.getOriginalName());
+
+	                return dto;
+	            })
 	            .collect(Collectors.toList());
 	}
+
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	// 프로그램 상세 조회
-	@Override
+/*	@Override
 	public EventInfoDTO getEvent(Long eventNum) {
 		EventInfo info = infoRepository.findById(eventNum)
 					.orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
@@ -231,6 +339,49 @@ public class EventServiceImpl implements EventService {
 		//dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
 		return dto;
 	}	
+*/	
+	
+	@Override
+	public EventInfoDTO getEvent(Long eventNum) {
+	    EventInfo event = infoRepository.findById(eventNum)
+	            .orElseThrow(() -> new RuntimeException("해당 이벤트를 찾을 수 없습니다."));
+
+	    // 1. 기본 매핑
+	    EventInfoDTO dto = modelMapper.map(event, EventInfoDTO.class);
+
+	    // 2. 수동 세팅 (중요 필드 누락 방지)
+	    dto.setMainImagePath(event.getMainImagePath());       // 대표 이미지 경로
+	    dto.setFilePath(event.getFilePath());                 // 대표 첨부파일 경로
+	    dto.setOriginalName(event.getOriginalName());         // 대표 첨부파일 원본 이름
+
+	    // 3. 이미지 리스트 변환
+	    List<EventImageDTO> imageDTOs = event.getImageList().stream()
+	            .map(img -> EventImageDTO.builder()
+	                    .id(img.getId())
+	                    .filePath(img.getFilePath())
+	                    .originalName(img.getOriginalName())
+	                    .build())
+	            .toList();
+	    dto.setImageList(imageDTOs);
+
+	    // 4. 첨부파일 리스트 변환
+	    List<EventFileDTO> fileDTOs = event.getAttachList().stream()
+	            .map(f -> EventFileDTO.builder()
+	                    .id(f.getId())
+	                    .filePath(f.getFilePath())
+	                    .originalName(f.getOriginalName())
+	                    .build())
+	            .toList();
+	    dto.setAttachList(fileDTOs);
+
+	    return dto;
+	}
+	
+	
+	
+	
+	
+	
 	
 	@Override
     public EventInfo getEventEntity(Long eventNum) {

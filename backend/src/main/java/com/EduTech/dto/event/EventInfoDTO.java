@@ -1,6 +1,7 @@
 package com.EduTech.dto.event;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.EduTech.entity.event.EventCategory;
@@ -68,6 +69,12 @@ public class EventInfoDTO {
     // 대표 이미지 또는 첨부파일
     private String originalName;
     private String filePath;
+    
+    private String mainImagePath;
+    
+    private List<EventImageDTO> imageList = new ArrayList<>();
+    
+    private List<EventFileDTO> attachList = new ArrayList<>();
 
     // 요일 목록
     private List<Integer> daysOfWeek;

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,8 +35,10 @@ import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventUseDTO;
+import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
+import com.EduTech.repository.event.EventFileRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.service.event.EventService;
 import com.EduTech.util.FileUtil;
@@ -140,24 +141,41 @@ import lombok.RequiredArgsConstructor;
 			public ResponseEntity<EventInfoDTO> getEvent(@RequestParam("eventNum") Long eventNum) {
 			    return ResponseEntity.ok(eventService.getEvent(eventNum));
 			}
+			
+			@RestController
+			@RequestMapping("/event")
+			@RequiredArgsConstructor
+			public class EventFileController {
+
+			    private final EventFileRepository eventFileRepository;
+			    private final FileUtil fileUtil;
+
+			    @GetMapping("/download/{fileId}")
+			    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
+			        EventFile file = eventFileRepository.findById(fileId)
+			                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
+
+			        return fileUtil.getFile(file.getFilePath(), null); // 썸네일 아님
+			    }
+			}
 	
 			// 5. 행사 등록(파일 업로드 포함)
 			@PostMapping("/register")
-			@PreAuthorize("hasRole('ADMIN')") // 관리자만 등록 가능
+			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<?> registerEvent(
-					@Valid @RequestPart("dto") EventInfoDTO dto,
-					@RequestPart(value = "file", required = false) MultipartFile file,
-					BindingResult bindingResult) {
-
-			    // 유효성 오류가 존재하면 400 응답 반환
+			    @Valid @RequestPart("dto") EventInfoDTO dto,
+			    @RequestPart(value = "mainImage", required = false) MultipartFile mainImage,
+			    @RequestPart(value = "imageList", required = false) List<MultipartFile> imageList,
+			    @RequestPart(value = "mainFile", required = false) MultipartFile mainFile,
+			    @RequestPart(value = "attachList", required = false) List<MultipartFile> attachList,
+			    BindingResult bindingResult
+			) {
 			    if (bindingResult.hasErrors()) {
-			        log.warn("❌ 유효성 검사 실패: {}", bindingResult.getAllErrors());
 			        return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
 			    }
 
-			    // 등록 처리
-			    eventService.registerEvent(dto, file);
-			    return ResponseEntity.ok("✅ 행사 등록이 완료되었습니다.");
+			    eventService.registerEvent(dto, mainImage, imageList, mainFile, attachList);
+			    return ResponseEntity.ok("행사 등록 완료");
 			}
 	
 			// 6. 수정(파일 업데이트 포함)
