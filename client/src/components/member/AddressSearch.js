@@ -10,7 +10,10 @@ const AddressSearch = ({ onAddressSelected }) => {
 
     return (
         <div>
-            <button className="border border-black px-1 bg-gray-300 active:bg-gray-400" onClick={openPostcode}>
+            <button
+                onClick={openPostcode}
+                className="float-left px-2 py-2 bg-gray-200 rounded-md hover:bg-gray-300 active:bg-gray-400 text-sm font-medium border border-gray-400"
+            >
                 주소 찾기
             </button>
         </div>

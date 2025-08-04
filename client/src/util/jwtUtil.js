@@ -34,7 +34,6 @@ const beforeRes = async (res) => {
         // 원래 요청을 한 번 더 보냄
         res.config.headers.Authorization = `Bearer ${result.accessToken}`;
         return await axios(res.config);
-        // return await jwtAxios(res.config);
     }
     return res;
 };

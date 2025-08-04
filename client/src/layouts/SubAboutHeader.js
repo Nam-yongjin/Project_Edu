@@ -1,23 +1,22 @@
 import { Link, useLocation } from "react-router-dom";
+import about from "../assets/about.png";
 
 const SubAboutHeader = () => {
     const location = useLocation();
 
     return (
-         <div className="bg-blue-100 w-full pt-16 pb-16"> 
+         <div className="bg-blue-100 w-full pt-8 pb-8"> 
             <div className="max-w-screen-xl mx-auto ">
                 <div className="flex items-center justify-between">
                     <div className="text-4xl font-bold text-gray-800">
                         소프트랩 소개
                     </div>
-                    {/* 이미지 영역 */}
-                    <div className="w-1/3">
-                        {/* 이미지 대체 영역 */}
+                    <div className="w-1/4">
+                        <img src={about} className="w-[240px]"/>
                     </div>
                 </div>
                 
-                {/* 서브 메뉴 영역 */}
-                <div className="mt-8 border-b-2 border-blue-500">
+                <div className="border-b-2 border-blue-500 pb-4">
                     <ul className="flex">
                         <li className="mr-6 pb-2">
                             <Link 
