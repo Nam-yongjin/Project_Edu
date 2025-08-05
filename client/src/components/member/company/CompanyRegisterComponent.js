@@ -159,7 +159,7 @@ const CompanyRegisterComponent = () => {
                 {/* 아이디 */}
                 <div>
                     <div className="flex items-center gap-2">
-                        <label className="w-32 text-left font-medium">아이디</label>
+                        <label className="w-32 text-left font-medium">아이디<span className='text-red-600'> *</span></label>
                         <input
                             name="memId"
                             placeholder="아이디"
@@ -181,7 +181,7 @@ const CompanyRegisterComponent = () => {
                 {/* 비밀번호 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">비밀번호</label>
+                        <label className="w-32 text-left font-medium">비밀번호<span className='text-red-600'> *</span></label>
                         <input
                             name="pw"
                             type="password"
@@ -197,7 +197,7 @@ const CompanyRegisterComponent = () => {
                 {/* 비밀번호 확인 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">비밀번호 확인</label>
+                        <label className="w-32 text-left font-medium">비밀번호 확인<span className='text-red-600'> *</span></label>
                         <input
                             name="pwCheck"
                             type="password"
@@ -213,7 +213,7 @@ const CompanyRegisterComponent = () => {
                 {/* 이름 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">이름</label>
+                        <label className="w-32 text-left font-medium">이름<span className='text-red-600'> *</span></label>
                         <input
                             name="name"
                             placeholder="이름"
@@ -228,7 +228,7 @@ const CompanyRegisterComponent = () => {
                 {/* 휴대폰 인증 */}
                 <div>
                     <div className="flex items-start">
-                        <div className="w-32 text-left font-medium pt-4">휴대폰</div>
+                        <div className="w-32 text-left font-medium pt-4">휴대폰<span className='text-red-600'> *</span></div>
                         <PhoneVerification onVerified={setVerifiedPhone} />
                     </div>
                     {errors.phone && <div className="text-red-500 text-sm text-left ml-32">{errors.phone}</div>}
@@ -237,7 +237,7 @@ const CompanyRegisterComponent = () => {
                 {/* 이메일 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">이메일</label>
+                        <label className="w-32 text-left font-medium">이메일<span className='text-red-600'> *</span></label>
                         <input
                             name="email"
                             type="email"
@@ -253,7 +253,7 @@ const CompanyRegisterComponent = () => {
                 {/* 생년월일 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">생년월일</label>
+                        <label className="w-32 text-left font-medium">생년월일<span className='text-red-600'> *</span></label>
                         <input
                             name="birthDate"
                             type="date"
@@ -268,7 +268,7 @@ const CompanyRegisterComponent = () => {
                 {/* 성별 */}
                 <div>
                     <div className="flex items-center">
-                        <div className="w-32 text-left font-medium">성별</div>
+                        <div className="w-32 text-left font-medium">성별<span className='text-red-600'> *</span></div>
                         <div className="flex gap-6">
                             <label className="inline-flex items-center gap-1">
                                 <input
@@ -331,7 +331,7 @@ const CompanyRegisterComponent = () => {
                 {/* 기업명 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">기업명</label>
+                        <label className="w-32 text-left font-medium">기업명<span className='text-red-600'> *</span></label>
                         <input
                             name="companyName"
                             placeholder="기업명"
@@ -345,7 +345,7 @@ const CompanyRegisterComponent = () => {
                 {/* 직급 */}
                 <div>
                     <div className="flex items-center">
-                        <label className="w-32 text-left font-medium">직급</label>
+                        <label className="w-32 text-left font-medium">직급<span className='text-red-600'> *</span></label>
                         <input
                             name="position"
                             placeholder="직급"
@@ -358,7 +358,7 @@ const CompanyRegisterComponent = () => {
 
                 {/* 수신 동의 체크박스 */}
                 <div className="flex items-center">
-                    <label className="w-32 text-left font-medium">SMS 수신</label>
+                    <label className="w-32 text-left font-medium">SMS 수신<span className='text-red-600'> *</span></label>
                     <input
                         name="checkSms"
                         type="checkbox"
@@ -370,7 +370,7 @@ const CompanyRegisterComponent = () => {
                 {errors.checkSms && <div className="text-red-500 text-sm text-left ml-32">{errors.checkSms}</div>}
 
                 <div className="flex items-center">
-                    <label className="w-32 text-left font-medium">이메일 수신</label>
+                    <label className="w-32 text-left font-medium">이메일 수신<span className='text-red-600'> *</span></label>
                     <input
                         name="checkEmail"
                         type="checkbox"
