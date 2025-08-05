@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useMove from '../../../hooks/useMove';
-import { readCompany, leaveMember, modifyCompany } from '../../../api/memberApi';
+import { readCompany, leaveMember, modifyCompany, checkEmail, checkPhone } from '../../../api/memberApi';
 import useLogin from '../../../hooks/useLogin';
 import PhoneVerification from '../PhoneVerification';
 import AddressSearch from '../AddressSearch';
@@ -30,10 +30,15 @@ const CompanyInfoModifyComponent = () => {
     const [verifiedPhone, setVerifiedPhone] = useState(null);
     const [modifying, setModifying] = useState(false);
     const [errors, setErrors] = useState({});
+    const [originalEmail, setOriginalEmail] = useState('');
+    const [originalPhone, setOriginalPhone] = useState('');
 
     const fetchCompanyInfo = async () => {
         try {
             const data = await readCompany();
+
+            setOriginalEmail(data.email);
+            setOriginalPhone(data.phone);
 
             // gender 값 변환 처리
             const translatedGender = data.gender === "MALE"
@@ -113,31 +118,60 @@ const CompanyInfoModifyComponent = () => {
         return errs;
     };
 
-    const handleClickModify = (e) => {
+    const handleClickModify = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
         setErrors(validationErrors);
 
-        if (Object.keys(validationErrors).length > 0) {
-            return;
-        };
+        if (Object.keys(validationErrors).length > 0) return;
 
-        // dataToSubmit: CompanyModifyDTO
+        if (form.email !== originalEmail) {
+            let isDuplicated = false;
+            try {
+                isDuplicated = await checkEmail({ email: form.email });
+            } catch (error) {
+                alert("이메일 중복 확인 중 오류가 발생했습니다.");
+                return;
+            }
+
+            if (isDuplicated) {
+                alert('이미 등록 된 이메일입니다.');
+                return;
+            }
+        }
+
+        if (form.phone !== originalPhone) {
+            let isDuplicated = false;
+            try {
+                isDuplicated = await checkPhone({ phone: form.phone });
+            } catch (error) {
+                alert("휴대본번호 중복 확인 중 오류가 발생했습니다.");
+                return;
+            }
+
+            if (isDuplicated) {
+                alert('이미 등록 된 휴대폰번호입니다.');
+                return;
+            }
+        }
+
         const { memId, pwCheck, birthDate, gender, role, ...dataToSubmit } = {
             ...form,
             phone: verifiedPhone
         };
 
-        modifyCompany(dataToSubmit).then((response) => {
-            alert("회원정보가 수정되었습니다.");
-            setForm({ ...initState });
-            setVerifiedPhone(null);
-            setModifying(false);
-            setErrors({});
-            moveToPath('/');
-        }).catch((error) => {
-            alert("회원정보 수정실패");
-        });
+        modifyCompany(dataToSubmit)
+            .then(() => {
+                alert("회원정보가 수정되었습니다.");
+                setForm({ ...initState });
+                setVerifiedPhone(null);
+                setModifying(false);
+                setErrors({});
+                moveToPath('/');
+            })
+            .catch((error) => {
+                alert("회원정보 수정 실패");
+            });
     };
 
     const handleModifyCancle = (e) => {

@@ -161,6 +161,20 @@ public class MemberServiceImpl implements MemberService {
 		return memberRepository.existsById(memId);
 	}
 
+	// 이메일 중복 체크
+	@Override
+	@Transactional
+	public boolean checkEmail(String email) {
+		return memberRepository.existsByEmail(email);
+	}
+	
+	// 휴대폰번호 중복 체크
+	@Override
+	@Transactional
+	public boolean checkPhone(String phone) {
+		return memberRepository.existsByPhone(phone);
+	}
+
 	// 일반회원정보 가져오기
 	@Override
 	@Transactional(readOnly = true)
@@ -386,7 +400,7 @@ public class MemberServiceImpl implements MemberService {
 	public String findId(String phone) {
 		return memberRepository.findMemIdByPhone(phone);
 	}
-	
+
 	// 아이디와 휴대폰번호 일치 확인
 	@Override
 	@Transactional
@@ -547,22 +561,19 @@ public class MemberServiceImpl implements MemberService {
 
 		LocalDate birthDate = null;
 		if (birthYear != null && birth != null) {
-		    // 숫자가 아닌 모든 문자 제거
-		    String mmdd = birth.replaceAll("\\D", "");  // "\\D" == [^0-9]
-		    String yyyymmdd = birthYear.trim() + mmdd;
+			// 숫자가 아닌 모든 문자 제거
+			String mmdd = birth.replaceAll("\\D", ""); // "\\D" == [^0-9]
+			String yyyymmdd = birthYear.trim() + mmdd;
 
-		    try {
-		        birthDate = LocalDate.parse(
-		            yyyymmdd,
-		            DateTimeFormatter.ofPattern("yyyyMMdd")
-		        );
-		    } catch (DateTimeParseException e) {
-		        birthDate = null;
-		    }
+			try {
+				birthDate = LocalDate.parse(yyyymmdd, DateTimeFormatter.ofPattern("yyyyMMdd"));
+			} catch (DateTimeParseException e) {
+				birthDate = null;
+			}
 		} else {
 			birthDate = null;
 		}
-		
+
 		MemberGender gender = genderStr != null && genderStr.equalsIgnoreCase("male") ? MemberGender.MALE
 				: MemberGender.FEMALE;
 

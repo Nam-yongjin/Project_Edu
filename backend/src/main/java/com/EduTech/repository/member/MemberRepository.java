@@ -22,6 +22,12 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 	// 아이디 중복 체크
 	boolean existsById(String memId);
 
+	// 이메일 중복 체크
+	boolean existsByEmail(String Email);
+	
+	// 휴대폰 번호 중복 체크
+	boolean existsByPhone(String phone);
+
 	// 학생회원정보 조회
 	@Query("SELECT s FROM Student s WHERE s.memId = :memId")
 	Optional<Student> findStudentById(@Param("memId") String memId);
