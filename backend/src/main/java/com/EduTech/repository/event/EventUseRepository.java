@@ -11,22 +11,22 @@ import org.springframework.data.repository.query.Param;
 import com.EduTech.entity.event.EventUse;
 import com.EduTech.entity.member.Member;
 
-public interface EventUseRepository extends JpaRepository<EventUse, Long>{
+public interface EventUseRepository extends JpaRepository<EventUse, Long> {
 
-	boolean existsByEventInfo_EventNumAndMember_MemId(Long eventNum, String memId);	// 신청 여부 확인
-	
+	boolean existsByEventInfo_EventNumAndMember_MemId(Long eventNum, String memId); // 신청 여부 확인
+
 	long countByEventInfo_EventNum(Long eventNum); // 신청자수 확인
 
-	@Query("SELECT COUNT(p) FROM EventUse p WHERE p.eventInfo.eventNum = :eventNum")	// 신청자 수 카운트
+	@Query("SELECT COUNT(p) FROM EventUse p WHERE p.eventInfo.eventNum = :eventNum") // 신청자 수 카운트
 	int countByEventInfo(@Param("eventNum") Long eventNum);
 
-	List<EventUse> findByMember_MemId(String memId);	// 회원별 신청목록 조회(리스트 형태)
+	List<EventUse> findByMember_MemId(String memId); // 회원별 신청목록 조회(리스트 형태)
 
-	Page<EventUse> findByMember_MemId(String memId, Pageable pageable);	// 회원별 신청목록 조회(페이지 형태)
+	Page<EventUse> findByMember_MemId(String memId, Pageable pageable); // 회원별 신청목록 조회(페이지 형태)
 
-	List<EventUse> findByEventInfo_EventNum(Long eventNum);	// 신청한 프로그램의 모든정보 조회
+	List<EventUse> findByEventInfo_EventNum(Long eventNum); // 신청한 프로그램의 모든정보 조회
 
-	Page<EventUse> findByMember(Member member, Pageable pageable);	// Member기준으로 예약내역 조회
+	Page<EventUse> findByMember(Member member, Pageable pageable); // Member기준으로 예약내역 조회
 
 	// member 함께 로딩해서 DTO 변환시 NPE(널포인터예외) 방지
 	@Query("SELECT pu FROM EventUse pu JOIN FETCH pu.member WHERE pu.eventInfo.eventNum = :eventNum")
@@ -39,5 +39,9 @@ public interface EventUseRepository extends JpaRepository<EventUse, Long>{
 
 	// 특정 회원 프로그램 신청 내역을 모두 조회(필요시 사용하면 됨, 현재는 필요 없음)
 	List<EventUse> findAllByMember_MemId(String memId);
-	
+
+	// 회원 탈퇴할때, 행사 신청 완료 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
+	@Query("SELECT COUNT(e) > 0 FROM EventUse e WHERE e.member.memId = :memId AND e.revState = 'APPROVED'")
+	boolean existsApprovedReservationByMemId(@Param("memId") String memId);
+
 }
