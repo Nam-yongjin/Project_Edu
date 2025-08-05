@@ -215,7 +215,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 	@Override
-	public void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO) {
+	public void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO,String memId) {
 		// 선택한 실증 상품의 예약된 상태를 불러오기 위해 사용한 dto
 		DemonstrationTimeReqDTO demonstrationTimeReqDTO = new DemonstrationTimeReqDTO();
 		demonstrationTimeReqDTO.setDemNum(demonstrationReservationDTO.getDemNum());
@@ -223,12 +223,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
 		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
 
+		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		if (ResState == null || ResState.isEmpty()) {
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
 					.startDate(demonstrationReservationDTO.getStartDate())
 					.endDate(demonstrationReservationDTO.getEndDate()).state(DemonstrationState.WAIT)
 					.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
-					.member(Member.builder().memId(demonstrationReservationDTO.getMemId()).build()).build();
+					.member(member).build();
 			demonstrationReserveRepository.save(demonstrationReserve);
 
 			// 실증 신청 시 예약된 날짜도 추가되야 하므로
@@ -275,14 +276,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@Override
-	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO) {
+	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO,String memId) {
 		// 기존 예약 취소
 		DemonstrationReservationCancelDTO demonstrationReservationcancelDTO = new DemonstrationReservationCancelDTO();
 		demonstrationReservationcancelDTO.setMemId(demonstrationReservationDTO.getMemId());
 		demonstrationReservationcancelDTO.setDemNum(demonstrationReservationDTO.getDemNum());
 		demonstrationReservationCancel(demonstrationReservationcancelDTO);
 		// 새로운 예약 추가
-		demonstrationReservation(demonstrationReservationDTO);
+		demonstrationReservation(demonstrationReservationDTO,memId);
 	}
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
