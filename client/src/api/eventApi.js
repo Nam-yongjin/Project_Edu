@@ -43,6 +43,21 @@ export const getList = async (current) => {
   return res.data;
 };
 
+// 행사 검색
+export const getSearchList = async ({ page, searchType, keyword, state, category, sortOrder }) => {
+  const res = await axios.get(`${event}/search`, {
+    params: {
+      page,
+      searchType,
+      keyword,
+      state,
+      category,       // ✅ 이게 반드시 포함돼야 함
+      sortOrder       // ✅ 정렬도 포함
+    }
+  });
+  return res.data;
+};
+
 // 행사 신청 요청
 export const applyEvent = async (dto) => {
   const res = await jwtAxios.post(`${event}/apply`, dto);
