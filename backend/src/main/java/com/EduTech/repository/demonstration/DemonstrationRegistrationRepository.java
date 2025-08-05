@@ -49,8 +49,8 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
     ); 
 	
 	// 나중에 회원 탈퇴할때, 실증 등록 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
-	@Query("SELECT state FROM DemonstrationRegistration WHERE member.memId=:memId")
-	DemonstrationState findByState(@Param("memId") String memId);
+	@Query("SELECT COUNT(d) > 0 FROM DemonstrationRegistration d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
+	boolean existsAcceptedRegistrationByMemId(@Param("memId") String memId);
 }
 
 
