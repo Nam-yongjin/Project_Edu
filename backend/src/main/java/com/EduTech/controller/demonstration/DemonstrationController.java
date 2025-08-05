@@ -63,13 +63,14 @@ public class DemonstrationController {
 	}
 
 	// 신청한 물품 대여 조회
-	// memId는 나중에 서버 인증 토큰으로 꺼내 처리할것(보안 이슈)
 	@GetMapping("/demRental")
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(
 			@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam("pageCount") Integer pageCount, @RequestParam("memId") String memId) {
+			@RequestParam(value="type",required=false,defaultValue="") String type,
+			@RequestParam("pageCount") Integer pageCount) {
+		String memId = JWTFilter.getMemId();
 		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService
-				.getAllDemRental(memId, search, pageCount);
+				.getAllDemRental(memId, search,type, pageCount);
 		return AllDemRental;
 	}
 
@@ -169,5 +170,14 @@ public class DemonstrationController {
 		return dto;
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
 	}
+	
+	// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
+		@GetMapping("/demReserveCheck")
+		public Boolean ReserveCheck(@RequestParam("demNum")  Long demNum) {
+			String memId = JWTFilter.getMemId();
+			Boolean bool=demonstrationService.checkRes(demNum,memId);
+			return bool;
+			// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
+		}
 
 }

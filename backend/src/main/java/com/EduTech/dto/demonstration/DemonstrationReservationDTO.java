@@ -13,5 +13,6 @@ public class DemonstrationReservationDTO { // 실증 상품 상세 페이지에�
 	private LocalDate endDate; // 끝 날짜
 	private String memId; // 신청자 아이디
 	private LocalDate applyAt; // 신청 일자
+	private Long itemNum; // 수량
 	private DemonstrationState demonstrationstate; // 신청 상태
 }

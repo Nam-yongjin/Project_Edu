@@ -60,7 +60,7 @@ const UpdateComponent = ({ demNum }) => {
 
     const handleFileChange = (e) => { // 파일 선택이 됬을 경우, 
         const files = Array.from(e.target.files); // 현재 파일을 files에 담고
-         if (files.length > 8) { // 한 번에 선택한 이미지가 9개 이상일 때
+        if (files.length > 8) { // 한 번에 선택한 이미지가 9개 이상일 때
             alert("이미지는 최대 8개까지만 업로드할 수 있습니다.");
             e.target.value = ""; // 선택 초기화 (필요시)
             return;
@@ -167,7 +167,7 @@ const UpdateComponent = ({ demNum }) => {
     return (
 
         <div className="flex mt-10 max-w-6xl mx-auto">
-            <div className="space-y-6 w-2/3">
+            <div className="space-y-6 w-full">
                 <div className="flex items-center">
                     <label className="text-xl font-semibold w-[120px]">물품명:</label>
                     <input
@@ -239,11 +239,46 @@ const UpdateComponent = ({ demNum }) => {
                             type="file"
                             multiple
                             accept="image/*"
-                            onChange={(e) => handleFileChange(e)}
-                            className="border p-2 text-base flex-1 cursor-pointer min-w-0 box-border"
+                            onChange={handleFileChange}
+                            className="border p-2 text-base w-full cursor-pointer box-border"
                         />
-                        {errors.images && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.images}</p>}
                     </div>
+                    {errors.images && <p className="text-red-600 text-sm ml-[120px]">{errors.images}</p>}
+
+                    {images.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 ml-[120px]">
+                            {images.map((img, index) => (
+                                <div key={img.url} className="flex flex-col items-start border rounded p-2 shadow">
+                                    <div className="flex justify-between w-full items-center mb-1">
+                                        <label className="text-xs font-medium">대표 이미지</label>
+                                        <input
+                                            type="checkbox"
+                                            checked={Boolean(img.isMain)}
+                                            onChange={() => handleCheckboxChange(index)}
+                                            className="w-4 h-4"
+                                        />
+                                    </div>
+                                    <img
+                                        src={img.url}
+                                        alt="preview"
+                                        className="w-full h-32 object-cover rounded"
+                                    />
+                                    <p className="text-sm mt-1 break-words">{img.name}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileDelete(img)}
+                                        className="text-red-600 text-xs mt-1 self-end hover:text-red-800"
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {errors.images && (
+                        <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.images}</p>
+                    )}
 
                     <div className="mt-4 flex justify-end gap-4 pr-2">
                         <button
@@ -260,27 +295,6 @@ const UpdateComponent = ({ demNum }) => {
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <div className="w-1/3 pl-10 flex flex-col gap-4 items-start">
-                {images.map((img, index) => 
-                
-                (
-                    <div key={img.url} className="flex flex-col items-start">
-                        <h6>대표 이미지설정</h6>
-                        <input
-                            type="checkbox"
-                            checked={Boolean(img.isMain)}
-                            onChange={() => handleCheckboxChange(index)}
-                            className="w-3 h-3"></input>
-                        <button className="w-full text-right" onClick={() => fileDelete(img)}>x</button>
-                        <img
-                            src={img.url}
-                            className="w-32 h-32 object-cover rounded-md border shadow mb-1"
-                        />
-                        <p className="text-sm text-gray-600 break-all">{img.name}</p>
-                    </div>
-                ))}
             </div>
         </div>
     );

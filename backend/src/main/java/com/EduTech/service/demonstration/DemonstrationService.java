@@ -23,7 +23,7 @@ public interface DemonstrationService {
 	
 		PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search,Integer pageCount); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search,Integer pageCount); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
-		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search, Integer pageCount); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search,String type, Integer pageCount); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
 		DemonstrationDetailDTO getDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지
 		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태인지 확인 가능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
@@ -35,5 +35,5 @@ public interface DemonstrationService {
 		void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO,List<MultipartFile> imageList,String memId); // 실증 상품 수정하는 기능
 		void deleteDemonstration(Long demNum); // 실증 번호를 받아 실증 상품을 삭제하는 기능
 		DemonstrationFormResDTO selectOne(Long demNum); // 실증 번호를 받아 실증 상품 하나의 정보를 받아오는 기능
-		
+		Boolean checkRes(Long demNum,String memId);// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
 }

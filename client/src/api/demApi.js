@@ -64,11 +64,42 @@ export const getResDate = async (startDate, endDate, demNum) => {
 }
 
 // 상세 페이지에서 날짜 선택 후, 예약하기 위한 요청
-export const postRes = async (startDate, endDate, demNum) => {
-  const res = await jwtAxios.post(`${demonstration}/ReservationRes`, {
+export const postRes = async (startDate, endDate, demNum,itemNum) => {
+ const res = await jwtAxios.post(`${demonstration}/ReservationRes`, {
         startDate: startDate,
         endDate: endDate,
-        demNum: demNum
+        demNum: demNum,
+        itemNum:itemNum
+    });
+    return res.data;
+}
+
+// 상세 페이지에서 예약 신청 클릭 시, 백에서 컨트롤러에서 아이디 확인해, 이미 해당 물품에 예약을 한 상태일경우 예약 못하게함
+export const getReserveCheck =async (demNum) => {
+ const res = await jwtAxios.get(`${demonstration}/demReserveCheck`, {
+        params: {demNum:demNum }
+    });
+    return res.data;
+}
+
+
+// 물품 대여 현황 페이지에서 여러가지 정보를 가져오기 위한 요청
+export const getRental =async (pageCount) => {
+ const res = await jwtAxios.get(`${demonstration}/demRental`, {
+     params: {  pageCount:pageCount}
+    });
+    return res.data;
+}
+// get요청은 param, requestParma
+// post요청은 json형태로 responsebody
+// 물품 대여 현황 페이지에서 여러가지 정보를 가져오기 위한 요청 (검색어 포함해서)
+export const getRentalSearch=async (search,type,pageCount) => {
+ const res = await jwtAxios.get(`${demonstration}/demRental`, {
+    params: {
+    search:search,
+    type:type,   
+    pageCount:pageCount,
+    }
     });
     return res.data;
 }

@@ -4,7 +4,7 @@ import BasicLayout from "../../layouts/BasicLayout"
 const DemonstrationPage = () => {
     return (
         <div>
-            <BasicLayout>
+            <BasicLayout isFullWidth={true}>
                 <Outlet/>
             </BasicLayout>
         </div>
