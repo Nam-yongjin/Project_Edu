@@ -63,8 +63,8 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 	DemonstrationState findByState(@Param("memId") String memId);
 	
 	// 물품 예약 신청할때 해당 회원이 동일한 상품에 예약을 할 경우, 막기 위해 만든 쿼리문
-	@Query("SELECT COUNT(r) > 0 FROM DemonstrationReserve r WHERE r.member.memId = :memId AND r.demonstration.demNum = :demNum")
-	Optional<Boolean> checkRes(@Param("demNum") Long demNum, @Param("memId") String memId);
+	@Query("SELECT COUNT(d) > 0 FROM DemonstrationReserve d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
+	boolean existsAcceptedReserveByMemId(@Param("memId") String memId);
 
 	
 }
