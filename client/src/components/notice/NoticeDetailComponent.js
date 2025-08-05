@@ -43,10 +43,11 @@ const NoticeDetailComponent = () => {
         console.log("noticeNum:", noticeNum);
         fetchNoticeDetail();
     }, [noticeNum]);
+
     //목록
     const handleList = (e) => {
         e.preventDefault();
-        moveToPath("/notice/list");
+        moveToPath("/notice");
     };
     //수정
     const handleUpdate = (e) => {
@@ -58,7 +59,7 @@ const NoticeDetailComponent = () => {
             try {
                 await axios.delete(`/api/notice/${noticeNum}`);
                 alert("삭제되었습니다.");
-                navigate("/notice/list");
+                navigate("/notice");
             } catch (err) {
                 console.error("삭제 실패", err);
                 alert("삭제 중 오류가 발생했습니다.");
@@ -73,29 +74,32 @@ const NoticeDetailComponent = () => {
         return date.toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: '2-digit'
         });
     };
     //로딩중
     if (loading) {
         return (
-            <div>
-                <div>
-                    <div></div>
-                    <span>로딩 중...</span>
+            <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span className="ml-2 text-gray-600">로딩 중...</span>
                 </div>
             </div>
         );
     }
     //에러 발생
-    if (error) {
+   if (error) {
         return (
-            <div>
-                <div>
-                    <p>{error}</p>
-                    <button onClick={handleList}>목록으로 돌아가기</button>
+            <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
+                <div className="text-center py-12">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <button 
+                        onClick={handleList}
+                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                    >
+                        목록으로 돌아가기
+                    </button>
                 </div>
             </div>
         );
@@ -103,51 +107,107 @@ const NoticeDetailComponent = () => {
     //데이터 없을 때
     if (!notice) {
         return (
-            <div>
-                <div>
-                    <p>공지사항을 찾을 수 없습니다.</p>
-                    <button onClick={handleList}>목록으로 돌아가기</button>
+            <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
+                <div className="text-center py-12">
+                    <p className="text-gray-600 mb-4">공지사항을 찾을 수 없습니다.</p>
+                    <button
+                        onClick={handleList}
+                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                    >
+                        목록으로 돌아가기
+                    </button>
                 </div>
             </div>
         );
     }
+    //이미지 파일과 일반 파일 분리
+    const imageFiles = notice.files?.filter(file => 
+        file.originalName?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/i)
+    ) || [];
+    
+    const attachmentFiles = notice.files?.filter(file => 
+        !file.originalName?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/i)
+    ) || [];
 
     return (
-        <div>
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
             {/* 공지사항 상세 페이지 */}
-            <div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 {/* 제목 */}
-                <div>
-                    <h2>{notice.title || '제목없음'}</h2>
-                    {notice.isPinned && (
-                        <span>공지</span>
-                    )}
-                </div>
-                {/* 정보 */}
-                <div>
-                    <div>
-                        <div>
-                            <span>작성자:</span>
-                            <span>{notice.name || '-'}</span>
+                <div className="px-6 py-8 border-b border-gray-200">
+                    <div className="flex items-center gap-3 mb-2">
+                        {notice.isPinned && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs fint-medium bg-red-100 text-red-800">
+                                공지
+                            </span>
+                        )}
+                        <h1 className="text-2xl font-bold text-gray-900">{notice.title || '제목없음'}</h1>
+                    </div>
+
+                    {/* 정보 */}
+                    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mt-4">
+                        <div className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strockLinecap="round" strockLinejoin="round" strockWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
+                            </svg>
+                            <span>작성자: {notice.name || '-'}</span>
                         </div>
-                        <div>
-                            <span>작성일:</span>
-                            <span>{formatDate(notice.crestedAt)}</span>
+                        <div className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4M3 7h18l-1 10a2 2 0 01-2 2H6a2 2 0 01-2-2L3 7z" />
+                            </svg>
+                            <span>작성일: {formatDate(notice.createdAt)}</span>
                         </div>
-                        <div>
-                            <span>조회수:</span>
-                            <span>{notice.viewCount || 0}</span>
+                        <div className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>조회수: {notice.viewCount || 0}</span>
                         </div>
                     </div>
                 </div>
+
+                {/* 내용 */}
+                <div className="px-6 py-6">
+                    <div className="prose max-w-none text-gray-800 leanding-relaxed whitespace-pre-wrap">
+                        {notice.content || '내용이 없습니다.'}
+                    </div>
+
+                {/* 이미지 표시 */}
+                {imageFiles.length > 0 && (
+                    <div className="mt-8">
+                        <div className="grid gap-4">
+                            {imageFiles.map((file, index) => (
+                                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                                    <img
+                                        src={`http://localhost:8090/api/notice/view/${file.savedName}`}
+                                        alt={file.originalName}
+                                        className="w-full h-auto max-w-full"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'block';
+                                        }}
+                                    />
+                                    <div
+                                        className="hidden p-4 text-center text-gray-500 bg-gray-50"
+                                    >
+                                        이미지를 불러올 수 없습니다: {file.originalName}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                </div>  
                 {/* 첨부파일 */}
-                {notice.files && notice.files.length > 0 && (
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                {attachmentFiles.length > 0 && (
+                    <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                         <div className="flex items-start">
                             <span className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">첨부파일:</span>
                             <div className="flex-1">
-                                {notice.files.map((file, index) => (
-                                    <div key={index} className="flex items-center mb-1">
+                                {attachmentFiles.map((file, index) => (
+                                    <div key={index} className="flex items-center mb-2 last:mb-0">
                                         <svg className="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                         </svg>
@@ -166,43 +226,36 @@ const NoticeDetailComponent = () => {
                         </div>
                     </div>
                 )}
-                {/* 내용 */}
-                <div>
-                    <div>
-                        <div>
-                            {notice.content || '내용이 없습니다.'}
-                        </div>
-                    </div>
-                </div>
-                {/* 버튼 */}
-                <div className="mt-6 flex justify-between">
-                    <button 
-                        onClick={handleList}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                    >
-                        목록
-                    </button>
                 
-                    <div className="flex gap-2">
+                {/* 버튼 */}
+                <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <div className="flex justify-between">
                         <button 
-                            onClick={handleUpdate}
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            onClick={handleList}
+                            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
                         >
-                            수정하기
+                            목록
                         </button>
-                        <button 
-                            onClick={handleDelete}
-                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                        >
-                            삭제하기
-                        </button>
-                    </div>
-                </div>                
+                
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={handleUpdate}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            >
+                                수정하기
+                            </button>
+                            <button 
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                            >
+                                삭제하기
+                            </button>
+                        </div>
+                    </div>                
+                </div>
             </div>
-            
         </div>
     )
-
 
 }
 
