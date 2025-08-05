@@ -40,7 +40,7 @@ public class EventInfoDTO {
     private String etc;
 
     @Builder.Default
-    private RevState revState = RevState.APPROVED;
+    private RevState revState = RevState.WAITTING;
 
     @NotNull(message = "신청 시작일은 필수입니다.")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
