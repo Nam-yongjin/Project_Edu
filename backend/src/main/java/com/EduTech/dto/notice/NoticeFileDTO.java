@@ -26,5 +26,7 @@ public class NoticeFileDTO { //파일저장
 	private String fileType; //파일종류
 	
 	private String downloadUrl; //사용자가 파일을 다운로드 할 때 사용(노출 가능)
+	
+	private String savedName; //저장된 파일명 (이미지 표시용)
 		
 }

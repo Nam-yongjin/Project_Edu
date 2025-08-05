@@ -3,10 +3,11 @@ import NoticeListComponent from "../../components/notice/NoticeListComponent";
 
 const NoticeListPage = () => {
     return (
-        <div className="w-full">
-            <NoticeTitleComponent title="공지사항" />
-            <NoticeListComponent />
-        </div>
+            // 반응형
+            <div> 
+                <NoticeTitleComponent title="공지사항" />
+                <NoticeListComponent />
+            </div>
     );
 };
 
