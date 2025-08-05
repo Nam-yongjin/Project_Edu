@@ -51,6 +51,8 @@ import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
+import com.EduTech.repository.event.EventUseRepository;
+import com.EduTech.repository.facility.FacilityReserveRepository;
 import com.EduTech.repository.member.CompanyRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.StudentRepository;
@@ -71,8 +73,8 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	private final DemonstrationReserveRepository demonstrationReserveRespository;
-	private
-	
+	private final EventUseRepository eventUseRepository;
+	private final FacilityReserveRepository facilityReserveRepository;
 
 	@Value("${naver.client-id}")
 	private String NAVER_CLIENT_ID;
@@ -346,9 +348,11 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void leaveMember(String memId) {
 		Member member = memberRepository.findById(memId).orElseThrow();
-		DemonstrationState demonstrationStateReg = demonstrationRegistrationRepository.findByState(memId);
-		DemonstrationState demonstrationStateRes = demonstrationReserveRespository.findByState(memId);
-
+		boolean demonstrationStateReg = demonstrationRegistrationRepository.existsAcceptedRegistrationByMemId(memId);
+		boolean demonstrationStateRes = demonstrationReserveRespository.existsAcceptedReserveByMemId(memId);
+		boolean eventUsing = eventUseRepository.existsApprovedReservationByMemId(memId);
+		boolean facilityRes = facilityReserveRepository.existsApprovedReservationByMemId(memId);
+		
 		// 관리자 계정은 탈퇴불가
 		if (member.getRole().equals("ADMIN")) {
 			throw new IllegalStateException("관리자는 탈퇴할 수 없습니다.");
@@ -364,13 +368,21 @@ public class MemberServiceImpl implements MemberService {
 			throw new IllegalStateException("이미 탈퇴 처리중 입니다.");
 		}
 
-		if (demonstrationStateReg != null && demonstrationStateReg.equals(DemonstrationState.ACCEPT)) {
+		if (demonstrationStateReg) {
 			throw new IllegalStateException("실증 등록 중인 회원은 탈퇴할 수 없습니다.");
 		}
 
-		if (demonstrationStateRes != null && demonstrationStateRes.equals(DemonstrationState.ACCEPT)) {
+		if (demonstrationStateRes) {
 			throw new IllegalStateException("실증 신청 중인 회원은 탈퇴할 수 없습니다.");
 		}
+		
+		if (eventUsing) {
+			throw new IllegalStateException("행사 신청 완료한 회원은 탈퇴할 수 없습니다.");
+		}	
+		
+		if (facilityRes) {
+			throw new IllegalStateException("공간 예약 완료한 회원은 탈퇴할 수 없습니다.");
+		}	
 
 		member.setState(MemberState.LEAVE);
 		memberRepository.save(member);
