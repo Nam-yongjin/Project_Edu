@@ -51,8 +51,8 @@ export const getSearchList = async ({ page, searchType, keyword, state, category
       searchType,
       keyword,
       state,
-      category,       // ✅ 이게 반드시 포함돼야 함
-      sortOrder       // ✅ 정렬도 포함
+      category,
+      sortOrder
     }
   });
   return res.data;

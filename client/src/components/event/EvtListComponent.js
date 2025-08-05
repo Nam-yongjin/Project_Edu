@@ -7,19 +7,19 @@ const EventListComponent = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // ✅ 검색/필터 조건 상태
+  // 검색/필터 조건 상태
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("eventName");
   const [state, setState] = useState("");
   const [category, setCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("DESC");
 
-  const [searchTrigger, setSearchTrigger] = useState(false); // ✅ 검색 버튼 클릭 시 트리거
+  const [searchTrigger, setSearchTrigger] = useState(false); // 검색 버튼 클릭 시 트리거
 
   const navigate = useNavigate();
   const host = "http://localhost:8090/view";
 
-  // ✅ 검색 API 호출 (keyword는 제외)
+  // 검색 API 호출 (keyword는 제외)
   useEffect(() => {
     getSearchList({ page, searchType, keyword, state, category, sortOrder }).then((data) => {
       setEvents(data.content);
@@ -50,7 +50,7 @@ const EventListComponent = () => {
     navigate(`/event/detail/${eventNum}`);
   };
 
-  // ✅ 검색 버튼 클릭 시에만 keyword 검색
+  // 검색 버튼 클릭 시에만 keyword 검색
   const handleSearch = () => {
     setPage(1);
     setSearchTrigger((prev) => !prev); // useEffect 트리거
@@ -63,7 +63,7 @@ const EventListComponent = () => {
 
   return (
     <div className="max-w-6xl mx-auto mt-10">
-      {/* ✅ 카테고리 필터 */}
+      {/* 카테고리 필터 */}
       <div className="flex gap-2 mb-6 justify-center">
         {[
           { label: "전체", value: "" },
@@ -84,7 +84,7 @@ const EventListComponent = () => {
         ))}
       </div>
 
-      {/* ✅ 검색 필터 + 정렬 */}
+      {/* 검색 필터 + 정렬 */}
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
         <select className="border p-2 rounded" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
           <option value="eventName">행사명</option>
@@ -100,7 +100,7 @@ const EventListComponent = () => {
           onChange={(e) => setKeyword(e.target.value)}
         />
 
-        {/* ✅ 신청 상태 드롭다운 (신청취소 제외) */}
+        {/* 신청 상태 드롭다운 (신청취소 제외) */}
         <select
           className="border p-2 rounded"
           value={state}
@@ -132,7 +132,7 @@ const EventListComponent = () => {
         </button>
       </div>
 
-      {/* ✅ 행사 카드 목록 */}
+      {/* 행사 카드 목록 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {events.map((event) => {
           const status = getApplyStatus(event);
@@ -176,7 +176,7 @@ const EventListComponent = () => {
         })}
       </div>
 
-      {/* ✅ 페이지네이션 */}
+      {/* 페이지네이션 */}
       <div className="mt-6 flex justify-center gap-2 text-blue-600 font-semibold">
         {blockStart > 1 && <button onClick={() => setPage(blockStart - 1)}>{"<"}</button>}
 

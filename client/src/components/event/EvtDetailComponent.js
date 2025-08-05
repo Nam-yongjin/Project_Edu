@@ -76,15 +76,15 @@ function EvtDetailComponent({ eventNum }) {
   };
 
   const getApplyButtonText = () => {
-    if (isCanceled) return "신청 취소됨";        // ✅ 가장 우선
-    if (alreadyApplied) return "신청 완료";      // ✅ 그 다음
+    if (isCanceled) return "신청 취소됨";
+    if (alreadyApplied) return "신청 완료";
     if (!isApplyPeriod()) return "신청 기간 아님";
     if (isFull()) return "모집 마감";
     return "신청하기";
   };
 
   const getApplyButtonStyle = () => {
-    if (isCanceled) return "bg-gray-300 text-gray-500 cursor-not-allowed";   // ✅ 먼저 검사
+    if (isCanceled) return "bg-gray-300 text-gray-500 cursor-not-allowed";
     if (alreadyApplied) return "bg-green-400 text-white cursor-not-allowed";
     if (!isApplyPeriod() || isFull())
       return "bg-gray-300 text-gray-500 cursor-not-allowed";
