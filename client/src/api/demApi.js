@@ -41,7 +41,7 @@ export const delDem = async (demNum) => {
 
 // 실증 상품 리스트 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
 export const getList = async (current) => {
-    const res = await jwtAxios.get(`${demonstration}/demList`, {
+    const res = await axios.get(`${demonstration}/demList`, {
         params : {pageCount: current}
     });
     return res.data;
@@ -49,7 +49,7 @@ export const getList = async (current) => {
 
 // 실증 상품 상세 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
 export const getDetail = async (demNum) => {
-    const res = await jwtAxios.get(`${demonstration}/demDetail`, {
+    const res = await axios.get(`${demonstration}/demDetail`, {
         params : {demNum: demNum}
     });
     return res.data;
@@ -57,8 +57,18 @@ export const getDetail = async (demNum) => {
 
 // 현재 달의 시작일 / 마지막날 / 상품 정보를 받아가 현재 달의 예약된 날짜를 가져오기 위한 요청
 export const getResDate = async (startDate, endDate, demNum) => {
-    const res = await jwtAxios.get(`${demonstration}/demResCon`, {
+    const res = await axios.get(`${demonstration}/demResCon`, {
         params: { startDate, endDate, demNum }
+    });
+    return res.data;
+}
+
+// 상세 페이지에서 날짜 선택 후, 예약하기 위한 요청
+export const postRes = async (startDate, endDate, demNum) => {
+  const res = await jwtAxios.post(`${demonstration}/ReservationRes`, {
+        startDate: startDate,
+        endDate: endDate,
+        demNum: demNum
     });
     return res.data;
 }
