@@ -7,8 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
@@ -65,6 +67,30 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 					AND (:eventInfo IS NULL OR p.eventInfo LIKE %:eventInfo%)
 			""")
 	Page<EventInfo> searchEvent(@Param("eventName") String eventName, @Param("eventInfo") String eventInfo, Pageable pageable);
+	
+	// 신청 후 신청인원 증가 코드
+	@Modifying
+	@Transactional // 이 메서드 단독 실행 시 트랜잭션 보장
+	@Query("UPDATE EventInfo e SET e.currCapacity = e.currCapacity + 1 WHERE e.eventNum = :eventNum")
+	void increaseCurrCapacity(@Param("eventNum") Long eventNum);
+	
+	// 상태를 OPEN으로 변경
+	@Modifying
+	@Transactional
+	@Query("UPDATE EventInfo e SET e.state = 'OPEN' WHERE CURRENT_TIMESTAMP BETWEEN e.applyStartPeriod AND e.applyEndPeriod AND e.state <> 'CANCEL'")
+	int updateStateToOpen();
+
+	// 상태를 BEFORE로 변경
+	@Modifying
+	@Transactional
+	@Query("UPDATE EventInfo e SET e.state = 'BEFORE' WHERE CURRENT_TIMESTAMP < e.applyStartPeriod AND e.state <> 'CANCEL'")
+	int updateStateToBefore();
+
+	// 상태를 CLOSED로 변경
+	@Modifying
+	@Transactional
+	@Query("UPDATE EventInfo e SET e.state = 'CLOSED' WHERE CURRENT_TIMESTAMP > e.applyEndPeriod AND e.state <> 'CANCEL'")
+	int updateStateToClosed();
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
 	List<EventInfo> findByEventEndPeriodGreaterThanEqual(LocalDateTime localDateTime, Sort sort); 

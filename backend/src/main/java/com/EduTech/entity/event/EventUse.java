@@ -35,8 +35,8 @@ public class EventUse {
 	@Column(nullable = false)
 	private LocalDateTime applyAt; // 프로그램 신청일
 	
-	@Enumerated(EnumType.STRING) //상태
-	@Column(name = "rev_state", nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(name = "rev_state", nullable = false, length = 20)
 	private RevState revState;
 
 	// FK 프로그램 정보 id

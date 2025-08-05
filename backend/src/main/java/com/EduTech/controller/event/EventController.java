@@ -4,7 +4,9 @@
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -221,14 +223,15 @@ import lombok.RequiredArgsConstructor;
 			// 7. 삭제
 			@DeleteMapping("/delete")
 			@PreAuthorize("hasRole('ADMIN')")
-			public ResponseEntity<Void> deleteEvent(@RequestParam("eventNum") Long eventNum) {
+			public ResponseEntity<String> deleteEvent(@RequestParam("eventNum") Long eventNum) {
 			    try {
-			        log.info("삭제 요청: eventNum={}", eventNum);
-			        eventService.deleteEvent(eventNum);
-			        return ResponseEntity.noContent().build();
+			        log.info("행사 취소 요청: eventNum={}", eventNum);
+			        eventService.deleteEvent(eventNum);  // 내부는 상태 변경
+			        return ResponseEntity.ok("행사가 정상적으로 취소되었습니다.");
 			    } catch (Exception e) {
-			        log.error("삭제 실패: {}", e.getMessage(), e);
-			        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			        log.error("행사 취소 실패: {}", e.getMessage(), e);
+			        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			                             .body("행사 취소 중 오류가 발생했습니다.");
 			    }
 			}
 	
@@ -248,15 +251,25 @@ import lombok.RequiredArgsConstructor;
 			// 사용자용 API
 			// 1. 행사 신청
 			@PostMapping("/apply")
-			public ResponseEntity<String> applyEvent(@RequestBody EventApplyRequestDTO dto) {
-				eventService.applyEvent(dto);
-				return ResponseEntity.ok("신청이 완료되었습니다.");
+			public ResponseEntity<Map<String, String>> applyEvent(@RequestBody EventApplyRequestDTO dto) {
+			    Map<String, String> response = new HashMap<>();
+			    try {
+			        eventService.applyEvent(dto);
+			        response.put("message", "신청이 완료되었습니다.");
+			        return ResponseEntity.ok(response);
+			    } catch (IllegalStateException | IllegalArgumentException e) {
+			        response.put("message", e.getMessage());
+			        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+			    }
 			}
 	
 			// 2. 신청 여부 확인(중복 신청 방지용)
 			@GetMapping("/applied")
-			public ResponseEntity<Boolean> isAlreadyApplied(@RequestParam Long eventNum, @RequestParam String memId) {
-				return ResponseEntity.ok(eventService.isAlreadyApplied(eventNum, memId));
+			public ResponseEntity<Boolean> isAlreadyApplied(
+			    @RequestParam(name = "eventNum") Long eventNum,
+			    @RequestParam(name = "memId") String memId
+			) {
+			    return ResponseEntity.ok(eventService.isAlreadyApplied(eventNum, memId));
 			}
 	
 			// 3. 신청 가능 여부 확인(신청 마감 확인용)

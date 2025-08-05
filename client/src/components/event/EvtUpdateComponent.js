@@ -37,7 +37,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
   fetchEvent();
 
-  // ❗ moveToReturn을 의존성에서 제외
+  // moveToReturn을 의존성에서 제외
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [eventNum]);
 

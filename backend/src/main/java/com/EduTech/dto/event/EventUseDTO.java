@@ -29,7 +29,7 @@ public class EventUseDTO {
 	private Integer currCapacity;			// 현재인원
 	
 	@Builder.Default
-	private RevState revState = RevState.WAITING;	// 상태(대기, 수락, 거절)
+	private RevState revState = RevState.APPROVED;	// 상태(대기, 수락, 거절)
 	
 	private Long eventNum;	// 행사 아이디
 	private String memId;	// 회원 아이디

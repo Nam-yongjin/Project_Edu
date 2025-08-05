@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getEventById, deleteEvent } from "../../api/eventApi";
+import { getEventById, deleteEvent, applyEvent } from "../../api/eventApi";
 
 const HOST = "http://localhost:8090/view";
 const API_HOST = "http://localhost:8090/api";
 
-const EvtDetailComponent = ({ eventNum }) => {
+function EvtDetailComponent({ eventNum }) {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+
   const navigate = useNavigate();
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+  const memId = useSelector((state) => state.loginState?.memId);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -23,14 +26,122 @@ const EvtDetailComponent = ({ eventNum }) => {
         setLoading(false);
       }
     };
+
+    const checkIfApplied = async () => {
+      if (!memId) return;
+
+      try {
+        const res = await fetch(`${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`응답 오류: ${text}`);
+        }
+        const isApplied = await res.json();
+        setAlreadyApplied(isApplied);
+      } catch (err) {
+        console.error("신청 여부 확인 실패:", err);
+      }
+    };
+
     fetchEvent();
-  }, [eventNum]);
+    checkIfApplied();
+  }, [eventNum, memId]);
 
-  const formatDate = (dateStr) =>
-    dateStr ? new Date(dateStr).toISOString().split("T")[0] : "없음";
+  const formatDate = (dateStr) => {
+    return dateStr ? new Date(dateStr).toISOString().split("T")[0] : "없음";
+  };
 
-  const getFullUrl = (path) =>
-    path?.startsWith("http") ? path : `${HOST}/${path}`;
+  const getFullUrl = (path) => {
+    return path?.startsWith("http") ? path : `${HOST}/${path}`;
+  };
+
+  const isCanceled = event?.state === "CANCEL";
+
+  const isApplyPeriod = () => {
+    const now = new Date();
+    return (
+      event?.applyStartPeriod &&
+      event?.applyEndPeriod &&
+      now >= new Date(event.applyStartPeriod) &&
+      now <= new Date(event.applyEndPeriod)
+    );
+  };
+
+  const isFull = () => {
+    return (
+      event?.currCapacity != null &&
+      event?.maxCapacity != null &&
+      event.currCapacity >= event.maxCapacity
+    );
+  };
+
+  const getApplyButtonText = () => {
+    if (isCanceled) return "신청 취소됨";        // ✅ 가장 우선
+    if (alreadyApplied) return "신청 완료";      // ✅ 그 다음
+    if (!isApplyPeriod()) return "신청 기간 아님";
+    if (isFull()) return "모집 마감";
+    return "신청하기";
+  };
+
+  const getApplyButtonStyle = () => {
+    if (isCanceled) return "bg-gray-300 text-gray-500 cursor-not-allowed";   // ✅ 먼저 검사
+    if (alreadyApplied) return "bg-green-400 text-white cursor-not-allowed";
+    if (!isApplyPeriod() || isFull())
+      return "bg-gray-300 text-gray-500 cursor-not-allowed";
+    return "bg-blue-500 text-white hover:bg-blue-600";
+  };
+
+  const handleApply = async () => {
+    if (!memId) {
+      alert("로그인한 사용자만 신청할 수 있습니다.");
+      return;
+    }
+
+    try {
+      await applyEvent({ eventNum: event.eventNum, memId });
+      setAlreadyApplied(true);
+      alert("신청이 완료되었습니다.");
+      navigate("/event/list");
+    } catch (err) {
+      const message = err.response?.data?.message || err.message;
+      alert(`신청 실패: ${message}`);
+      window.location.reload();
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!window.confirm("정말 이 행사를 취소하시겠습니까?")) return;
+
+    if ((event.currCapacity ?? 0) > 0) {
+      const confirmCancel = window.confirm(
+        `이미 ${event.currCapacity}명이 신청했습니다.\n그래도 취소하시겠습니까?`
+      );
+      if (!confirmCancel) return;
+    }
+
+    try {
+      await deleteEvent(event.eventNum);
+      alert("행사가 취소되었습니다.");
+      navigate("/event/list");
+    } catch (err) {
+      alert("행사 취소 실패: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const renderDownloadLink = (label, url, name, key) => {
+    return (
+      <a
+        key={key}
+        href={url}
+        download
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block text-sm text-blue-600 hover:underline"
+      >
+        {name || label}
+      </a>
+    );
+  };
 
   const categoryLabel = {
     TEACHER: "교사",
@@ -38,37 +149,12 @@ const EvtDetailComponent = ({ eventNum }) => {
     USER: "일반인",
   }[event?.category] || "미지정";
 
-  const handleDelete = async () => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    try {
-      await deleteEvent(event.eventNum);
-      alert("삭제가 완료되었습니다.");
-      navigate("/event/list");
-    } catch (err) {
-      alert("삭제 실패: " + (err.response?.data?.message || err.message));
-    }
-  };
-
-  const renderDownloadLink = (label, url, name) => (
-    <a
-      href={url}
-      download
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block text-sm text-blue-600 hover:underline"
-    >
-      {name || label}
-    </a>
-  );
-
   if (loading) return <div className="text-center p-10">로딩 중...</div>;
   if (!event) return <div className="text-center p-10">행사 정보를 불러올 수 없습니다.</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow mt-8 space-y-10">
-      {/* 상단 - 대표 이미지 + 행사 정보 */}
       <div className="flex flex-col md:flex-row gap-8">
-        {/* 대표 이미지 */}
         <div className="md:w-1/2 flex items-center justify-center">
           {event.mainImagePath ? (
             <img
@@ -83,7 +169,6 @@ const EvtDetailComponent = ({ eventNum }) => {
           )}
         </div>
 
-        {/* 행사 정보 */}
         <div className="md:w-1/2 space-y-4">
           <div className="text-sm inline-block border border-blue-400 text-blue-600 px-3 py-1 rounded-full">
             {categoryLabel}
@@ -100,10 +185,13 @@ const EvtDetailComponent = ({ eventNum }) => {
             <p><strong>기타 유의사항:</strong> {event.etc || "없음"}</p>
           </div>
 
-          {/* 버튼 */}
           <div className="pt-6 space-y-4">
-            <button className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 font-semibold">
-              신청하기
+            <button
+              className={`w-full py-3 rounded font-semibold transition ${getApplyButtonStyle()}`}
+              disabled={alreadyApplied || isCanceled || !isApplyPeriod() || isFull()}
+              onClick={handleApply}
+            >
+              {getApplyButtonText()}
             </button>
 
             {isAdmin && (
@@ -114,19 +202,27 @@ const EvtDetailComponent = ({ eventNum }) => {
                 >
                   수정
                 </button>
-                <button
-                  className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
-                  onClick={handleDelete}
-                >
-                  삭제
-                </button>
+                {isCanceled ? (
+                  <button
+                    className="flex-1 bg-gray-400 text-white py-2 rounded cursor-not-allowed"
+                    disabled
+                  >
+                    취소 완료
+                  </button>
+                ) : (
+                  <button
+                    className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+                    onClick={handleCancel}
+                  >
+                    행사 취소
+                  </button>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* 첨부파일 및 이미지 다운로드 */}
       {(event.filePath || event.mainImagePath || event.attachList?.length > 0 || event.imageList?.length > 0) && (
         <div className="w-full">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">📎 첨부파일 목록</h3>
@@ -147,14 +243,16 @@ const EvtDetailComponent = ({ eventNum }) => {
               renderDownloadLink(
                 "첨부파일",
                 `${API_HOST}/event/download/file/${file.id}`,
-                file.originalName
+                file.originalName,
+                file.id
               )
             )}
             {event.imageList?.map((img) =>
               renderDownloadLink(
                 "이미지",
                 `${API_HOST}/event/download/image/${img.id}`,
-                img.originalName
+                img.originalName,
+                img.id
               )
             )}
           </div>
@@ -162,6 +260,6 @@ const EvtDetailComponent = ({ eventNum }) => {
       )}
     </div>
   );
-};
+}
 
 export default EvtDetailComponent;
