@@ -4,7 +4,7 @@ import BasicLayout from "../../layouts/BasicLayout"
 const NoticePage = () => {
     return (
         <div>
-            <BasicLayout>
+             <BasicLayout isFullWidth={true}>
                 <Outlet/>
             </BasicLayout>
         </div>

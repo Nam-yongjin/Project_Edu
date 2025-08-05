@@ -1,7 +1,9 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
-
-
+import { Navigate } from "react-router-dom";
+//파일명 소문자/대문자로 바꿨을 때 오류나면
+//파일명을 우회해서 바꿔줘야 함
+//noticRouter -> tempRouter -> noticeRouter
 const NoticeList = lazy(() => import("../pages/notice/NoticeListPage"))
 const AddNotice = lazy(() => import("../pages/notice/AddNoticePage"))
 const UpdateNotice = lazy(() => import("../pages/notice/UpdateNoticePage"))
@@ -11,8 +13,13 @@ const noticeRouter = () => {
 
     return [
         {
-             path:"list",
+             path:"",
             element: <Suspense fallback={<Loading />}><NoticeList /></Suspense>,
+        },
+        {
+            // 자동 리다이렉션
+            path: "",
+            element: <Navigate replace to="notice" />
         },
         {
             path: "add",

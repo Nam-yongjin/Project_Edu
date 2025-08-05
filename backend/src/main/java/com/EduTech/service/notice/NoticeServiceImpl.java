@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -190,9 +192,14 @@ public class NoticeServiceImpl implements NoticeService {
     }
     // 관리자 권한 체크
     private void validateAdminRole(Member member) {
-        if (!"ADMIN".equals(member.getRole())) {
-            throw new AccessDeniedException("관리자 권한이 필요합니다.");
-        }
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	System.out.println("권한 목록: " + authentication.getAuthorities());
+    	System.out.println("인증된 사용자: " + authentication.getName());
+    	System.out.println("현재 로그인한 사용자 권한: " + member.getRole());
+    	
+    	if (!"ADMIN".equals(member.getRole())) {
+    	    throw new AccessDeniedException("관리자 권한이 필요합니다.");
+    	}
     }
     // 유효한 파일이 있는지 체크
     private boolean hasValidFiles(List<MultipartFile> files) {
@@ -203,7 +210,7 @@ public class NoticeServiceImpl implements NoticeService {
     private List<NoticeFile> processFiles(List<MultipartFile> files, Notice notice) {
         String dirName = "notice-files";
         List<Object> fileDataList = fileUtil.saveFiles(files, dirName);
-        //noticeFile 리스트 생성
+        
         return fileDataList.stream()
                 .map(obj -> (Map<String, String>) obj)
                 .filter(this::isAllowedFileType)
@@ -312,7 +319,14 @@ public class NoticeServiceImpl implements NoticeService {
         fileDTO.setFilePath(noticeFile.getFilePath());
         fileDTO.setFileType(noticeFile.getFileType());
         fileDTO.setDownloadUrl("/api/notices/files/" + noticeFile.getNotFileNum() + "/download");
+        fileDTO.setSavedName(extractSavedNameFromPath(noticeFile.getFilePath())); //이미지 표시용(원본 파일)
+//        fileDTO.setSavedName("s_" + extractSavedNameFromPath(noticeFile.getFilePath())); //(썸네일)
         
         return fileDTO;
+    }
+    //파일 경로에서 저장된 파일명 추출
+    private String extractSavedNameFromPath(String filePath) {
+        if (filePath == null) return null;
+        return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 }

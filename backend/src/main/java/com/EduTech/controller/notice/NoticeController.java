@@ -49,14 +49,14 @@ public class NoticeController {
 	// 공지사항 전체 조회(검색, 페이징)
 	@GetMapping("/NoticeList")
     public ResponseEntity<Page<NoticeListDTO>> getNoticeList(@ModelAttribute NoticeSearchDTO searchDTO) {
-		System.out.println("공지사항 전체 조회");
+		System.out.println("공지사항 전체 조회!!");
         return ResponseEntity.ok(noticeService.getNoticeList(searchDTO));
     }
 
     // 공지사항 상세 조회(조회수 증가)
 	@GetMapping("/NoticeDetail/{noticeNum}")
 	public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable("noticeNum") Long noticeNum) {
-    	System.out.println("공지사항 상세 조회");
+    	System.out.println("공지사항 상세 조회!!");
         noticeService.increaseViewCount(noticeNum);
         return ResponseEntity.ok(noticeService.getNoticeDetail(noticeNum));
     }
@@ -73,8 +73,9 @@ public class NoticeController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/AddNotice")
     public ResponseEntity<String> createNotice(
-            @RequestPart("dto") NoticeCreateRegisterDTO dto,
+            @RequestPart("dto") NoticeCreateRegisterDTO dto, //프론트에서 dto를 JSON 문자열로 변환해서 FormData에 넣어줘야 함
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    	System.out.println("공지사항 등록!!");
         
         // DTO에 파일 설정
         if (files != null) {
@@ -92,7 +93,7 @@ public class NoticeController {
             @PathVariable Long noticeNum,
             @RequestPart("dto") NoticeUpdateRegisterDTO dto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        
+    	System.out.println("공지사항 수정!!");
         // DTO에 새 파일들 설정
         if (files != null) {
             dto.setNewFiles(files);
@@ -106,6 +107,7 @@ public class NoticeController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/DeleteNotice/{noticeNum}")
     public ResponseEntity<String> deleteNotice(@PathVariable Long noticeNum) {
+    	System.out.println("공지사항 삭제(단일)!!");
         noticeService.deleteNotice(noticeNum);
         return ResponseEntity.ok("공지사항이 삭제되었습니다.");
     }
@@ -114,6 +116,7 @@ public class NoticeController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/DeleteNotices")
     public ResponseEntity<String> deleteNotices(@RequestBody List<Long> noticeNums) {
+    	System.out.println("공지사항 삭제(일괄)!!");
         noticeService.deleteNotices(noticeNums);
         return ResponseEntity.ok("공지사항이 일괄 삭제되었습니다.");
     }
@@ -121,6 +124,7 @@ public class NoticeController {
     // 파일 다운로드
     @GetMapping("/files/{fileId}/download")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
+    	System.out.println("공지사항 파일 다운로드!!");
         try {
             // NoticeFileRepository를 통해 파일 정보 조회
             NoticeFile noticeFile = noticeFileRepository.findById(fileId)
@@ -142,5 +146,22 @@ public class NoticeController {
             throw new RuntimeException("파일 다운로드 중 오류가 발생했습니다.", e);
         }
     }
+    
+    //이미지 보기
+    @GetMapping("/view/{fileName}")
+    public ResponseEntity<Resource> viewFile(@PathVariable String fileName) {
+    	System.out.println("공지사항 이미지 보기!!");
+    	try {
+    		//noticeFiles에서 파일 찾기
+    		String filePath = "notice-files/" + fileName;
+    		return fileUtil.getFile(filePath, "thumbnail");
+    		
+    	} catch (Exception e) {
+    		//파일을 찾을 수 없으면 기본 이미지 반환
+    		return fileUtil.getFile("default.png", null);
+    	}
+    }
+    
+    
     
 }

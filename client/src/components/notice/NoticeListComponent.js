@@ -163,7 +163,7 @@ const NoticeListComponent = () => {
   const allNotices = [...pinnedNotices, ...normalNotices];
 
   return (
-    <div>
+    <div className="w-full px-4 mt-10 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">공지사항</h1>
         <p className="text-gray-600 mt-1">
@@ -186,11 +186,11 @@ const NoticeListComponent = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   {loginState.role === 'ADMIN' && ( //관리자만 선택 가능
-                    <th className="px-4 py-3 text-left">
+                    <th className="w-12 px-2 py-3 text-center align-middle">
                       <input
                         type="checkbox"
                         checked={selectedNotices.length === notices.length && notices.length > 0}
@@ -199,11 +199,11 @@ const NoticeListComponent = () => {
                       />
                     </th>
                   )}
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-900 w-20">번호</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">제목</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-900 w-24">작성자</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-900 w-28">작성일</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-900 w-20">조회수</th>
+                  <th className="w-16 px-2 py-3 text-center text-sm font-medium text-gray-900">번호</th>
+                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-900">제목</th>
+                  <th className="w-28 px-3 py-3 text-center text-sm font-medium text-gray-900">작성자</th>
+                  <th className="w-36 px-3 py-3 text-center text-sm font-medium text-gray-900">작성일</th>
+                  <th className="w-24 px-3 py-3 text-center text-sm font-medium text-gray-900">조회수</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -217,7 +217,7 @@ const NoticeListComponent = () => {
                     </td>
                   </tr>
                 ) : (
-                  allNotices.map((notice) => (
+                  allNotices.map((notice, index) => (
                     <tr 
                       key={notice.noticeNum}
                       className={`hover:bg-gray-50 ${notice.isPinned ? 'bg-yellow-50' : ''}`}
@@ -238,7 +238,9 @@ const NoticeListComponent = () => {
                             공지
                           </span>
                         ) : (
-                          notice.noticeNum
+                          //일반글 역순 번호 계산
+                          //전체 일반글 개수 - (현재 페이지 × 페이지 크기) - 현재 일반글 인덱스
+                          totalElements - pinnedNotices.length - (currentPage * searchParams.size) - (index - pinnedNotices.length)
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -305,16 +307,18 @@ const NoticeListComponent = () => {
       {renderPagination()}
 
       {/* 하단 버튼 */}
-      <NoticeButtonComponent
-        isAdmin={loginState.role === 'ADMIN'}
-        selectedNotices={selectedNotices}
-        onDelete={() => {
-          // 삭제 후 목록 새로고침
-          fetchNotices();
-          setSelectedNotices([]);
-        }}
-      />
-    </div>
+      <div className="mb-8">
+        <NoticeButtonComponent
+          isAdmin={loginState.role === 'ADMIN'}
+          selectedNotices={selectedNotices}
+          onDelete={() => {
+            // 삭제 후 목록 새로고침
+            fetchNotices();
+            setSelectedNotices([]);
+          }}
+        />
+      </div>
+  </div>
   );
 };
 
