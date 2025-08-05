@@ -154,7 +154,7 @@ const Header = () => {
         </nav>
 
         {/* 로그인/검색/사이드 */}
-        <div className="flex items-center space-x-6 text-sm pl-6 flex-none">
+        <div className="flex items-center space-x-6 text-sm pl-3 pr-1 flex-none">
           {loginState && loginState.memId ? (
             <>
               <span
@@ -179,11 +179,11 @@ const Header = () => {
           )}
 
         </div>
-        <div className="flex space-x-3 mx-3">
+        <div className="flex mx-3">
           {/* <img src={searchIcon} alt="검색" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" /> */}
           {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
             Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
-          <img src={sideIcon} alt="사이드" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200 lg:hidden" onClick={handleOpenSidebar} />
+          <img src={sideIcon} alt="사이드" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" onClick={handleOpenSidebar} />
           {/* <a href="https://www.flaticon.com/kr/free-icons/" title="햄버거 아이콘">햄버거 아이콘 제작자: Lizel Arina - Flaticon</a> */}
         </div>
 
