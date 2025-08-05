@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import about from "../assets/about.png";
+import myInfo from "../assets/myInfo.png";
 import { useSelector } from "react-redux";
 
 const SubMyInfoHeader = () => {
@@ -27,7 +27,7 @@ const SubMyInfoHeader = () => {
                         마이페이지
                     </div>
                     <div className="w-1/4">
-                        <img src={about} className="w-[240px]" />
+                        <img src={myInfo} className="w-[252px]" />
                     </div>
                 </div>
 
