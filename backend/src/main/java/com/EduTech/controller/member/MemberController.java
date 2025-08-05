@@ -75,13 +75,13 @@ public class MemberController {
 	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam("memId") String memId) {
 		return ResponseEntity.ok(memberService.isDuplicatedId(memId));
 	}
-	
+
 	// 이메일 중복 체크
 	@GetMapping("/checkEmail")
 	public ResponseEntity<Boolean> checkEmail(@RequestParam("email") String email) {
 		return ResponseEntity.ok(memberService.checkEmail(email));
 	}
-	
+
 	// 휴대폰번호 중복 체크
 	@GetMapping("/checkPhone")
 	public ResponseEntity<Boolean> checkPhone(@RequestParam("phone") String phone) {
@@ -159,9 +159,13 @@ public class MemberController {
 	// 회원 탈퇴
 	@DeleteMapping("/leave")
 	public ResponseEntity<String> leaveMember() {
-		String memId = JWTFilter.getMemId();
-		memberService.leaveMember(memId);
-		return ResponseEntity.ok("회원탈퇴가 완료되었습니다. 일주일뒤 재가입 가능합니다.");
+		try {
+			String memId = JWTFilter.getMemId();
+			memberService.leaveMember(memId);
+			return ResponseEntity.ok("회원탈퇴가 완료되었습니다. 일주일뒤 재가입 가능합니다.");
+		} catch (IllegalStateException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 
 	// 아이디 찾기
@@ -177,13 +181,14 @@ public class MemberController {
 
 	// 아이디, 휴대폰번호 일치 확인
 	@GetMapping("/checkIdPhone")
-	public ResponseEntity<Boolean> checkIdPhone(@RequestParam(name = "memId") String memId, @RequestParam(name = "phone") String phone) {
-	    MemberResetPwDTO memberResetPwDTO = new MemberResetPwDTO();
-	    memberResetPwDTO.setMemId(memId);
-	    memberResetPwDTO.setPhone(phone);
-	    return ResponseEntity.ok(memberService.checkIdPhone(memberResetPwDTO));
+	public ResponseEntity<Boolean> checkIdPhone(@RequestParam(name = "memId") String memId,
+			@RequestParam(name = "phone") String phone) {
+		MemberResetPwDTO memberResetPwDTO = new MemberResetPwDTO();
+		memberResetPwDTO.setMemId(memId);
+		memberResetPwDTO.setPhone(phone);
+		return ResponseEntity.ok(memberService.checkIdPhone(memberResetPwDTO));
 	}
-	
+
 	// 비밀번호 찾기(변경)
 	@PutMapping("/resetPw")
 	public ResponseEntity<String> resetPw(@RequestBody MemberResetPwDTO memberResetPwDTO) {

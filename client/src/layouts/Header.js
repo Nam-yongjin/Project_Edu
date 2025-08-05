@@ -110,7 +110,7 @@ const Header = () => {
         </div>
 
         {/* 메뉴 */}
-        <nav className="relative group hidden lg:block flex-none w-[820px]">
+        <nav className="relative group hidden lg:block flex-none w-[860px]">
           <div className="flex justify-between">
             {mainMenus.map((menu, idx) => (
               <div key={idx} className="relative text-center flex-1">
@@ -131,12 +131,12 @@ const Header = () => {
               opacity-0 invisible translate-y-2 rounded
               group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
               transition-all duration-200 ease-in-out
-              py-6 
+              py-8 
             "
           >
             <div className={`mx-auto grid gap-6 text-base text-gray-700 px-4 ${loginState.role === "ADMIN" ? "grid-cols-6" : "grid-cols-5"}`}>
               {mainMenus.map((menu, idx) => (
-                <div key={idx} className="space-y-2 text-center">
+                <div key={idx} className="space-y-4 text-center">
                   {menu.sub.map((item, subIdx) => (
                     <div key={subIdx}>
                       <Link
@@ -154,7 +154,7 @@ const Header = () => {
         </nav>
 
         {/* 로그인/검색/사이드 */}
-        <div className="flex items-center space-x-6 text-sm pl-5 pr-3 flex-none">
+        <div className="flex items-center space-x-6 text-sm pl-6 flex-none">
           {loginState && loginState.memId ? (
             <>
               <span
@@ -180,10 +180,10 @@ const Header = () => {
 
         </div>
         <div className="flex space-x-3 mx-3">
-          <img src={searchIcon} alt="검색" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" />
+          {/* <img src={searchIcon} alt="검색" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" /> */}
           {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
             Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
-          <img src={sideIcon} alt="사이드" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" onClick={handleOpenSidebar} />
+          <img src={sideIcon} alt="사이드" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200 lg:hidden" onClick={handleOpenSidebar} />
           {/* <a href="https://www.flaticon.com/kr/free-icons/" title="햄버거 아이콘">햄버거 아이콘 제작자: Lizel Arina - Flaticon</a> */}
         </div>
 

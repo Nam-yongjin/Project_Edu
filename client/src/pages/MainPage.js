@@ -45,7 +45,7 @@ const MainPage = () => {
 
                     <div className="absolute top-1/4 left-0 w-full z-20 pointer-events-none select-none ">
                         <div className="max-w-screen-xl mx-auto px-4">
-                            <div className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold drop-shadow-[1px_1px_0px_rgba(0,0,0,0.8)]">
+                            <div className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
                                 서울<br />
                                 에듀테크<br />
                                 소프트랩

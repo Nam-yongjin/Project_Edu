@@ -63,7 +63,7 @@ const ResetPwComponent = () => {
 
     return (
 
-        <div className='my-10 p-10 w-[500px] space-y-6 shadow-2xl text-center'>
+        <div className='my-10 p-10 w-[500px] space-y-6 shadow-2xl shadow-gray-500 text-center'>
             <div className='text-3xl font-bold'>비밀번호 찾기 / 재설정</div>
 
             {step === 'checkId' && (
@@ -119,7 +119,7 @@ const ResetPwComponent = () => {
                             className="flex-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div><div>
-                        <button className="rounded p-2 w-18 w-full bg-blue-500	text-white hover:bg-blue-600 active:bg-blue-700 font-bold"
+                        <button className="rounded p-2 w-18 w-full bg-blue-500	text-white hover:bg-blue-600 active:bg-blue-700 font-semibold"
                             onClick={handleResetPassword}>비밀번호 재설정</button>
                     </div>
                 </>

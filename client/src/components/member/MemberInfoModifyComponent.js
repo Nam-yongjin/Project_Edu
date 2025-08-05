@@ -186,7 +186,11 @@ const MemberInfoModifyComponent = () => {
                 doLogout();
                 moveToPath('/');
             } catch (error) {
-                alert("탈퇴에 실패했습니다.");
+                if (error.response && error.response.data) {
+                    alert(error.response.data);
+                } else {
+                    alert("탈퇴에 실패했습니다.");
+                }
             }
         } else {
             alert("탈퇴를 취소했습니다.");
@@ -195,7 +199,7 @@ const MemberInfoModifyComponent = () => {
 
     return (
         <div>
-            <div className={`${modifying ? "" : "w-[640px]"} my-10 p-10 space-y-6 text-center shadow-2xl`}>
+            <div className={`${modifying ? "" : "w-[640px]"} my-10 p-10 space-y-6 text-center shadow-2xl shadow-gray-500`}>
                 {modifying ?
                     <div className="text-3xl font-bold">회원정보수정</div>
                     :

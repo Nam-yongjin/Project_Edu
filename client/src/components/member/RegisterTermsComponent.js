@@ -18,7 +18,6 @@ const RegisterTermsComponent = () => {
             .then((res) => res.text())
             .then((text) => setRegisterText(text))
             .catch((error) => {
-                console.error("이용약관 로드 실패", error);
                 setRegisterText("이용약관을 불러올 수 없습니다.");
             });
     }, []);
@@ -28,7 +27,6 @@ const RegisterTermsComponent = () => {
             .then((res) => res.text())
             .then((text) => setAgreeText(text))
             .catch((error) => {
-                console.error("이용약관 로드 실패", error);
                 setAgreeText("이용약관을 불러올 수 없습니다.");
             });
     }, []);
@@ -38,7 +36,6 @@ const RegisterTermsComponent = () => {
             .then((res) => res.text())
             .then((text) => setProcessText(text))
             .catch((error) => {
-                console.error("이용약관 로드 실패", error);
                 setProcessText("이용약관을 불러올 수 없습니다.");
             });
     }, []);

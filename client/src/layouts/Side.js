@@ -50,9 +50,12 @@ const Side = ({ isOpen, onClose }) => {
                         {loginState && loginState.memId ?
                             <>
                                 <li>
-                                    <Link to={handleLogout} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
+                                    <div className="block p-2 rounded hover:bg-gray-100 hover:cursor-pointer" onClick={() => {
+                                        handleLogout();
+                                        onClose();
+                                    }}>
                                         🔒 로그아웃
-                                    </Link>
+                                    </div>
                                 </li>
                                 <li>
                                     <Link to={getMyPageLink(loginState.role)} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
