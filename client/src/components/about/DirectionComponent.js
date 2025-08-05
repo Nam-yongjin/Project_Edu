@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import SubAboutHeader from "../../layouts/SubAboutHeader";
 import defaultImage from "../../assets/default.jpg";
 
 const DirectionComponent = () => {
@@ -74,8 +73,6 @@ const DirectionComponent = () => {
 
     return (
         <div>
-            <SubAboutHeader />
-
             <div className="mx-auto max-w-screen-xl my-10">
                 <div className="text-2xl font-bold mb-8">오시는 길</div>
                 {mapError ? (

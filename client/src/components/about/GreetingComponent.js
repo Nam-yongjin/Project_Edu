@@ -1,4 +1,3 @@
-import SubAboutHeader from "../../layouts/SubAboutHeader";
 import { useEffect, useState } from "react";
 import logo from "../../assets/logo.png";
 
@@ -16,7 +15,6 @@ const GreetingComponent = () => {
 
     return (
         <div className="">
-            <SubAboutHeader />
             <div className="">
                 <img
                     src={logo}

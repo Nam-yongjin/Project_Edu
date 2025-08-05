@@ -203,7 +203,7 @@ const StudentInfoModifyComponent = () => {
 
     return (
         <div>
-            <div className={`${modifying ? "" : "w-[640px]"} my-10 p-10 space-y-6 text-center shadow-2xl shadow-gray-500`}>
+             <div className={`${modifying ? "max-w-screen-md" : "max-w-screen-sm"} mx-auto my-10 p-10 space-y-6 text-center shadow-2xl shadow-gray-500`}>
                 {modifying ?
                     <div className="text-3xl font-bold">회원정보수정</div>
                     :

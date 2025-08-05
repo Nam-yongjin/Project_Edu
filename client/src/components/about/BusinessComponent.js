@@ -1,4 +1,3 @@
-import SubAboutHeader from "../../layouts/SubAboutHeader";
 import { useState, useEffect } from "react";
 
 const BusinessComponent = () => {
@@ -15,7 +14,6 @@ const BusinessComponent = () => {
 
     return (
         <div className="">
-            <SubAboutHeader />
             <div className="mx-auto max-w-screen-xl my-10 border-b border-gray-300">
                 <div className="text-2xl font-bold">사업소개</div>
                 <div className="text-xl font-semibold py-8">에듀테크 소프트랩이란?</div>

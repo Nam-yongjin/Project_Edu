@@ -38,7 +38,7 @@ const SubAboutHeader = () => {
                                 사업소개
                             </Link>
                         </li>
-                        <li className="pb-2">
+                        <li className="mr-6 pb-2">
                             <Link 
                                 to="/about/direction"
                                 className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
