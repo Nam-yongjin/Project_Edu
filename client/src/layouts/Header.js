@@ -37,34 +37,32 @@ const Header = () => {
       sub: [
         { name: "인사말", link: "/about/greeting" },
         { name: "사업소개", link: "/about/business" },
-        { name: "오시는길", link: "/about/direction" },
+        { name: "오시는 길", link: "/about/direction" },
       ],
     },
     {
       name: "프로그램",
       link: "/event",
       sub: [
-        { name: "메뉴1", link: "/event" },
-        { name: "메뉴2", link: "/" },
-        { name: "메뉴3", link: "/" },
+        { name: "프로그램 일정", link: "/event" },
+        { name: "프로그램 운영", link: "/" },
       ],
     },
     {
-      name: "공간운영",
+      name: "공간 운영",
       link: "/facility",
       sub: [
-        { name: "메뉴4", link: "/facility" },
-        { name: "메뉴5", link: "/" },
-        { name: "메뉴6", link: "/" },
+        { name: "공간 안내", link: "/facility" },
+        { name: "공간 예약", link: "/" },
       ],
     },
     {
-      name: "지원사업",
+      name: "실증 지원",
       link: "/demonstration",
       sub: [
-        { name: "메뉴7", link: "/demonstration" },
-        { name: "메뉴8", link: "/" },
-        { name: "메뉴9", link: "/" },
+        { name: "실증지원 안내", link: "/demonstration" },
+        { name: "실증기업 소개", link: "/" },
+        { name: "실증 신청", link: "/" },
       ],
     },
     {
@@ -83,9 +81,10 @@ const Header = () => {
       name: "관리자",
       link: "/admin",
       sub: [
-        { name: "관리", link: "/admin" },
-        { name: "관리", link: "/" },
-        { name: "관리", link: "/" },
+        { name: "회원 관리", link: "/admin" },
+        { name: "프로그램 관리", link: "/" },
+        { name: "공간 관리", link: "/" },
+        { name: "실증 관리", link: "/" },
       ],
     });
   }
@@ -105,7 +104,7 @@ const Header = () => {
         </div>
 
         {/* 메뉴 */}
-        <nav className="relative group hidden lg:block flex-none w-[640px]">
+        <nav className="relative group hidden lg:block flex-none w-[820px]">
           <div className="flex justify-between">
             {mainMenus.map((menu, idx) => (
               <div key={idx} className="relative text-center flex-1">
@@ -125,7 +124,7 @@ const Header = () => {
               absolute inset-x-0 top-full mt-2 bg-white shadow-lg border-t
               opacity-0 invisible translate-y-2 rounded
               group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
-              transition-all duration-300 ease-in-out
+              transition-all duration-200 ease-in-out
               py-6 
             "
           >
@@ -149,7 +148,7 @@ const Header = () => {
         </nav>
 
         {/* 로그인/검색/사이드 */}
-        <div className="flex items-center space-x-6 text-sm pl-8 flex-none pr-3">
+        <div className="flex items-center space-x-6 text-sm pl-8 pr-3 flex-none">
           {loginState && loginState.memId ? (
             <>
               <span
@@ -175,10 +174,10 @@ const Header = () => {
 
         </div>
         <div className="flex space-x-3 mx-3">
-          <img src={searchIcon} alt="검색" className="h-6 cursor-pointer active:bg-gray-200" />
+          <img src={searchIcon} alt="검색" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" />
           {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
 Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
-          <img src={sideIcon} alt="사이드" className="h-6 cursor-pointer active:bg-gray-200" />
+          <img src={sideIcon} alt="사이드" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" />
           {/* <a href="https://www.flaticon.com/kr/free-icons/" title="햄버거 아이콘">햄버거 아이콘 제작자: Lizel Arina - Flaticon</a> */}
         </div>
 
