@@ -13,8 +13,8 @@ const EventListComponent = () => {
   // ✅ 행사 목록 조회
   useEffect(() => {
     getList(page).then((data) => {
-      setEvents(data.content);       // 현재 페이지 데이터
-      setTotalPages(data.totalPages); // 전체 페이지 수
+      setEvents(data.content);
+      setTotalPages(data.totalPages);
     });
   }, [page]);
 
@@ -27,6 +27,9 @@ const EventListComponent = () => {
 
   // ✅ 신청 상태 계산
   const getApplyStatus = (event) => {
+    if (event.revState === "APPROVED") return { text: "신청 완료", style: "bg-green-500" };
+    if (event.revState === "CANCEL") return { text: "신청 취소", style: "bg-red-500" };
+
     const now = new Date();
     const start = new Date(event.applyStartPeriod);
     const end = new Date(event.applyEndPeriod);

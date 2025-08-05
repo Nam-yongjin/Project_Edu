@@ -5,7 +5,8 @@ import java.util.Arrays;
 public enum EventState {
 	BEFORE("신청전"),
     OPEN("신청중"),
-    CLOSED("신청마감");
+    CLOSED("신청마감"),
+    CANCEL("신청취소");
 
     private final String label;
 
