@@ -211,7 +211,7 @@ public class NewsServiceTests {
 	        System.out.println("===== 조회수 증가 테스트 완료 =====\n");
 	    }
 	    
-//	    @Test
+//	    @Test //삭제 테스트 실패
 	    @Transactional
 	    @Rollback(false)
 	    @Commit

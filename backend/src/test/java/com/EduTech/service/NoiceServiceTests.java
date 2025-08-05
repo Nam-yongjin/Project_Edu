@@ -341,7 +341,7 @@ public class NoiceServiceTests {
         System.out.println("===== 일괄 삭제 테스트 완료 =====\n");
     }
     
-//    @Test
+//    @Test //삭제 테스트 실패
     @Transactional
     @DisplayName("존재하지 않는 공지사항 삭제 - 예외 처리")
     void testDeleteNonExistentNotice() {

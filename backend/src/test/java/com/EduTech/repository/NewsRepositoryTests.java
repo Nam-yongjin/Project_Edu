@@ -174,7 +174,7 @@ public class NewsRepositoryTests {
         assertThat(update.getNewsFiles().get(0).getOriginalName()).isEqualTo("new.jpg");
 	}
 	
-//	@Test
+//	@Test //첨부파일 삭제 실패
 	@Transactional
 	@DisplayName("언론보도 삭제")
 	@Commit
