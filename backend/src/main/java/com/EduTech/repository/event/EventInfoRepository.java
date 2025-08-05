@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
 
@@ -91,6 +92,20 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 	@Transactional
 	@Query("UPDATE EventInfo e SET e.state = 'CLOSED' WHERE CURRENT_TIMESTAMP > e.applyEndPeriod AND e.state <> 'CANCEL'")
 	int updateStateToClosed();
+	
+	// 검색 관련 코드
+	@Query("""
+		    SELECT e FROM EventInfo e
+		    WHERE 
+		        (:#{#dto.keyword} IS NULL OR :#{#dto.keyword} = ''
+		        OR (:#{#dto.searchType} = 'eventName' AND e.eventName LIKE %:#{#dto.keyword}%)
+		        OR (:#{#dto.searchType} = 'eventInfo' AND e.eventInfo LIKE %:#{#dto.keyword}%)
+		        OR (:#{#dto.searchType} = 'all' AND (e.eventName LIKE %:#{#dto.keyword}% OR e.eventInfo LIKE %:#{#dto.keyword}%))
+		        )
+		        AND (:#{#dto.state} IS NULL OR e.state = :#{#dto.state})
+		        AND (:#{#dto.category} IS NULL OR e.category = :#{#dto.category})
+		""")
+		Page<EventInfo> searchEvents(@Param("dto") EventSearchRequestDTO dto, Pageable pageable);
 	
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
 	List<EventInfo> findByEventEndPeriodGreaterThanEqual(LocalDateTime localDateTime, Sort sort); 
