@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
@@ -23,6 +24,8 @@ public interface EventService {
     List<EventInfoDTO> getAllEvents(); // 전체 이벤트 조회
     
     List<EventInfoDTO> getAllEventsWithoutFilter(int page);
+    
+    Page<EventInfoDTO> searchEventList(EventSearchRequestDTO dto, int page); // 리스트에서 검색
     
     Page<EventInfoDTO> getEventList(Pageable pageable, String title, String eventInfo, EventState state); // 관리자/운영자용
     

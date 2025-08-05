@@ -109,11 +109,11 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
     updateEvent(eventNum, formData)
       .then(() => {
-        alert("✅ 행사 수정이 완료되었습니다.");
+        alert("행사 수정이 완료되었습니다.");
         moveToPath("/event/list");
       })
       .catch((err) => {
-        console.error("🔥 수정 실패", err);
+        console.error("수정 실패", err);
         alert("수정 실패: " + (err.response?.data?.message || err.message));
       });
   };

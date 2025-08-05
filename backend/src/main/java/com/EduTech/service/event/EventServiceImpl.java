@@ -25,6 +25,7 @@ import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventFileDTO;
 import com.EduTech.dto.event.EventImageDTO;
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventBanner;
 import com.EduTech.entity.event.EventCategory;
@@ -337,6 +338,7 @@ public class EventServiceImpl implements EventService {
 	        .collect(Collectors.toList());
 	}
 	
+	// 현재 사용중
 	@Override
 	public List<EventInfoDTO> getAllEventsWithoutFilter(int page) {
 	    Pageable pageable = PageRequest.of(page - 1, 8); // 0-based index
@@ -353,7 +355,21 @@ public class EventServiceImpl implements EventService {
 	}
 
 	
-	
+	@Override
+	public Page<EventInfoDTO> searchEventList(EventSearchRequestDTO dto, int page) {
+	    Sort.Direction direction = Sort.Direction.fromString(dto.getSortOrder());
+	    Pageable pageable = PageRequest.of(page - 1, 8, Sort.by(direction, "applyStartPeriod"));
+
+	    Page<EventInfo> result = infoRepository.searchEvents(dto, pageable);
+
+	    return result.map(info -> {
+	        EventInfoDTO eventDto = modelMapper.map(info, EventInfoDTO.class);
+	        eventDto.setMainImagePath(info.getMainImagePath());
+	        eventDto.setFilePath(info.getFilePath());
+	        eventDto.setOriginalName(info.getOriginalName());
+	        return eventDto;
+	    });
+	}
 	
 	
 	

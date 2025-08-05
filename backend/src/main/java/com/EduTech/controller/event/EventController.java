@@ -39,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.EduTech.dto.event.EventApplyRequestDTO;
 import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.event.EventInfo;
@@ -146,6 +147,14 @@ import lombok.RequiredArgsConstructor;
 
 			    return ResponseEntity.ok(dtoPage);
 			}
+			
+			@GetMapping("/search")
+			public ResponseEntity<Page<EventInfoDTO>> searchEvents(
+			        @ModelAttribute EventSearchRequestDTO dto,
+			        @RequestParam(name = "page", defaultValue = "1") int page) {
+			    Page<EventInfoDTO> result = eventService.searchEventList(dto, page);
+			    return ResponseEntity.ok(result);
+			}
 	
 //			// 3. 페이지네이션 + 검색 조건 포함 목록 조회
 //			@GetMapping("/admin/list")
@@ -220,7 +229,7 @@ import lombok.RequiredArgsConstructor;
 			    return ResponseEntity.ok("✅ 행사 수정이 완료되었습니다.");
 			}
 	
-			// 7. 삭제
+			// 7. 수정
 			@DeleteMapping("/delete")
 			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<String> deleteEvent(@RequestParam("eventNum") Long eventNum) {
