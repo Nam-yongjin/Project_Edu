@@ -52,7 +52,7 @@ const LoginComponent = () => {
 
     return (
         <div className="">
-            <div className="my-10 p-10 w-[500px] shadow-2xl">
+            <div className="my-10 p-10 w-[500px] shadow-2xl shadow-gray-500">
                 <div className="text-4xl text-center font-bold mb-6">로그인</div>
 
                 <div className="mb-4">
@@ -95,7 +95,7 @@ const LoginComponent = () => {
                     <div className="flex justify-center">
                         <button
                             onClick={handleClickLogin}
-                            className="bg-blue-500 text-white font-bold p-2 w-[400px] rounded-md hover:bg-blue-600 active:bg-blue-700"
+                            className="bg-blue-500 text-white font-semibold p-2 w-[400px] rounded-md hover:bg-blue-600 active:bg-blue-700"
                         >
                             로그인
                         </button>

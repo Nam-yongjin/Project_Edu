@@ -71,6 +71,8 @@ public class MemberServiceImpl implements MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final DemonstrationRegistrationRepository demonstrationRegistrationRepository;
 	private final DemonstrationReserveRepository demonstrationReserveRespository;
+	private
+	
 
 	@Value("${naver.client-id}")
 	private String NAVER_CLIENT_ID;
@@ -346,26 +348,6 @@ public class MemberServiceImpl implements MemberService {
 		Member member = memberRepository.findById(memId).orElseThrow();
 		DemonstrationState demonstrationStateReg = demonstrationRegistrationRepository.findByState(memId);
 		DemonstrationState demonstrationStateRes = demonstrationReserveRespository.findByState(memId);
-		// 현재 예약중인 시설, 행사, 실증대여 있을시 탈퇴불가 처리
-		// 역할별 탈퇴 제약 조건 예시
-//	    if (member.getRole().equals("COMPANY")) {
-//	        if (jobPostRepository.existsByCompanyId(memId)) {
-//	            throw new IllegalStateException("등록된 채용공고가 있는 기업은 탈퇴할 수 없습니다.");
-//	        }
-//	    }
-
-//		if (member.getRole().equals("USER")) {
-//
-//		}
-//		if (member.getRole().equals("STUDENT")) {
-//
-//		}
-//		if (member.getRole().equals("TEACHER")) {
-//
-//		}
-//		if (member.getRole().equals("COMPANY")) {
-//
-//		}
 
 		// 관리자 계정은 탈퇴불가
 		if (member.getRole().equals("ADMIN")) {

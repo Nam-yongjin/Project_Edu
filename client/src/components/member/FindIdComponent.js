@@ -24,14 +24,14 @@ const FindIdComponent = () => {
 
     return (
         <div>
-        <div className='my-10 p-10 w-[500px] space-y-6 text-center shadow-2xl bg-white'>
+        <div className='my-10 p-10 w-[500px] space-y-6 text-center shadow-2xl shadow-gray-500'>
             <div className='text-3xl font-bold'>아이디 찾기</div>
             {!foundId ? (
                 <PhoneVerification onVerified={handleVerified} />
             ) : (
                 <>
                     <div>찾은 아이디: <strong className='text-lg'>{foundId}</strong></div>
-                    <button className="rounded-md p-2 w-18 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 font-bold text-white" onClick={moveToLogin}>로그인 페이지로 이동</button>
+                    <button className="rounded-md p-2 w-18 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 font-semibold text-white" onClick={moveToLogin}>로그인 페이지로 이동</button>
                 </>
             )}
         </div>
