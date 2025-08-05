@@ -33,8 +33,9 @@ public class DemonstrationTime {
 	@Column(nullable = false)
 	private LocalDate demDate; // 날짜
 
+	/*
 	@Column(nullable = false)
-	private Boolean state; // 예약상태
+	private Boolean state; // 예약상태 */
 
 	@ManyToOne
 	@JoinColumn(name = "demNum")

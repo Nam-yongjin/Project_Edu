@@ -1,6 +1,6 @@
 import CalendarComponent from "./CalendarComponent";
 import { useState, useEffect } from "react";
-import { getDetail, postRes,getResDate } from "../../api/demApi";
+import { getDetail, postRes, getResDate,getReserveCheck } from "../../api/demApi";
 import ImageSliderModal from "./ImageSliderModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -8,6 +8,7 @@ import { ko } from "date-fns/locale";
 import megaphone from '../../assets/megaphone.png';
 import calendar from '../../assets/calendar.png';
 import useMove from "../../hooks/useMove";
+import ItemModal from "./itemModal";
 const DetailComponent = ({ demNum }) => {
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [dem, setDem] = useState([]); // 서버에서 받아올 여러가지 값들
@@ -16,6 +17,9 @@ const DetailComponent = ({ demNum }) => {
     const [modalOpen, setModalOpen] = useState(false); // 이미지 창 띄우기 위한 모달 state 변수
     const [selectedImages, setSelectedImages] = useState([]); // 모달창에 이미지 전달을 위한 state 변수
     const { moveToPath } = useMove(); // useMove에서 가져온 모듈들
+    const [showQtyModal, setShowQtyModal] = useState(false);
+    const [reservationQty, setReservationQty] = useState(1);
+    const [reserveCheck,setReserveCheck]=useState(false);
     const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
@@ -29,14 +33,17 @@ const DetailComponent = ({ demNum }) => {
     const [selectedDate, setSelectedDate] = useState([]); // 캘린더에서 선택한 날짜를 저장하는 state 변수
     useEffect(() => {
         const loadData = async () => { // 상세페이지의 정보 및 이미지 불러오는 코드
-            const data = await getDetail(demNum);
-            setDem(data);
-            setFileList(data);
-            const mainImageObj = data.imageList.find(img => img.isMain);
+            const detailData = await getDetail(demNum);
+            setDem(detailData);
+            setFileList(detailData);
+            const mainImageObj = detailData.imageList.find(img => img.isMain);
             setMainImageUrl(mainImageObj ? `http://localhost:8090/view/${mainImageObj.imageUrl}` : '');
-            data.imageList.map(img => img.isMain);
+            detailData.imageList.map(img => img.isMain);
+           const reserveData=await getReserveCheck(demNum);
+           setReserveCheck(reserveData);
         }
         loadData();
+
     }, [demNum]);
 
     useEffect(() => {
@@ -62,7 +69,7 @@ const DetailComponent = ({ demNum }) => {
         const newStart = date instanceof Date ? date : new Date(date.replace(/-/g, "/"));
         setStartDate(newStart);
 
-        if (endDate && newStart <= endDate) { 
+        if (endDate && newStart <= endDate) {
             const dates = [];
             let current = new Date(newStart);
             while (current <= endDate) {
@@ -101,24 +108,24 @@ const DetailComponent = ({ demNum }) => {
         return `${y}-${m}-${d}`;
     }
 
-const fetchDisabledDates = async (year, month) => {
-  const monthStart = new Date(year, month, 1);
-  const monthEnd = new Date(year, month + 1, 0);
+    const fetchDisabledDates = async (year, month) => {
+        const monthStart = new Date(year, month, 1);
+        const monthEnd = new Date(year, month + 1, 0);
 
-  const formattedStart = toLocalDateString(monthStart);
-  const formattedEnd = toLocalDateString(monthEnd);
+        const formattedStart = toLocalDateString(monthStart);
+        const formattedEnd = toLocalDateString(monthEnd);
 
-  const data = await getResDate(formattedStart, formattedEnd, demNum);
+        const data = await getResDate(formattedStart, formattedEnd, demNum);
 
-  if (Array.isArray(data)) {
-    const newDates = data.map(item => item.demDate);
-    // 기존과 중복 제거
-    setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));
-  }
-};
+        if (Array.isArray(data)) {
+            const newDates = data.map(item => item.demDate);
+            // 기존과 중복 제거
+            setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));
+        }
+    };
 
 
-    const reservation = () => {
+    const reservation = (updatedItemNum) => {
         const loadData = async () => {
             if (!selectedDate || selectedDate.length === 0) {
                 alert('날짜를 선택해주세요!');
@@ -145,11 +152,23 @@ const fetchDisabledDates = async (year, month) => {
                 }
             }
 
+            if(selectedDate.some(date=>disabledDates.includes(date)))
+            {
+                alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
+                return;
+            }
+
+            if(reserveCheck) // 이미 해당 상품을 예약한 회원 일경우, return
+            {
+                alert('이미 해당 상품을 예약 하셨습니다.');
+                return;
+            }
+
             try {
                 await postRes(
-                    toLocalDateString(startDate), toLocalDateString(endDate), demNum);
+                    toLocalDateString(startDate), toLocalDateString(endDate), demNum, updatedItemNum);
                 alert('예약 신청 완료');
-                moveToPath(`/demonstration/detail/${demNum}`);
+                moveToPath(`/demonstration/list`);
             } catch (error) {
                 console.error('예약 실패:', error);
                 alert('예약에 실패했습니다.');
@@ -161,7 +180,7 @@ const fetchDisabledDates = async (year, month) => {
 
     return (
         <>
-            <div className="w-full mb-2">
+            <div className="max-w-screen-lg mb-2">
                 <div className="flex items-start gap-4 ml-[100px]">
                     <img onClick={() => {
                         const urlList = fileList.imageList.map(img => `http://localhost:8090/view/${img.imageUrl}`);
@@ -181,6 +200,8 @@ const fetchDisabledDates = async (year, month) => {
                         <span className="text-blue-600">제조사:</span> {dem.demMfr}
                         <br />
                         <span className="text-blue-600">물품소개:</span> {dem.demInfo}
+                        <br />
+                        <span className="text-blue-600">수량: </span> {dem.itemNum}
                     </div>
                 </div>
                 <div>
@@ -247,10 +268,29 @@ const fetchDisabledDates = async (year, month) => {
                             </div>
 
                             <div className="space-y-2">
-                                <button className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2 px-4 rounded w-full mb-[190px]" onClick={reservation}>
+                                <button
+                                    className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2 px-4 rounded w-full mb-[190px]"
+                                    onClick={() => setShowQtyModal(true)}
+                                >
                                     예약 신청하기
                                 </button>
                             </div>
+                            {showQtyModal && (
+                                <ItemModal
+                                    maxQty={dem.itemNum}
+                                    value={reservationQty}
+                                    onChange={(val) => setReservationQty(val)}
+                                    onConfirm={() => {
+                                        setShowQtyModal(false);
+                                        setDem(prev => {
+                                            const updatedDem = { ...prev, itemNum: prev.itemNum - reservationQty };
+                                            reservation(updatedDem.itemNum);
+                                            return updatedDem;
+                                        });
+                                    }}
+                                    onClose={() => setShowQtyModal(false)}
+                                />
+                            )}
 
                             <div className="border border-black p-4 rounded flex items-start gap-3 bg-gray-50">
                                 <img src={megaphone} className="w-8 h-8 mt-1" alt="megaphone" />
