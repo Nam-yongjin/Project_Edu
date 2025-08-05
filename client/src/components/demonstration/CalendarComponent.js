@@ -1,16 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect,useRef } from "react";
 import Calendar from "react-calendar";
+import { getResDate } from "../../api/demApi";
 import 'react-calendar/dist/Calendar.css';
-const CalendarComponent = () => {
-  const [selectedDates, setSelectedDates] = useState([]); // selectedDates을 배열로 설정
+
+const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDates, setDisabledDates }) => {
   const today = new Date(); // 날짜 객체 생성
   today.setHours(0, 0, 0, 0); // 오늘 날짜의 자정으로 초기화
   // hours, minutes, seconds, milliseconds
 
-  const disabledDates = ['2025-08-10', '2025-08-15']; // 캘린더에서 disabled할 날짜 배열
+  const [calendarDate, setCalendarDate] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() }); // 캘린더 날짜를 받는 state변수
+  const loadedMonths = useRef(new Set()); // set객체를 이용해 중복을 회피하며, useRef사용 이유는 일반 변수는 랜더링이 일어나면 사라지기 때문에
+
+  useEffect(() => {
+    const loadData = async () => {
+      const key = `${calendarDate.year}-${String(calendarDate.month + 1).padStart(2, '0')}`; // 년도와 날짜를 이용한 고유한 키
+
+      if (loadedMonths.current.has(key)) return; // 해당 키값이 ref에 존재한다면 useEffect 실행 안함
+      loadedMonths.current.add(key); // 추가 후, db에서 값 불러옴
+
+      const { monthStart, monthEnd } = getMonthDates(calendarDate.year, calendarDate.month);
+      const data = await getResDate(monthStart, monthEnd, demNum);
+
+      if (Array.isArray(data)) {
+        const newDates = data.map(item => item.demDate);
+        setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));
+      }
+    };
+
+    loadData();
+  }, [calendarDate]);
+
+
+  // 리액트 컴포넌트 랜더링 순서로는
+  // 컴포넌트 함수 -> useState -> 화면 랜더링 -> useEffect 순서이다.
+  // getMonthDates는 useEffect 초기값 설정 함수
+
+  function getMonthDates(year, month) {
+    // 이번 달 1일
+    const monthStart = new Date(year, month, 1);
+    // 이번 달 마지막 날
+    const monthEnd = new Date(year, month + 1, 0);
+    // yyyy-MM-dd 포맷으로 변환하는 함수
+    return {
+      monthStart: toLocalDateString(monthStart),
+      monthEnd: toLocalDateString(monthEnd)
+    };
+  }
 
   // 문자열로 변환해서 비교나 include함수 사용 위함
-  const toLocalDateString = (date) => {
+  function toLocalDateString(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
@@ -22,7 +60,8 @@ const CalendarComponent = () => {
   // disabled 처리 위한 함수
   const isDateDisabled = (date) => {
     const dateStr = toLocalDateString(date);
-    return disabledDates.includes(dateStr) || date < today;
+    // console.log(disabledDates);
+    return disabledDates.includes(dateStr) || date <= today;
   };
 
 
@@ -34,14 +73,15 @@ const CalendarComponent = () => {
     return 'text-black'; // 그 외
   };
 
-// 선택 날짜가 포함되어 있지 않다면, 추가
-// 선택 날짜가 포함되어 있다면 삭제.
+  // 선택 날짜가 포함되어 있지 않다면, 추가
+  // 선택 날짜가 포함되어 있다면 삭제.
   const handleReserve = (date) => {
     const dateStr = toLocalDateString(date);
-    if (!selectedDates.includes(dateStr)) {
-      setSelectedDates([...selectedDates, dateStr]);
-    } else {
-      setSelectedDates(selectedDates.filter((d) => d !== dateStr));
+    if (!selectedDate.includes(dateStr)) {
+      setSelectedDate([...selectedDate, dateStr]);
+    }
+    else {
+      setSelectedDate(selectedDate.filter((d) => d !== dateStr));
     }
   };
 
@@ -49,8 +89,9 @@ const CalendarComponent = () => {
   // 선택 되어 있는 날짜 여부 반환 함수
   const isSelected = (date) => {
     const dateStr = toLocalDateString(date);
-    return selectedDates.includes(dateStr);
+    return selectedDate.includes(dateStr);
   };
+
 
   return (
     <>
@@ -90,8 +131,16 @@ const CalendarComponent = () => {
       `}</style>
 
       <Calendar
+        onActiveStartDateChange={({ activeStartDate, view }) => {
+          if (view === 'month') { // 달력 날짜를 변경할 경우 해당 년과 월 정보가 리랜더링 됨
+            setCalendarDate({
+              year: activeStartDate.getFullYear(),
+              month: activeStartDate.getMonth()
+            });
+          }
+        }}
         tileClassName={({ date, view }) => { // 해당 날짜가 선택 되어 잇다면, selected-title css 적용
-            // date는 현재 랜더링 중인 날짜 객체, view는 현재 달력 뷰 모드(여기선 month일 경우 클릭 시, 적용되게 해둠)
+          // date는 현재 랜더링 중인 날짜 객체, view는 현재 달력 뷰 모드(여기선 month일 경우 클릭 시, 적용되게 해둠)
           if (view === 'month') {
             return isSelected(date) ? 'selected-tile' : '';
           }
@@ -104,7 +153,7 @@ const CalendarComponent = () => {
         tileDisabled={({ date }) => isDateDisabled(date)} // 날짜 타일 disabled
 
         // 달력 칸마다 커스터마이징 할 수 있는 콜백 함수
-        tileContent={({ date, view }) => { 
+        tileContent={({ date, view }) => {
           if (view !== 'month') return null;
 
           const disabled = isDateDisabled(date);
@@ -113,7 +162,7 @@ const CalendarComponent = () => {
             <>
               <abbr className={getDayClass(date)}>{date.getDate()}</abbr>
               {disabled ? (
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-black font-semibold select-none">
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] text-black font-semibold select-none">
                   예약불가
                 </div>
               ) : (

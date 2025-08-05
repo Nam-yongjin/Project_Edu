@@ -109,7 +109,8 @@ public class DemonstrationController {
 	@PostMapping("/ReservationRes")
 	public ResponseEntity<String> DemResReservation(
 			@RequestBody DemonstrationReservationDTO demonstrationReservationDTO) {
-		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
+		String memId = JWTFilter.getMemId();
+		demonstrationService.demonstrationReservation(demonstrationReservationDTO,memId);
 		return ResponseEntity.ok("예약 성공");
 	}
 
@@ -125,7 +126,8 @@ public class DemonstrationController {
 	@PutMapping("/ChangeRes")
 	public ResponseEntity<String> DemResChange(@RequestBody DemonstrationReservationDTO demonstrationReservationDTO)
 	{
-		demonstrationService.demonstrationReservation(demonstrationReservationDTO);
+		String memId = JWTFilter.getMemId();
+		demonstrationService.demonstrationReservation(demonstrationReservationDTO,memId);
 		return ResponseEntity.ok("예약 변경 성공");
 	}
 
