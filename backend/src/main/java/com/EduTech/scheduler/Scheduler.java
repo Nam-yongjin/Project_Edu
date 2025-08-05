@@ -23,7 +23,7 @@ public class Scheduler {
         memberRepository.deleteMembersAfterOneWeekLeave();
     }
     
-    @Scheduled(cron = "*/6000 * * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul")
     public void updateEventStates() {
         int before = infoRepository.updateStateToBefore();
         int open = infoRepository.updateStateToOpen();
