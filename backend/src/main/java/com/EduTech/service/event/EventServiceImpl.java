@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -300,59 +299,24 @@ public class EventServiceImpl implements EventService {
 	    infoRepository.save(origin);
 	}
 
-	// 행사 삭제
+	// 행사 취소
 	@Override
 	public void deleteEvent(Long eventNum) {
-	    EventInfo eventToDelete = infoRepository.findById(eventNum)
+	    EventInfo eventToCancel = infoRepository.findById(eventNum)
 	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
 
-	    // 1. 배너 삭제
-	    bannerRepository.findByEventInfo_EventNum(eventNum).ifPresent(banner -> {
-	        String filePath = banner.getFilePath();
-	        if (filePath != null) {
-	            fileUtil.deleteFiles(List.of(filePath)); // 썸네일 포함 삭제는 fileUtil 내부에서 처리됨
-	        }
-	        bannerRepository.delete(banner);
-	    });
+	    // 1. 행사 상태를 CANCEL로 변경
+	    eventToCancel.setState(EventState.CANCEL);
 
-	    // 2. 신청자 삭제
+	    // 2. 신청자 상태를 CANCEL로 변경
 	    List<EventUse> uses = useRepository.findByEventInfo_EventNum(eventNum);
-	    useRepository.deleteAll(uses);
-
-	    // 3. 대표 이미지 삭제
-	    if (eventToDelete.getMainImagePath() != null && !eventToDelete.getMainImagePath().isEmpty()) {
-	        fileUtil.deleteFiles(List.of(eventToDelete.getMainImagePath()));
+	    for (EventUse use : uses) {
+	        use.setRevState(RevState.CANCEL);
 	    }
 
-	    // 4. 대표 첨부파일 삭제
-	    if (eventToDelete.getFilePath() != null && !eventToDelete.getFilePath().isEmpty()) {
-	        fileUtil.deleteFiles(List.of(eventToDelete.getFilePath()));
-	    }
-
-	    // 5. 서브 이미지들 삭제
-	    if (eventToDelete.getImageList() != null && !eventToDelete.getImageList().isEmpty()) {
-	        List<String> imagePaths = eventToDelete.getImageList().stream()
-	                .map(EventImage::getFilePath)
-	                .filter(Objects::nonNull)
-	                .toList();
-	        fileUtil.deleteFiles(imagePaths);
-	        eventToDelete.getImageList().forEach(img -> img.setEventInfo(null));
-	        eventToDelete.getImageList().clear();
-	    }
-
-	    // 6. 서브 첨부파일들 삭제
-	    if (eventToDelete.getAttachList() != null && !eventToDelete.getAttachList().isEmpty()) {
-	        List<String> filePaths = eventToDelete.getAttachList().stream()
-	                .map(EventFile::getFilePath)
-	                .filter(Objects::nonNull)
-	                .toList();
-	        fileUtil.deleteFiles(filePaths);
-	        eventToDelete.getAttachList().forEach(f -> f.setEventInfo(null));
-	        eventToDelete.getAttachList().clear();
-	    }
-
-	    // 7. 행사 정보 삭제
-	    infoRepository.delete(eventToDelete);
+	    // 3. 변경 사항 저장
+	    infoRepository.save(eventToCancel);
+	    useRepository.saveAll(uses);
 	}
 	
 	// ========================================
@@ -655,6 +619,7 @@ public class EventServiceImpl implements EventService {
 	
 	// 사용자 행사 신청
 	@Override
+	@Transactional
 	public void applyEvent(EventApplyRequestDTO dto) {
 	    Long eventNum = dto.getEventNum();
 	    String memId = dto.getMemId();
@@ -683,12 +648,17 @@ public class EventServiceImpl implements EventService {
 	        throw new IllegalStateException("신청 기간이 종료되었습니다.");
 	    }
 
+	    if (event.getCurrCapacity() >= event.getMaxCapacity()) {
+	        throw new IllegalStateException("모집 정원이 초과되었습니다.");
+	    }
+
 	    Member member = memberRepository.findById(memId)
 	            .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
 
 	    if (member.getState() == MemberState.BEN) {
 	        throw new IllegalStateException("회원이 정지 상태로 인해 프로그램을 신청할 수 없습니다.");
 	    }
+
 	    if (member.getState() == MemberState.LEAVE) {
 	        throw new IllegalStateException("탈퇴한 계정은 신청할 수 없습니다.");
 	    }
@@ -696,24 +666,19 @@ public class EventServiceImpl implements EventService {
 	    if (!isEligible(event.getCategory(), member)) {
 	        throw new IllegalStateException("신청 대상이 아닙니다.");
 	    }
-	    
-	    if (dto.getRevState() == null) {
-	        dto.setRevState(RevState.WAITING); // 기본 상태로 보완
-	    }
 
+	    // ✅ 바로 승인 상태로 저장
 	    EventUse eventUse = EventUse.builder()
 	            .eventInfo(event)
 	            .member(member)
-	            .revState(dto.getRevState())
+	            .revState(RevState.APPROVED)  // 즉시 승인
 	            .applyAt(LocalDateTime.now())
 	            .build();
 
-	    try {
-	        useRepository.save(eventUse);
-	    } catch (DataIntegrityViolationException e) {
-	        log.warn("중복 신청 시도 감지 - eventNum={}, memId={}", eventNum, memId);
-	        throw new IllegalStateException("이미 신청한 프로그램입니다.");
-	    }
+	    useRepository.save(eventUse);
+
+	    // 신청과 동시에 현재 인원 증가
+	    event.increaseCurrCapacity();
 	}
 	
 	// 행사 신청 취소

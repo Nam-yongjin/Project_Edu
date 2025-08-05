@@ -1,11 +1,25 @@
-import { useState } from "react";
+// ✅ 필요한 모듈 임포트
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
 import { postAddEvent } from "../../api/eventApi";
 import useMove from "../../hooks/useMove";
+import { useNavigate } from "react-router-dom"; // ✅ navigate 추가
 
 const EvtAddComponent = () => {
+  const navigate = useNavigate(); // ✅ 페이지 이동용
+  const { moveToPath, moveToReturn } = useMove();
+
+  // ✅ 권한 체크 useEffect
+  useEffect(() => {
+    const userRole = localStorage.getItem("role");
+    if (userRole !== "ADMIN") {
+      alert("권한이 없습니다.");
+      navigate("/event/list");
+    }
+  }, [navigate]);
+
   const initState = {
     eventName: "",
     maxCapacity: 0,
@@ -25,7 +39,6 @@ const EvtAddComponent = () => {
   const [imageList, setImageList] = useState([]);
   const [attachFiles, setAttachFiles] = useState([]);
   const [mainFile, setMainFile] = useState(null);
-  const { moveToPath, moveToReturn } = useMove();
 
   const handleChangeEvt = (e) => {
     const { name, value } = e.target;
@@ -50,13 +63,8 @@ const EvtAddComponent = () => {
     setImageList(previews.slice(1));
   };
 
-  const deleteMainImage = () => {
-    setMainImage(null);
-  };
-
-  const deleteSubImage = (index) => {
-    setImageList((prev) => prev.filter((_, i) => i !== index));
-  };
+  const deleteMainImage = () => setMainImage(null);
+  const deleteSubImage = (index) => setImageList((prev) => prev.filter((_, i) => i !== index));
 
   const handleAttachChange = (e) => {
     const files = Array.from(e.target.files);
@@ -77,125 +85,68 @@ const EvtAddComponent = () => {
   };
 
   const register = () => {
-  const formData = new FormData();
+    const formData = new FormData();
 
-  // 디버깅 로그 - 대표 및 서브 이미지/파일 확인
-  console.log("== FormData 체크 ==");
-  console.log("대표 이미지:", mainImage);
-  console.log("대표 첨부파일:", mainFile);
-  console.log("서브 이미지 리스트:", imageList);
-  console.log("서브 첨부파일 리스트:", attachFiles);
-  console.log("DTO 내용:", evt);
+    // 대표 이미지
+    if (mainImage) formData.append("mainImage", mainImage.file);
+    imageList.forEach((img) => formData.append("imageList", img.file));
 
-  // 대표 이미지 추가
-  if (mainImage) {
-    formData.append("mainImage", mainImage.file);
-  }
+    // 첨부파일
+    if (mainFile) formData.append("mainFile", mainFile);
+    attachFiles.forEach((file) => formData.append("attachList", file));
 
-  // 서브 이미지 추가
-  imageList.forEach((img) => {
-    formData.append("imageList", img.file);
-  });
+    // DTO
+    const dto = {
+      ...evt,
+      applyStartPeriod: formatDateTime(evt.applyStartPeriod),
+      applyEndPeriod: formatDateTime(evt.applyEndPeriod),
+      eventStartPeriod: formatDateTime(evt.eventStartPeriod),
+      eventEndPeriod: formatDateTime(evt.eventEndPeriod),
+    };
 
-  // 대표 첨부파일 추가
-  if (mainFile) {
-    formData.append("mainFile", mainFile);
-  }
+    const jsonBlob = new Blob([JSON.stringify(dto)], { type: "application/json" });
+    formData.append("dto", jsonBlob);
 
-  // 서브 첨부파일 추가
-  attachFiles.forEach((file) => {
-    formData.append("attachList", file);
-  });
-
-  // DTO 구성
-  const dto = {
-    ...evt,
-    applyStartPeriod: formatDateTime(evt.applyStartPeriod),
-    applyEndPeriod: formatDateTime(evt.applyEndPeriod),
-    eventStartPeriod: formatDateTime(evt.eventStartPeriod),
-    eventEndPeriod: formatDateTime(evt.eventEndPeriod),
+    postAddEvent(formData)
+      .then(() => {
+        alert("행사 등록 완료");
+        moveToPath("/event/list");
+      })
+      .catch((error) => {
+        console.error("등록 실패", error);
+        alert(
+          "등록 실패: " +
+            (error.response?.data?.message || JSON.stringify(error.response?.data) || error.message)
+        );
+      });
   };
-
-  // JSON Blob으로 DTO 추가
-  const jsonBlob = new Blob([JSON.stringify(dto)], {
-    type: "application/json",
-  });
-  formData.append("dto", jsonBlob);
-
-  // 디버깅 로그 - 최종 FormData 확인
-  console.log("== FormData 최종 구성 확인 ==");
-  for (let pair of formData.entries()) {
-    console.log(pair[0], pair[1]);
-  }
-
-  // API 전송
-  postAddEvent(formData)
-    .then(() => {
-      alert("행사 등록 완료");
-      moveToPath("/event/list");
-    })
-    .catch((error) => {
-      console.error("등록 실패", error);
-      alert(
-        "등록 실패: " +
-          (error.response?.data?.message ||
-            JSON.stringify(error.response?.data) ||
-            error.message)
-      );
-    });
-};
 
   return (
     <div className="flex mt-10 max-w-6xl mx-auto">
+      {/* === 폼 === */}
       <div className="space-y-6 w-2/3">
         {/* 행사명 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">행사명:</label>
-          <input
-            type="text"
-            name="eventName"
-            value={evt.eventName}
-            onChange={handleChangeEvt}
-            placeholder="행사명을 입력하세요"
-            className="border p-3 text-lg flex-1"
-          />
+          <input type="text" name="eventName" value={evt.eventName} onChange={handleChangeEvt} placeholder="행사명을 입력하세요" className="border p-3 text-lg flex-1" />
         </div>
 
         {/* 소개 */}
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">소개:</label>
-          <textarea
-            name="eventInfo"
-            value={evt.eventInfo}
-            onChange={handleChangeEvt}
-            rows={5}
-            className="border p-3 text-lg flex-1 resize-y"
-            placeholder="행사 소개 입력"
-          />
+          <textarea name="eventInfo" value={evt.eventInfo} onChange={handleChangeEvt} rows={5} className="border p-3 text-lg flex-1 resize-y" placeholder="행사 소개 입력" />
         </div>
 
         {/* 장소 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">장소:</label>
-          <input
-            type="text"
-            name="place"
-            value={evt.place}
-            onChange={handleChangeEvt}
-            placeholder="행사 장소"
-            className="border p-3 text-lg flex-1"
-          />
+          <input type="text" name="place" value={evt.place} onChange={handleChangeEvt} placeholder="행사 장소" className="border p-3 text-lg flex-1" />
         </div>
 
         {/* 모집 대상 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">모집 대상:</label>
-          <select
-            name="category"
-            value={evt.category}
-            onChange={handleChangeEvt}
-            className="border p-3 text-lg flex-1"
-          >
+          <select name="category" value={evt.category} onChange={handleChangeEvt} className="border p-3 text-lg flex-1">
             <option value="USER">일반인</option>
             <option value="STUDENT">학생</option>
             <option value="TEACHER">교수</option>
@@ -203,17 +154,12 @@ const EvtAddComponent = () => {
         </div>
 
         {/* 날짜 선택 */}
-        {[
-          { label: "모집 시작", name: "applyStartPeriod", value: evt.applyStartPeriod },
-          { label: "모집 종료", name: "applyEndPeriod", value: evt.applyEndPeriod },
-          { label: "행사 시작", name: "eventStartPeriod", value: evt.eventStartPeriod },
-          { label: "행사 종료", name: "eventEndPeriod", value: evt.eventEndPeriod },
-        ].map((item) => (
-          <div key={item.name} className="flex items-center">
-            <label className="text-xl font-semibold w-[120px]">{item.label}:</label>
+        {["applyStartPeriod", "applyEndPeriod", "eventStartPeriod", "eventEndPeriod"].map((key, idx) => (
+          <div key={key} className="flex items-center">
+            <label className="text-xl font-semibold w-[120px]">{["모집 시작", "모집 종료", "행사 시작", "행사 종료"][idx]}:</label>
             <DatePicker
-              selected={item.value}
-              onChange={(date) => handleDateChange(item.name, date)}
+              selected={evt[key]}
+              onChange={(date) => handleDateChange(key, date)}
               showTimeSelect
               dateFormat="yyyy-MM-dd HH:mm"
               timeFormat="HH:mm"
@@ -249,66 +195,36 @@ const EvtAddComponent = () => {
         {/* 최대 인원 */}
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">최대 인원:</label>
-          <input
-            type="number"
-            name="maxCapacity"
-            value={evt.maxCapacity}
-            onChange={handleChangeEvt}
-            className="border p-3 text-lg flex-1"
-          />
+          <input type="number" name="maxCapacity" value={evt.maxCapacity} onChange={handleChangeEvt} className="border p-3 text-lg flex-1" />
         </div>
 
-        {/* 기타 유의사항 */}
+        {/* 유의사항 */}
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">유의사항:</label>
-          <textarea
-            name="etc"
-            value={evt.etc}
-            onChange={handleChangeEvt}
-            rows={3}
-            className="border p-3 text-lg flex-1 resize-y"
-            placeholder="기타 유의사항 입력"
-          />
+          <textarea name="etc" value={evt.etc} onChange={handleChangeEvt} rows={3} className="border p-3 text-lg flex-1 resize-y" placeholder="기타 유의사항 입력" />
         </div>
 
         {/* 이미지 업로드 */}
         <div className="flex items-center mt-3">
           <label className="text-xl font-semibold w-[120px]">이미지:</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="border p-2 text-base flex-1"
-          />
+          <input type="file" multiple accept="image/*" onChange={handleImageChange} className="border p-2 text-base flex-1" />
         </div>
 
-        {/* 첨부파일 */}
+        {/* 첨부파일 업로드 */}
         <div className="flex items-center mt-3">
           <label className="text-xl font-semibold w-[120px]">첨부파일:</label>
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.hwp,.doc,.docx"
-            onChange={handleAttachChange}
-            className="border p-2 text-base flex-1"
-          />
+          <input type="file" multiple accept=".pdf,.hwp,.doc,.docx" onChange={handleAttachChange} className="border p-2 text-base flex-1" />
         </div>
 
         {/* 버튼 */}
         <div className="mt-4 flex justify-end gap-4">
-          <button onClick={register} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-            행사 등록
-          </button>
-          <button onClick={moveToReturn} className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500">
-            뒤로가기
-          </button>
+          <button onClick={register} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">행사 등록</button>
+          <button onClick={moveToReturn} className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500">뒤로가기</button>
         </div>
       </div>
 
-      {/* 미리보기 */}
+      {/* === 미리보기 === */}
       <div className="w-1/3 pl-10 flex flex-col gap-4">
-        {/* 대표 이미지 */}
         {mainImage && (
           <div className="border rounded p-2 shadow">
             <div className="flex justify-between items-center">
@@ -320,7 +236,6 @@ const EvtAddComponent = () => {
           </div>
         )}
 
-        {/* 서브 이미지 */}
         {imageList.map((img, idx) => (
           <div key={idx} className="border rounded p-2 shadow">
             <div className="flex justify-between items-center">
@@ -332,13 +247,13 @@ const EvtAddComponent = () => {
           </div>
         ))}
 
-        {/* 첨부파일 */}
         {mainFile && (
           <div className="border rounded p-2 shadow">
             <p className="text-sm font-semibold text-blue-600">대표 첨부파일</p>
             <p className="text-sm break-words">{mainFile.name}</p>
           </div>
         )}
+
         {attachFiles.map((file, index) => (
           <div key={index} className="border rounded p-2 shadow">
             <p className="text-sm text-gray-700">기타 첨부파일</p>

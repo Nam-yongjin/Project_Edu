@@ -55,7 +55,7 @@ public class EventInfo {
     private EventCategory category;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private EventState state;
 
     @Builder.Default
@@ -76,7 +76,7 @@ public class EventInfo {
     @Column(nullable = false)
     private int maxCapacity;
 
-    @Column(nullable = false)
+    @Column(name = "curr_capacity", nullable = false)
     private int currCapacity;
 
     @Column(length = 1000)
@@ -111,5 +111,9 @@ public class EventInfo {
         if (this.state == null) {
             this.state = EventState.BEFORE;
         }
+    }
+    
+    public void increaseCurrCapacity() {
+        this.currCapacity += 1;
     }
 }
