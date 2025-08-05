@@ -61,4 +61,10 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 	// 나중에 회원 탈퇴할때, 실증 신청 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
 	@Query("SELECT state FROM DemonstrationReserve WHERE member.memId=:memId")
 	DemonstrationState findByState(@Param("memId") String memId);
+	
+	// 물품 예약 신청할때 해당 회원이 동일한 상품에 예약을 할 경우, 막기 위해 만든 쿼리문
+	@Query("SELECT COUNT(r) > 0 FROM DemonstrationReserve r WHERE r.member.memId = :memId AND r.demonstration.demNum = :demNum")
+	Optional<Boolean> checkRes(@Param("demNum") Long demNum, @Param("memId") String memId);
+
+	
 }

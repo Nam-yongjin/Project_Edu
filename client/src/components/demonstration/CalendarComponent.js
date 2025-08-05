@@ -60,7 +60,6 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
   // disabled 처리 위한 함수
   const isDateDisabled = (date) => {
     const dateStr = toLocalDateString(date);
-    // console.log(disabledDates);
     return disabledDates.includes(dateStr) || date <= today;
   };
 
@@ -77,6 +76,9 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
   // 선택 날짜가 포함되어 있다면 삭제.
   const handleReserve = (date) => {
     const dateStr = toLocalDateString(date);
+
+    if (isDateDisabled(date)) return;
+
     if (!selectedDate.includes(dateStr)) {
       setSelectedDate([...selectedDate, dateStr]);
     }
@@ -88,6 +90,7 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
 
   // 선택 되어 있는 날짜 여부 반환 함수
   const isSelected = (date) => {
+    if (isDateDisabled(date)) return;
     const dateStr = toLocalDateString(date);
     return selectedDate.includes(dateStr);
   };

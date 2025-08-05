@@ -15,12 +15,6 @@ import lombok.NoArgsConstructor;
 public class DemonstrationTimeResDTO { // 이 dto는 실증 신청의 사용 시작일 ~ 사용 종료일을 하루 단위로 세세하기 나눈 dto를 뜻함. 
 	// (백-> 클라이언트 받을때 사용)
 	private LocalDate demDate; // 사용 시작일과 사용 종료일을 하루 단위로 나눈 날짜
-	private Boolean state; // 예약 상태
 	private Long demNum; // 실증 번호
-	public DemonstrationTimeResDTO(LocalDate demDate, boolean state, Long demNum) {
-	    this.demDate = demDate;
-	    this.state = state;
-	    this.demNum = demNum;
-	}
 	
 }

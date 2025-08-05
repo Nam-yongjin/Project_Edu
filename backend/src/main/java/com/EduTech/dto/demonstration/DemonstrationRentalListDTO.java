@@ -1,6 +1,7 @@
 package com.EduTech.dto.demonstration;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class DemonstrationRentalListDTO {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private LocalDate applyAt;
-
+	private List<DemonstrationImageDTO> imageList; 
 	// 물품 대여 조회 페이지용 생성자
 	public DemonstrationRentalListDTO(Long demNum, String demName, String companyName, Long itemNum,
 			LocalDate startDate, LocalDate endDate, LocalDate applyAt) {

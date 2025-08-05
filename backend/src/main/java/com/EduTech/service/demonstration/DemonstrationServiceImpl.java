@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.EduTech.BackendApplication;
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
@@ -50,6 +50,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class DemonstrationServiceImpl implements DemonstrationService {
+
 	@Autowired
 	DemonstrationReserveRepository demonstrationReserveRepository;
 	@Autowired
@@ -67,7 +68,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	@Autowired
 	ModelMapper modelMapper;
 
-	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
+	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
 	@Override
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search, Integer pageCount) {
 		if (pageCount == null || pageCount < 0) {
@@ -89,7 +90,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
-	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.)
+	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
 	@Override
 	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search, Integer pageCount) {
 		if (pageCount == null || pageCount < 0) {
@@ -113,24 +114,34 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search, Integer pageCount) {
+	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search, String type,
+			Integer pageCount) {
 
 		if (pageCount == null || pageCount < 0) {
 			pageCount = 0;
 		}
 
+		Page<DemonstrationRentalListDTO> currentPage = Page.empty();
+
 		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
-			Page<DemonstrationRentalListDTO> currentPage = demonstrationRepository
+			currentPage = demonstrationRepository
 					.selectPageViewDem(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId);
-
-			return new PageResponseDTO<DemonstrationRentalListDTO>(currentPage); // 페이지 DTO 객체 리턴
 		} else { // 검색어 입력을 했을 경우,
-			Page<DemonstrationRentalListDTO> currentPage = demonstrationRepository.selectPageViewDemSearch(
-					PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId, search);
+			if (type.equals("demName")) {
+				currentPage = demonstrationRepository.selectPageViewDemSearch(
+						PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId, search);
+			} else if (type.equals("companyName")) {
+				currentPage = demonstrationRepository.selectPageViewDemSearchCom(
+						PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId, search);
+			}
 
-			return new PageResponseDTO<DemonstrationRentalListDTO>(currentPage); // 페이지 DTO 객체 리턴
 		}
 
+		for (DemonstrationRentalListDTO dto : currentPage) {
+			dto.setImageList(demonstrationImageRepository.selectDemImage(dto.getDemNum()));
+		}
+
+		return new PageResponseDTO<DemonstrationRentalListDTO>(currentPage); // 페이지 DTO 객체 리턴
 	}
 
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
@@ -147,7 +158,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		List<DemonstrationTime> dates = new ArrayList<>();
 		for (LocalDate date = demonstrationResRentalDTO.getUpdatedStartDate(); !date
 				.isAfter(demonstrationResRentalDTO.getUpdatedEndDate()); date = date.plusDays(1)) {
-			dates.add(DemonstrationTime.builder().demDate(date).state(true)
+			dates.add(DemonstrationTime.builder().demDate(date)
 					.demonstration(Demonstration.builder().demNum(demonstrationResRentalDTO.getDemNum()).build())
 					.build());
 		}
@@ -215,14 +226,17 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 	@Override
-	public void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO,String memId) {
+	@Transactional
+	public void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO, String memId) {
 		// 선택한 실증 상품의 예약된 상태를 불러오기 위해 사용한 dto
 		DemonstrationTimeReqDTO demonstrationTimeReqDTO = new DemonstrationTimeReqDTO();
 		demonstrationTimeReqDTO.setDemNum(demonstrationReservationDTO.getDemNum());
 		demonstrationTimeReqDTO.setStartDate(demonstrationReservationDTO.getStartDate());
 		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
 		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
-
+		int result = demonstrationRepository.updateItemNum(demonstrationReservationDTO.getItemNum(),
+				demonstrationReservationDTO.getDemNum());
+		System.out.println(result);
 		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		if (ResState == null || ResState.isEmpty()) {
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
@@ -237,13 +251,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			List<DemonstrationTime> demonstrationTimeList = new ArrayList<>();
 			for (LocalDate date = demonstrationReservationDTO.getStartDate(); !date
 					.isAfter(demonstrationReservationDTO.getEndDate()); date = date.plusDays(1)) {
-				DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date).state(true)
+				DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date)
 						.demonstration(Demonstration.builder().demNum(demonstrationReservationDTO.getDemNum()).build())
 						.build();
 				demonstrationTimeList.add(demonstrationTime);
 			} // 변경 전 날짜로 부터 변경 후 까지의 날짜의 예약 상태 추가
 				// time 리스트를 저장
 			demonstrationTimeRepository.saveAll(demonstrationTimeList);
+
 		} else {
 			System.out.println("예약된 날짜가 겹쳐 있습니다.");
 		}
@@ -274,21 +289,22 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
 	}
 
-	// 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
+	// 실증 신청 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@Override
-	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO,String memId) {
+	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO, String memId) {
 		// 기존 예약 취소
 		DemonstrationReservationCancelDTO demonstrationReservationcancelDTO = new DemonstrationReservationCancelDTO();
 		demonstrationReservationcancelDTO.setMemId(demonstrationReservationDTO.getMemId());
 		demonstrationReservationcancelDTO.setDemNum(demonstrationReservationDTO.getDemNum());
 		demonstrationReservationCancel(demonstrationReservationcancelDTO);
 		// 새로운 예약 추가
-		demonstrationReservation(demonstrationReservationDTO,memId);
+		demonstrationReservation(demonstrationReservationDTO, memId);
 	}
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
 	@Override
-	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,String memId) {
+	public void addDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,
+			String memId) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
 				.itemNum(demonstrationFormDTO.getItemNum()).build();
@@ -297,7 +313,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationRepository.save(demonstration);
 		Long demNum = demonstration.getDemNum();
 
-		//System.out.println(memId);
+		// System.out.println(memId);
 		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		DemonstrationRegistration demonstrationRegistration = DemonstrationRegistration.builder()
 				.regDate(LocalDate.now()).expDate(demonstrationFormDTO.getExpDate()).state(DemonstrationState.WAIT)
@@ -305,81 +321,80 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 		// 실증 등록
 		demonstrationRegistrationRepository.save(demonstrationRegistration);
-		
+
 		// 폴더에 이미지 저장 (demImages라는 폴더에)
 		List<Object> files = fileUtil.saveFiles(imageList, "demImages");
 
 		Integer mainIndex = demonstrationFormDTO.getMainImageIndex(); // ex) 0, 1, 2 중 하나
 
 		for (int i = 0; i < files.size(); i++) {
-		    Object obj = files.get(i);
-		    if (obj instanceof Map) {
-		        Map<String, String> map = (Map<String, String>) obj;
+			Object obj = files.get(i);
+			if (obj instanceof Map) {
+				Map<String, String> map = (Map<String, String>) obj;
 
-		        boolean isMain = (mainIndex != null && mainIndex == i); // 현재 인덱스가 mainIndex면 true
+				boolean isMain = (mainIndex != null && mainIndex == i); // 현재 인덱스가 mainIndex면 true
 
-		        DemonstrationImage demonstrationImage = DemonstrationImage.builder()
-		                .imageName(map.get("originalName"))
-		                .imageUrl(map.get("filePath"))
-		                .demonstration(Demonstration.builder().demNum(demNum).build())
-		                .isMain(isMain)
-		                .build();
+				DemonstrationImage demonstrationImage = DemonstrationImage.builder().imageName(map.get("originalName"))
+						.imageUrl(map.get("filePath")).demonstration(Demonstration.builder().demNum(demNum).build())
+						.isMain(isMain).build();
 
-		        demonstrationImageRepository.save(demonstrationImage);
-		    }
+				demonstrationImageRepository.save(demonstrationImage);
+			}
 		}
 
 	}
 
 	@Override
 	@Transactional
-	public void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,String memId) {
-	    // 실증 상품 정보 업데이트
-	    demonstrationRepository.updateDem(demonstrationFormDTO.getDemName(), demonstrationFormDTO.getDemMfr(),
-	            demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum());
+	public void updateDemonstration(DemonstrationFormReqDTO demonstrationFormDTO, List<MultipartFile> imageList,
+			String memId) {
+		// 실증 상품 정보 업데이트
+		demonstrationRepository.updateDem(demonstrationFormDTO.getDemName(), demonstrationFormDTO.getDemMfr(),
+				demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum());
 
-	    // 반납 예정일 수정
-	    demonstrationRegistrationRepository.updateDemRegChangeExpDate(demonstrationFormDTO.getExpDate(),
-	            demonstrationFormDTO.getDemNum(), memId);
+		// 반납 예정일 수정
+		demonstrationRegistrationRepository.updateDemRegChangeExpDate(demonstrationFormDTO.getExpDate(),
+				demonstrationFormDTO.getDemNum(), memId);
 
-	    // 기존 상품 이미지 불러옴(폴더에서 이미지 삭제 위해)
-	    List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository
-	            .selectDemImage(demonstrationFormDTO.getDemNum());
-	    List<String> filePaths = new ArrayList<>();
-	    for (DemonstrationImageDTO dto : deleteImageList) {
-	        String path = dto.getImageUrl();
-	        String s_path = "s_" + dto.getImageUrl();
-	        filePaths.add(path);
-	        filePaths.add(s_path);
-	    }
+		// 기존 상품 이미지 불러옴(폴더에서 이미지 삭제 위해)
+		List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository
+				.selectDemImage(demonstrationFormDTO.getDemNum());
+		List<String> filePaths = new ArrayList<>();
+		for (DemonstrationImageDTO dto : deleteImageList) {
+			String path = dto.getImageUrl();
+			String s_path = "s_" + dto.getImageUrl();
+			filePaths.add(path);
+			filePaths.add(s_path);
+		}
 
-	    // 폴더에서 이미지 삭제
-	    fileUtil.deleteFiles(filePaths);
+		// 폴더에서 이미지 삭제
+		fileUtil.deleteFiles(filePaths);
 
-	    // 기존 상품 이미지 삭제 후,
-	    demonstrationImageRepository.deleteDemNumImage(demonstrationFormDTO.getDemNum());
+		// 기존 상품 이미지 삭제 후,
+		demonstrationImageRepository.deleteDemNumImage(demonstrationFormDTO.getDemNum());
 
-	    if (imageList != null && !imageList.isEmpty()) {
-	        List<Object> files = fileUtil.saveFiles(imageList, "demImages");
+		if (imageList != null && !imageList.isEmpty()) {
+			List<Object> files = fileUtil.saveFiles(imageList, "demImages");
 
-	        int mainIndex = demonstrationFormDTO.getMainImageIndex() != null ? demonstrationFormDTO.getMainImageIndex() : 0;
+			int mainIndex = demonstrationFormDTO.getMainImageIndex() != null ? demonstrationFormDTO.getMainImageIndex()
+					: 0;
 
-	        for (int i = 0; i < files.size(); i++) {
-	            Object obj = files.get(i);
-	            if (obj instanceof Map) {
-	                Map<String, String> map = (Map<String, String>) obj;
-	                DemonstrationImage demonstrationimage = DemonstrationImage.builder()
-	                        .imageName(map.get("originalName"))
-	                        .imageUrl(map.get("filePath"))
-	                        .isMain(i == mainIndex)  // mainImageIndex와 비교해서 true/false 설정
-	                        .demonstration(Demonstration.builder().demNum(demonstrationFormDTO.getDemNum()).build())
-	                        .build();
-	                demonstrationImageRepository.save(demonstrationimage);
-	            }
-	        }
-	    }
+			for (int i = 0; i < files.size(); i++) {
+				Object obj = files.get(i);
+				if (obj instanceof Map) {
+					Map<String, String> map = (Map<String, String>) obj;
+					DemonstrationImage demonstrationimage = DemonstrationImage.builder()
+							.imageName(map.get("originalName")).imageUrl(map.get("filePath")).isMain(i == mainIndex) // mainImageIndex와
+																														// 비교해서
+																														// true/false
+																														// 설정
+							.demonstration(Demonstration.builder().demNum(demonstrationFormDTO.getDemNum()).build())
+							.build();
+					demonstrationImageRepository.save(demonstrationimage);
+				}
+			}
+		}
 	}
-
 
 	// 실증 번호를 받아서 실증 상품을 삭제하는 기능
 	@Override
@@ -396,16 +411,23 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Demonstration entity = demonstrationRepository.findById(demNum)
 				.orElseThrow(() -> new RuntimeException("해당 번호의 실증 정보가 없습니다: " + demNum));
 		DemonstrationFormResDTO dto = modelMapper.map(entity, DemonstrationFormResDTO.class);
-		List<DemonstrationImageDTO> imageDtoList=demonstrationImageRepository.selectDemImage(demNum);
+		List<DemonstrationImageDTO> imageDtoList = demonstrationImageRepository.selectDemImage(demNum);
 		// 각 리스트 분리해서 dto에 세팅
 		for (DemonstrationImageDTO imageDto : imageDtoList) {
 			dto.getImageUrlList().add(imageDto.getImageUrl());
 			dto.getImageNameList().add(imageDto.getImageName());
 			dto.getIsMain().add(String.valueOf(imageDto.getIsMain())); // boolean을 string으로
 		}
-		
+
 		dto.setExpDate(demonstrationRegistrationRepository.selectDemRegExpDate(demNum));
-		
+
 		return dto;
+	}
+	
+	// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
+	@Override
+	public Boolean checkRes(Long demNum,String memId) {
+		Boolean bool=demonstrationReserveRepository.checkRes(demNum, memId).orElse(false);
+		return bool;
 	}
 }
