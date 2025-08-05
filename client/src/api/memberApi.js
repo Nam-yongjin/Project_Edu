@@ -57,6 +57,18 @@ export const checkDuplicateId = async (params) => {
     return res.data;
 };
 
+// 이메일 중복 체크
+export const checkEmail = async (params) => {
+    const res = await axios.get(`${host}/checkEmail`, { params: params });
+    return res.data;
+};
+
+// 휴대폰번호 중복 체크
+export const checkPhone = async (params) => {
+    const res = await axios.get(`${host}/checkPhone`, { params: params });
+    return res.data;
+};
+
 // 회원정보조회
 export const readMember = async () => {
     const res = await jwtAxios.get(`${member}/myInfo`);

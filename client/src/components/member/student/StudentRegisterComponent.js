@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PhoneVerification from '../PhoneVerification';
 import useMove from '../../../hooks/useMove';
-import { registerStudent, checkDuplicateId } from '../../../api/memberApi';
+import { registerStudent, checkDuplicateId, checkEmail, checkPhone } from '../../../api/memberApi';
 import AddressSearch from '../AddressSearch';
 
 const initState = {
@@ -90,37 +90,53 @@ const StudentRegisterComponent = () => {
         return errs;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         const validationErrors = validate();
         setErrors(validationErrors);
 
-        if (Object.keys(validationErrors).length > 0) {
-            return;
-        };
-
-        // pwCheck를 제거한 객체
-        const { pwCheck, ...dataToSubmit } = {
-            ...form,
-            phone: verifiedPhone
-        };
+        if (Object.keys(validationErrors).length > 0) return;
 
         if (!idCheck) {
             alert("아이디 중복 확인을 해야합니다.");
             return;
-        };
+        }
 
-        registerStudent(dataToSubmit).then((response) => {
-            alert('회원가입 완료');
-            // 초기화
-            setForm({ ...initState });
-            setVerifiedPhone(null);
-            setErrors({});
-            moveToLogin();
-        }).catch((error) => {
-            alert('회원가입 실패');
-        });
+        // 이메일, 휴대폰번호 중복 체크
+        try {
+            const isDuplicatedEmail = await checkEmail({ email: form.email });
+            if (isDuplicatedEmail) {
+                alert('이미 등록 된 이메일입니다.');
+                return;
+            }
+            const isDuplicatedPhone = await checkPhone({ email: form.phone });
+            if (isDuplicatedPhone) {
+                alert('이미 등록 된 휴대폰번호입니다.');
+                return;
+            }
 
+            // pwCheck 제거
+            const { pwCheck, ...dataToSubmit } = {
+                ...form,
+                phone: verifiedPhone
+            };
+
+            registerStudent(dataToSubmit)
+                .then(() => {
+                    alert('회원가입을 완료했습니다.');
+                    setForm({ ...initState });
+                    setVerifiedPhone(null);
+                    setErrors({});
+                    moveToLogin();
+                })
+                .catch((error) => {
+                    alert('회원가입 중 오류 발생');
+                });
+
+        } catch (error) {
+            alert('중복 확인 중 오류 발생');
+        }
     };
 
     const handleCheckDuplicateId = async () => {

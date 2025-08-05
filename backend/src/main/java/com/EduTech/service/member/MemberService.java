@@ -28,6 +28,10 @@ public interface MemberService {
 	
 	boolean isDuplicatedId(String memId);
 	
+	boolean checkEmail(String email);
+	
+	boolean checkPhone(String phone);
+	
 	MemberDetailDTO readMemberInfo(String memId);
 	
 	StudentDetailDTO readStudentInfo(String memId);

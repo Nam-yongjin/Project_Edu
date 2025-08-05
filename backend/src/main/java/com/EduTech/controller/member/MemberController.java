@@ -75,6 +75,18 @@ public class MemberController {
 	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam("memId") String memId) {
 		return ResponseEntity.ok(memberService.isDuplicatedId(memId));
 	}
+	
+	// 이메일 중복 체크
+	@GetMapping("/checkEmail")
+	public ResponseEntity<Boolean> checkEmail(@RequestParam("email") String email) {
+		return ResponseEntity.ok(memberService.checkEmail(email));
+	}
+	
+	// 휴대폰번호 중복 체크
+	@GetMapping("/checkPhone")
+	public ResponseEntity<Boolean> checkPhone(@RequestParam("phone") String phone) {
+		return ResponseEntity.ok(memberService.checkPhone(phone));
+	}
 
 	// 일반회원 상세정보
 	@GetMapping("/member/myInfo")
