@@ -160,170 +160,222 @@ const MemberInfoModifyComponent = () => {
     };
 
     return (
-        <div className='space-y-5 pl-4'>
-            <div className='text-3xl'>회원상세정보</div>
-            <div>
-                <input
-                    name="memId"
-                    value={form.memId}
-                    disabled={true} />
-            </div>
-            {modifying ?
+        <div>
+            <div className={`${modifying ? "" : "w-[640px]"} my-10 p-10 space-y-6 text-center shadow-2xl`}>
+                {modifying ?
+                    <div className="text-3xl font-bold">회원정보수정</div>
+                    :
+                    <div className="text-3xl font-bold">회원상세정보</div>
+                }
                 <div>
-                    <input
-                        name="pw"
-                        type="password"
-                        placeholder="새 비밀번호 입력"
-                        value={form.pw}
-                        onChange={handleChange} />
-                    {errors.pw && <div style={{ color: 'red' }}>{errors.pw}</div>}
+                    <div className="flex items-center">
+                        <label className="w-36 text-left font-medium">아이디<span className='text-red-600' hidden={!modifying}> *</span></label>
+                        <input
+                            name="memId"
+                            value={form.memId}
+                            disabled={true}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" />
+                    </div>
                 </div>
-                :
-                <></>}
-            {modifying ?
+                {modifying ?
+                    <div>
+                        <div className="flex items-center">
+                            <label className="w-36 text-left font-medium">새 비밀번호<span className='text-red-600' hidden={!modifying}> *</span></label>
+                            <input
+                                name="pw"
+                                type="password"
+                                placeholder="새 비밀번호 입력"
+                                value={form.pw}
+                                onChange={handleChange}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            {errors.pw && <div style={{ color: 'red' }}>{errors.pw}</div>}
+                        </div>
+                    </div>
+                    :
+                    <></>}
+                {modifying ?
+                    <div>
+                        <div className="flex items-center">
+                            <label className="w-36 text-left font-medium">새 비밀번호 확인<span className='text-red-600' hidden={!modifying}> *</span></label>
+                            <input
+                                name="pwCheck"
+                                type="password"
+                                placeholder="새 비밀번호 확인"
+                                value={form.pwCheck}
+                                onChange={handleChange}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            {errors.pwCheck && <div style={{ color: 'red' }}>{errors.pwCheck}</div>}
+                        </div>
+                    </div>
+                    :
+                    <></>}
                 <div>
-                    <input
-                        name="pwCheck"
-                        type="password"
-                        placeholder="새 비밀번호 확인"
-                        value={form.pwCheck}
-                        onChange={handleChange}
-                    />
-                    {errors.pwCheck && <div style={{ color: 'red' }}>{errors.pwCheck}</div>}
+                    <div className="flex items-center">
+                        <label className="w-36 text-left font-medium">이름<span className='text-red-600' hidden={!modifying}> *</span></label>
+                        <input
+                            name="name"
+                            placeholder="이름"
+                            value={form.name}
+                            disabled={!modifying}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        {errors.name && <div style={{ color: 'red' }}>{errors.name}</div>}
+                    </div>
                 </div>
-                :
-                <></>}
-            <div>
-                <input
-                    name="name"
-                    placeholder="이름"
-                    value={form.name}
-                    disabled={!modifying}
-                    onChange={handleChange} />
-                {errors.name && <div style={{ color: 'red' }}>{errors.name}</div>}
-            </div>
 
-            {modifying ?
+                {modifying ?
+                    <div>
+                        <div className="flex items-start">
+                            <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
+                            <PhoneVerification onVerified={setVerifiedPhone} />
+                        </div>
+                        {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
+                    </div>
+                    :
+                    <div>
+                        <div className="flex items-start">
+                            <div className="w-36 text-left font-medium pt-2">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
+                            <input
+                                type="text"
+                                value={formattedPhoneNumber}
+                                disabled={true}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                }
+
                 <div>
-                    <PhoneVerification onVerified={setVerifiedPhone} />
-                    {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
+                    <div className="flex items-center">
+                        <label className="w-36 text-left font-medium">이메일<span className='text-red-600' hidden={!modifying}> *</span></label>
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="이메일"
+                            value={form.email}
+                            disabled={!modifying}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        {errors.email && <div style={{ color: 'red' }}>{errors.email}</div>}
+                    </div>
                 </div>
-                :
+
                 <div>
-                    <input
-                        type="text"
-                        value={formattedPhoneNumber}
-                        disabled={true}
-                    />
+                    <div className="flex items-center">
+                        <label className="w-36 text-left font-medium">생년월일<span className='text-red-600' hidden={!modifying}> *</span></label>
+                        <input
+                            name="birthDate"
+                            type="date"
+                            value={form.birthDate}
+                            disabled={true}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" />
+                    </div>
                 </div>
-            }
 
-
-            <div>
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="이메일"
-                    value={form.email}
-                    disabled={!modifying}
-                    onChange={handleChange} />
-                {errors.email && <div style={{ color: 'red' }}>{errors.email}</div>}
-            </div>
-
-            <div>
-                <input
-                    name="birthDate"
-                    type="date"
-                    value={form.birthDate}
-                    disabled={true} />
-            </div>
-
-            <div>
-                <input
-                    name="gender"
-                    value={form.gender}
-                    disabled={true} />
-            </div>
-
-            {modifying ?
                 <div>
-                    <AddressSearch onAddressSelected={handleAddressSelected} />
-                    <input
-                        name="addr"
-                        placeholder="주소"
-                        value={form.addr}
-                        readOnly
-                    />
+                    <div className="flex items-center">
+                        <div className="w-36 text-left font-medium">성별<span className='text-red-600' hidden={!modifying}> *</span></div>
+                        <input
+                            name="gender"
+                            value={form.gender}
+                            disabled={true}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" />
+                    </div>
                 </div>
-                :
+
+                {modifying ?
+                    <div>
+                        <div className="flex items-start">
+                            <div className="w-36 text-left font-medium pt-2">주소</div>
+                            <div className="flex-1">
+                                <AddressSearch onAddressSelected={handleAddressSelected} />
+                                <input
+                                    name="addr"
+                                    placeholder="주소"
+                                    value={form.addr}
+                                    readOnly
+                                    className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    :
+                    <div>
+                        <div className="flex items-center">
+                            <label className="w-36 text-left font-medium">주소</label>
+                            <input
+                                name="addr"
+                                value={form.addr ?? ''}
+                                disabled={true}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                }
+
                 <div>
-                    <input
-                        name="addr"
-                        value={form.addr ?? ''}
-                        disabled={true}
-                    />
+                    <div className="flex items-center">
+                        <label className="w-36 text-left font-medium">상세 주소</label>
+                        <input
+                            name="addrDetail"
+                            placeholder="상세 주소"
+                            value={form.addrDetail ?? ''}
+                            disabled={!modifying}
+                            onChange={handleChange}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
                 </div>
-            }
 
-            <div>
-                <input
-                    name="addrDetail"
-                    placeholder="상세 주소"
-                    value={form.addrDetail ?? ''}
-                    disabled={!modifying} 
-                    onChange={handleChange}/>
-            </div>
-
-            <div>
-                <label>
+                <div className="flex items-center">
+                    <label className="w-36 text-left font-medium">SMS 수신<span className='text-red-600' hidden={!modifying}> *</span></label>
                     <input
                         name="checkSms"
                         type="checkbox"
                         checked={form.checkSms}
                         disabled={!modifying}
-                        onChange={handleChange} />
-                    SMS 수신 동의
-                </label>
-                {errors.checkSms && <div style={{ color: 'red' }}>{errors.checkSms}</div>}
-            </div>
+                        onChange={handleChange}
+                        className="mr-2" />
+                    {errors.checkSms && <div style={{ color: 'red' }}>{errors.checkSms}</div>}
+                </div>
 
-            <div>
-                <label>
+                <div className="flex items-center">
+                    <label className="w-36 text-left font-medium">이메일 수신<span className='text-red-600' hidden={!modifying}> *</span></label>
                     <input
                         name="checkEmail"
                         type="checkbox"
                         checked={form.checkEmail}
                         disabled={!modifying}
-                        onChange={handleChange} />
-                    이메일 수신 동의
-                </label>
-                {errors.checkEmail && <div style={{ color: 'red' }}>{errors.checkEmail}</div>}
-            </div>
+                        onChange={handleChange}
+                        className="mr-2" />
+                    {errors.checkEmail && <div style={{ color: 'red' }}>{errors.checkEmail}</div>}
+                </div>
 
-            <div className=''>
-                {modifying
-                    ?
-                    <div className='flex'>
-                        <div className='pr-4'>
-                            <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600 font-bold' onClick={handleClickModify}>수정완료</button>
+                <div className=''>
+                    {modifying
+                        ?
+                        <div className='flex justify-center'>
+                            <div className='pr-4'>
+                                <button className='rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold' onClick={handleClickModify}>수정완료</button>
+                            </div>
+                            <div className='pr-4'>
+                                <button className='rounded-md p-2 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 font-semibold' onClick={handleModifyCancle}>수정취소</button>
+                            </div>
+                            <div>
+                                <button className='rounded-md p-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold' onClick={handleMoveLeave}>회원탈퇴</button>
+                            </div>
                         </div>
-                        <div className='pr-4'>
-                            <button className='rounded p-1 w-[70px] bg-gray-200 active:bg-gray-300 font-bold' onClick={handleModifyCancle}>취소</button>
+                        :
+                        <div className='flex justify-center'>
+                            <div className='pr-4'>
+                                <button className="rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold" onClick={handleMoveModify}>정보수정</button>
+                            </div>
+                            <div>
+                                <button className='rounded-md p-2 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 font-semibold' onClick={moveToReturn}>뒤로가기</button>
+                            </div>
                         </div>
-                        <div>
-                            <button className='rounded p-1 w-[70px] bg-red-500	text-white active:bg-red-600 font-bold' onClick={handleMoveLeave}>회원탈퇴</button>
-                        </div>
-                    </div>
-                    :
-                    <div className='flex'>
-                        <div className='pr-4'>
-                            <button className='rounded p-1 w-[70px] bg-blue-500	text-white active:bg-blue-600 font-bold' onClick={handleMoveModify}>정보수정</button>
-                        </div>
-                        <div>
-                            <button className='rounded p-1 w-[70px] bg-gray-300 active:bg-gray-400 font-bold' onClick={moveToReturn}>뒤로가기</button>
-                        </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
         </div>
     );

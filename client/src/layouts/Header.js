@@ -158,7 +158,7 @@ const Header = () => {
                 로그아웃
               </span>
               <span className="hover:text-blue-400 cursor-pointer active:text-blue-600 hidden lg:block">
-                <Link to={getMyPageLink(loginState.role)}>마이페이지</Link>
+                <Link to={getMyPageLink(loginState.role)}>내정보</Link>
               </span>
             </>
           ) : (

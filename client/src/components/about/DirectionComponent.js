@@ -1,7 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import SubAboutHeader from "../../layouts/SubAboutHeader";
 
 const DirectionComponent = () => {
+    const location = useLocation();
+    const mapInitialized = useRef(false);
+
     const addr = "건국대학교 서울캠퍼스";
     const addrDetail = "서울특별시 광진구 능동로 120 신공학관 1F";
     const tel = "Tel. 02-450-0698,9";
@@ -9,12 +13,28 @@ const DirectionComponent = () => {
     const Longitude = 127.07935535096505;
 
     useEffect(() => {
-        const initMap = () => {
-            if (!window.kakao || !window.kakao.maps) {
-                console.error("카카오 맵 객체가 없습니다.");
-                return;
-            }
+        const isDirectionPage = location.pathname === "/about/direction";
+        if (!isDirectionPage || mapInitialized.current) return;
 
+        mapInitialized.current = true;
+
+        const loadKakaoMapScript = () => {
+            return new Promise((resolve, reject) => {
+                if (window.kakao && window.kakao.maps) {
+                    resolve(true);
+                    return;
+                }
+
+                const script = document.createElement("script");
+                script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.REACT_APP_KAKAOMAP_API_KEY}&autoload=false`;
+                script.async = true;
+                script.onload = () => resolve(true);
+                script.onerror = () => reject("Kakao Map load error");
+                document.head.appendChild(script);
+            });
+        };
+
+        const initMap = () => {
             const container = document.getElementById("map");
             const options = {
                 center: new window.kakao.maps.LatLng(Latitude, Longitude),
@@ -32,13 +52,10 @@ const DirectionComponent = () => {
             map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
         };
 
-        // SDK가 이미 로드된 상태라면 load 호출
-        if (window.kakao && window.kakao.maps && window.kakao.maps.load) {
-            window.kakao.maps.load(initMap);
-        } else {
-            console.error("Kakao SDK가 아직 로드되지 않았습니다.");
-        }
-    }, []);
+        loadKakaoMapScript()
+            .then(() => window.kakao.maps.load(initMap))
+            .catch(console.error);
+    }, [location]);
 
     return (
         <div>
@@ -51,7 +68,13 @@ const DirectionComponent = () => {
 
             <div className="pb-4 mx-auto max-w-screen-xl border-b border-gray-300">
                 <div className="text-2xl font-bold my-8">주소 및 연락처</div>
-                <div className="my-4">{addr}<br/>{addrDetail}<br/>{tel}</div>
+                <div className="my-4">
+                    {addr}
+                    <br />
+                    {addrDetail}
+                    <br />
+                    {tel}
+                </div>
             </div>
 
             <div className="pb-4 mx-auto max-w-screen-xl mb-10 ">

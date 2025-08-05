@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_SERVER_HOST } from "./config";
 
-const CLIENT_ID = "XK757MnqVq2Mgu15SLns";
+const CLIENT_ID = `${process.env.REACT_APP_NAVER_API_KEY}`;
 const REDIRECT_URI = "http://127.0.0.1:3000/login/naver";
 const AUTH_CODE_PATH = "https://nid.naver.com/oauth2.0/authorize";
 const host = `${API_SERVER_HOST}/api`;
