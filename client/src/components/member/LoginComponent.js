@@ -52,7 +52,7 @@ const LoginComponent = () => {
 
     return (
         <div className="">
-            <div className="my-10 p-10 w-full shadow-2xl">
+            <div className="my-10 p-10 w-[500px] shadow-2xl">
                 <div className="text-4xl text-center font-bold mb-6">로그인</div>
 
                 <div className="mb-4">

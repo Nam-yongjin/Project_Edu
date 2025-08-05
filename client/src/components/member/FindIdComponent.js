@@ -24,7 +24,7 @@ const FindIdComponent = () => {
 
     return (
         <div>
-        <div className='my-10 p-10 w-full space-y-6 text-center shadow-2xl bg-white'>
+        <div className='my-10 p-10 w-[500px] space-y-6 text-center shadow-2xl bg-white'>
             <div className='text-3xl font-bold'>아이디 찾기</div>
             {!foundId ? (
                 <PhoneVerification onVerified={handleVerified} />
