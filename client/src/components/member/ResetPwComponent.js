@@ -64,7 +64,7 @@ const ResetPwComponent = () => {
     return (
 
         <div className='my-10 p-10 w-full space-y-6 shadow-2xl text-center'>
-            <div className='text-center'>비밀번호 찾기 / 재설정</div>
+            <div className='text-3xl font-bold'>비밀번호 찾기 / 재설정</div>
 
             {step === 'checkId' && (
                 <div className="">
@@ -74,7 +74,7 @@ const ResetPwComponent = () => {
                             placeholder="아이디 입력"
                             value={memId}
                             onChange={(e) => setMemId(e.target.value)}
-                            className="flex-1 px-4 py-2 my-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 my-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div>
@@ -83,7 +83,7 @@ const ResetPwComponent = () => {
                             placeholder="휴대폰번호 입력 ('-' 없이)"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <button className="text-center p-2 my-3 w-full bg-gray-200 rounded-md hover:bg-gray-300 active:bg-gray-400 border border-gray-400 text-sm font-medium"
