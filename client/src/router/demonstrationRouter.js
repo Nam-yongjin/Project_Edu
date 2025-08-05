@@ -6,6 +6,8 @@ const UpdateDem = lazy(() => import("../pages/demonstration/UpdateDemPage"))
 const AddDem = lazy(() => import("../pages/demonstration/AddDemPage"))
 const DemDetail = lazy(() => import("../pages/demonstration/DemDetailPage"))
 const DemList = lazy(() => import("../pages/demonstration/DemListPage"))
+const RentalList = lazy(() => import("../pages/demonstration/DemRentalPage"))
+const BorrowList = lazy(() => import("../pages/demonstration/DemBorrowPage"))
 
 const demonstrationRouter = () => {
 
@@ -25,6 +27,14 @@ const demonstrationRouter = () => {
         {
              path:"list",
             element: <Suspense fallback={<Loading />}><DemList /></Suspense>
+        },
+        {
+             path:"rentalList",
+            element: <Suspense fallback={<Loading />}><RentalList /></Suspense>
+        },
+        {
+            path:"borrowList",
+            element: <Suspense fallback={<Loading />}><BorrowList /></Suspense>
         }
     ]
 

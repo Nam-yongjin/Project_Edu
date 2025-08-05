@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 const UpdateDemPage = () => {
     const {demNum}=useParams();
     return (
-        <div className="w-full">
+        <div>
             <DemTitleComponent title="실증 수정" />
             <UpdateComponent demNum={demNum}/>
         </div>
