@@ -126,10 +126,10 @@ const Header = () => {
               opacity-0 invisible translate-y-2 rounded
               group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
               transition-all duration-300 ease-in-out
-              py-6
+              py-6 
             "
           >
-            <div className={`mx-auto grid gap-6 text-sm text-gray-700 px-4 ${loginState.role === "ADMIN" ? "grid-cols-6" : "grid-cols-5"}`}>
+            <div className={`mx-auto grid gap-6 text-base text-gray-700 px-4 ${loginState.role === "ADMIN" ? "grid-cols-6" : "grid-cols-5"}`}>
               {mainMenus.map((menu, idx) => (
                 <div key={idx} className="space-y-2 text-center">
                   {menu.sub.map((item, subIdx) => (
