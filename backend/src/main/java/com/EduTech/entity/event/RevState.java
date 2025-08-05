@@ -2,7 +2,6 @@ package com.EduTech.entity.event;
 
 public enum RevState {
     APPROVED("수락"),
-    REJECTED("거절"),
     CANCEL("취소");
 
     private final String label;
