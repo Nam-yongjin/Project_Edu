@@ -148,7 +148,7 @@ const Header = () => {
         </nav>
 
         {/* 로그인/검색/사이드 */}
-        <div className="flex items-center space-x-6 text-sm pl-8 pr-3 flex-none">
+        <div className="flex items-center space-x-6 text-sm pl-5 pr-3 flex-none">
           {loginState && loginState.memId ? (
             <>
               <span
