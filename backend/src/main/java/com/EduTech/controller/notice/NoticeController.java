@@ -76,10 +76,20 @@ public class NoticeController {
             @RequestPart("dto") NoticeCreateRegisterDTO dto, //프론트에서 dto를 JSON 문자열로 변환해서 FormData에 넣어줘야 함
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
     	System.out.println("공지사항 등록!!");
+//    	System.out.println("등록 파일 수: " + dto.getFiles().size());
+    	
+    	int fileCount = (dto.getFiles() != null) ? dto.getFiles().size() : 0;
+        System.out.println("DTO 파일 수: " + fileCount);
         
         // DTO에 파일 설정
+//        if (files != null) {
+//            dto.setFiles(files);
+//        }
         if (files != null) {
             dto.setFiles(files);
+            System.out.println("실제 업로드된 파일 수: " + files.size());
+        } else {
+            System.out.println("업로드된 파일 없음");
         }
         
         Long noticeNum = noticeService.createNotice(dto);
@@ -104,9 +114,9 @@ public class NoticeController {
     }
 
     // 공지사항 삭제(단일)
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/DeleteNotice/{noticeNum}")
-    public ResponseEntity<String> deleteNotice(@PathVariable Long noticeNum) {
+    public ResponseEntity<String> deleteNotice(@PathVariable("noticeNum") Long noticeNum) {
     	System.out.println("공지사항 삭제(단일)!!");
         noticeService.deleteNotice(noticeNum);
         return ResponseEntity.ok("공지사항이 삭제되었습니다.");
@@ -122,13 +132,15 @@ public class NoticeController {
     }
 
     // 파일 다운로드
-    @GetMapping("/files/{fileId}/download")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
+    @GetMapping("/files/{notFileNum}/download")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("notFileNum") Long notFileNum) {
     	System.out.println("공지사항 파일 다운로드!!");
+    	 System.out.println("=== 다운로드 API 호출됨 ===");
+    	    System.out.println("요청된 notFileNum: " + notFileNum);
         try {
-            // NoticeFileRepository를 통해 파일 정보 조회
-            NoticeFile noticeFile = noticeFileRepository.findById(fileId)
-                    .orElseThrow(() -> new EntityNotFoundException("파일을 찾을 수 없습니다. ID: " + fileId));
+        	 // notFileNum으로 조회
+            NoticeFile noticeFile = noticeFileRepository.findById(notFileNum)
+                .orElseThrow(() -> new EntityNotFoundException("파일을 찾을 수 없습니다. ID: " + notFileNum));
             
             // FileUtil을 사용하여 파일 다운로드
             ResponseEntity<Resource> response = fileUtil.getFile(noticeFile.getFilePath(), null);
@@ -149,7 +161,7 @@ public class NoticeController {
     
     //이미지 보기
     @GetMapping("/view/{fileName}")
-    public ResponseEntity<Resource> viewFile(@PathVariable String fileName) {
+    public ResponseEntity<Resource> viewFile(@PathVariable("fileName") String fileName) {
     	System.out.println("공지사항 이미지 보기!!");
     	try {
     		//noticeFiles에서 파일 찾기

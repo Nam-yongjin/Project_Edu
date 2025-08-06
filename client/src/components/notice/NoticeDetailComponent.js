@@ -47,26 +47,26 @@ const NoticeDetailComponent = () => {
     //목록
     const handleList = (e) => {
         e.preventDefault();
-        moveToPath("/notice");
+        moveToPath("/notice/NoticeList");
     };
     //수정
     const handleUpdate = (e) => {
-        navigate(`/notice/update/${noticeNum}`);
+        navigate(`/notice/UpdateNotice/${noticeNum}`);
     };
     //삭제
     const handleDelete = async () => {
+        console.log("삭제 요청 보냄");
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
-                await axios.delete(`/api/notice/${noticeNum}`);
+                await axios.delete(`http://localhost:8090/api/notice/DeleteNotice/${noticeNum}`);
                 alert("삭제되었습니다.");
-                navigate("/notice");
+                navigate("/notice/NoticeList");
             } catch (err) {
                 console.error("삭제 실패", err);
                 alert("삭제 중 오류가 발생했습니다.");
             }
         }
     };
-
     //현재 날짜 기준 
     const formatDate = (dateString) => {
         if (!dateString) return "-";
@@ -148,7 +148,7 @@ const NoticeDetailComponent = () => {
                     <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mt-4">
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strockLinecap="round" strockLinejoin="round" strockWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
                             </svg>
                             <span>작성자: {notice.name || '-'}</span>
                         </div>
@@ -179,11 +179,21 @@ const NoticeDetailComponent = () => {
                     <div className="mt-8">
                         <div className="grid gap-4">
                             {imageFiles.map((file, index) => (
-                                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                                <div key={index} className="border border-gray-200 rounded-lg">
                                     <img
                                         src={`http://localhost:8090/api/notice/view/${file.savedName}`}
                                         alt={file.originalName}
-                                        className="w-full h-auto max-w-full"
+                                        className="max-w-full h-auto mx-auto block border rounded shadow-md"
+                                        style={{
+                                            width: 'auto',
+                                            height: 'auto',
+                                            maxWidth: '100%', //화면 크기보다 클 때만 줄임
+                                            display: 'block',
+                                            margin: '20px auto',
+                                            imageRendering: 'high-quality', //고화질 렌더링
+                                            imageRendering: '-webkit-optimize-contrast' //웹킷 최적화
+                                        }}
+                                        loading="lazy" //지연 로딩
                                         onError={(e) => {
                                             e.target.style.display = 'none';
                                             e.target.nextSibling.style.display = 'block';
@@ -193,6 +203,7 @@ const NoticeDetailComponent = () => {
                                         className="hidden p-4 text-center text-gray-500 bg-gray-50"
                                     >
                                         이미지를 불러올 수 없습니다: {file.originalName}
+                                        {/* 기본 이미지:<a href="https://pixabay.com/ko//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Pixabay</a>로부터 입수된 <a href="https://pixabay.com/ko/users/mollyroselee-9214707/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Mollyroselee</a>님의 이미지 입니다. */}
                                     </div>
                                 </div>
                             ))}

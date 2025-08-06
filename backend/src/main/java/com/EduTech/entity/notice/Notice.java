@@ -10,6 +10,7 @@ import com.EduTech.entity.BaseEntity;
 import com.EduTech.entity.member.Member;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -44,6 +45,7 @@ public class Notice extends BaseEntity{
 	
 	private String title; //제목
 	
+	@Column(columnDefinition = "TEXT")
 	private String content; //내용
 	
 	@Builder.Default //Builder 사용할 때 기본 값 유지(false)
