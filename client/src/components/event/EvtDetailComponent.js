@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getEventById, cancelEvent, applyEvent } from "../../api/eventApi";
+import { getEventById, deleteEvent, applyEvent } from "../../api/eventApi";
 
 const HOST = "http://localhost:8090/view";
 const API_HOST = "http://localhost:8090/api";
@@ -120,7 +120,7 @@ function EvtDetailComponent({ eventNum }) {
     }
 
     try {
-      await cancelEvent(event.eventNum);
+      await deleteEvent(event.eventNum);
       alert("행사가 취소되었습니다.");
       navigate("/event/list");
     } catch (err) {
