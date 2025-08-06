@@ -2,8 +2,11 @@ package com.EduTech.service.demonstration;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ import com.EduTech.entity.demonstration.DemonstrationRegistration;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.demonstration.DemonstrationTime;
+import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
@@ -67,6 +71,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	DemonstrationImageRepository demonstrationImageRepository;
 	@Autowired
 	FileUtil fileUtil;
+
 	@Autowired
 	MemberRepository memberRepository;
 	@Autowired
@@ -115,58 +120,74 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			return new PageResponseDTO<DemonstrationListRegistrationDTO>(currentPage); // 페이지 DTO 객체 리턴
 		}
 	}
-
-	// 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
+	
+	// 실증 물품 대여 조회
 	@Override
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
-			DemonstrationSearchDTO demonstrationSearchDTO) {
-		Integer pageCount = demonstrationSearchDTO.getPageCount();
-		String type = demonstrationSearchDTO.getType();
-		String search = demonstrationSearchDTO.getSearch();
-		String sortBy = demonstrationSearchDTO.getSortBy();
-		String sort = demonstrationSearchDTO.getSort();
+	        DemonstrationSearchDTO demonstrationSearchDTO) {
+	    Integer pageCount = demonstrationSearchDTO.getPageCount();
+	    String type = demonstrationSearchDTO.getType();
+	    String search = demonstrationSearchDTO.getSearch();
+	    String sortBy = demonstrationSearchDTO.getSortBy();
+	    String sort = demonstrationSearchDTO.getSort();
 
-		if (pageCount == null || pageCount < 0)
-			pageCount = 0;
-		if (!StringUtils.hasText(sortBy))
-			sortBy = "applyAt";
-		if (!StringUtils.hasText(sort))
-			sort = "desc";
+	    if (pageCount == null || pageCount < 0)
+	        pageCount = 0;
+	    if (!StringUtils.hasText(sortBy))
+	        sortBy = "applyAt";
+	    if (!StringUtils.hasText(sort))
+	        sort = "desc";
 
-		// 페이지 사이즈를 10으로 고정
-		Pageable pageable = PageRequest.of(pageCount, 10);
+	    Pageable pageable = PageRequest.of(pageCount, 10);
 
-		Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
-				sortBy, sort);
+	    Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
+	            sortBy, sort);
 
-		Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable);
+	    Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable);
 
-		Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
-			Demonstration dem = reserve.getDemonstration();
+	    // 1. reservePage에서 demNum만 모으기 (중복 없이 Set)
+	    Set<Long> demNums = reservePage.stream()
+	            .map(reserve -> reserve.getDemonstration().getDemNum())
+	            .collect(Collectors.toSet());
 
-			String companyName = "";
-			if (reserve.getMember() != null && reserve.getMember().getCompany() != null) {
-				companyName = reserve.getMember().getCompany().getCompanyName();
-			}
+	    // 2. demNum으로 regMemId (회원ID) 한꺼번에 조회 (repository에 메서드 필요)
+	    // List<Object[]> {demNum, memId} 반환
+	    List<Object[]> demNumMemIdList = demonstrationRegistrationRepository.findDemNumAndMemId(demNums);
 
-			DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
-			dto.setDemNum(dem.getDemNum());
-			dto.setDemName(dem.getDemName());
-			dto.setCompanyName(companyName);
-			dto.setItemNum(dem.getItemNum());
-			dto.setStartDate(reserve.getStartDate());
-			dto.setEndDate(reserve.getEndDate());
-			dto.setApplyAt(reserve.getApplyAt());
+	    // 3. Map<demNum, memId>로 변환
+	    Map<Long, String> demNumToMemId = demNumMemIdList.stream()
+	            .collect(Collectors.toMap(row -> (Long) row[0], row -> (String) row[1]));
 
-			// 이미지 리스트 추가
-			dto.setImageList(demonstrationImageRepository.selectDemImage(dem.getDemNum()));
+	    // 4. memId로 companyName Map 만들기 (repository 메서드로 한꺼번에 조회)
+	    Set<String> memIds = new HashSet<>(demNumToMemId.values());
+	    List<Company> companies = memberRepository.findCompaniesByMemIds(memIds);
+	    Map<String, String> memIdToCompanyName = companies.stream()
+	            .collect(Collectors.toMap(Company::getMemId, Company::getCompanyName));
 
-			return dto;
-		});
+	    // 5. DTO 변환, 회사명 map에서 꺼내 넣기, 이미지도 넣기
+	    Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
+	        Demonstration dem = reserve.getDemonstration();
+	        Long demNum = dem.getDemNum();
 
-		System.out.println(dtoPage.getContent());
-		return new PageResponseDTO<>(dtoPage);
+	        DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
+	        dto.setDemNum(demNum);
+	        dto.setDemName(dem.getDemName());
+	        dto.setItemNum(dem.getItemNum());
+	        dto.setStartDate(reserve.getStartDate());
+	        dto.setEndDate(reserve.getEndDate());
+	        dto.setApplyAt(reserve.getApplyAt());
+
+	        String regMemId = demNumToMemId.get(demNum);
+	        dto.setCompanyName(memIdToCompanyName.getOrDefault(regMemId, "회사명 없음"));
+	        dto.setImageList(demonstrationImageRepository.selectDemImage(demNum));
+
+	        return dto;
+	    });
+
+	    return new PageResponseDTO<>(dtoPage);
 	}
+
+
 
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
 	@Override
@@ -192,14 +213,27 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 장비신청 페이지 (실증 물품 리스트 목록)
 	@Override
-	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount) {
+	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount, String type, String search) {
 		if (pageCount == null || pageCount < 0) {
 			pageCount = 0;
 		}
-
-		Page<DemonstrationPageListDTO> currentPage = demonstrationRepository
-				.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()));
-
+		Page<DemonstrationPageListDTO> currentPage; // 페이지 담을 객체
+		System.out.println(type);
+		System.out.println(search);
+		if (type.equals("demName") && !search.equals("")) {
+			System.out.println("검색어있음3");
+			currentPage = demonstrationRepository
+					.selectPageDemName(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search);
+		} else if (type.equals("demMfr") && !search.equals("")) {
+			System.out.println("검색어있음2");
+			currentPage = demonstrationRepository
+					.selectPageDemMfr(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search);
+		} else {
+			System.out.println("검색어없음");
+			currentPage = demonstrationRepository
+					.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()));
+		}
+		System.out.println(currentPage.getContent());
 		// list의 값을 넣지만 currentPage에도 setImage가 적용된다.
 		// 얕은 참조 복사이기 때문에
 		List<DemonstrationPageListDTO> list = currentPage.getContent();

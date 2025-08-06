@@ -1,6 +1,8 @@
 package com.EduTech.repository.demonstration;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,10 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Query("SELECT reg.expDate FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum=:demNum")
 	LocalDate selectDemRegExpDate(@Param("demNum") Long demNum);
 	
+	// 실증 기업 신청 페이지에서 반납 날짜를 불러오는 쿼리문
+		@Query("SELECT reg.member.memId FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum=:demNum")
+		String selectRegMemId(@Param("demNum") Long demNum);
+		
 	// 실증 기업 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Modifying 
 	@Transactional
@@ -51,6 +57,10 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	// 나중에 회원 탈퇴할때, 실증 등록 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
 	@Query("SELECT COUNT(d) > 0 FROM DemonstrationRegistration d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
 	boolean existsAcceptedRegistrationByMemId(@Param("memId") String memId);
+	
+	// Repository 메서드 (JPQL로 demNum과 memId 한꺼번에 조회)
+	@Query("SELECT reg.demonstration.demNum, reg.member.memId FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum IN :demNums")
+	List<Object[]> findDemNumAndMemId(@Param("demNums") Set<Long> demNums);
 }
 
 
