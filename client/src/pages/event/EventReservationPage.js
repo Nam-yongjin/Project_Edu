@@ -1,11 +1,11 @@
-import EvtTitleComponent from "../../components/event/EvtTitleComponent";
 import "react-datepicker/dist/react-datepicker.css";
 import EvtReservation from "../../components/event/EvtReservation";
+import SubMyInfoHeader from "../../layouts/SubMyInfoHeader";
 
 const EventReservationPage = () => {
     return (
         <div>
-            <EvtTitleComponent title="행사 신청" />
+            <SubMyInfoHeader />
             <EvtReservation />
         </div>
     );

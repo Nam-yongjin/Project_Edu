@@ -66,7 +66,7 @@ export const applyEvent = async (dto) => {
 
 // 사용자 예약행사 조회
 export const getReservationList = async ({ page = 0, size = 5 }) => {
-  const res = await jwtAxios.get(`${event}/Reservation`, {
+  const res = await jwtAxios.get(`${event}/reservation`, {
     params: { page, size },
   });
   return res.data;
@@ -77,6 +77,15 @@ export const cancelReservation = async (evtRevNum) => {
   const res = await jwtAxios.delete(`${event}/cancel`, {
     params: { evtRevNum },
     withCredentials: true, // 이걸 추가해야 로그인으로 처리되어 취소 가능
+  });
+  return res.data;
+};
+
+//============================================
+// 배너로 사용할 행사 불러오는 코드
+export const getBannerList = async (current) => {
+  const res = await axios.get(`${event}/banners`, {
+    params: { page: current }
   });
   return res.data;
 };

@@ -44,7 +44,7 @@ const SubMyInfoHeader = () => {
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/"
+                                to="/event/Reservation"
                                 className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/event") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
