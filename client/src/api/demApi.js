@@ -40,9 +40,14 @@ export const delDem = async (demNum) => {
 }
 
 // 실증 상품 리스트 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
-export const getList = async (current) => {
+export const getList = async (current,searchType,search) => {
+    console.log(searchType);
+    console.log(search);
     const res = await axios.get(`${demonstration}/demList`, {
-        params : {pageCount: current}
+        params : {pageCount: current,
+                type:searchType,
+                search:search,
+        }
     });
     return res.data;
 }
@@ -86,7 +91,7 @@ export const getReserveCheck =async (demNum) => {
 // 물품 대여 현황 페이지에서 여러가지 정보를 가져오기 위한 요청
 export const getRental =async (pageCount) => {
  const res = await jwtAxios.get(`${demonstration}/demRental`, {
-     params: {  pageCount:pageCount}
+     params: {pageCount:pageCount}
     });
     return res.data;
 }

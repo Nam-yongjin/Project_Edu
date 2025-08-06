@@ -1,6 +1,6 @@
 import CalendarComponent from "./CalendarComponent";
 import { useState, useEffect } from "react";
-import { getDetail, postRes, getResDate,getReserveCheck } from "../../api/demApi";
+import { getDetail, postRes, getResDate, getReserveCheck } from "../../api/demApi";
 import ImageSliderModal from "./ImageSliderModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -9,6 +9,7 @@ import megaphone from '../../assets/megaphone.png';
 import calendar from '../../assets/calendar.png';
 import useMove from "../../hooks/useMove";
 import ItemModal from "./itemModal";
+
 const DetailComponent = ({ demNum }) => {
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [dem, setDem] = useState([]); // 서버에서 받아올 여러가지 값들
@@ -19,7 +20,7 @@ const DetailComponent = ({ demNum }) => {
     const { moveToPath } = useMove(); // useMove에서 가져온 모듈들
     const [showQtyModal, setShowQtyModal] = useState(false);
     const [reservationQty, setReservationQty] = useState(1);
-    const [reserveCheck,setReserveCheck]=useState(false);
+    const [reserveCheck, setReserveCheck] = useState(false);
     const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
@@ -31,6 +32,7 @@ const DetailComponent = ({ demNum }) => {
         return d;
     });
     const [selectedDate, setSelectedDate] = useState([]); // 캘린더에서 선택한 날짜를 저장하는 state 변수
+
     useEffect(() => {
         const loadData = async () => { // 상세페이지의 정보 및 이미지 불러오는 코드
             const detailData = await getDetail(demNum);
@@ -39,11 +41,10 @@ const DetailComponent = ({ demNum }) => {
             const mainImageObj = detailData.imageList.find(img => img.isMain);
             setMainImageUrl(mainImageObj ? `http://localhost:8090/view/${mainImageObj.imageUrl}` : '');
             detailData.imageList.map(img => img.isMain);
-           const reserveData=await getReserveCheck(demNum);
-           setReserveCheck(reserveData);
+            const reserveData = await getReserveCheck(demNum);
+            setReserveCheck(reserveData);
         }
         loadData();
-
     }, [demNum]);
 
     useEffect(() => {
@@ -60,8 +61,6 @@ const DetailComponent = ({ demNum }) => {
             setEndDate(maxDate);
         }
     }, [selectedDate]);
-
-
 
     const handleStartDateChange = (date) => {
         if (!date) return;
@@ -124,7 +123,6 @@ const DetailComponent = ({ demNum }) => {
         }
     };
 
-
     const reservation = (updatedItemNum) => {
         const loadData = async () => {
             if (!selectedDate || selectedDate.length === 0) {
@@ -152,14 +150,12 @@ const DetailComponent = ({ demNum }) => {
                 }
             }
 
-            if(selectedDate.some(date=>disabledDates.includes(date)))
-            {
+            if (selectedDate.some(date => disabledDates.includes(date))) {
                 alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
                 return;
             }
 
-            if(reserveCheck) // 이미 해당 상품을 예약한 회원 일경우, return
-            {
+            if (reserveCheck) { // 이미 해당 상품을 예약한 회원 일경우, return
                 alert('이미 해당 상품을 예약 하셨습니다.');
                 return;
             }
@@ -180,13 +176,20 @@ const DetailComponent = ({ demNum }) => {
 
     return (
         <>
-            <div className="max-w-screen-lg mb-2">
-                <div className="flex items-start gap-4 ml-[100px]">
-                    <img onClick={() => {
-                        const urlList = fileList.imageList.map(img => `http://localhost:8090/view/${img.imageUrl}`);
-                        setSelectedImages(urlList);
-                        setModalOpen(true);
-                    }} src={mainImageUrl} alt="default" className="w-40 h-40 object-cover mb-10 w-[500px] h-[300px]" />
+            {/* 최상위 div에 mx-auto 추가하여 화면 중앙 배치 */}
+            <div className="max-w-screen-lg mb-2 mx-auto">
+                {/* 이미지와 텍스트 영역 flex 컨테이너에 justify-center 추가로 가로 중앙 정렬 */}
+                <div className="flex items-start gap-4 justify-center">
+                    <img
+                        onClick={() => {
+                            const urlList = fileList.imageList.map(img => `http://localhost:8090/view/${img.imageUrl}`);
+                            setSelectedImages(urlList);
+                            setModalOpen(true);
+                        }}
+                        src={mainImageUrl}
+                        alt="default"
+                        className="w-40 h-40 object-cover mb-10 w-[500px] h-[300px]"
+                    />
 
                     <ImageSliderModal
                         open={modalOpen}
@@ -194,7 +197,8 @@ const DetailComponent = ({ demNum }) => {
                         imageList={selectedImages}
                     />
 
-                    <div className="space-y-1 mt-3 ml-[100px]">
+                    {/* 텍스트 영역에 ml-[100px] 제거하여 중앙정렬 방해 안함 */}
+                    <div className="space-y-1 mt-3">
                         <span className="text-blue-600">장비명:</span> {dem.demName}
                         <br />
                         <span className="text-blue-600">제조사:</span> {dem.demMfr}
@@ -222,7 +226,13 @@ const DetailComponent = ({ demNum }) => {
                     <div className="flex flex-wrap lg:flex-nowrap gap-x-10 mt-6">
                         {/* 캘린더 */}
                         <div className="flex-1 min-w-[300px]">
-                            <CalendarComponent selectedDate={selectedDate} setSelectedDate={setSelectedDate} demNum={demNum} disabledDates={disabledDates} setDisabledDates={setDisabledDates} />
+                            <CalendarComponent
+                                selectedDate={selectedDate}
+                                setSelectedDate={setSelectedDate}
+                                demNum={demNum}
+                                disabledDates={disabledDates}
+                                setDisabledDates={setDisabledDates}
+                            />
                         </div>
 
                         {/* 날짜 선택 및 버튼 등 */}
