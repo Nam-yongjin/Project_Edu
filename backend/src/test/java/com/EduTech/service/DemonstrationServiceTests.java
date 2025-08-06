@@ -391,7 +391,7 @@ public class DemonstrationServiceTests {
 	}
 	*/
 	
-	//@Test
+	@Test
 	@DisplayName("상품 삭제 테스트")
 	public void deleteDem() {
 		Long demNum=Long.valueOf(100);

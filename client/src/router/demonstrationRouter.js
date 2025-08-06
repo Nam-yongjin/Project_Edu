@@ -1,6 +1,6 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
-
+import { Navigate } from "react-router-dom";
 
 const UpdateDem = lazy(() => import("../pages/demonstration/UpdateDemPage"))
 const AddDem = lazy(() => import("../pages/demonstration/AddDemPage"))
@@ -35,6 +35,11 @@ const demonstrationRouter = () => {
         {
             path:"borrowList",
             element: <Suspense fallback={<Loading />}><BorrowList /></Suspense>
+        },
+        {
+            // 자동 리다이렉션
+            path: "",
+            element: <Navigate replace to="list" />
         }
     ]
 
