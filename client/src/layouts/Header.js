@@ -69,7 +69,10 @@ const Header = () => {
       sub: [
         { name: "실증지원 안내", link: "/demonstration" },
         { name: "실증기업 소개", link: "/" },
-        { name: "실증 신청", link: "/" },
+        { name: "실증 신청", link: "demonstration/add" },
+        { name: "빌림테스트", link: "demonstration/rentalList" },
+        { name: "빌려줌테스트", link: "demonstration/borrowList" },
+        { name: "실증 물품", link: "demonstration/list" },
       ],
     },
     {
