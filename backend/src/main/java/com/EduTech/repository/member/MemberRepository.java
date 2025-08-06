@@ -2,6 +2,7 @@ package com.EduTech.repository.member;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -61,4 +62,7 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 	@Query("update Member m set m.state = :state where m.memId in :memId")
 	void updateMemberState(@Param("state") MemberState state, @Param("memId") List<String> memId);
 
+	// 아이디들을 가져와서 기업 목록들을 가져오는 쿼리문
+	@Query("select c from Company c where c.memId in :memIds")
+	List<Company> findCompaniesByMemIds(@Param("memIds") Set<String> memIds);
 }

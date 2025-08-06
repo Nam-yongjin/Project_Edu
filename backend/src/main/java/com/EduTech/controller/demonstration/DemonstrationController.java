@@ -66,6 +66,7 @@ public class DemonstrationController {
 	@GetMapping("/demRental")
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
 		String memId = JWTFilter.getMemId();
+		System.out.println(demonstrationSearchDTO);
 		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService
 				.getAllDemRental(memId,demonstrationSearchDTO);
 		return AllDemRental;
@@ -73,8 +74,10 @@ public class DemonstrationController {
 
 	// 실증 물품 리스트 목록 조회
 	@GetMapping("/demList")
-	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") Integer pageCount) {
-		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount);
+	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") Integer pageCount,
+			@RequestParam(value = "type", defaultValue = "demName") String type,
+			@RequestParam(value = "search", defaultValue = "") String search) {
+		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount,type,search);
 		return AllDemList;
 	}
 

@@ -1,7 +1,6 @@
 package com.EduTech.entity.demonstration;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import com.EduTech.entity.member.Member;
 
@@ -19,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "demonstration_reserve")
@@ -54,8 +54,5 @@ public class DemonstrationReserve {
 	@JoinColumn(name = "memId")
 	private Member member;
 	
-	@ManyToOne // Res 엔티티의 Reg 외래키
-	@JoinColumn(name = "demRegNum")
-	private DemonstrationRegistration demonstrationRegistration;
 
 }
