@@ -30,7 +30,7 @@ const MainPage = () => {
                         lazy={true}
                         speed={1200}
                         modules={[Autoplay, Pagination]}
-                        className="mySwiper max-h-screen aspect-[4/3]"
+                        className="mySwiper max-h-screan aspect-video"
                     >
                         <SwiperSlide>
                             <img src={main1} className="w-full h-full object-cover" loading="lazy"/>
