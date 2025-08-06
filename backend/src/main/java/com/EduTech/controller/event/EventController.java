@@ -230,7 +230,7 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 7. 수정
-			@DeleteMapping("/delete")
+			@DeleteMapping("/cancel")
 			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<String> deleteEvent(@RequestParam("eventNum") Long eventNum) {
 			    try {
@@ -295,7 +295,7 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 5. 사용자 신청 취소
-			@DeleteMapping("/cancel/{eventUseNo}")
+			@DeleteMapping("/userCancel/{eventUseNo}")
 			public ResponseEntity<Void> cancelEvent(@PathVariable Long eventUseNo) {
 				eventService.cancelEvent(eventUseNo);
 				return ResponseEntity.noContent().build();
