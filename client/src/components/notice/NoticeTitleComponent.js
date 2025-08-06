@@ -10,7 +10,7 @@ const NoticeTitleComponent = ({ title }) => {
 
   // 탭 경로 정의
   const tabItems = [
-    { name: "공지사항", path: "/notice" },
+    { name: "공지사항", path: "/notice/NoticeList" },
     { name: "언론보도", path: "/news/list" },
     { name: "문의하기", path: "/qna" },
   ];
