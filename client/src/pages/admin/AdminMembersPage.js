@@ -1,6 +1,5 @@
 import AdminMembersComponent from "../../components/admin/AdminMembersComponent";
 
-
 const AdminMembersPage = () => {
     return (
         <div>
