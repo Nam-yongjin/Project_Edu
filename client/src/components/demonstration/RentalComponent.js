@@ -21,10 +21,12 @@ const RentalComponent = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort).then(data => {
                 setListData(data);
+                setPageData(data); 
             });
         } else {
-            getRental(current, sortBy, sort).then(data => {
+            getRental(current).then(data => {
                 setListData(data);
+                 setPageData(data); 
             });
         }
     };
@@ -43,7 +45,7 @@ const RentalComponent = () => {
             setSort(prev => prev === "asc" ? "desc" : "asc");
         } else {
             setSortBy(column);
-            setSort("asc");
+            setSort("");
         }
     };
 
