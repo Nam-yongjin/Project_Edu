@@ -63,7 +63,7 @@ const ResetPwComponent = () => {
 
     return (
 
-        <div className='my-10 p-10 w-[500px] space-y-6 shadow-2xl shadow-gray-500 text-center'>
+        <div className='my-10 p-10 w-[500px] space-y-6 text-center shadow-lg shadow-gray-400 rounded-lg'>
             <div className='text-3xl font-bold'>비밀번호 찾기 / 재설정</div>
 
             {step === 'checkId' && (

@@ -165,7 +165,7 @@ const TeacherRegisterComponent = () => {
 
     return (
         <div>
-            <div className="my-10 p-10 space-y-6 text-center shadow-2xl shadow-gray-500">
+            <div className="my-10 p-10 space-y-6 text-center  shadow-lg shadow-gray-400 rounded-lg">
                 <div className="text-3xl font-bold">회원가입</div>
 
                 {/* 아이디 */}
