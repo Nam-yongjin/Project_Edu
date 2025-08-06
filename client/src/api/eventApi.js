@@ -29,8 +29,8 @@ export const updateEvent = async (eventNum, formData) => {
 };
 
 // 행사 취소 요청 (JWT 필요)
-export const cancelEvent = async (eventNum) => {
-  return await jwtAxios.cancel(`${event}/cancel`, {
+export const deleteEvent = async (eventNum) => {
+  return await jwtAxios.delete(`${event}/delete`, {
     params: { eventNum },
   });
 };
@@ -61,5 +61,22 @@ export const getSearchList = async ({ page, searchType, keyword, state, category
 // 행사 신청 요청
 export const applyEvent = async (dto) => {
   const res = await jwtAxios.post(`${event}/apply`, dto);
+  return res.data;
+};
+
+// 사용자 예약행사 조회
+export const getReservationList = async ({ page = 0, size = 5 }) => {
+  const res = await jwtAxios.get(`${event}/Reservation`, {
+    params: { page, size },
+  });
+  return res.data;
+};
+
+// 사용자 예약 취소
+export const cancelReservation = async (evtRevNum) => {
+  const res = await jwtAxios.delete(`${event}/cancel`, {
+    params: { evtRevNum },
+    withCredentials: true, // 이걸 추가해야 로그인으로 처리되어 취소 가능
+  });
   return res.data;
 };

@@ -21,7 +21,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -230,7 +232,7 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 7. 수정
-			@DeleteMapping("/cancel")
+			@DeleteMapping("/delete")
 			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<String> deleteEvent(@RequestParam("eventNum") Long eventNum) {
 			    try {
@@ -288,17 +290,32 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 4. 사용자 신청 내역 조회 (페이징)
-			@GetMapping("/user/applied/page")
-			public ResponseEntity<Page<EventUseDTO>> getUseListByMemberPaged(@RequestParam String memId, Pageable pageable) {
-	
-				return ResponseEntity.ok(eventService.getUseListByMemberPaged(memId, pageable));
+			@GetMapping("/Reservation")
+			public ResponseEntity<Page<EventUseDTO>> getUseListByMemberPaged(
+			        @AuthenticationPrincipal(expression = "username") String memId,
+			        Pageable pageable) {
+				
+				log.info("예약 리스트 조회 요청: {}", memId);
+
+			    return ResponseEntity.ok(eventService.getUseListByMemberPaged(memId, pageable));
 			}
 	
 			// 5. 사용자 신청 취소
-			@DeleteMapping("/userCancel/{eventUseNo}")
-			public ResponseEntity<Void> cancelEvent(@PathVariable Long eventUseNo) {
-				eventService.cancelEvent(eventUseNo);
-				return ResponseEntity.noContent().build();
+			@DeleteMapping("/cancel")
+			public ResponseEntity<String> cancelEvent(
+			        @RequestParam("evtRevNum") Long evtRevNum,
+			        @AuthenticationPrincipal(expression = "username") String memId) {
+			    try {
+			        log.info("예약 취소 요청: evtRevNum={}, 요청자 memId={}", evtRevNum, memId);
+			        eventService.cancelEvent(evtRevNum, memId);
+			        return ResponseEntity.ok("예약이 정상적으로 취소되었습니다.");
+			    } catch (AccessDeniedException e) {
+			        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("해당 예약에 대한 취소 권한이 없습니다.");
+			    } catch (IllegalArgumentException e) {
+			        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("예약 내역이 존재하지 않습니다.");
+			    } catch (Exception e) {
+			        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예약 취소 중 오류가 발생했습니다.");
+			    }
 			}
 	
 			// 6. 사용자 행사 목록 조회

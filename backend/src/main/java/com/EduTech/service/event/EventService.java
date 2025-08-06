@@ -76,7 +76,7 @@ public interface EventService {
 
     void applyEvent(EventApplyRequestDTO dto); // 이벤트 신청
     
-    void cancelEvent(Long eventUseNo); // 신청 취소
+    void cancelEvent(Long evtRevNum, String memId); // 신청 취소
 
     boolean isAlreadyApplied(Long eventNum, String memId); // 중복 신청 여부
     
