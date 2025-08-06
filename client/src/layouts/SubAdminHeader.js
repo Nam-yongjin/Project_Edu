@@ -24,13 +24,13 @@ const SubAdminHeader = () => {
                                 className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/members") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
-                                회원조회
+                                회원관리
                             </Link>
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/"
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                to="/admin/"
+                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 분석1
@@ -38,8 +38,8 @@ const SubAdminHeader = () => {
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/"
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                to="/admin/"
+                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 분석2

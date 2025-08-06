@@ -16,13 +16,18 @@ public class AdminMemberViewReqDTO {
 	private String memId; // 회원 아이디
 	private String name; // 회원 이름
 	private String email; // 이메일
+	private String phone; // 휴대폰
 	private MemberRole role;
 	private MemberState state;
 
-	public AdminMemberViewReqDTO(String memId, String name, String email, MemberRole role, MemberState state) {
+	private String sortField; // 정렬 기준
+	private String sortDirection; // 정렬 방향
+
+	public AdminMemberViewReqDTO(String memId, String name, String email, String phone, MemberRole role, MemberState state) {
 		this.memId = memId;
 		this.name = name;
 		this.email = email;
+		this.phone = phone;
 		this.role = role;
 		this.state = state;
 	}

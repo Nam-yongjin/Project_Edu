@@ -85,13 +85,13 @@ public class MemberRepositoryTests {
 	public void testInsertMember() {
 
 		Member member = Member.builder()
-				.memId("oj4263")
-				.pw(passwordEncoder.encode("qwer1234!@#$"))
-				.name("남용진")
-				.email("oj4263@test.com")
-				.birthDate(LocalDate.of(2000, 7, 5))
+				.memId("user147147")
+				.pw(passwordEncoder.encode("147147"))
+				.name("탸탸탸")
+				.email("user147147@test.com")
+				.birthDate(LocalDate.of(2025, 8, 6))
 				.gender(MemberGender.MALE)
-				.phone("01012345678")
+				.phone("01014714714")
 				.addr("테스트주소")
 				.addrDetail("테스트 상세주소")
 				.checkSms(true)
@@ -105,7 +105,7 @@ public class MemberRepositoryTests {
 	}
 	
 //	 관리자계정
-	@Test
+//	@Test
 	@Transactional
 	@Commit
 	public void testInsertAdmin() {
