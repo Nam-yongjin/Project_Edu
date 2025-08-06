@@ -77,7 +77,7 @@ const RegisterTermsComponent = () => {
         <div className="mb-20 pt-20">
             <div className="max-w-screen-md">
 
-                <div className="text-center text-xl font-bold mb-4">이용 약관 동의</div>
+                <div className="text-center text-2xl font-bold mb-4">이용 약관 동의</div>
 
                 <div className="mt-20">
                     <div className="text-lg font-bold mb-4">서울 에듀테크 소프트랩 이용약관</div>

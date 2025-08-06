@@ -115,7 +115,7 @@ const CompanyRegisterComponent = () => {
                 alert('이미 등록 된 이메일입니다.');
                 return;
             }
-            const isDuplicatedPhone = await checkPhone({ email: form.phone });
+            const isDuplicatedPhone = await checkPhone({ phone: verifiedPhone });
             if (isDuplicatedPhone) {
                 alert('이미 등록 된 휴대폰번호입니다.');
                 return;
@@ -276,6 +276,8 @@ const CompanyRegisterComponent = () => {
                             type="date"
                             value={form.birthDate}
                             onChange={handleChange}
+                            min="1900-01-01"
+                            max={new Date().toISOString().split("T")[0]} // 오늘 날짜까지 제한
                             className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
