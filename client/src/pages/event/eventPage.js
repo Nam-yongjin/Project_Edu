@@ -1,10 +1,11 @@
 import { Outlet } from "react-router-dom"
 import BasicLayout from "../../layouts/BasicLayout"
 
+
 const eventPage = () => {
     return (
         <div>
-            <BasicLayout>
+            <BasicLayout  isFullWidth={true}>
                 <Outlet />
             </BasicLayout>
         </div>
