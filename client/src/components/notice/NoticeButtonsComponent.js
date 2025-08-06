@@ -9,7 +9,7 @@ const NoticeButtonsComponent = ({selectedNotices, onDelete }) => {
 
     const handleWrite = (e) => {
         e.preventDefault();
-        moveToPath("/notice/add");
+        moveToPath("/notice/AddNotice");
     };
   
     // 선택된 공지사항 삭제
@@ -57,7 +57,7 @@ const NoticeButtonsComponent = ({selectedNotices, onDelete }) => {
           
           {selectedNotices.length === 1 && (
              <button
-              onClick={`/notice/update/${selectedNotices[0]}`}
+              onClick={() => moveToPath(`/notice/UpdateNotice/${selectedNotices[0]}`)}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium inline-block"
             >
               수정하기

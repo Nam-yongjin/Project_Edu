@@ -6,8 +6,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor // 기본 생성자 생성
+@AllArgsConstructor // 모든 필드를 매개변수로 받는 생성자 자동 생성
+@Builder
 @Data
 public class NoticeCreateRegisterDTO {
 	
@@ -16,7 +26,6 @@ public class NoticeCreateRegisterDTO {
 	private String title; //제목
 	
 	@NotBlank(message = "내용을 입력하세요.")
-	@Size(max = 3000, message = "내용은 최대 3000자까지 입력 가능합니다.")
 	private String content; //내용
 	
 	private Boolean isPinned = false; //게시판 고정

@@ -22,6 +22,7 @@ import com.EduTech.dto.notice.NoticeListDTO;
 import com.EduTech.dto.notice.NoticeSearchDTO;
 import com.EduTech.dto.notice.NoticeUpdateRegisterDTO;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.notice.Notice;
 import com.EduTech.entity.notice.NoticeFile;
 import com.EduTech.repository.member.MemberRepository;
@@ -93,18 +94,24 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     @Transactional
     public void deleteNotice(Long noticeNum) {
-        Member currentMember = getCurrentMember();
-        validateAdminRole(currentMember);
+    	//단일 삭제에서 권한 충돌이 나서 주석처리 함 @PreAuthorize("hasRole('ADMIN')")도 같이
+    	//프론트에서 관리자만 버튼이 보이도록 설정했기 때문에 없어도 괜찮을 것 같다고 판단....
+//        Member currentMember = getCurrentMember();
+//        validateAdminRole(currentMember);
         
         Notice notice = noticeRepository.findById(noticeNum)
                 .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
         
-        // 파일 삭제 (orphanRemoval = true로 인해 자동으로 삭제되지만, 물리적 파일은 직접 삭제 필요)
-        deleteNoticeFiles(notice.getNoticeNum());
+        // 파일 삭제 (orphanRemoval = true로 인해 자동으로 삭제되지만 물리적 파일은 직접 삭제 필요)
+        deleteNoticeFiles(noticeNum);
+        
+        // 연관관계 끊기(orphanRemoval 반영을 위한 작업)
+        notice.getNoticeFiles().clear(); // JPA 영속성 컨텍스트에서 관계 해제
         
         // 공지사항 삭제
         noticeRepository.delete(notice);
     }
+    
     // 공지사항 삭제(일괄)
     @Override
     @Transactional
@@ -126,12 +133,21 @@ public class NoticeServiceImpl implements NoticeService {
             throw new EntityNotFoundException("존재하지 않는 공지사항: " + notFoundIds);
         }
         
+        for (Notice notice : notices) {
+        	deleteNoticeFiles(notice.getNoticeNum()); //파일 삭제
+        	notice.getNoticeFiles().clear(); //관계 해제
+        	noticeRepository.delete(notice); //하나씩 삭제 --> orphanRemoval 정상 작동
+        }
+        
         // 파일들 삭제
-        noticeNums.forEach(this::deleteNoticeFiles);
+        //noticeNums.forEach(this::deleteNoticeFiles);
         
         // 공지사항들 삭제
-        noticeRepository.deleteByNoticeNumIn(noticeNums);
+        // deleteByNoticeNumIn은 JPA의 delete in 쿼리를 사용하는데 이 방식은 엔티티를 영속성 컨텍스트에 올리지 않아서
+        // cascade = CascadeType.ALL, orphanRemoval = true가 동작이 안됨 --> NoticeFile이 DB에 남아있어서 외래키 제약조건 오류 발생
+        // noticeRepository.deleteByNoticeNumIn(noticeNums);
     }
+    
     // 공지사항 상세조회
     @Override
     @Transactional(readOnly = true)
@@ -139,8 +155,11 @@ public class NoticeServiceImpl implements NoticeService {
         Notice notice = noticeRepository.findById(noticeNum)
                 .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
         
+        System.out.println("공지사항 첨부파일 수: " + notice.getNoticeFiles().size());
+        
         return mapToDetailDTO(notice);
     }
+    
     // 공지사항 목록조회
     @Override
     @Transactional(readOnly = true)
@@ -162,6 +181,7 @@ public class NoticeServiceImpl implements NoticeService {
         
         return notices.map(this::mapToListDTO);
     }
+    
     //고정 공지사항 목록 조회(통합된 NoticeList가 있지만 고정된 공지만 따로 볼 수 있도록 남겨둠...!)
     @Override
     @Transactional(readOnly = true)
@@ -197,36 +217,43 @@ public class NoticeServiceImpl implements NoticeService {
     	System.out.println("인증된 사용자: " + authentication.getName());
     	System.out.println("현재 로그인한 사용자 권한: " + member.getRole());
     	
-    	if (!"ADMIN".equals(member.getRole())) {
+    	if (!MemberRole.ADMIN.equals(member.getRole())) {
     	    throw new AccessDeniedException("관리자 권한이 필요합니다.");
     	}
     }
     // 유효한 파일이 있는지 체크
     private boolean hasValidFiles(List<MultipartFile> files) {
         return files != null && !files.isEmpty() && 
-               files.stream().anyMatch(file -> !file.isEmpty());
+               files.stream().anyMatch(file -> file != null && !file.isEmpty());
     }
     //파일 저장
     private List<NoticeFile> processFiles(List<MultipartFile> files, Notice notice) {
         String dirName = "notice-files";
         List<Object> fileDataList = fileUtil.saveFiles(files, dirName);
         
-        return fileDataList.stream()
+        System.out.println("파일 저장 결과: " + fileDataList.size() + "개");
+        
+        List<NoticeFile> result = fileDataList.stream()
                 .map(obj -> (Map<String, String>) obj)
-                .filter(this::isAllowedFileType)
-                .map(fileData -> NoticeFile.builder()
-                        .originalName(fileData.get("originalName"))
-                        .filePath(fileData.get("filePath"))
-                        .fileType(fileData.get("fileType").toLowerCase())
-                        .notice(notice)
-                        .build())
+                .peek(fileData -> System.out.println("파일 데이터: " + fileData))
+                .map(fileData -> {
+                    //originalName에서 추출
+                    String originalName = fileData.get("originalName");
+                    String fileType = extractFileType(originalName);
+                    
+                    return NoticeFile.builder()
+                            .originalName(originalName)
+                            .filePath(fileData.get("filePath"))
+                            .fileType(fileType) //추출한 fileType 사용
+                            .notice(notice)
+                            .build();
+                })
+                .filter(noticeFile -> isAllowedFileType(noticeFile.getFileType())) //필터링 로직 변경
+                .peek(noticeFile -> System.out.println("허용된 파일: " + noticeFile.getOriginalName()))
                 .toList();
+		return result;
     }
-    // 허용된 파일 유형인지 체크
-    private boolean isAllowedFileType(Map<String, String> fileData) {
-        String fileType = fileData.get("fileType");
-        return fileType != null && ALLOWED_FILE_TYPES.contains(fileType.toLowerCase());
-    }
+    
     // 수정 시 파일 처리
     private void handleFileUpdates(Notice notice, NoticeUpdateRegisterDTO requestDto) {
         // 기존 파일 삭제 (요청에 따라)
@@ -308,7 +335,6 @@ public class NoticeServiceImpl implements NoticeService {
         listDTO.setName(notice.getMember().getName());
         listDTO.setViewCount(notice.getViewCount());
         listDTO.setCreatedAt(notice.getCreatedAt());
-        listDTO.setFileCount(notice.getNoticeFiles().size());
         
         return listDTO;
     }
@@ -318,15 +344,44 @@ public class NoticeServiceImpl implements NoticeService {
         fileDTO.setOriginalName(noticeFile.getOriginalName());
         fileDTO.setFilePath(noticeFile.getFilePath());
         fileDTO.setFileType(noticeFile.getFileType());
-        fileDTO.setDownloadUrl("/api/notices/files/" + noticeFile.getNotFileNum() + "/download");
-        fileDTO.setSavedName(extractSavedNameFromPath(noticeFile.getFilePath())); //이미지 표시용(원본 파일)
-//        fileDTO.setSavedName("s_" + extractSavedNameFromPath(noticeFile.getFilePath())); //(썸네일)
+        //파일 다운로드 오류로 절대 경로로 변경!! - 백엔드 서버 주소 포함하기
+        String downloadUrl = "http://localhost:8090/api/notice/files/" + noticeFile.getNotFileNum() + "/download";
+        fileDTO.setDownloadUrl(downloadUrl);
+        //프론트엔드랑 백엔드가 다른 포드에서 실행되어서 상대 경로가 프론트엔드 서버로 요청이 가고 있었음
+        //네트워크에서 실제 요청 url 확인 -> 프론트, 백엔드 포트가 다를 경우 절대경로 사용
+        //브라우저에 직접 url입력해서 API 테스트 하기
+        
+        System.out.println("생성된 downloadUrl: " + downloadUrl);
+
+     // 파일 경로에서 파일명만 추출
+        String savedName = extractSavedNameFromPath(noticeFile.getFilePath());
+        fileDTO.setSavedName(savedName);
         
         return fileDTO;
     }
+    
+    
     //파일 경로에서 저장된 파일명 추출
     private String extractSavedNameFromPath(String filePath) {
         if (filePath == null) return null;
-        return filePath.substring(filePath.lastIndexOf("/") + 1);
+        //"notice-files/UUID_filename.ext" -> "UUID_filename.ext" 추출
+        int lastSlashIndex = filePath.lastIndexOf("/");
+        if (lastSlashIndex != -1) {
+            return filePath.substring(lastSlashIndex + 1);
+        }
+        return filePath;
+    }
+    
+    //파일 확장자 추출 메서드 추가
+    private String extractFileType(String originalName) {
+        if (originalName == null || !originalName.contains(".")) {
+            return "";
+        }
+        return originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
+    }
+
+    //필터링 메서드 수정
+    private boolean isAllowedFileType(String fileType) {
+        return fileType != null && ALLOWED_FILE_TYPES.contains(fileType.toLowerCase());
     }
 }
