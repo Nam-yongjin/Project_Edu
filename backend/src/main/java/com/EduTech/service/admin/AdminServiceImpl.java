@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
 	MemberRepository memberRepository;
 	@Autowired
 	MailService mailService;
-	
+
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// String memId = JWTFilter.getMemId(); 나중에 로그인 구현되면 추가
@@ -63,12 +64,20 @@ public class AdminServiceImpl implements AdminService {
 		mailService.sendSimpleMailMessage(adminMessageDTO);
 	}
 
-	// 관리자 회원 목록 페이지 조회 기능
+	// 관리자 회원 목록 페이지 조회 기능 (+정렬기준, 정렬방향 추가)
 	@Override
 	public PageResponseDTO<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewReqDTO,
 			Integer pageCount) {
 		// Specification은 동적 쿼리지만, 엔티티로만 조회 가능하다.
 		// 직접 DTO로 받고 싶다면 QueryDSL 같은 방식으로 바꿔야 한다.
+
+		String sortField = adminMemberViewReqDTO.getSortField() != null ? adminMemberViewReqDTO.getSortField()
+				: "createdAt";
+		Direction direction = adminMemberViewReqDTO.getSortDirection() != null
+				&& adminMemberViewReqDTO.getSortDirection().equalsIgnoreCase("ASC") ? Direction.ASC : Direction.DESC;
+
+		// 정렬 정보를 담은 Sort 객체 생성
+		Sort sort = Sort.by(direction, sortField);
 
 		// DTO로 받을 리스트
 		List<AdminMemberViewResDTO> dtoList = new ArrayList<>();
@@ -83,7 +92,9 @@ public class AdminServiceImpl implements AdminService {
 			spec = spec.and(MemberSpecs.nameContains(adminMemberViewReqDTO.getName()));
 		} else if (adminMemberViewReqDTO.getEmail() != null && !adminMemberViewReqDTO.getEmail().isBlank()) {
 			spec = spec.and(MemberSpecs.emailContains(adminMemberViewReqDTO.getEmail()));
-		}
+		} else if (adminMemberViewReqDTO.getPhone() != null && !adminMemberViewReqDTO.getPhone().isBlank()) {
+            spec = spec.and(MemberSpecs.phoneContains(adminMemberViewReqDTO.getPhone()));
+        }
 
 		// role, state 조건은 따로
 		if (adminMemberViewReqDTO.getRole() != null) {
@@ -94,7 +105,7 @@ public class AdminServiceImpl implements AdminService {
 		}
 
 		// 기본 Pageable (페이지, 사이즈는 클라이언트에서 넘긴다고 가정)
-		Pageable pageable = PageRequest.of(pageCount, 10, Sort.by("memId").descending());
+		Pageable pageable = PageRequest.of(pageCount, 10, sort);
 
 		Page<Member> memberPage = memberRepository.findAll(spec, pageable);
 
@@ -114,15 +125,14 @@ public class AdminServiceImpl implements AdminService {
 			dtoList.add(adminMemberViewResDTO);
 		}
 
-		return new PageResponseDTO<AdminMemberViewResDTO>(dtoList, memberPage.getTotalPages(),memberPage.getNumber());
+		return new PageResponseDTO<AdminMemberViewResDTO>(dtoList, memberPage.getTotalPages(), memberPage.getNumber());
 	}
 
 	// 관리자가 회원 상태 수정하는 기능
 	@Override
-	public void MemberStateChange(List<String> memId,MemberState memberState) {
-		memberRepository.updateMemberState(memberState,memId);
-		
+	public void MemberStateChange(List<String> memId, MemberState memberState) {
+		memberRepository.updateMemberState(memberState, memId);
+
 	}
-	
-	
+
 }

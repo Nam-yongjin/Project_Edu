@@ -52,7 +52,7 @@ const LoginComponent = () => {
 
     return (
         <div className="">
-            <div className="my-10 p-10 w-[500px] shadow-2xl shadow-gray-500">
+            <div className="my-10 p-10 w-[500px]  shadow-lg shadow-gray-400 rounded-lg">
                 <div className="text-4xl text-center font-bold mb-6">로그인</div>
 
                 <div className="mb-4">
@@ -62,7 +62,7 @@ const LoginComponent = () => {
                         value={loginParam.memId}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
-                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         autoFocus
                     />
                 </div>
@@ -75,7 +75,7 @@ const LoginComponent = () => {
                         value={loginParam.pw}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
-                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
 
