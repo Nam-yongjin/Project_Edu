@@ -30,6 +30,7 @@ public class News extends BaseEntity{
 	
 	private String title; //제목
 	
+	@Column(columnDefinition = "TEXT")
 	private String content; //내용
 	
 	@Builder.Default

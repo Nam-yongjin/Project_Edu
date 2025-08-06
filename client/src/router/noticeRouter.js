@@ -13,24 +13,24 @@ const noticeRouter = () => {
 
     return [
         {
-             path:"",
+             path:"NoticeList",
             element: <Suspense fallback={<Loading />}><NoticeList /></Suspense>,
         },
         {
             // 자동 리다이렉션
             path: "",
-            element: <Navigate replace to="notice" />
+            element: <Navigate replace to="NoticeList" />
         },
         {
-            path: "add",
+            path: "AddNotice",
             element: <Suspense fallback={<Loading />}><AddNotice /></Suspense>,
         },
         {
-            path: "update/:noticeNum",
+            path: "UpdateNotice/:noticeNum",
             element: <Suspense fallback={<Loading />}><UpdateNotice /></Suspense>,
         },    
         {
-            path:"detail/:noticeNum",
+            path:"NoticeDetail/:noticeNum",
             element: <Suspense fallback={<Loading />}><NoticeDetail /></Suspense>,
         }
     ]

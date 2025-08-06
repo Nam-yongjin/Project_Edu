@@ -246,7 +246,7 @@ const NoticeListComponent = () => {
                       <td className="px-4 py-3">
                         <div className="flex items-center">
                           <Link //제목 누르면 상세페이지로 넘어감
-                            to={`/notice/detail/${notice.noticeNum}`}
+                            to={`/notice/NoticeDetail/${notice.noticeNum}`}
                             className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
                           >
                             {notice.title}
