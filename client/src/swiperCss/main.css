@@ -34,6 +34,10 @@ body {
   object-fit: cover;
 }
 
+.swiper-pagination{
+   bottom: 30px !important;
+}
+
 .swiper-pagination-bullet {
   border: 2px solid #ffffff;
   width: 20px;
