@@ -41,10 +41,10 @@ const Header = () => {
       ],
     },
     {
-      name: "프로그램",
+      name: "행사",
       link: "/event",
       sub: [
-        { name: "메뉴1", link: "/" },
+        { name: "행사안내", link: "event/list" },
         { name: "메뉴2", link: "/" },
         { name: "메뉴3", link: "/" },
       ],
