@@ -110,4 +110,6 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
 	// 지정된 날짜보다 같거나 이후인 행사를 정렬
 	List<EventInfo> findByEventEndPeriodGreaterThanEqual(LocalDateTime localDateTime, Sort sort); 
 	
+	Page<EventInfo> findByState(EventState state, Pageable pageable);
+	
 }

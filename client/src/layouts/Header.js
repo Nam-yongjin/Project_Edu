@@ -50,7 +50,7 @@ const Header = () => {
       name: "프로그램",
       link: "/event",
       sub: [
-        { name: "프로그램 안내", link: "event/list" },
+        { name: "프로그램 안내", link: "/event/list" },
         { name: "프로그램", link: "/" },
         { name: "프로그램", link: "/" },
       ],
