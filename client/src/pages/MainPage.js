@@ -5,7 +5,7 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import '../swiperCss/loop.css'
+import '../swiperCss/main.css'
 import main1 from '../assets/main1.jpg';
 import main2 from '../assets/main2.jpg';
 import main3 from '../assets/main3.jpg';
@@ -17,7 +17,6 @@ const MainPage = () => {
             <BasicLayout isFullWidth={true}>
                 <div className="mx-auto relative">
                     <Swiper
-                        spaceBetween={30}
                         centeredSlides={true}
                         autoplay={{
                             delay: 5000,
@@ -26,20 +25,24 @@ const MainPage = () => {
                         pagination={{
                             clickable: true,
                         }}
+                        loop={true}
+                        loopedSlides={4}
+                        lazy={true}
+                        speed={1200}
                         modules={[Autoplay, Pagination]}
                         className="mySwiper max-h-screen aspect-[4/3]"
                     >
                         <SwiperSlide>
-                            <img src={main1} className="w-full h-full object-cover" />
+                            <img src={main1} className="w-full h-full object-cover" loading="lazy"/>
                         </SwiperSlide>
                         <SwiperSlide>
-                            <img src={main2} className="w-full h-full object-cover" />
+                            <img src={main2} className="w-full h-full object-cover" loading="lazy"/>
                         </SwiperSlide>
                         <SwiperSlide>
-                            <img src={main3} className="w-full h-full object-cover" />
+                            <img src={main3} className="w-full h-full object-cover" loading="lazy"/>
                         </SwiperSlide>
                         <SwiperSlide>
-                            <img src={main4} className="w-full h-full object-cover" />
+                            <img src={main4} className="w-full h-full object-cover" loading="lazy"/>
                         </SwiperSlide>
                     </Swiper>
 
