@@ -136,12 +136,12 @@ const Header = () => {
           >
             <div className={`mx-auto grid gap-6 text-base text-gray-700 px-4 ${loginState.role === "ADMIN" ? "grid-cols-6" : "grid-cols-5"}`}>
               {mainMenus.map((menu, idx) => (
-                <div key={idx} className="space-y-4 text-center">
+                <div key={idx} className="space-y-3 text-center">
                   {menu.sub.map((item, subIdx) => (
                     <div key={subIdx}>
                       <Link
                         to={item.link}
-                        className="hover:text-blue-400 active:text-blue-600 block px-2 py-1 rounded hover:bg-blue-100 active:bg-blue-200"
+                        className="hover:text-blue-400 active:text-blue-600 block px-2 py-2 rounded hover:bg-blue-100 active:bg-blue-200"
                       >
                         {item.name}
                       </Link>
