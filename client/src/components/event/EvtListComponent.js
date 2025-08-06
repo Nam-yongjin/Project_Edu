@@ -21,11 +21,23 @@ const EventListComponent = () => {
 
   // 검색 API 호출 (keyword는 제외)
   useEffect(() => {
-    getSearchList({ page, searchType, keyword, state, category, sortOrder }).then((data) => {
-      setEvents(data.content);
-      setTotalPages(data.totalPages);
+  const fetchData = async () => {
+    const data = await getSearchList({
+      page,
+      searchType,
+      keyword,
+      state,
+      category,
+      sortOrder,
     });
-  }, [page, state, category, sortOrder, searchTrigger]);
+    setEvents(data.content);
+    setTotalPages(data.totalPages);
+  };
+
+  fetchData();
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [page, state, category, sortOrder, searchTrigger]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
