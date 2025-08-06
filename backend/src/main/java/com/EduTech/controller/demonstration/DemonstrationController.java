@@ -2,7 +2,6 @@ package com.EduTech.controller.demonstration;
 
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +26,7 @@ import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationResRentalDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
+import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.security.jwt.JWTFilter;
@@ -64,13 +64,10 @@ public class DemonstrationController {
 
 	// 신청한 물품 대여 조회
 	@GetMapping("/demRental")
-	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(
-			@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam(value="type",required=false,defaultValue="") String type,
-			@RequestParam("pageCount") Integer pageCount) {
+	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
 		String memId = JWTFilter.getMemId();
 		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService
-				.getAllDemRental(memId, search,type, pageCount);
+				.getAllDemRental(memId,demonstrationSearchDTO);
 		return AllDemRental;
 	}
 

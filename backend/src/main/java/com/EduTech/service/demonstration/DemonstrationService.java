@@ -15,6 +15,7 @@ import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationResRentalDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
+import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 
@@ -23,7 +24,7 @@ public interface DemonstrationService {
 	
 		PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search,Integer pageCount); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search,Integer pageCount); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
-		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search,String type, Integer pageCount); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, DemonstrationSearchDTO demonstrationSearchDTO); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
 		DemonstrationDetailDTO getDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지
 		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태인지 확인 가능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)

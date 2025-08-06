@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +17,7 @@ import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
 
-public interface DemonstrationReserveRepository extends JpaRepository<DemonstrationReserve, Long> { // 실증 교사 신청 관련 레포지토리
+public interface DemonstrationReserveRepository extends JpaRepository<DemonstrationReserve, Long>,JpaSpecificationExecutor<DemonstrationReserve> { // 실증 교사 신청 관련 레포지토리
 
 	@Modifying
 	@Transactional // 트랜잭션 처리 (실행중 오류가 발생했을때, rollback 처리를 하여 db 무결성을 해치지 않도록 함.)
@@ -59,12 +60,11 @@ public interface DemonstrationReserveRepository extends JpaRepository<Demonstrat
 	int updateDemResChangeState(@Param("state") DemonstrationState state, @Param("memId") String memId,@Param("demRevNum") Long demRevNum);
 
 	// 나중에 회원 탈퇴할때, 실증 신청 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
-	@Query("SELECT state FROM DemonstrationReserve WHERE member.memId=:memId")
-	DemonstrationState findByState(@Param("memId") String memId);
-	
-	// 물품 예약 신청할때 해당 회원이 동일한 상품에 예약을 할 경우, 막기 위해 만든 쿼리문
 	@Query("SELECT COUNT(d) > 0 FROM DemonstrationReserve d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
 	boolean existsAcceptedReserveByMemId(@Param("memId") String memId);
-
+	
+	// 물품 예약 신청할때 해당 회원이 동일한 상품에 예약을 할 경우, 막기 위해 만든 쿼리문
+		@Query("SELECT COUNT(r) > 0 FROM DemonstrationReserve r WHERE r.member.memId = :memId AND r.demonstration.demNum = :demNum")
+		Optional<Boolean> checkRes(@Param("demNum") Long demNum, @Param("memId") String memId);
 	
 }
