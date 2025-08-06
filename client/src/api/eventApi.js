@@ -29,8 +29,8 @@ export const updateEvent = async (eventNum, formData) => {
 };
 
 // 행사 취소 요청 (JWT 필요)
-export const deleteEvent = async (eventNum) => {
-  return await jwtAxios.delete(`${event}/delete`, {
+export const cancelEvent = async (eventNum) => {
+  return await jwtAxios.cancel(`${event}/cancel`, {
     params: { eventNum },
   });
 };
