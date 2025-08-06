@@ -53,5 +53,9 @@ public class DemonstrationReserve {
 	@ManyToOne // member엔티티의 memId 외래키
 	@JoinColumn(name = "memId")
 	private Member member;
+	
+	@ManyToOne // Res 엔티티의 Reg 외래키
+	@JoinColumn(name = "demRegNum")
+	private DemonstrationRegistration demonstrationRegistration;
 
 }
