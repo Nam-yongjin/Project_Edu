@@ -23,7 +23,7 @@ public interface EventService {
 
     List<EventInfoDTO> getAllEvents(); // 전체 이벤트 조회
     
-    List<EventInfoDTO> getAllEventsWithoutFilter(int page);
+    List<EventInfoDTO> getAllEventsWithoutFilter(int page); //(use)
     
     Page<EventInfoDTO> searchEventList(EventSearchRequestDTO dto, int page); // 리스트에서 검색
     
@@ -64,7 +64,7 @@ public interface EventService {
     // 3. 배너 관련
     // =============================
 
-    List<EventBannerDTO> getAllBanners(); // 배너 목록 조회
+    List<EventInfoDTO> getAllBanners(int page); // 배너 목록 조회
     
     void registerBanner(EventBannerDTO dto, MultipartFile file); // 배너 등록
     

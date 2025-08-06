@@ -527,9 +527,13 @@ public class EventServiceImpl implements EventService {
 	// 회원 ID(mid)를 기준으로 해당 회원이 신청한 프로그램 목록을 페이지 형태로 조회
 	@Override
 	public Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable) {
-		Page<EventUse> result = useRepository.findByMember_MemId(memId, pageable);
+	    if (memId == null || memId.isBlank()) {
+	        throw new IllegalArgumentException("회원 ID는 null 또는 빈 값일 수 없습니다.");
+	    }
 
-		return result.map(this::toDTO);
+	    Page<EventUse> result = useRepository.findByMember_MemId(memId, pageable);
+
+	    return result.map(this::toDTO); // 또는: result.map(eventUseMapper::toDTO);
 	}
 	
 	// 진행 중인 이벤트만 조회
@@ -598,36 +602,18 @@ public class EventServiceImpl implements EventService {
 	
 	// 배너 조회 리스트
 	@Override
-	public List<EventBannerDTO> getAllBanners() {
-		LocalDateTime today = LocalDateTime.now();
-		List<EventBanner> result = bannerRepository.findValidBanners(today);
+	public List<EventInfoDTO> getAllBanners(int page) {
+	    Pageable pageable = PageRequest.of(page - 1, 8); // 0-based index
+	    Page<EventInfo> result = infoRepository.findAll(pageable);
 
-		return result.stream().map(banner -> {
-			EventInfo info = banner.getEventInfo();
-			EventBannerDTO dto = new EventBannerDTO();
-			dto.setEvtFileNum(banner.getEvtFileNum());
-			dto.setOriginalName(banner.getOriginalName());
-			dto.setFilePath(banner.getFilePath());
-			dto.setEventInfoId(info.getEventNum());
-
-			// 썸네일 경로 생성 (s_ 접두사 방식)
-			String filePath = banner.getFilePath();
-			if (filePath != null && filePath.contains("/")) {
-				String fileName = Paths.get(filePath).getFileName().toString();
-				String parent = Paths.get(filePath).getParent().toString();
-				dto.setThumbnailPath(filePath);
-			}
-			
-			// 프로그램 정보 추가
-			dto.setEventName(info.getEventName());
-			dto.setCategory(info.getCategory());
-			dto.setEventStartPeriod(info.getEventStartPeriod());
-			dto.setEventEndPeriod(info.getEventEndPeriod());
-			dto.setDaysOfWeek(info.getDaysOfWeek());
-			dto.setDayNames(convertToDayNames(info.getDaysOfWeek()));
-
-			return dto;
-		}).collect(Collectors.toList());
+	    return result.getContent().stream()
+	            .map(info -> {
+	                EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
+	                dto.setMainImagePath(info.getMainImagePath());
+	                dto.setFilePath(info.getFilePath());
+	                dto.setOriginalName(info.getOriginalName());
+	                return dto;
+	            }).toList();
 	}
 	
 	// ========================================

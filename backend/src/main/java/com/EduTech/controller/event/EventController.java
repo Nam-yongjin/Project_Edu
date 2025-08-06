@@ -43,6 +43,7 @@ import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
+import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
@@ -73,10 +74,25 @@ import lombok.RequiredArgsConstructor;
 	
 		// 관리자용 Api
 			// 1. 배너 목록 조회
-			@GetMapping("/banners")
-			public ResponseEntity<List<EventBannerDTO>> getAllBanners() {
-				return ResponseEntity.ok(eventService.getAllBanners());
-			}
+		@GetMapping("/banners")
+		public ResponseEntity<Page<EventInfoDTO>> getAllBanners(
+		        @RequestParam(name = "page", required = false, defaultValue = "1") int page) {
+
+		    Pageable pageable = PageRequest.of(page - 1, 8, Sort.by(Sort.Direction.DESC, "applyAt"));
+
+		    // ❗ 상태가 OPEN인 것만 가져오도록 쿼리 변경 필요
+		    Page<EventInfo> result = infoRepository.findByState(EventState.OPEN, pageable);
+
+		    Page<EventInfoDTO> dtoPage = result.map(info -> {
+		        EventInfoDTO dto = modelMapper.map(info, EventInfoDTO.class);
+		        dto.setMainImagePath(info.getMainImagePath());
+		        dto.setFilePath(info.getFilePath());
+		        dto.setOriginalName(info.getOriginalName());
+		        return dto;
+		    });
+
+		    return ResponseEntity.ok(dtoPage);
+		}
 	
 			// 1-1. 배너 등록
 			@PostMapping("/banners/register")
@@ -289,15 +305,15 @@ import lombok.RequiredArgsConstructor;
 				return ResponseEntity.ok(eventService.isAvailable(eventNum));
 			}
 	
-			// 4. 사용자 신청 내역 조회 (페이징)
-			@GetMapping("/Reservation")
+			// 4. 사용자 신청 내역 조회 (페이징)(사용)
+			@GetMapping("/reservation")
 			public ResponseEntity<Page<EventUseDTO>> getUseListByMemberPaged(
-			        @AuthenticationPrincipal(expression = "username") String memId,
-			        Pageable pageable) {
-				
-				log.info("예약 리스트 조회 요청: {}", memId);
-
-			    return ResponseEntity.ok(eventService.getUseListByMemberPaged(memId, pageable));
+			    @AuthenticationPrincipal MemberDTO memberDTO,
+			    Pageable pageable
+			) {
+			    return ResponseEntity.ok(
+			        eventService.getUseListByMemberPaged(memberDTO.getMemId(), pageable)
+			    );
 			}
 	
 			// 5. 사용자 신청 취소
