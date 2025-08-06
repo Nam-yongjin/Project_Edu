@@ -1,5 +1,6 @@
 import Loading from "./Loading";
 import { Suspense, lazy } from "react";
+import { Navigate } from "react-router-dom";
 
 const EventAddPage = lazy(() => import("../pages/event/EventAddPage"))
 const EventList = lazy(() => import("../pages/event/EventListPage"))
@@ -24,7 +25,12 @@ const eventRouter = () => {
         {
             path: "update/:eventNum",
             element: <Suspense fallback={<Loading />}><EventUpdate /></Suspense>,
-        }
+        },
+        {
+            // 자동 리다이렉션
+            path: "",
+            element: <Navigate replace to="list" />
+        },
     ]
 
 }
