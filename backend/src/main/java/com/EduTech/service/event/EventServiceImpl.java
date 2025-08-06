@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -699,10 +700,17 @@ public class EventServiceImpl implements EventService {
 	
 	// 행사 신청 취소
 	@Override
-	public void cancelEvent(Long evtRevNum) {
+	@Transactional
+	public void cancelEvent(Long evtRevNum, String memId) {
 	    EventUse eventUse = useRepository.findById(evtRevNum)
 	            .orElseThrow(() -> new IllegalArgumentException("신청 내역이 존재하지 않습니다."));
-	    useRepository.delete(eventUse);
+
+	    if (!eventUse.getMember().getMemId().equals(memId)) {
+	        throw new AccessDeniedException("예약 취소 권한이 없습니다.");
+	    }
+
+	    // 상태를 CANCEL로 변경
+	    eventUse.setRevState(RevState.CANCEL);
 	}
 	
 	// 행사 신청 여부 확인
@@ -743,6 +751,7 @@ public class EventServiceImpl implements EventService {
 	            .maxCapacity(info.getMaxCapacity())
 	            .currCapacity(useRepository.countByEventInfo(info.getEventNum()))
 	            .revState(use.getRevState())
+	            .applyAt(use.getApplyAt())
 	            .memId(member != null ? member.getMemId() : null)
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)

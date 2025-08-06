@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.EduTech.entity.event.RevState;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,8 @@ public class EventUseDTO {
 	
 	private LocalDateTime eventStartPeriod;	// 행사시작기간
 	private LocalDateTime eventEndPeriod;	// 행사종료기간
+	
+    private LocalDateTime applyAt;
 	
 	private List<Integer> daysOfWeek;		// 요일 (숫자)
 	
