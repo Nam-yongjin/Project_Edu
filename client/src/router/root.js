@@ -10,6 +10,7 @@ import demonstrationRouter from "./demonstrationRouter";
 import noticeRouter from "./noticeRouter";
 import eventRouter from "./eventRouter";
 import aboutRouter from "./aboutRouter";
+import adminRouter from "./adminRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
@@ -26,7 +27,7 @@ const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPag
 const Notice = lazy(() => import("../pages/notice/noticePage"))
 const Event = lazy(() => import("../pages/event/eventPage"))
 const About = lazy(() => import("../pages/about/AboutPage"))
-
+const Admin = lazy(() => import("../pages/admin/AdminPage"))
 
 const root = createBrowserRouter([
     {
@@ -99,6 +100,11 @@ const root = createBrowserRouter([
         path: "about",
         element: <Suspense fallback={<Loading />}><About /></Suspense>,
         children: aboutRouter()
+    },
+    {
+        path: "admin",
+        element: <Suspense fallback={<Loading />}><Admin /></Suspense>,
+        children: adminRouter()
     }
 
 ])

@@ -91,7 +91,7 @@ const Header = () => {
       name: "관리자",
       link: "/admin",
       sub: [
-        { name: "회원 관리", link: "/admin" },
+        { name: "회원 관리", link: "/admin/members" },
         { name: "프로그램 관리", link: "/" },
         { name: "공간 관리", link: "/" },
         { name: "실증 관리", link: "/" },
