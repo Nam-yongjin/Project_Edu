@@ -26,7 +26,7 @@ const ListComponent = () => {
         <>
             <div className="w-full">
                 <div className="flex gap-2">
-                    {listData.content?.map((item) => {
+                    {listData.content.map((item) => {
                         const mainImageObj = item.imageList.find(img => String(img.isMain) === "true");
                         const mainImageUrl = mainImageObj ? `http://localhost:8090/view/${mainImageObj.imageUrl}` : defaultImg;
                         return (

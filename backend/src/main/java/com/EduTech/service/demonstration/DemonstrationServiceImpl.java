@@ -9,12 +9,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import com.EduTech.BackendApplication;
+
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
@@ -27,6 +29,7 @@ import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationResRentalDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
+import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.entity.demonstration.Demonstration;
@@ -40,6 +43,7 @@ import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
+import com.EduTech.repository.demonstration.DemonstrationReserveSpecs;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.util.FileUtil;
@@ -114,34 +118,54 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 	@Override
-	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, String search, String type,
-			Integer pageCount) {
+	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
+			DemonstrationSearchDTO demonstrationSearchDTO) {
+		Integer pageCount = demonstrationSearchDTO.getPageCount();
+		String type = demonstrationSearchDTO.getType();
+		String search = demonstrationSearchDTO.getSearch();
+		String sortBy = demonstrationSearchDTO.getSortBy();
+		String sort = demonstrationSearchDTO.getSort();
 
-		if (pageCount == null || pageCount < 0) {
+		if (pageCount == null || pageCount < 0)
 			pageCount = 0;
-		}
+		if (!StringUtils.hasText(sortBy))
+			sortBy = "applyAt";
+		if (!StringUtils.hasText(sort))
+			sort = "desc";
 
-		Page<DemonstrationRentalListDTO> currentPage = Page.empty();
+		// 페이지 사이즈를 10으로 고정
+		Pageable pageable = PageRequest.of(pageCount, 10);
 
-		if (!StringUtils.hasText(search)) { // 검색어 입력이 없을 경우,
-			currentPage = demonstrationRepository
-					.selectPageViewDem(PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId);
-		} else { // 검색어 입력을 했을 경우,
-			if (type.equals("demName")) {
-				currentPage = demonstrationRepository.selectPageViewDemSearch(
-						PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId, search);
-			} else if (type.equals("companyName")) {
-				currentPage = demonstrationRepository.selectPageViewDemSearchCom(
-						PageRequest.of(pageCount, 10, Sort.by("demNum").descending()), memId, search);
+		Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
+				sortBy, sort);
+
+		Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable);
+
+		Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
+			Demonstration dem = reserve.getDemonstration();
+
+			String companyName = "";
+			if (reserve.getMember() != null && reserve.getMember().getCompany() != null) {
+				companyName = reserve.getMember().getCompany().getCompanyName();
 			}
 
-		}
+			DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
+			dto.setDemNum(dem.getDemNum());
+			dto.setDemName(dem.getDemName());
+			dto.setCompanyName(companyName);
+			dto.setItemNum(dem.getItemNum());
+			dto.setStartDate(reserve.getStartDate());
+			dto.setEndDate(reserve.getEndDate());
+			dto.setApplyAt(reserve.getApplyAt());
 
-		for (DemonstrationRentalListDTO dto : currentPage) {
-			dto.setImageList(demonstrationImageRepository.selectDemImage(dto.getDemNum()));
-		}
+			// 이미지 리스트 추가
+			dto.setImageList(demonstrationImageRepository.selectDemImage(dem.getDemNum()));
 
-		return new PageResponseDTO<DemonstrationRentalListDTO>(currentPage); // 페이지 DTO 객체 리턴
+			return dto;
+		});
+
+		System.out.println(dtoPage.getContent());
+		return new PageResponseDTO<>(dtoPage);
 	}
 
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
@@ -423,11 +447,11 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 		return dto;
 	}
-	
+
 	// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
 	@Override
-	public Boolean checkRes(Long demNum,String memId) {
-		Boolean bool=demonstrationReserveRepository.checkRes(demNum, memId).orElse(false);
+	public Boolean checkRes(Long demNum, String memId) {
+		Boolean bool = demonstrationReserveRepository.checkRes(demNum, memId).orElse(false);
 		return bool;
 	}
 }

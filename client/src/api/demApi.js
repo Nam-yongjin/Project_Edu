@@ -93,12 +93,18 @@ export const getRental =async (pageCount) => {
 // get요청은 param, requestParma
 // post요청은 json형태로 responsebody
 // 물품 대여 현황 페이지에서 여러가지 정보를 가져오기 위한 요청 (검색어 포함해서)
-export const getRentalSearch=async (search,type,pageCount) => {
+export const getRentalSearch=async (search,type,pageCount,sortBy,sort) => {
+    console.log(search);
+    console.log(type);
+    console.log(sortBy);
+    console.log(sort);
  const res = await jwtAxios.get(`${demonstration}/demRental`, {
     params: {
     search:search,
     type:type,   
     pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort,
     }
     });
     return res.data;

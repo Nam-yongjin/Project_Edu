@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 //물품 대여 조회 페이지용 DTO (백->클라이언트)
 @Data
+@NoArgsConstructor
 public class DemonstrationRentalListDTO {
 	private Long demNum;
 	private String demName;
