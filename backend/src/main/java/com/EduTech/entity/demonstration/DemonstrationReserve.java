@@ -46,6 +46,9 @@ public class DemonstrationReserve {
 	@Column(nullable = false)
 	private DemonstrationState state; // 상태
 
+	@Column(nullable = false)
+	private Long bItemNum; // 대여한 개수
+	
 	@ManyToOne // demonstration엔티티의 demNum 외래키
 	@JoinColumn(name = "demNum")
 	private Demonstration demonstration;
