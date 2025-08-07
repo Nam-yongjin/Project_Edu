@@ -14,19 +14,18 @@ import lombok.NoArgsConstructor;
 public class DemonstrationRentalListDTO {
 	private Long demNum;
 	private String demName;
-	private String companyName;
 	private Long bItemNum;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private LocalDate applyAt;
+	private String companyName;
 	private List<DemonstrationImageDTO> imageList; 
 	private DemonstrationState state;
 	// 물품 대여 조회 페이지용 생성자
-	public DemonstrationRentalListDTO(Long demNum, String demName, String companyName, Long bItemNum,
+	public DemonstrationRentalListDTO(Long demNum, String demName, Long bItemNum,String companyName,
 			LocalDate startDate, LocalDate endDate, LocalDate applyAt,DemonstrationState state) {
 		this.demNum = demNum;
 		this.demName = demName;
-		this.companyName = companyName;
 		this.bItemNum = bItemNum;
 		this.startDate = startDate;
 		this.endDate = endDate;
