@@ -5,16 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
@@ -57,12 +54,10 @@ public class EventInfo {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EventState state;
-
-    @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "event_days", joinColumns = @JoinColumn(name = "eventNum"))
-    @Column(nullable = false)
-    private List<Integer> daysOfWeek = new ArrayList<>();
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EventBannerState bannerState;
 
     @Column(nullable = false, length = 20)
     private String place;
@@ -111,9 +106,19 @@ public class EventInfo {
         if (this.state == null) {
             this.state = EventState.BEFORE;
         }
+        if (this.bannerState == null) {
+            this.bannerState = EventBannerState.NO;
+        }
     }
     
     public void increaseCurrCapacity() {
         this.currCapacity += 1;
     }
+    
+    public void decreaseCurrCapacity() {
+        if (this.currCapacity > 0) {
+            this.currCapacity -= 1;
+        }
+    }
+    
 }

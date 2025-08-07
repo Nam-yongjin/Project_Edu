@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.EduTech.entity.event.EventBannerState;
 import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.RevState;
@@ -30,15 +31,20 @@ public class EventInfoDTO {
     private String eventInfo;
 
     private EventState state;
+    
     private EventCategory category;
+    
+    private EventBannerState bannerState;
 
     @NotNull(message = "모집 인원은 필수입니다.")
     private Integer maxCapacity;
 
     private Integer currCapacity; // 현재 신청 인원
+    
     private String place;
+    
     private String etc;
-
+//
     @Builder.Default
     private RevState revState = RevState.WAITING;
 
@@ -63,10 +69,12 @@ public class EventInfoDTO {
 
     // 대표 첨부파일
     private String originalName;
+    
     private String filePath;
 
     // 대표 이미지
     private String mainImagePath;
+    
     private String mainImageOriginalName;
 
     // 이미지 리스트
@@ -77,6 +85,4 @@ public class EventInfoDTO {
     @Builder.Default
     private List<EventFileDTO> attachList = new ArrayList<>();
 
-    // 요일 배열
-    private List<Integer> daysOfWeek;
 }

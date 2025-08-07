@@ -29,6 +29,7 @@ import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventBanner;
+import com.EduTech.entity.event.EventBannerState;
 import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.event.EventImage;
@@ -102,14 +103,18 @@ public class EventServiceImpl implements EventService {
 	
 	// 모집대상
 	private boolean isEligible(EventCategory category, Member member) {
-	    if (category == null) return true; // 전체 대상
-	    if (member == null || member.getRole() == null) return false;
+	    if (category == EventCategory.USER) {
+	        return true; // ✅ 누구나 신청 가능
+	    }
 
-	    return switch (category) {
-	        case USER -> member.getRole() == MemberRole.USER;
-	        case STUDENT -> member.getRole() == MemberRole.STUDENT;
-	        case TEACHER -> member.getRole() == MemberRole.TEACHER;
-	    };
+	    switch (category) {
+	        case STUDENT:
+	            return member.getRole() == MemberRole.STUDENT;
+	        case TEACHER:
+	            return member.getRole() == MemberRole.TEACHER;
+	        default:
+	            return false; // 알 수 없는 카테고리는 불허
+	    }
 	}
 	
 	// ========================================
@@ -517,13 +522,13 @@ public class EventServiceImpl implements EventService {
     }
 	
 	// 관리자용: 특정 프로그램의 신청자 목록 조회
-	@Override
-	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
-		List<EventUse> list = useRepository.findByEventInfo_EventNum(eventNum);
-		return list.stream().map(this::toDTO).collect(Collectors.toList());
-	}
+//	@Override
+//	public List<EventUseDTO> getApplicantsByEvent(Long eventNum) {
+//		List<EventUse> list = useRepository.findByEventInfo_EventNum(eventNum);
+//		return list.stream().map(this::toDTO).collect(Collectors.toList());
+//	}
 	
-	// 사용자 신청 리스트
+	// 사용자 신청 리스트(사용)
 	// 회원 ID(mid)를 기준으로 해당 회원이 신청한 프로그램 목록을 페이지 형태로 조회
 	@Override
 	public Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable) {
@@ -552,40 +557,46 @@ public class EventServiceImpl implements EventService {
     // 5. 배너 기능
     // ========================================
 	
-	// 배너 등록
+	// 배너 등록(사용)
 	@Override
-    public void registerBanner(EventBannerDTO dto, MultipartFile file) {
-		LocalDateTime today = LocalDateTime.now();
-        long currentBannerCount = bannerRepository.countValidBanners(today);
-        if (currentBannerCount >= 9) {
-            throw new IllegalStateException("배너는 최대 3개까지 등록할 수 있습니다.");
-        }
+	public void registerBanner(EventBannerDTO dto) {
+	    // 1. 이미 등록된 행사인지 확인 먼저!
+	    if (bannerRepository.existsByEventInfo_EventNum(dto.getEventNum())) {
+	        throw new IllegalStateException("해당 프로그램에는 이미 배너가 등록되어 있습니다.");
+	    }
 
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("배너 이미지를 첨부해주세요.");
-        }
-        if (!file.getContentType().startsWith("image")) {
-            throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
-        }
+	    // 2. 최대 3개 제한 체크는 그 다음
+	    LocalDateTime today = LocalDateTime.now();
+	    long currentBannerCount = bannerRepository.countValidBanners(today);
+	    if (currentBannerCount >= 3) {
+	        throw new IllegalStateException("배너는 최대 3개까지 등록할 수 있습니다.");
+	    }
 
-        if (bannerRepository.existsByEventInfo_EventNum(dto.getEventInfoId())) {
-            throw new IllegalStateException("해당 프로그램에는 이미 배너가 등록되어 있습니다.");
-        }
+	    // 3. 행사 정보 가져오기
+	    EventInfo event = infoRepository.findById(dto.getEventNum())
+	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
 
-        List<Object> savedFiles = fileUtil.saveFiles(List.of(file), "Event/banner");
-        Map<String, String> fileMap = (Map<String, String>) savedFiles.get(0);
+	    // 4. 대표 이미지가 없는 경우 기본 이미지로 설정
+	    String defaultImagePath = "default/no-image.png";
+	    String defaultOriginalName = "기본이미지";
 
-        EventInfo event = infoRepository.findById(dto.getEventInfoId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+	    EventBanner banner = new EventBanner();
+	    banner.setOriginalName(
+	        event.getMainImageOriginalName() != null ? event.getMainImageOriginalName() : defaultOriginalName
+	    );
+	    banner.setFilePath(
+	        event.getMainImagePath() != null ? event.getMainImagePath() : defaultImagePath
+	    );
+	    banner.setEventInfo(event);
 
-        EventBanner banner = new EventBanner();
-        banner.setOriginalName(fileMap.get("originalName"));
-        banner.setFilePath(fileMap.get("filePath"));
-        banner.setEventInfo(event);
-        bannerRepository.save(banner);
-    }
+	    bannerRepository.save(banner);
+
+	    // ✅ 배너 등록되었으므로 상태 변경
+	    event.setBannerState(EventBannerState.YES);
+	    infoRepository.save(event); // 반드시 save 해야 변경 사항 반영됨
+	}
 	
-	// 배너 삭제
+	// 배너 삭제( 미완성 )
 	@Override
     public void deleteBanner(Long evtFileNum) {
 		EventBanner banner = bannerRepository.findById(evtFileNum)
@@ -600,7 +611,7 @@ public class EventServiceImpl implements EventService {
         bannerRepository.delete(banner);
     }
 	
-	// 배너 조회 리스트
+	// 배너 조회 리스트(사용)
 	@Override
 	public List<EventInfoDTO> getAllBanners(int page) {
 	    Pageable pageable = PageRequest.of(page - 1, 8); // 0-based index
@@ -620,7 +631,7 @@ public class EventServiceImpl implements EventService {
 	// 6. 사용자 신청/취소/중복확인
 	// ========================================
 	
-	// 사용자 행사 신청
+	// 사용자 행사 신청(사용)
 	@Override
 	@Transactional
 	public void applyEvent(EventApplyRequestDTO dto) {
@@ -684,7 +695,7 @@ public class EventServiceImpl implements EventService {
 	    event.increaseCurrCapacity();
 	}
 	
-	// 행사 신청 취소
+	// 행사 신청 취소(사용)
 	@Override
 	@Transactional
 	public void cancelEvent(Long evtRevNum, String memId) {
@@ -695,14 +706,19 @@ public class EventServiceImpl implements EventService {
 	        throw new AccessDeniedException("예약 취소 권한이 없습니다.");
 	    }
 
+	    // ✅ APPROVED 상태일 경우에만 현재 인원 감소
+	    if (eventUse.getRevState() == RevState.APPROVED) {
+	        eventUse.getEventInfo().decreaseCurrCapacity();
+	    }
+
 	    // 상태를 CANCEL로 변경
 	    eventUse.setRevState(RevState.CANCEL);
 	}
 	
-	// 행사 신청 여부 확인
+	// 행사 신청 여부 확인(사용)
 	@Override
-	public boolean isAlreadyApplied(Long eventNum, String memIid) {
-	    return useRepository.existsByEventInfo_EventNumAndMember_MemId(eventNum, memIid);
+	public boolean isAlreadyApplied(Long eventNum, String memId) {
+	    return useRepository.existsByEventInfo_EventNumAndMember_MemIdAndRevState(eventNum, memId, RevState.APPROVED);
 	}
 	
 	// 행사 신청 가능 여부(화면단 버튼 비활성화용)
@@ -742,6 +758,7 @@ public class EventServiceImpl implements EventService {
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
 	            .phone(member != null ? member.getPhone() : null)
+	            .mainImagePath(info.getMainImagePath())
 	            .build();
 	}
 

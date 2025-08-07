@@ -1,6 +1,7 @@
 package com.EduTech.entity.event;
 
 public enum EventCategory {
+	
     USER("일반인"),
     STUDENT("학생"),
     TEACHER("교수");
@@ -14,4 +15,5 @@ public enum EventCategory {
     public String getLabel() {
         return label;
     }
+    
 }

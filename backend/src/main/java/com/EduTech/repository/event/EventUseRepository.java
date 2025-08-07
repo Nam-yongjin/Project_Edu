@@ -9,13 +9,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.EduTech.entity.event.EventUse;
+import com.EduTech.entity.event.RevState;
 import com.EduTech.entity.member.Member;
 
 public interface EventUseRepository extends JpaRepository<EventUse, Long> {
 
-	boolean existsByEventInfo_EventNumAndMember_MemId(Long eventNum, String memId); // 신청 여부 확인
+	boolean existsByEventInfo_EventNumAndMember_MemIdAndRevState(Long eventNum, String memId, RevState revState);
+
 
 	long countByEventInfo_EventNum(Long eventNum); // 신청자수 확인
+	
+//	Optional<EventUse> findByEventInfo_EventNumAndMember_MemId(Long eventNum, String memId);	
 
 	@Query("SELECT COUNT(p) FROM EventUse p WHERE p.eventInfo.eventNum = :eventNum") // 신청자 수 카운트
 	int countByEventInfo(@Param("eventNum") Long eventNum);
@@ -27,6 +31,8 @@ public interface EventUseRepository extends JpaRepository<EventUse, Long> {
 	List<EventUse> findByEventInfo_EventNum(Long eventNum); // 신청한 프로그램의 모든정보 조회
 
 	Page<EventUse> findByMember(Member member, Pageable pageable); // Member기준으로 예약내역 조회
+	
+//	Optional<EventUse> findTopByEventInfo_EventNumAndMember_MemIdOrderByApplyAtDesc(Long eventNum, String memId);	
 
 	// member 함께 로딩해서 DTO 변환시 NPE(널포인터예외) 방지
 	@Query("SELECT pu FROM EventUse pu JOIN FETCH pu.member WHERE pu.eventInfo.eventNum = :eventNum")
