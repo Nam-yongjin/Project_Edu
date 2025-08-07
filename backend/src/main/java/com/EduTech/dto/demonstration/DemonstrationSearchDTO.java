@@ -16,4 +16,5 @@ public class DemonstrationSearchDTO {
 	 private String sortBy;
 	 private String sort;
 	 private Integer pageCount;
+	 private String statusFilter;
 }
