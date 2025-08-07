@@ -159,7 +159,7 @@ const DetailComponent = ({ demNum }) => {
                 alert('이미 해당 상품을 예약 하셨습니다.');
                 return;
             }
-
+        
             try {
                 await postRes(
                     toLocalDateString(startDate), toLocalDateString(endDate), demNum, updatedItemNum);
@@ -174,6 +174,7 @@ const DetailComponent = ({ demNum }) => {
         loadData();
     };
 
+    
     return (
         <>
             {/* 최상위 div에 mx-auto 추가하여 화면 중앙 배치 */}
@@ -287,19 +288,19 @@ const DetailComponent = ({ demNum }) => {
                             </div>
                             {showQtyModal && (
                                 <ItemModal
-                                    maxQty={dem.itemNum}
-                                    value={reservationQty}
-                                    onChange={(val) => setReservationQty(val)}
-                                    onConfirm={() => {
-                                        setShowQtyModal(false);
-                                        setDem(prev => {
-                                            const updatedDem = { ...prev, itemNum: prev.itemNum - reservationQty };
-                                            reservation(updatedDem.itemNum);
-                                            return updatedDem;
-                                        });
-                                    }}
-                                    onClose={() => setShowQtyModal(false)}
-                                />
+    maxQty={dem.itemNum} // 현재 남은 재고 수량 전달
+    value={reservationQty}
+    onChange={(val) => setReservationQty(val)}
+    onConfirm={() => {
+        setShowQtyModal(false);
+        setDem(prev => {
+            const updatedDem = { ...prev, itemNum: prev.itemNum - reservationQty };
+            reservation(updatedDem.itemNum);
+            return updatedDem;
+        });
+    }}
+    onClose={() => setShowQtyModal(false)}
+/>
                             )}
 
                             <div className="border border-black p-4 rounded flex items-start gap-3 bg-gray-50">

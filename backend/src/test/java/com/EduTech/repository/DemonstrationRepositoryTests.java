@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
@@ -417,7 +418,7 @@ public class DemonstrationRepositoryTests {
 		}	
 		*/
 		
-		@Test
+		//@Test
 		@Transactional
 		@Commit
 		public void testInsertMember() {
@@ -441,4 +442,11 @@ public class DemonstrationRepositoryTests {
 			memberRepository.flush();
 			
 		}
+		
+		 //@Test
+		public void testDemonstrationReserve1() {
+			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT, "poi2484", 250L);
+				
+			}
+		
 }

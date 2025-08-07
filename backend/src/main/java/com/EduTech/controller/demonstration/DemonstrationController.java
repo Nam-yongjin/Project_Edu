@@ -78,6 +78,7 @@ public class DemonstrationController {
 			@RequestParam(value = "type", defaultValue = "demName") String type,
 			@RequestParam(value = "search", defaultValue = "") String search) {
 		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount,type,search);
+		
 		return AllDemList;
 	}
 
