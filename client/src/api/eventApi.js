@@ -20,13 +20,6 @@ export const getEventById = async (eventNum) => {
   return res.data;
 };
 
-export const getUserReserveDetail = async (eventNum, memId) => {
-  const res = await jwtAxios.get(`${event}/userReserveDetail`, {
-    params: { eventNum, memId }
-  });
-  return res.data;
-};
-
 // 행사 수정 요청 (JWT 필요)
 export const updateEvent = async (eventNum, formData) => {
   const res = await jwtAxios.put(`${event}/update?eventNum=${eventNum}`, formData, {
@@ -98,6 +91,6 @@ export const getBannerList = async (current) => {
 };
 
 export const registerBanner = async (formData) => {
-  const response = await axios.post(`${event}/banners/register`, formData); // ✅ 헤더 제거
+  const response = await axios.post(`${event}/banners/register`, formData);
   return response.data;
 };

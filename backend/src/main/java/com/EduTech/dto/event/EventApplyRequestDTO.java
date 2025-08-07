@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventApplyRequestDTO {
+	
 	private Long eventNum;
 	
 	private String memId;

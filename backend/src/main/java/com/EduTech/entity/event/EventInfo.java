@@ -5,19 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,6 +54,10 @@ public class EventInfo {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EventState state;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EventBannerState bannerState;
 
     @Column(nullable = false, length = 20)
     private String place;
@@ -91,7 +90,6 @@ public class EventInfo {
 
     @Column(length = 100)
     private String mainImageOriginalName;
-    
 
     // 다중 첨부파일
     @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -108,9 +106,19 @@ public class EventInfo {
         if (this.state == null) {
             this.state = EventState.BEFORE;
         }
+        if (this.bannerState == null) {
+            this.bannerState = EventBannerState.NO;
+        }
     }
     
     public void increaseCurrCapacity() {
         this.currCapacity += 1;
     }
+    
+    public void decreaseCurrCapacity() {
+        if (this.currCapacity > 0) {
+            this.currCapacity -= 1;
+        }
+    }
+    
 }

@@ -22,4 +22,5 @@ public enum EventState {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid label: " + label));
         
     }
+    
 }

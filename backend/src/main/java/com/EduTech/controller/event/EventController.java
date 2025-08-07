@@ -45,9 +45,9 @@ import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.dto.member.MemberDTO;
+import com.EduTech.entity.event.EventFile;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
-import com.EduTech.entity.event.RevState;
 import com.EduTech.repository.event.EventFileRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.member.MemberRepository;
@@ -67,7 +67,6 @@ import lombok.RequiredArgsConstructor;
 		private final EventService eventService;
 		private final EventInfoRepository infoRepository;
 		private final MemberRepository memberRepository;
-		private final EventFileRepository eventFileRepository;
 		private final FileUtil fileUtil;
 		private final ModelMapper modelMapper;
 		
@@ -97,21 +96,18 @@ import lombok.RequiredArgsConstructor;
 		}
 	
 			// 1-1. 배너 등록
+			@PostMapping("banners/register")
+			public ResponseEntity<String> registerBanner(@ModelAttribute EventBannerDTO dto) {
+				System.out.println("📥 받은 eventNum: " + dto.getEventNum());
+				eventService.registerBanner(dto);
+				return ResponseEntity.ok("배너 등록 완료");
+			}
 
-		    @PostMapping("banners/register")
-		    public ResponseEntity<String> registerBanner(@ModelAttribute EventBannerDTO dto) {
-		        System.out.println("📥 받은 eventNum: " + dto.getEventNum());
-		        eventService.registerBanner(dto);
-		        return ResponseEntity.ok("배너 등록 완료");
-		    }
-
-		    // ✅ 예외 메시지 반환
-		    @ExceptionHandler(IllegalStateException.class)
-		    public ResponseEntity<String> handleIllegalState(IllegalStateException e) {
-		        return ResponseEntity.badRequest().body(e.getMessage()); // 400 + 메시지 본문
-		    }
-		
-
+			// 예외 메시지 반환
+			@ExceptionHandler(IllegalStateException.class)
+			public ResponseEntity<String> handleIllegalState(IllegalStateException e) {
+				return ResponseEntity.badRequest().body(e.getMessage()); // 400 + 메시지 본문
+			}
 	
 			// 1-2. 배너 삭제
 			@DeleteMapping("/banners/delete/{evtFileNum}")
@@ -176,7 +172,6 @@ import lombok.RequiredArgsConstructor;
 			    return ResponseEntity.ok(dtoPage);
 			}
 			
-			// 리스트에서 검색
 			@GetMapping("/search")
 			public ResponseEntity<Page<EventInfoDTO>> searchEvents(
 			        @ModelAttribute EventSearchRequestDTO dto,
@@ -201,33 +196,22 @@ import lombok.RequiredArgsConstructor;
 			    return ResponseEntity.ok(eventService.getEvent(eventNum));
 			}
 			
-			@GetMapping("/event/revState")
-			public ResponseEntity<?> getRevState(@RequestParam Long eventNum,
-			                                     @RequestParam String memId) {
-			    RevState state = eventService.getUserRevState(eventNum, memId);
-			    if (state != null) {
-			        return ResponseEntity.ok(Map.of("revState", state));
-			    } else {
-			        return ResponseEntity.ok(Map.of("revState", "NONE")); // 혹은 null
+			@RestController
+			@RequestMapping("/event")
+			@RequiredArgsConstructor
+			public class EventFileController {
+
+			    private final EventFileRepository eventFileRepository;
+			    private final FileUtil fileUtil;
+
+			    @GetMapping("/download/{fileId}")
+			    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
+			        EventFile file = eventFileRepository.findById(fileId)
+			                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
+
+			        return fileUtil.getFile(file.getFilePath(), null); // 썸네일 아님
 			    }
 			}
-			
-//			@RestController
-//			@RequestMapping("/event")
-//			@RequiredArgsConstructor
-//			public class EventFileController {
-//
-//			    private final EventFileRepository eventFileRepository;
-//			    private final FileUtil fileUtil;
-//
-//			    @GetMapping("/download/{fileId}")
-//			    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
-//			        EventFile file = eventFileRepository.findById(fileId)
-//			                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
-//
-//			        return fileUtil.getFile(file.getFilePath(), null); // 썸네일 아님
-//			    }
-//			}
 	
 			// 5. 행사 등록(파일 업로드 포함)
 			@PostMapping("/register")
@@ -269,7 +253,7 @@ import lombok.RequiredArgsConstructor;
 			    return ResponseEntity.ok("✅ 행사 수정이 완료되었습니다.");
 			}
 	
-			// 7. 행사 취소
+			// 7. 수정
 			@DeleteMapping("/delete")
 			@PreAuthorize("hasRole('ADMIN')")
 			public ResponseEntity<String> deleteEvent(@RequestParam("eventNum") Long eventNum) {
@@ -284,22 +268,22 @@ import lombok.RequiredArgsConstructor;
 			    }
 			}
 	
-//			// 8. 특정 행사의 신청 회원 리스트 조회
+			// 8. 특정 행사의 신청 회원 리스트 조회
 //			@GetMapping("/{progNo}/applicants")
 //			public ResponseEntity<List<EventUseDTO>> getApplicantsByProgram(@PathVariable Long eventNum) {
 //				return ResponseEntity.ok(eventService.getApplicantsByEvent(eventNum));
 //			}
 	
-//			// 파일 다운로드
-//			@GetMapping("/file/{eventNum}")
-//			public ResponseEntity<Resource> downloadFile(@PathVariable Long eventNum) {
-//				EventInfo event = eventService.getEventEntity(eventNum);
-//				return fileUtil.getFile(event.getFilePath(), event.getOriginalName());
-//			}
+			// 파일 다운로드
+			@GetMapping("/file/{eventNum}")
+			public ResponseEntity<Resource> downloadFile(@PathVariable Long eventNum) {
+				EventInfo event = eventService.getEventEntity(eventNum);
+				return fileUtil.getFile(event.getFilePath(), event.getOriginalName());
+			}
 	
 			// 사용자용 API
-			// 1. 행사 신청	(사용중)
-			@PostMapping("/apply")//(사용중)
+			// 1. 행사 신청
+			@PostMapping("/apply")
 			public ResponseEntity<Map<String, String>> applyEvent(@RequestBody EventApplyRequestDTO dto) {
 			    Map<String, String> response = new HashMap<>();
 			    try {
@@ -322,10 +306,10 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 3. 신청 가능 여부 확인(신청 마감 확인용)
-//			@GetMapping("/available/{eventNum}")
-//			public ResponseEntity<Boolean> isAvailable(@PathVariable Long eventNum) {
-//				return ResponseEntity.ok(eventService.isAvailable(eventNum));
-//			}
+			@GetMapping("/available/{eventNum}")
+			public ResponseEntity<Boolean> isAvailable(@PathVariable Long eventNum) {
+				return ResponseEntity.ok(eventService.isAvailable(eventNum));
+			}
 	
 			// 4. 사용자 신청 내역 조회 (페이징)(사용)
 			@GetMapping("/reservation")
@@ -338,7 +322,7 @@ import lombok.RequiredArgsConstructor;
 			    );
 			}
 	
-			// 5. 사용자 신청 취소(사용중)
+			// 5. 사용자 신청 취소
 			@DeleteMapping("/cancel")
 			public ResponseEntity<String> cancelEvent(
 			        @RequestParam("evtRevNum") Long evtRevNum,
@@ -357,21 +341,62 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 6. 사용자 행사 목록 조회
-//			@GetMapping("/user/list")
-//			public ResponseEntity<Page<EventInfoDTO>> getUserEventList(@RequestParam(required = false) String option,
-//					@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
-//					Pageable pageable) {
-//				log.info("getUserEventList called with option: {}, query: {}, status: {}, pageable: {}", option, query,
-//						status, pageable);
-//				Page<EventInfoDTO> result = eventService.searchEventList(pageable, option, query, status);
-//				log.info("Returned {} programs. Total elements: {}", result.getContent().size(), result.getTotalElements());
-//				return ResponseEntity.ok(result);
-//			}
-//	
-//			@GetMapping("/admin/notEnd")
-//			public ResponseEntity<List<EventInfoDTO>> getUserProgramList() {
-//				List<EventInfoDTO> result = eventService.searchNotEndEventList();
-//				return ResponseEntity.ok(result);
-//			}
+			@GetMapping("/user/list")
+			public ResponseEntity<Page<EventInfoDTO>> getUserEventList(@RequestParam(required = false) String option,
+					@RequestParam(required = false) String query, @RequestParam(required = false) EventState status,
+					Pageable pageable) {
+				log.info("getUserEventList called with option: {}, query: {}, status: {}, pageable: {}", option, query,
+						status, pageable);
+				Page<EventInfoDTO> result = eventService.searchEventList(pageable, option, query, status);
+				log.info("Returned {} programs. Total elements: {}", result.getContent().size(), result.getTotalElements());
+				return ResponseEntity.ok(result);
+			}
+	
+			@GetMapping("/admin/notEnd")
+			public ResponseEntity<List<EventInfoDTO>> getUserProgramList() {
+				List<EventInfoDTO> result = eventService.searchNotEndEventList();
+				return ResponseEntity.ok(result);
+			}
+			//------------------------
 			
+			//@PostMapping("/test-form")
+			public ResponseEntity<String> testForm(@RequestParam("eventName") String eventName) {
+			    log.info("eventName: {}", eventName);
+			    return ResponseEntity.ok("OK");
+			}
+			
+			//@PostMapping("/test-form")
+			public ResponseEntity<String> testFormUpload(
+			        @ModelAttribute EventInfoDTO dto,
+			        @RequestParam(value = "imageList", required = false) List<MultipartFile> imageList,
+			        @RequestParam(value = "attachList", required = false) List<MultipartFile> attachList
+			) {
+			    log.info("테스트용 컨트롤러 호출됨");
+
+			    log.info("▶️ eventName: {}", dto.getEventName());
+			    log.info("▶️ eventInfo: {}", dto.getEventInfo());
+			    log.info("▶️ applyStartPeriod: {}", dto.getApplyStartPeriod());
+			    log.info("▶️ applyEndPeriod: {}", dto.getApplyEndPeriod());
+			    log.info("▶️ eventStartPeriod: {}", dto.getEventStartPeriod());
+			    log.info("▶️ eventEndPeriod: {}", dto.getEventEndPeriod());
+			    log.info("▶️ category: {}", dto.getCategory());
+			    log.info("▶️ maxCapacity: {}", dto.getMaxCapacity());
+			    log.info("▶️ place: {}", dto.getPlace());
+
+			    if (imageList != null) {
+			        log.info("imageList count: {}", imageList.size());
+			        imageList.forEach(file -> log.info("🖼️ 이미지 파일명: {}", file.getOriginalFilename()));
+			    } else {
+			        log.info("imageList: null");
+			    }
+
+			    if (attachList != null) {
+			        log.info("📎 attachList count: {}", attachList.size());
+			        attachList.forEach(file -> log.info("📎 첨부파일명: {}", file.getOriginalFilename()));
+			    } else {
+			        log.info("📎 attachList: null");
+			    }
+
+			    return ResponseEntity.ok("테스트 완료");
+			}
 	}

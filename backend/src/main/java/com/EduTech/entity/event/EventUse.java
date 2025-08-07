@@ -48,4 +48,5 @@ public class EventUse {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memId", nullable = false)
 	private Member member;
+	
 }
