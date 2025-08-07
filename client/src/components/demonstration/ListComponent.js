@@ -122,9 +122,13 @@ const ListComponent = () => {
       </button>
     </form>
       </div>
-        <div className="flex flex-wrap justify-center gap-4">
-          {mainContent}
-        </div>
+       <div className="flex flex-wrap justify-center gap-4">
+      {listData.content && listData.content.length === 0 ? (
+        <p className="text-gray-500 text-lg mt-20">등록된 상품이 없습니다.</p>
+      ) : (
+        mainContent
+      )}
+    </div>
       <div className="flex justify-center">
         <PageComponent
           totalPages={pageData.totalPages}

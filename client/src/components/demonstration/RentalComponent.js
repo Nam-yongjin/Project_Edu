@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SearchComponent from "../../components/demonstration/SearchComponent";
-import { getRental, getRentalSearch } from "../../api/demApi";
+import { getRental, getRentalSearch, deleteRental } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import { useNavigate } from "react-router-dom";
 
@@ -18,17 +18,18 @@ const RentalComponent = () => {
     const [listData, setListData] = useState({ content: [] });
     const [sortBy, setSortBy] = useState("applyAt");
     const [sort, setSort] = useState("asc");
-    const [statusFilter, setStatusFilter] = useState("");
+    const [statusFilter, setStatusFilter] = useState("total");
     const navigate = useNavigate();
     const [selectedItems, setSelectedItems] = useState(new Set());
+
     const fetchData = () => {
         if (search && search.trim() !== "") {
-            getRentalSearch(search, type, current, sortBy, sort).then((data) => {
+            getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
                 setListData(data);
                 setPageData(data);
             });
         } else {
-            getRental(current, sort, sortBy).then((data) => {
+            getRental(current, sort, sortBy, statusFilter).then((data) => {
                 setListData(data);
                 setPageData(data);
             });
@@ -36,12 +37,11 @@ const RentalComponent = () => {
     };
 
     useEffect(() => {
-        fetchData(); // 최초 로딩, 페이지 변경, 정렬 변경에 따라
-    }, [current, sort, sortBy,statusFilter]);
+        fetchData();
+    }, [current, sort, sortBy, statusFilter]);
 
     const onSearchClick = () => {
-        fetchData(); // 검색 실행
-        console.log(listData);
+        fetchData();
     };
 
     const handleSortChange = (column) => {
@@ -49,7 +49,7 @@ const RentalComponent = () => {
             setSort((prev) => (prev === "asc" ? "desc" : "asc"));
         } else {
             setSortBy(column);
-            setSort("asc"); // 기본 오름차순
+            setSort("asc");
         }
     };
 
@@ -60,8 +60,9 @@ const RentalComponent = () => {
     // 전체선택 체크박스 핸들러
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            // 현재 페이지 모든 demNum을 선택
-            const allIds = listData.content.map((item) => item.demNum);
+            const allIds = listData.content
+                .filter(item => item.state !== "CANCEL") // cancel 제외
+                .map((item) => item.demNum);
             setSelectedItems(new Set(allIds));
         } else {
             setSelectedItems(new Set());
@@ -79,49 +80,51 @@ const RentalComponent = () => {
         setSelectedItems(newSet);
     };
 
-    // 예약 취소 버튼 클릭 이벤트 (예시 alert, 실제 구현 시 API 호출 필요)
-   const handleCancelReservation = () => {
-    if (selectedItems.size === 0) {
-        alert("하나 이상 선택해주세요.");
-        return;
-    }
-
-    const invalidItems = listData.content.filter(
-        (item) => selectedItems.has(item.demNum) && item.state !== "WAIT"
-    );
-
-    if (invalidItems.length > 0) {
-        const states = invalidItems.map((item) => `${item.demNum}: ${item.state}`).join("\n");
-        alert(`${states}상태 이므로 예약 취소가 불가능 합니다.`);
-        return;
-    }
-
-    // 모든 선택 항목이 "WAIT"일 때만 실행
-    alert(`예약 취소 요청: ${[...selectedItems].join(", ")}`);
-    // TODO: 실제 취소 API 호출
-};
-
-
-    // 상태컬럼 우측 버튼들 클릭 예시 함수 (실제 로직으로 대체 필요)
-    const handleActionClick = (demNum, action) => {
-    const item = listData.content.find((item) => item.demNum === demNum);
-    if (!item) return;
-
-    if (action === "예약변경") {
-        if (item.state !== "WAIT") {
-            alert(`${item.state}상태 이므로 예약 변경이 불가능합니다.`);
+    const handleCancelReservation = () => {
+        if (selectedItems.size === 0) {
+            alert("선택된 항목이 없습니다.");
             return;
         }
-        alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
-        // TODO: 예약 변경 로직
-    } else if (action === "대여연장") {
-        // 여긴 예외처리 안 함 (예시이므로 자유롭게 확장 가능)
-        alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
-    } else if (action === "반납") {
-        alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
-    }
-};
 
+        const invalidItems = !listData.content
+            .filter(item => selectedItems.has(item.demNum))
+            .some(item => item.state === "WAIT");
+
+        if (invalidItems) {
+            alert("선택한 항목 중 'WAIT' 상태가 하나도 없습니다. 예약 취소가 불가능합니다.");
+            return;
+        }
+
+        deleteRental(Array.from(selectedItems));
+
+        alert("예약이 취소 되었습니다.");
+        window.location.reload();
+    };
+
+    const handleActionClick = (demNum, action) => {
+        const item = listData.content.find((item) => item.demNum === demNum);
+        if (!item) return;
+
+        if (action === "예약변경") {
+            if (item.state !== "WAIT") {
+                alert(`${item.state} 상태이므로 예약 변경이 불가능합니다.`);
+                return;
+            }
+            alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
+        } else if (action === "대여연장") {
+            if (item.state !== "ACCEPT") {
+                alert(`${item.state} 상태이므로 대여 연장이 불가능합니다.`);
+                return;
+            }
+            alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
+        } else if (action === "반납") {
+            if (item.state !== "ACCEPT") {
+                alert(`${item.state} 상태이므로 반납이 불가능합니다.`);
+                return;
+            }
+            alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
+        }
+    };
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -142,8 +145,8 @@ const RentalComponent = () => {
                                     type="checkbox"
                                     onChange={handleSelectAll}
                                     checked={
-                                        listData.content.length > 0 &&
-                                        selectedItems.size === listData.content.length
+                                        listData.content.filter(item => item.state !== "CANCEL").length > 0 &&
+                                        selectedItems.size === listData.content.filter(item => item.state !== "CANCEL").length
                                     }
                                 />
                             </th>
@@ -195,6 +198,7 @@ const RentalComponent = () => {
                                     <option value="reject">reject</option>
                                     <option value="accept">accept</option>
                                     <option value="wait">wait</option>
+                                    <option value="cancel">cancel</option>
                                 </select>
                             </th>
                             {/* 버튼 3개 컬럼 */}
@@ -204,18 +208,26 @@ const RentalComponent = () => {
                     <tbody className="text-gray-600 text-sm">
                         {listData.content.map((item) => {
                             const mainImage = item.imageList?.find((img) => img.isMain === true);
+                            const isCancelled = item.state === "CANCEL";
+
                             return (
                                 <tr
                                     key={item.demNum}
-                                    className="border-b border-gray-200 hover:bg-gray-50 cursor-default"
+                                    className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${
+                                        isCancelled ? "bg-gray-100 text-gray-400" : ""
+                                    }`}
                                 >
                                     {/* 체크박스 */}
                                     <td className="py-3 px-4 text-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedItems.has(item.demNum)}
-                                            onChange={(e) => handleSelectOne(e, item.demNum)}
-                                        />
+                                        {!isCancelled ? (
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedItems.has(item.demNum)}
+                                                onChange={(e) => handleSelectOne(e, item.demNum)}
+                                            />
+                                        ) : (
+                                            <span>취소됨</span>
+                                        )}
                                     </td>
                                     <td className="py-3 px-4">
                                         {mainImage ? (
@@ -241,24 +253,30 @@ const RentalComponent = () => {
 
                                     {/* 버튼 3개 */}
                                     <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
-                                        <button
-                                            onClick={() => handleActionClick(item.demNum, "예약변경")}
-                                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs w-full"
-                                        >
-                                            예약변경
-                                        </button>
-                                        <button
-                                            onClick={() => handleActionClick(item.demNum, "대여연장")}
-                                            className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs w-full"
-                                        >
-                                            대여연장
-                                        </button>
-                                        <button
-                                            onClick={() => handleActionClick(item.demNum, "반납")}
-                                            className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs w-full"
-                                        >
-                                            반납
-                                        </button>
+                                        {!isCancelled ? (
+                                            <>
+                                                <button
+                                                    onClick={() => handleActionClick(item.demNum, "예약변경")}
+                                                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs w-full"
+                                                >
+                                                    예약변경
+                                                </button>
+                                                <button
+                                                    onClick={() => handleActionClick(item.demNum, "대여연장")}
+                                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs w-full"
+                                                >
+                                                    대여연장
+                                                </button>
+                                                <button
+                                                    onClick={() => handleActionClick(item.demNum, "반납")}
+                                                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs w-full"
+                                                >
+                                                    반납
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <span className="text-gray-500 mt-[30px]">취소됨</span>
+                                        )}
                                     </td>
                                 </tr>
                             );
