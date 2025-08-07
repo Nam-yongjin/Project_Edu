@@ -91,8 +91,9 @@ const Header = () => {
       link: "/admin",
       sub: [
         { name: "회원 관리", link: "/admin/members" },
-        { name: "배너 관리", link: "/admin/banner" },
-        { name: "관리", link: "/" },
+        { name: "프로그램 관리", link: "/event/banner" },
+        { name: "공간 관리", link: "/" },
+        { name: "실증 관리", link: "/" },
       ],
     });
   }

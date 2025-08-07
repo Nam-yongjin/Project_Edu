@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -428,7 +429,11 @@ public class EventServiceImpl implements EventService {
 	    return dto;
 	}
 	
-	
+	@Override
+	public RevState getUserRevState(Long eventNum, String memId) {
+	    Optional<EventUse> use = useRepository.findByEventInfo_EventNumAndMember_MemId(eventNum, memId);
+	    return use.map(EventUse::getRevState).orElse(null);
+	}
 	
 	
 	
@@ -633,10 +638,6 @@ public class EventServiceImpl implements EventService {
 	        throw new IllegalStateException("로그인한 사용자만 신청할 수 있습니다.");
 	    }
 
-	    if (isAlreadyApplied(eventNum, memId)) {
-	        throw new IllegalStateException("이미 신청한 프로그램입니다.");
-	    }
-
 	    EventInfo event = infoRepository.findById(eventNum)
 	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
 
@@ -646,11 +647,8 @@ public class EventServiceImpl implements EventService {
 	        throw new IllegalStateException("신청 기간 정보가 없습니다.");
 	    }
 
-	    if (now.isBefore(event.getApplyStartPeriod())) {
-	        throw new IllegalStateException("신청 기간이 아닙니다.");
-	    }
-	    if (now.isAfter(event.getApplyEndPeriod())) {
-	        throw new IllegalStateException("신청 기간이 종료되었습니다.");
+	    if (now.isBefore(event.getApplyStartPeriod()) || now.isAfter(event.getApplyEndPeriod())) {
+	        throw new IllegalStateException("현재는 신청 기간이 아닙니다.");
 	    }
 
 	    if (event.getCurrCapacity() >= event.getMaxCapacity()) {
@@ -661,31 +659,38 @@ public class EventServiceImpl implements EventService {
 	            .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
 
 	    if (member.getState() == MemberState.BEN) {
-	        throw new IllegalStateException("회원이 정지 상태로 인해 프로그램을 신청할 수 없습니다.");
+	        throw new IllegalStateException("정지된 회원입니다.");
 	    }
 
 	    if (member.getState() == MemberState.LEAVE) {
-	        throw new IllegalStateException("탈퇴한 계정은 신청할 수 없습니다.");
+	        throw new IllegalStateException("탈퇴한 회원입니다.");
 	    }
 
-	    // USER는 누구나 신청 가능
-	    if (event.getCategory() != EventCategory.USER && !isEligible(event.getCategory(), member)) {
-	        throw new IllegalStateException("신청 대상이 아닙니다.");
+	    // 가장 최근 신청 이력 확인
+	    Optional<EventUse> recentUseOpt = useRepository
+	            .findTopByEventInfo_EventNumAndMember_MemIdOrderByApplyAtDesc(eventNum, memId);
+
+	    if (recentUseOpt.isPresent()) {
+	        RevState recentState = recentUseOpt.get().getRevState();
+	        if (recentState == RevState.APPROVED) {
+	            throw new IllegalStateException("이미 신청한 상태입니다.");
+	        }
+	        // WAITING, CANCEL이면 → 새 신청 가능 (아래에서 insert 처리)
 	    }
 
-	    // ✅ 바로 승인 상태로 저장
-	    EventUse eventUse = EventUse.builder()
+	    // 신청 insert
+	    EventUse newUse = EventUse.builder()
 	            .eventInfo(event)
 	            .member(member)
-	            .revState(RevState.APPROVED)  // 즉시 승인
-	            .applyAt(LocalDateTime.now())
+	            .revState(RevState.APPROVED)
+	            .applyAt(now)
 	            .build();
 
-	    useRepository.save(eventUse);
+	    useRepository.save(newUse);
 
-	    // 신청과 동시에 현재 인원 증가
 	    event.increaseCurrCapacity();
 	}
+	
 	
 	// 행사 신청 취소
 	@Override
@@ -745,6 +750,7 @@ public class EventServiceImpl implements EventService {
 	            .name(member != null ? member.getName() : null)
 	            .email(member != null ? member.getEmail() : null)
 	            .phone(member != null ? member.getPhone() : null)
+	            .mainImagePath(info.getMainImagePath())
 	            .build();
 	}
 
