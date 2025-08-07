@@ -65,9 +65,9 @@ public class DemonstrationController {
 	@GetMapping("/demRental")
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
 		String memId = JWTFilter.getMemId();
-		System.out.println(demonstrationSearchDTO);
 		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService
 				.getAllDemRental(memId,demonstrationSearchDTO);
+		System.out.println(AllDemRental);
 		return AllDemRental;
 	}
 
@@ -92,6 +92,7 @@ public class DemonstrationController {
 	@GetMapping("/demResCon")
 	public List<DemonstrationTimeResDTO> checkReservationStateList(
 			 DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
+		String memId = JWTFilter.getMemId();
 		List<DemonstrationTimeResDTO> checkResList = demonstrationService
 				.checkReservationState(demonstrationTimeReqDTO);
 		return checkResList;

@@ -16,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
 
@@ -85,11 +86,15 @@ public interface DemonstrationReserveRepository
 	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
 	Long getBItemNum(@Param("demNum") Long demNum, @Param("memId") String memId,
 			@Param("state") DemonstrationState state);
-	
+
 	// 스케줄러를 이용해 state가 cancel인 값 삭제
 	@Modifying
 	@Transactional
 	@Query("DELETE FROM DemonstrationReserve WHERE state=:state")
-	void deleteResCancel(@Param("state") DemonstrationState state); 
+	void deleteResCancel(@Param("state") DemonstrationState state);
 
+	// RES테이블에서 아이디와 상품번호를 받아와 예약 시작날짜와 끝날짜를 받아오는 쿼리문
+		@Query("SELECT r.startDate,r.endDate FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
+		Long getResDate(@Param("demNum") Long demNum, @Param("memId") String memId,
+				@Param("state") DemonstrationState state);
 }
