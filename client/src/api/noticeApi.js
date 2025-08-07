@@ -34,7 +34,7 @@ export const createNotice = async (formData) => {
 
 //공지사항 수정
 export const updateNotice = async (noticeNum, formData) => {
-    const res = await jwtAxios.post(`${notice}/UpdateNotice/${noticeNum}`, formData, {
+    const res = await jwtAxios.put(`${notice}/UpdateNotice/${noticeNum}`, formData, {
         headers: {"Content-Type": "multipart/form-data"}, //자동설정 되지만 명시하면 더 안전
     });
     return res.data;
@@ -42,6 +42,7 @@ export const updateNotice = async (noticeNum, formData) => {
 
 //공지사항 삭제(단일)
 export const deleteNotice = async (noticeNum) => {
+    console.log("프론트에서 백엔드로 보낼 noticeNum:", noticeNum);
     const res = await jwtAxios.delete(`${notice}/DeleteNotice/${noticeNum}`);
     return res.data;
 }
