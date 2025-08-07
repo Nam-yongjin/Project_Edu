@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
-import searchIcon from "../assets/search.png";
 import sideIcon from "../assets/side.png";
 import { useSelector } from "react-redux";
 import useMove from "../hooks/useMove";
@@ -92,9 +91,8 @@ const Header = () => {
       link: "/admin",
       sub: [
         { name: "회원 관리", link: "/admin/members" },
-        { name: "프로그램 관리", link: "/" },
-        { name: "공간 관리", link: "/" },
-        { name: "실증 관리", link: "/" },
+        { name: "배너 관리", link: "/admin/banner" },
+        { name: "관리", link: "/" },
       ],
     });
   }

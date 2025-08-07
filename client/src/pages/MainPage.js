@@ -6,45 +6,60 @@ import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import '../swiperCss/main.css'
-import main1 from '../assets/main1.jpg';
-import main2 from '../assets/main2.jpg';
-import main3 from '../assets/main3.jpg';
-import main4 from '../assets/main4.jpg';
+import { useState, useEffect } from "react";
+import { getAllBanners, getBannerImage } from "../api/adminApi";
 
 const MainPage = () => {
+    const [banners, setBanners] = useState([]);
+
+    useEffect(() => {
+        const fetchBanners = () => {
+            getAllBanners()
+                .then(data => {
+                    setBanners(data);
+                })
+                .catch(error => {
+                    console.error("배너를 불러올 수 없습니다.:", error);
+                });
+        };
+        fetchBanners();
+    }, []);
+
     return (
         <div className="">
             <BasicLayout isFullWidth={true}>
                 <div className="mx-auto relative">
-                    <Swiper
-                        centeredSlides={true}
-                        autoplay={{
-                            delay: 5000,
-                            disableOnInteraction: false,
-                        }}
-                        pagination={{
-                            clickable: true,
-                        }}
-                        loop={true}
-                        loopedSlides={4}
-                        lazy={true}
-                        speed={1200}
-                        modules={[Autoplay, Pagination]}
-                        className="mySwiper max-h-screan aspect-video"
-                    >
-                        <SwiperSlide>
-                            <img src={main1} className="w-full h-full object-cover" loading="lazy"/>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={main2} className="w-full h-full object-cover" loading="lazy"/>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={main3} className="w-full h-full object-cover" loading="lazy"/>
-                        </SwiperSlide>
-                        <SwiperSlide>
-                            <img src={main4} className="w-full h-full object-cover" loading="lazy"/>
-                        </SwiperSlide>
-                    </Swiper>
+                    {banners.length > 0 && (
+                        <Swiper
+                            centeredSlides={true}
+                            autoplay={{
+                                delay: 5000,
+                                disableOnInteraction: false,
+                            }}
+                            pagination={{
+                                clickable: true,
+                            }}
+                            loop={true}
+                            loopedSlides={banners.length}
+                            lazy={{
+                                loadPrevNext: true,
+                            }}
+                            speed={1200}
+                            modules={[Autoplay, Pagination]}
+                            className="mySwiper max-h-screan aspect-video"
+                        >
+                            {banners.map((banner) => (
+                                <SwiperSlide key={banner.bannerNum}>
+                                    <img
+                                        src={getBannerImage(banner.imagePath)}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                        alt={banner.originalName}
+                                    />
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    )}
 
                     <div className="absolute top-1/4 left-0 w-full z-20 pointer-events-none select-none ">
                         <div className="max-w-screen-xl mx-auto px-4">

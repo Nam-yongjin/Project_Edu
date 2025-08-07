@@ -12,6 +12,7 @@ import com.EduTech.dto.admin.BoardListDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.notice.NoticeCreateRegisterDTO;
+import com.EduTech.entity.admin.BannerImage;
 import com.EduTech.entity.member.MemberState;
 
 public interface AdminService {
@@ -20,4 +21,10 @@ public interface AdminService {
 	void sendMessageForUser(AdminMessageDTO adminMessageDTO); // 관리자가 회원들에게 메시지를 보내는 기능
 	PageResponseDTO<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewReqDTO,Integer pageCount); // 관리자 회원 목록 페이지 조회 기능
 	void MemberStateChange(List<String> memId,MemberState memberState); // 관리자가 회원 상태 수정하는 기능
+	
+	List<BannerImage> uploadBanners(List<MultipartFile> files);	// 관리자 메인페이지의 배너 등록 기능
+	List<BannerImage> getAllBanners();	// 배너 조회
+	void deleteBanner(Long bannerNum);	// 배너 삭제
+	void updateBannerSequence(List<Long> bannerNums);	// 배너 순서 수정
+	
 }
