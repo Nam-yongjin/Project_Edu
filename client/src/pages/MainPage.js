@@ -46,7 +46,7 @@ const MainPage = () => {
                             }}
                             speed={1200}
                             modules={[Autoplay, Pagination]}
-                            className="mySwiper max-h-screan aspect-video"
+                            className="mySwiper max-h-[80vh] aspect-video"
                         >
                             {banners.map((banner) => (
                                 <SwiperSlide key={banner.bannerNum}>

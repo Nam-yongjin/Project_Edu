@@ -76,9 +76,9 @@ const DirectionComponent = () => {
             <div className="mx-auto max-w-screen-xl my-10">
                 <div className="text-2xl font-bold mb-8">오시는 길</div>
                 {mapError ? (
-                    <img src={defaultImage} alt="지도 로딩 실패" className="h-[600px] w-full object-cover" />
+                    <img src={defaultImage} alt="지도 로딩 실패" className="lg:h-[600px] md:h-[500px] sm:h-[400px] h-[300px] w-full object-cover" />
                 ) : (
-                    <div id="map" className="h-[600px] mt-4" />
+                    <div id="map" className="lg:h-[600px] md:h-[500px] sm:h-[400px] h-[300px] mt-4" />
                 )}
             </div>
 
