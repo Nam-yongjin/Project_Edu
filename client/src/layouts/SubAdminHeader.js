@@ -39,7 +39,11 @@ const SubAdminHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link
                                 to="/event/banner"
+<<<<<<< HEAD
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+=======
+                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+>>>>>>> refs/heads/Event
                                     }`}
                             >
                                 프로그램 배너 관리
