@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { NoticeDetail } from "../../api/noticeApi";
+import { deleteNotice } from "../../api/noticeApi";
 import useMove from "../../hooks/useMove";
-import axios from "axios";
+import { useSelector } from "react-redux"
 
 const NoticeDetailComponent = () => {
     const { noticeNum } = useParams();
@@ -12,6 +13,8 @@ const NoticeDetailComponent = () => {
     const [notice, setNotice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const loginState = useSelector((state) => state.loginState);
 
     //공지사항 상세 조회
     const fetchNoticeDetail = async () => {
@@ -56,17 +59,21 @@ const NoticeDetailComponent = () => {
     //삭제
     const handleDelete = async () => {
         console.log("삭제 요청 보냄");
+
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
-                await axios.delete(`http://localhost:8090/api/notice/DeleteNotice/${noticeNum}`);
-                alert("삭제되었습니다.");
-                navigate("/notice/NoticeList");
-            } catch (err) {
-                console.error("삭제 실패", err);
+                await deleteNotice(Number(noticeNum));
+                console.log("삭제할 공지사항:",noticeNum);
+                alert("공지사항이 삭제되었습니다.");
+
+                moveToPath("/notice/NoticeList")
+            } catch (error) {
+                console.error("삭제 실패:", error);
                 alert("삭제 중 오류가 발생했습니다.");
             }
         }
     };
+
     //현재 날짜 기준 
     const formatDate = (dateString) => {
         if (!dateString) return "-";
@@ -247,11 +254,12 @@ const NoticeDetailComponent = () => {
                         >
                             목록
                         </button>
-                
+
+                        {loginState.role === 'ADMIN' ? (
                         <div className="flex gap-2">
                             <button 
                                 onClick={handleUpdate}
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
                             >
                                 수정하기
                             </button>
@@ -262,12 +270,12 @@ const NoticeDetailComponent = () => {
                                 삭제하기
                             </button>
                         </div>
+                        ) : (<></>)}
                     </div>                
                 </div>
             </div>
         </div>
     )
-
 }
 
 export default NoticeDetailComponent;

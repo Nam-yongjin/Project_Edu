@@ -96,8 +96,8 @@ public class NoticeServiceImpl implements NoticeService {
     public void deleteNotice(Long noticeNum) {
     	//단일 삭제에서 권한 충돌이 나서 주석처리 함 @PreAuthorize("hasRole('ADMIN')")도 같이
     	//프론트에서 관리자만 버튼이 보이도록 설정했기 때문에 없어도 괜찮을 것 같다고 판단....
-//        Member currentMember = getCurrentMember();
-//        validateAdminRole(currentMember);
+        Member currentMember = getCurrentMember();
+        validateAdminRole(currentMember);
         
         Notice notice = noticeRepository.findById(noticeNum)
                 .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
@@ -152,11 +152,11 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     @Transactional(readOnly = true)
     public NoticeDetailDTO getNoticeDetail(Long noticeNum) {
-        Notice notice = noticeRepository.findById(noticeNum)
+        Notice notice = noticeRepository.findByIdWithFiles(noticeNum)
                 .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
         
         System.out.println("공지사항 첨부파일 수: " + notice.getNoticeFiles().size());
-        
+        //DTO 변환 로직
         return mapToDetailDTO(notice);
     }
     
@@ -341,6 +341,7 @@ public class NoticeServiceImpl implements NoticeService {
     // 파일 DTO 변환
     private NoticeFileDTO mapToFileDTO(NoticeFile noticeFile) {
         NoticeFileDTO fileDTO = new NoticeFileDTO();
+        fileDTO.setNotFileNum(noticeFile.getNotFileNum()); //첨부파일 삭제할 때 필요
         fileDTO.setOriginalName(noticeFile.getOriginalName());
         fileDTO.setFilePath(noticeFile.getFilePath());
         fileDTO.setFileType(noticeFile.getFileType());

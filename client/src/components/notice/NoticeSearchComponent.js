@@ -65,7 +65,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                             name="searchType"
                             value={searchForm.searchType}
                             onChange={handleInputChange}
-                            className="boder boder-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="ALL">전체</option>
                             <option value="TITLE">제목</option>
@@ -88,11 +88,11 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
 
                 {/* 고정글 필터와 기간 검색 */}
                 {loginState.role === 'ADMIN' ? (
-                    <div className="flex flxe-wrap items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-4">
                         <div  className="flex items-center gap-2">
                             <label className="text-sm font-medium text-gray-700">고정글:</label>
                             <select
-                                name="pinnrdFilter"
+                                name="pinnedFilter"
                                 value={searchForm.isPinned === null ? "all" : searchForm.isPinned ? "pinned" : "normal"}
                                 onChange={handlePinnedChange}
                                 className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
