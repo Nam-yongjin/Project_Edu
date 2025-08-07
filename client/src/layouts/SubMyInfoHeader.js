@@ -23,7 +23,7 @@ const SubMyInfoHeader = () => {
         <div className="bg-blue-100 w-full pt-8 pb-8">
             <div className="max-w-screen-xl mx-auto ">
                 <div className="flex items-center justify-between">
-                    <div className="text-4xl font-bold text-gray-800 ">
+                    <div className="text-4xl font-bold text-gray-800">
                         마이페이지
                     </div>
                     <div className="w-1/4">
