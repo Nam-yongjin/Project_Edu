@@ -161,12 +161,12 @@ const MemberRegisterComponent = () => {
     return (
         <div>
             <div className="page-shadow my-10 p-10 space-y-6 text-center">
-                <div className="text-3xl font-bold">회원가입</div>
+                <div className="newText-3xl font-bold">회원가입</div>
 
                 {/* 아이디 */}
                 <div>
-                    <div className="flex items-center gap-4">
-                        <label className="w-32 text-left font-medium">아이디<span className='text-red-600'> *</span></label>
+                    <div className="newText-base flex items-center gap-4">
+                        <label className="newText-base w-32 text-left font-medium">아이디<span className='text-red-600'> *</span></label>
                         <input
                             name="memId"
                             placeholder="아이디"
@@ -187,7 +187,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 비밀번호 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">비밀번호<span className='text-red-600'> *</span></label>
                         <input
                             name="pw"
@@ -203,7 +203,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 비밀번호 확인 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">비밀번호 확인<span className='text-red-600'> *</span></label>
                         <input
                             name="pwCheck"
@@ -219,7 +219,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 이름 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">이름<span className='text-red-600'> *</span></label>
                         <input
                             name="name"
@@ -234,7 +234,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 휴대폰 인증 */}
                 <div>
-                    <div className="flex items-start">
+                    <div className="newText-base flex items-start">
                         <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600'> *</span></div>
                         <PhoneVerification onVerified={setVerifiedPhone} />
                     </div>
@@ -243,7 +243,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 이메일 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">이메일<span className='text-red-600'> *</span></label>
                         <input
                             name="email"
@@ -259,7 +259,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 생년월일 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">생년월일<span className='text-red-600'> *</span></label>
                         <input
                             name="birthDate"
@@ -276,7 +276,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 성별 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <div className="w-36 text-left font-medium">성별<span className='text-red-600'> *</span></div>
                         <div className="flex gap-6">
                             <label className="inline-flex items-center gap-1">
@@ -308,7 +308,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 주소 */}
                 <div>
-                    <div className="flex items-start">
+                    <div className="newText-base flex items-start">
                         <div className="w-36 text-left font-medium pt-2">주소</div>
                         <div className="flex-1">
                             <AddressSearch onAddressSelected={handleAddressSelected} />
@@ -325,7 +325,7 @@ const MemberRegisterComponent = () => {
 
                 {/* 상세 주소 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">상세 주소</label>
                         <input
                             name="addrDetail"
@@ -338,7 +338,7 @@ const MemberRegisterComponent = () => {
                 </div>
 
                 {/* 수신 동의 체크박스 */}
-                <div className="flex items-center">
+                <div className="newText-base flex items-center">
                     <label className="w-36 text-left font-medium">SMS 수신</label>
                     <input
                         name="checkSms"
@@ -349,7 +349,7 @@ const MemberRegisterComponent = () => {
                     />
                 </div>
                 
-                <div className="flex items-center">
+                <div className="newText-base flex items-center">
                     <label className="w-36 text-left font-medium">이메일 수신</label>
                     <input
                         name="checkEmail"
@@ -363,7 +363,7 @@ const MemberRegisterComponent = () => {
                 {/* 제출 버튼 */}
                 <div>
                     <button
-                        className="positive-button"
+                        className="newText-base positive-button"
                         onClick={handleSubmit}
                     >
                         회원가입
