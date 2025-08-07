@@ -58,9 +58,10 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Query("SELECT COUNT(d) > 0 FROM DemonstrationRegistration d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
 	boolean existsAcceptedRegistrationByMemId(@Param("memId") String memId);
 	
-	// Repository 메서드 (JPQL로 demNum과 memId 한꺼번에 조회)
+	// Repository 메서드 (JPQL로 demNum과 memId 한꺼번에 조회) - 삭제예정
 	@Query("SELECT reg.demonstration.demNum, reg.member.memId FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum IN :demNums")
 	List<Object[]> findDemNumAndMemId(@Param("demNums") Set<Long> demNums);
+	
 }
 
 
