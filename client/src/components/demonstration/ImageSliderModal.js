@@ -17,7 +17,6 @@ const ImageSliderModal = ({ open, onClose, imageList }) => {
                 <Swiper
                     spaceBetween={10}
                     slidesPerView={1}
-                    navigation
                     pagination={{ clickable: true }}
                       className="w-[500px] h-[400px] bg-white flex justify-center items-center"
                 >

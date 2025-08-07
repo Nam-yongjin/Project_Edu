@@ -24,7 +24,6 @@ import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
 import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationResRentalDTO;
-import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
@@ -116,11 +115,12 @@ public class DemonstrationController {
 		return ResponseEntity.ok("예약 성공");
 	}
 
-	// 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
+	// 실증 대여 목록 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 	@DeleteMapping("/CancelRes")
 	public ResponseEntity<String> DemResCancel(
-			@RequestBody DemonstrationReservationCancelDTO demonstrationReservationCancelDTO) {
-		demonstrationService.demonstrationReservationCancel(demonstrationReservationCancelDTO);
+			@RequestBody List<Long>demNum) {
+		String memId = JWTFilter.getMemId();
+		demonstrationService.demonstrationReservationCancel(demNum,memId);
 		return ResponseEntity.ok("예약 취소 완료");
 	}
 	
