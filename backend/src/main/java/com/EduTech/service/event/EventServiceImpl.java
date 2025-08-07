@@ -554,36 +554,38 @@ public class EventServiceImpl implements EventService {
 	
 	// 배너 등록
 	@Override
-    public void registerBanner(EventBannerDTO dto, MultipartFile file) {
-		LocalDateTime today = LocalDateTime.now();
-        long currentBannerCount = bannerRepository.countValidBanners(today);
-        if (currentBannerCount >= 9) {
-            throw new IllegalStateException("배너는 최대 3개까지 등록할 수 있습니다.");
-        }
+	public void registerBanner(EventBannerDTO dto) {
+	    // 1. 이미 등록된 행사인지 확인 먼저!
+	    if (bannerRepository.existsByEventInfo_EventNum(dto.getEventNum())) {
+	        throw new IllegalStateException("해당 프로그램에는 이미 배너가 등록되어 있습니다.");
+	    }
 
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("배너 이미지를 첨부해주세요.");
-        }
-        if (!file.getContentType().startsWith("image")) {
-            throw new IllegalArgumentException("이미지 파일만 업로드할 수 있습니다.");
-        }
+	    // 2. 최대 3개 제한 체크는 그 다음
+	    LocalDateTime today = LocalDateTime.now();
+	    long currentBannerCount = bannerRepository.countValidBanners(today);
+	    if (currentBannerCount >= 3) {
+	        throw new IllegalStateException("배너는 최대 3개까지 등록할 수 있습니다.");
+	    }
 
-        if (bannerRepository.existsByEventInfo_EventNum(dto.getEventInfoId())) {
-            throw new IllegalStateException("해당 프로그램에는 이미 배너가 등록되어 있습니다.");
-        }
+	    // 3. 행사 정보 가져오기
+	    EventInfo event = infoRepository.findById(dto.getEventNum())
+	            .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
 
-        List<Object> savedFiles = fileUtil.saveFiles(List.of(file), "Event/banner");
-        Map<String, String> fileMap = (Map<String, String>) savedFiles.get(0);
+	    // 4. 대표 이미지가 없는 경우 기본 이미지로 설정
+	    String defaultImagePath = "default/no-image.png";
+	    String defaultOriginalName = "기본이미지";
 
-        EventInfo event = infoRepository.findById(dto.getEventInfoId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로그램이 존재하지 않습니다."));
+	    EventBanner banner = new EventBanner();
+	    banner.setOriginalName(
+	        event.getMainImageOriginalName() != null ? event.getMainImageOriginalName() : defaultOriginalName
+	    );
+	    banner.setFilePath(
+	        event.getMainImagePath() != null ? event.getMainImagePath() : defaultImagePath
+	    );
+	    banner.setEventInfo(event);
 
-        EventBanner banner = new EventBanner();
-        banner.setOriginalName(fileMap.get("originalName"));
-        banner.setFilePath(fileMap.get("filePath"));
-        banner.setEventInfo(event);
-        bannerRepository.save(banner);
-    }
+	    bannerRepository.save(banner);
+	}
 	
 	// 배너 삭제
 	@Override
@@ -666,7 +668,8 @@ public class EventServiceImpl implements EventService {
 	        throw new IllegalStateException("탈퇴한 계정은 신청할 수 없습니다.");
 	    }
 
-	    if (!isEligible(event.getCategory(), member)) {
+	    // USER는 누구나 신청 가능
+	    if (event.getCategory() != EventCategory.USER && !isEligible(event.getCategory(), member)) {
 	        throw new IllegalStateException("신청 대상이 아닙니다.");
 	    }
 

@@ -24,7 +24,7 @@ public class EventBanner {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long evtFileNum;
+	private Long bannerNum;
 	
 	@Column(nullable = false, length = 100)
 	private String originalName;

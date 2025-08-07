@@ -1,11 +1,11 @@
-import EvtTitleComponent from "../../components/event/EvtTitleComponent";
+import SubAdminHeader from "../../layouts/SubAdminHeader";
 import "react-datepicker/dist/react-datepicker.css";
 import EvtBannerListComponent from "../../components/event/EvtBannerListComponent";
 
 const EventBannerPage = () => {
     return (
         <div>
-            <EvtTitleComponent title="행사 배너" />
+            <SubAdminHeader title="행사 배너" />
             <EvtBannerListComponent />
         </div>
     );
