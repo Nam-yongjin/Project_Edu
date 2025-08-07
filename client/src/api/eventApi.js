@@ -89,3 +89,8 @@ export const getBannerList = async (current) => {
   });
   return res.data;
 };
+
+export const registerBanner = async (formData) => {
+  const response = await axios.post(`${event}/banners/register`, formData); // ✅ 헤더 제거
+  return response.data;
+};
