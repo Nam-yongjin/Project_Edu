@@ -24,7 +24,7 @@ const LoginComponent = () => {
             setFailCount(0);
             moveToPath('/');
         }).catch(error => {
-            alert(error.message || "로그인에 실패했습니다.");
+            alert("로그인에 실패했습니다.",error);
             const nextFailCount = failCount + 1;
             setFailCount(nextFailCount);
             removeCookie("member");
@@ -52,7 +52,7 @@ const LoginComponent = () => {
 
     return (
         <div className="">
-            <div className="my-10 p-10 w-[500px]  shadow-lg shadow-gray-400 rounded-lg">
+            <div className="page-shadow my-10 p-10 w-[500px]">
                 <div className="text-4xl text-center font-bold mb-6">로그인</div>
 
                 <div className="mb-4">
@@ -62,7 +62,7 @@ const LoginComponent = () => {
                         value={loginParam.memId}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full input-focus"
                         autoFocus
                     />
                 </div>
@@ -75,7 +75,7 @@ const LoginComponent = () => {
                         value={loginParam.pw}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full input-focus"
                     />
                 </div>
 
@@ -85,7 +85,7 @@ const LoginComponent = () => {
                         <div className="flex justify-center">
 
                             <button
-                                className="bg-blue-500 text-white font-bold p-2 w-[400px] rounded-md active:bg-blue-600"
+                                className="positive-button w-full"
                             >
                                 로그인
                             </button>
@@ -95,7 +95,7 @@ const LoginComponent = () => {
                     <div className="flex justify-center">
                         <button
                             onClick={handleClickLogin}
-                            className="bg-blue-500 text-white font-semibold p-2 w-[400px] rounded-md hover:bg-blue-600 active:bg-blue-700"
+                            className="positive-button w-full"
                         >
                             로그인
                         </button>

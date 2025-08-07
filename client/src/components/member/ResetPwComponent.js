@@ -28,7 +28,7 @@ const ResetPwComponent = () => {
                 };
             })
             .catch((error) => {
-                alert('아이디 확인 중 오류가 발생했습니다.');
+                alert('아이디 확인 중 오류가 발생했습니다.',error);
             });
     };
 
@@ -63,8 +63,8 @@ const ResetPwComponent = () => {
 
     return (
 
-        <div className='my-10 p-10 w-[500px] space-y-6 text-center shadow-lg shadow-gray-400 rounded-lg'>
-            <div className='text-3xl font-bold'>비밀번호 찾기 / 재설정</div>
+        <div className='page-shadow my-10 p-10 w-[500px] space-y-6 text-center'>
+            <div className='text-2xl font-bold'>비밀번호 찾기 / 재설정</div>
 
             {step === 'checkId' && (
                 <div className="">
@@ -74,7 +74,7 @@ const ResetPwComponent = () => {
                             placeholder="아이디 입력"
                             value={memId}
                             onChange={(e) => setMemId(e.target.value)}
-                            className="w-full px-4 py-2 my-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full my-3 input-focus"
                         />
                     </div>
                     <div>
@@ -83,10 +83,10 @@ const ResetPwComponent = () => {
                             placeholder="휴대폰번호 입력 ('-' 없이)"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full input-focus"
                         />
                     </div>
-                    <button className="text-center p-2 my-3 w-full bg-gray-200 rounded-md hover:bg-gray-300 active:bg-gray-400 border border-gray-400 text-sm font-medium"
+                    <button className="normal-button p-2 my-3 w-full"
                         onClick={handleCheckIdPhone}>아이디 확인</button>
                 </div>
 
@@ -107,7 +107,7 @@ const ResetPwComponent = () => {
                             placeholder="새 비밀번호 입력"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="flex-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 w-full input-focus"
                         />
                     </div>
                     <div>
@@ -116,10 +116,10 @@ const ResetPwComponent = () => {
                             placeholder="새 비밀번호 확인"
                             value={pwCheck}
                             onChange={(e) => setPwCheck(e.target.value)}
-                            className="flex-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 w-full input-focus"
                         />
                     </div><div>
-                        <button className="rounded p-2 w-18 w-full bg-blue-500	text-white hover:bg-blue-600 active:bg-blue-700 font-semibold"
+                        <button className="positive-button w-full"
                             onClick={handleResetPassword}>비밀번호 재설정</button>
                     </div>
                 </>

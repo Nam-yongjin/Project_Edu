@@ -21,10 +21,10 @@ const BusinessComponent = () => {
             </div>
             <div className="mx-auto max-w-screen-xl my-10">
                 <div className="text-2xl font-bold pb-8">주요사업</div>
-                <div className="flex flex-col lg:flex-row justify-center gap-10 text-center items-center">
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-20 py-16 font-semibold w-[400px] h-[400px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:flex-row gap-10 text-center items-center">
+                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105">
                         에듀테크 프로그램 운영
-                        <ul className="text-base space-y-8 mt-16 font-normal">
+                        <ul className="text-base space-y-8 mt-12 font-normal">
                             <li>
                                 에듀테크 수요자 맞춤형 학생 대상 교육 프로그램 운영
                             </li>
@@ -36,9 +36,9 @@ const BusinessComponent = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-20 py-16 font-semibold w-[400px] h-[400px]">
-                        연구회 운영 및 기업 지원
-                        <ul className="text-base space-y-8 mt-16 font-normal">
+                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105">
+                        연구회 운영 및 기업지원
+                        <ul className="text-base space-y-8 mt-12 font-normal">
                             <li>
                                 에듀테크 실증 관련 연구
                             </li>
@@ -50,9 +50,9 @@ const BusinessComponent = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-20 py-16 font-semibold w-[400px] h-[400px]">
+                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105">
                         실증 지원
-                        <ul className="text-base space-y-8 mt-16 font-normal">
+                        <ul className="text-base space-y-8 mt-12 font-normal">
                             <li>
                                 교육성 중심의 실증 체계 전환
                             </li>
