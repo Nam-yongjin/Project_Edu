@@ -1,6 +1,7 @@
 package com.EduTech.repository.notice;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,5 +27,9 @@ public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecif
 	@Transactional
     @Query("DELETE FROM Notice n WHERE n.noticeNum IN :noticeNums")
     void deleteByNoticeNumIn(@Param("noticeNums") List<Long> noticeNums); //일괄삭제(noticeNum값들의 목록)
+	//수정 페이지에서 무한루프, 네트워크 에러 발생해서 넣음
+	//Query 사용해서 fetch join을 명시적으로 처리
+	@Query("SELECT n FROM Notice n LEFT JOIN FETCH n.noticeFiles WHERE n.noticeNum = :noticeNum")
+	Optional<Notice> findByIdWithFiles(@Param("noticeNum") Long noticeNum);
 		
 }
