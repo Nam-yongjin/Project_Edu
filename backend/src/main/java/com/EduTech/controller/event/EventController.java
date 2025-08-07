@@ -26,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,13 +96,27 @@ import lombok.RequiredArgsConstructor;
 		}
 	
 			// 1-1. 배너 등록
-			@PostMapping("/banners/register")
-			@PreAuthorize("hasRole('ADMIN')") // 나중에 권한 ADMIN말고 더 있을시 hasRole('Role') or 이거 추가
-			public ResponseEntity<String> registerBanner(@ModelAttribute EventBannerDTO dto,
-					@RequestParam("file") MultipartFile file) {
-				eventService.registerBanner(dto, file);
-				return ResponseEntity.ok("배너 등록 완료");
-			}
+		@RestController
+		@RequestMapping("/api/event/banners")
+		@RequiredArgsConstructor
+		public class EventBannerController {
+
+		    private final EventService eventService;
+
+		    @PostMapping("/register")
+		    public ResponseEntity<String> registerBanner(@ModelAttribute EventBannerDTO dto) {
+		        System.out.println("📥 받은 eventNum: " + dto.getEventNum());
+		        eventService.registerBanner(dto);
+		        return ResponseEntity.ok("배너 등록 완료");
+		    }
+
+		    // ✅ 예외 메시지 반환
+		    @ExceptionHandler(IllegalStateException.class)
+		    public ResponseEntity<String> handleIllegalState(IllegalStateException e) {
+		        return ResponseEntity.badRequest().body(e.getMessage()); // 400 + 메시지 본문
+		    }
+		}
+
 	
 			// 1-2. 배너 삭제
 			@DeleteMapping("/banners/delete/{evtFileNum}")
@@ -276,8 +291,8 @@ import lombok.RequiredArgsConstructor;
 			}
 	
 			// 사용자용 API
-			// 1. 행사 신청
-			@PostMapping("/apply")
+			// 1. 행사 신청	(사용중)
+			@PostMapping("/apply")//(사용중)
 			public ResponseEntity<Map<String, String>> applyEvent(@RequestBody EventApplyRequestDTO dto) {
 			    Map<String, String> response = new HashMap<>();
 			    try {
@@ -316,7 +331,7 @@ import lombok.RequiredArgsConstructor;
 			    );
 			}
 	
-			// 5. 사용자 신청 취소
+			// 5. 사용자 신청 취소(사용중)
 			@DeleteMapping("/cancel")
 			public ResponseEntity<String> cancelEvent(
 			        @RequestParam("evtRevNum") Long evtRevNum,
@@ -376,7 +391,6 @@ import lombok.RequiredArgsConstructor;
 			    log.info("▶️ category: {}", dto.getCategory());
 			    log.info("▶️ maxCapacity: {}", dto.getMaxCapacity());
 			    log.info("▶️ place: {}", dto.getPlace());
-			    log.info("▶️ daysOfWeek: {}", dto.getDaysOfWeek());
 
 			    if (imageList != null) {
 			        log.info("imageList count: {}", imageList.size());

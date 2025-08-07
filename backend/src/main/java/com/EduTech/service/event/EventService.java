@@ -66,7 +66,7 @@ public interface EventService {
 
     List<EventInfoDTO> getAllBanners(int page); // 배너 목록 조회
     
-    void registerBanner(EventBannerDTO dto, MultipartFile file); // 배너 등록
+    void registerBanner(EventBannerDTO dto); // 배너 등록
     
     void deleteBanner(Long evtFileNum); // 배너 삭제
 
