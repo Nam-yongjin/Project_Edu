@@ -1,15 +1,16 @@
 package com.EduTech.repository.demonstration;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
+import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationImage;
 
 public interface DemonstrationImageRepository extends JpaRepository<DemonstrationImage, Long> { // 실증 상품 이미지 관련 페포지토리

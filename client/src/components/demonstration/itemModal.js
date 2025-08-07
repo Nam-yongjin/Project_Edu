@@ -1,5 +1,6 @@
-const ItemModal = ({ value, onChange, onConfirm, onClose }) => {
-    const maxQty = 30;
+const ItemModal = ({ maxQty, value, onChange, onConfirm, onClose }) => {
+    // maxQty는 남아있는 재고 수량 (ex: dem.itemNum)
+    const maxAllowed = Math.min(maxQty, 30);  // 재고 수량 vs 최대 대여 가능 수량 중 작은 값
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -8,7 +9,7 @@ const ItemModal = ({ value, onChange, onConfirm, onClose }) => {
                 <input
                     type="number"
                     min={1}
-                    max={maxQty}
+                    max={maxAllowed}
                     value={value}
                     onChange={(e) => onChange(Number(e.target.value))}
                     className="w-full border p-2 rounded text-center text-lg"
@@ -26,11 +27,19 @@ const ItemModal = ({ value, onChange, onConfirm, onClose }) => {
                                 alert("수량은 1개 이상이어야 합니다.");
                                 return;
                             }
-                            if (value > maxQty) {
-                                alert(`최대 수량은 ${maxQty}개입니다.`);
+
+                            if (value > 30) {
+                                alert("한 회원당 30개까지 대여 가능합니다.");
                                 return;
                             }
+
+                            if (value > maxQty) {
+                                alert(`재고 수량은 ${maxQty}개입니다.`);
+                                return;
+                            }
+
                             onConfirm();
+
                         }}
                         className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                     >
@@ -41,5 +50,6 @@ const ItemModal = ({ value, onChange, onConfirm, onClose }) => {
         </div>
     );
 };
+
 
 export default ItemModal;
