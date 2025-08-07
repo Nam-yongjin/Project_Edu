@@ -15,16 +15,17 @@ const BusinessComponent = () => {
     return (
         <div className="">
             <div className="mx-auto max-w-screen-xl my-10 border-b border-gray-300">
-                <div className="text-2xl font-bold">사업소개</div>
-                <div className="text-xl font-semibold py-8">에듀테크 소프트랩이란?</div>
-                <div className="text-lg pb-8" style={{ whiteSpace: 'pre-wrap' }}>{businessText}</div>
+                <div className="newText-2xl font-bold">사업소개</div>
+                <div className="newText-xl font-semibold py-8">에듀테크 소프트랩이란?</div>
+                <div className="newText-lg pb-8" style={{ whiteSpace: 'pre-wrap' }}>{businessText}</div>
             </div>
             <div className="mx-auto max-w-screen-xl my-10">
-                <div className="text-2xl font-bold pb-8">주요사업</div>
+                <div className="newText-2xl font-bold pb-8">주요사업</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:flex-row gap-10 text-center items-center">
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105 ease-in-out duration-300">
+                    <div className="newText-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold 
+                    lg:w-[330px] sm:w-[310px] w-[290px] lg:h-[400px] sm:h-[370px] h-[340px] hover:scale-105 ease-in-out duration-300">
                         에듀테크 프로그램 운영
-                        <ul className="text-base space-y-8 mt-12 font-normal">
+                        <ul className="newText-base space-y-8 mt-12 font-normal">
                             <li>
                                 에듀테크 수요자 맞춤형 학생 대상 교육 프로그램 운영
                             </li>
@@ -36,9 +37,10 @@ const BusinessComponent = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105 ease-in-out duration-300">
+                    <div className="newText-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold 
+                    lg:w-[330px] sm:w-[310px] w-[290px] lg:h-[400px] sm:h-[370px] h-[340px] hover:scale-105 ease-in-out duration-300">
                         연구회 운영 및 기업지원
-                        <ul className="text-base space-y-8 mt-12 font-normal">
+                        <ul className="newText-base space-y-8 mt-12 font-normal">
                             <li>
                                 에듀테크 실증 관련 연구
                             </li>
@@ -50,9 +52,10 @@ const BusinessComponent = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105 ease-in-out duration-300">
+                    <div className="newText-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold 
+                    lg:w-[330px] sm:w-[310px] w-[290px] lg:h-[400px] sm:h-[370px] h-[340px] hover:scale-105 ease-in-out duration-300">
                         실증 지원
-                        <ul className="text-base space-y-8 mt-12 font-normal">
+                        <ul className="newText-base space-y-8 mt-12 font-normal">
                             <li>
                                 교육성 중심의 실증 체계 전환
                             </li>

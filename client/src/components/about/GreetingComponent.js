@@ -24,8 +24,8 @@ const GreetingComponent = () => {
                 {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
             </div>
             <div className="mx-auto max-w-screen-xl my-10">
-                <div className="text-2xl font-bold mb-4">인사말</div>
-                <div className="text-lg py-4" style={{ whiteSpace: 'pre-wrap' }}>{greetText}</div>
+                <div className="newText-2xl font-bold mb-4">인사말</div>
+                <div className="newText-lg py-4" style={{ whiteSpace: 'pre-wrap' }}>{greetText}</div>
             </div>
 
         </div>
