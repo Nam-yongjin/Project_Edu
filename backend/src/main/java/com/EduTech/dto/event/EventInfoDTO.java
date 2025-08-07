@@ -79,4 +79,7 @@ public class EventInfoDTO {
 
     // 요일 배열
     private List<Integer> daysOfWeek;
+    
+    // 배너 등록 번호
+    private Long bannerNum;
 }

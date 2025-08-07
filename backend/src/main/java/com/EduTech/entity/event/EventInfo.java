@@ -11,11 +11,13 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -95,6 +97,10 @@ public class EventInfo {
 
     @Column(length = 100)
     private String mainImageOriginalName;
+    
+    // 배너번호
+    @OneToOne(mappedBy = "eventInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private EventBanner banner;
 
     // 다중 첨부파일
     @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)

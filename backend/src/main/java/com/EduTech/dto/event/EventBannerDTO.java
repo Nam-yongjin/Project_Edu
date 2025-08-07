@@ -11,12 +11,14 @@ import lombok.Data;
 @Data
 public class EventBannerDTO {
 	
-	private Long evtFileNum;		// 첨부파일 번호
+	private Long bannerNum;		// 배너 번호
 	private String originalName;	// 원본파일명
 	private String filePath;		// 파일저장경로
-	private String fileType;		// 파일 종류
-	private String thumbnailPath;	// 썸네일 경로
-	private Long eventInfoId;		// 
+	
+	// private String fileType;		// 파일 종류 사용하지 않으므로 제거
+	// private String thumbnailPath;	// 썸네일 경로 사용하지 않으므로 제거
+	
+	private Long eventNum;		// 행사 ID
 	
 	private String eventName;		// 행사명
 	private EventCategory category;	// 모집 대상
@@ -26,7 +28,5 @@ public class EventBannerDTO {
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime eventEndPeriod; 	// 행사종료기간
-	
-	private List<Integer> daysOfWeek; // 요일 (숫자)
-	private List<String> dayNames;    // 요일 한글명 (월, 화, 수...)
+
 }
