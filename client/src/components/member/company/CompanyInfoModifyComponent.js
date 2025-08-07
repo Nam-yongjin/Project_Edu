@@ -53,8 +53,8 @@ const CompanyInfoModifyComponent = () => {
                 pw: '',
                 gender: translatedGender
             }));
-        } catch (err) {
-            console.error("회원 정보 조회 실패:", err);
+        } catch (error) {
+            alert("회원 정보 조회 실패:", error);
         };
     };
     useEffect(() => {
@@ -130,7 +130,7 @@ const CompanyInfoModifyComponent = () => {
             try {
                 isDuplicated = await checkEmail({ email: form.email });
             } catch (error) {
-                alert("이메일 중복 확인 중 오류가 발생했습니다.");
+                alert("이메일 중복 확인 중 오류가 발생했습니다.", error);
                 return;
             }
 
@@ -145,7 +145,7 @@ const CompanyInfoModifyComponent = () => {
             try {
                 isDuplicated = await checkPhone({ phone: form.phone });
             } catch (error) {
-                alert("휴대본번호 중복 확인 중 오류가 발생했습니다.");
+                alert("휴대본번호 중복 확인 중 오류가 발생했습니다.",error);
                 return;
             }
 
@@ -170,7 +170,7 @@ const CompanyInfoModifyComponent = () => {
                 moveToPath('/');
             })
             .catch((error) => {
-                alert("회원정보 수정 실패");
+                alert("회원정보 수정 실패", error);
             });
     };
 
@@ -198,7 +198,7 @@ const CompanyInfoModifyComponent = () => {
                 if (error.response && error.response.data) {
                     alert(error.response.data);
                 } else {
-                    alert("탈퇴에 실패했습니다.");
+                    alert("탈퇴에 실패했습니다.", error);
                 }
             }
         } else {
@@ -208,7 +208,7 @@ const CompanyInfoModifyComponent = () => {
 
     return (
         <div>
-            <div className={`${modifying ? "max-w-screen-md" : "max-w-screen-sm"} mx-auto my-10 p-10 space-y-6 text-center  shadow-lg shadow-gray-400 rounded-lg`}>
+            <div className={`page-shadow mx-auto my-10 p-10 space-y-6 text-center ${modifying ? "max-w-screen-md" : "max-w-screen-sm"}`}>
                 {modifying ?
                     <div className="text-3xl font-bold">회원정보수정</div>
                     :
@@ -221,7 +221,7 @@ const CompanyInfoModifyComponent = () => {
                             name="memId"
                             value={form.memId}
                             disabled={true}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" />
+                            className="flex-1 input-focus cursor-not-allowed" />
                     </div>
                 </div>
                 {modifying ?
@@ -234,9 +234,9 @@ const CompanyInfoModifyComponent = () => {
                                 placeholder="새 비밀번호 입력"
                                 value={form.pw}
                                 onChange={handleChange}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            {errors.pw && <div style={{ color: 'red' }}>{errors.pw}</div>}
+                                className="flex-1 input-focus" />
                         </div>
+                        {errors.pw && <div className="text-red-500 text-sm text-left ml-36">{errors.pw}</div>}
                     </div>
                     :
                     <></>}
@@ -250,10 +250,10 @@ const CompanyInfoModifyComponent = () => {
                                 placeholder="새 비밀번호 확인"
                                 value={form.pwCheck}
                                 onChange={handleChange}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 input-focus"
                             />
-                            {errors.pwCheck && <div style={{ color: 'red' }}>{errors.pwCheck}</div>}
                         </div>
+                        {errors.pwCheck && <div className="text-red-500 text-sm text-left ml-36">{errors.pwCheck}</div>}
                     </div>
                     :
                     <></>}
@@ -266,9 +266,9 @@ const CompanyInfoModifyComponent = () => {
                             value={form.name}
                             disabled={!modifying}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        {errors.name && <div style={{ color: 'red' }}>{errors.name}</div>}
+                            className="flex-1 input-focus" />
                     </div>
+                    {errors.name && <div className="text-red-500 text-sm text-left ml-36">{errors.name}</div>}
                 </div>
 
                 {modifying ?
@@ -277,7 +277,7 @@ const CompanyInfoModifyComponent = () => {
                             <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
                             <PhoneVerification onVerified={setVerifiedPhone} />
                         </div>
-                        {errors.phone && <div style={{ color: 'red' }}>{errors.phone}</div>}
+                        {errors.phone && <div className="text-red-500 text-sm text-left ml-36">{errors.phone}</div>}
                     </div>
                     :
                     <div>
@@ -287,7 +287,7 @@ const CompanyInfoModifyComponent = () => {
                                 type="text"
                                 value={formattedPhoneNumber}
                                 disabled={true}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 input-focus"
                             />
                         </div>
                     </div>
@@ -303,9 +303,9 @@ const CompanyInfoModifyComponent = () => {
                             value={form.email}
                             disabled={!modifying}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        {errors.email && <div style={{ color: 'red' }}>{errors.email}</div>}
+                            className="flex-1 input-focus" />
                     </div>
+                    {errors.email && <div className="text-red-500 text-sm text-left ml-36">{errors.email}</div>}
                 </div>
 
                 <div>
@@ -316,7 +316,7 @@ const CompanyInfoModifyComponent = () => {
                             type="date"
                             value={form.birthDate}
                             disabled={true}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" />
+                            className="flex-1 input-focus cursor-not-allowed" />
                     </div>
                 </div>
 
@@ -327,7 +327,7 @@ const CompanyInfoModifyComponent = () => {
                             name="gender"
                             value={form.gender}
                             disabled={true}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" />
+                            className="flex-1 input-focus cursor-not-allowed" />
                     </div>
                 </div>
 
@@ -342,7 +342,7 @@ const CompanyInfoModifyComponent = () => {
                                     placeholder="주소"
                                     value={form.addr}
                                     readOnly
-                                    className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full mt-2 bg-gray-100 input-focus"
                                 />
                             </div>
                         </div>
@@ -355,7 +355,7 @@ const CompanyInfoModifyComponent = () => {
                                 name="addr"
                                 value={form.addr ?? ''}
                                 disabled={true}
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 input-focus"
                             />
                         </div>
                     </div>
@@ -370,7 +370,7 @@ const CompanyInfoModifyComponent = () => {
                             value={form.addrDetail ?? ''}
                             disabled={!modifying}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            className="flex-1 input-focus" />
                     </div>
                 </div>
 
@@ -384,9 +384,9 @@ const CompanyInfoModifyComponent = () => {
                             value={form.companyName}
                             disabled={!modifying}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        {errors.companyName && <div style={{ color: 'red' }}>{errors.companyName}</div>}
+                            className="flex-1 input-focus" />
                     </div>
+                    {errors.companyName && <div className="text-red-500 text-sm text-left ml-36">{errors.companyName}</div>}
                 </div>
                 <div>
                     <div className="flex items-center">
@@ -398,13 +398,13 @@ const CompanyInfoModifyComponent = () => {
                             value={form.position}
                             disabled={!modifying}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        {errors.position && <div style={{ color: 'red' }}>{errors.position}</div>}
+                            className="flex-1 input-focus" />
                     </div>
+                    {errors.position && <div className="text-red-500 text-sm text-left ml-36">{errors.position}</div>}
                 </div>
 
                 <div className="flex items-center">
-                    <label className="w-36 text-left font-medium">SMS 수신<span className='text-red-600' hidden={!modifying}> *</span></label>
+                    <label className="w-36 text-left font-medium">SMS 수신</label>
                     <input
                         name="checkSms"
                         type="checkbox"
@@ -412,11 +412,10 @@ const CompanyInfoModifyComponent = () => {
                         disabled={!modifying}
                         onChange={handleChange}
                         className="mr-2" />
-                    {errors.checkSms && <div style={{ color: 'red' }}>{errors.checkSms}</div>}
                 </div>
 
                 <div className="flex items-center">
-                    <label className="w-36 text-left font-medium">이메일 수신<span className='text-red-600' hidden={!modifying}> *</span></label>
+                    <label className="w-36 text-left font-medium">이메일 수신</label>
                     <input
                         name="checkEmail"
                         type="checkbox"
@@ -424,7 +423,6 @@ const CompanyInfoModifyComponent = () => {
                         disabled={!modifying}
                         onChange={handleChange}
                         className="mr-2" />
-                    {errors.checkEmail && <div style={{ color: 'red' }}>{errors.checkEmail}</div>}
                 </div>
 
                 <div className=''>
@@ -432,22 +430,22 @@ const CompanyInfoModifyComponent = () => {
                         ?
                         <div className='flex justify-center'>
                             <div className='pr-4'>
-                                <button className='rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold' onClick={handleClickModify}>수정완료</button>
+                                <button className='positive-button' onClick={handleClickModify}>수정완료</button>
                             </div>
                             <div className='pr-4'>
-                                <button className='rounded-md p-2 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 font-semibold' onClick={handleModifyCancle}>수정취소</button>
+                                <button className='normal-button' onClick={handleModifyCancle}>수정취소</button>
                             </div>
                             <div>
-                                <button className='rounded-md p-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold' onClick={handleMoveLeave}>회원탈퇴</button>
+                                <button className='nagative-button' onClick={handleMoveLeave}>회원탈퇴</button>
                             </div>
                         </div>
                         :
                         <div className='flex justify-center'>
                             <div className='pr-4'>
-                                <button className="rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold" onClick={handleMoveModify}>정보수정</button>
+                                <button className="positive-button" onClick={handleMoveModify}>정보수정</button>
                             </div>
                             <div>
-                                <button className='rounded-md p-2 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 font-semibold' onClick={moveToReturn}>뒤로가기</button>
+                                <button className='normal-button' onClick={moveToReturn}>뒤로가기</button>
                             </div>
                         </div>
                     }

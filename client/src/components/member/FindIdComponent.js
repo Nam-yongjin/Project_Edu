@@ -17,24 +17,24 @@ const FindIdComponent = () => {
                 };
             })
             .catch((error) => {
-                alert((error.response?.data || error.message));
+                alert("아이디 찾기 중 오류 발생",error);
                 moveToLogin();
             });
     };
 
     return (
         <div>
-        <div className='my-10 p-10 w-[500px] space-y-6 text-center  shadow-lg shadow-gray-400 rounded-lg'>
-            <div className='text-3xl font-bold'>아이디 찾기</div>
-            {!foundId ? (
-                <PhoneVerification onVerified={handleVerified} />
-            ) : (
-                <>
-                    <div>찾은 아이디: <strong className='text-lg'>{foundId}</strong></div>
-                    <button className="rounded-md p-2 w-18 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 font-semibold text-white" onClick={moveToLogin}>로그인 페이지로 이동</button>
-                </>
-            )}
-        </div>
+            <div className='page-shadow my-10 p-10 w-[500px] space-y-6 text-center'>
+                <div className='text-2xl font-bold'>아이디 찾기</div>
+                {!foundId ? (
+                    <PhoneVerification onVerified={handleVerified} />
+                ) : (
+                    <>
+                        <div>찾은 아이디: <strong className='text-lg'>{foundId}</strong></div>
+                        <button className="positive-button w-full" onClick={moveToLogin}>로그인 페이지로 이동</button>
+                    </>
+                )}
+            </div>
         </div>
     );
 };

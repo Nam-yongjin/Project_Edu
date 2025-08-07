@@ -131,11 +131,11 @@ const StudentRegisterComponent = () => {
                     moveToLogin();
                 })
                 .catch((error) => {
-                    alert('회원가입 중 오류 발생');
+                    alert('회원가입 중 오류 발생',error);
                 });
 
         } catch (error) {
-            alert('중복 확인 중 오류 발생');
+            alert('중복 확인 중 오류 발생',error);
         }
     };
 
@@ -158,14 +158,14 @@ const StudentRegisterComponent = () => {
                 };
             })
             .catch((error) => {
-                alert('중복 확인 중 오류 발생');
+                alert('중복 확인 중 오류 발생',error);
                 setIdCheck(false);
             });
     };
 
     return (
         <div>
-            <div className="my-10 p-10 space-y-6 text-center  shadow-lg shadow-gray-400 rounded-lg">
+            <div className="page-shadow my-10 p-10 space-y-6 text-center">
                 <div className="text-3xl font-bold">회원가입</div>
 
                 {/* 아이디 */}
@@ -178,7 +178,7 @@ const StudentRegisterComponent = () => {
                             value={form.memId}
                             onChange={handleChange}
                             autoFocus
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                         <button
                             className="text-center p-2 bg-gray-200 rounded-md hover:bg-gray-300 active:bg-gray-400 border border-gray-400 text-sm font-medium"
@@ -187,7 +187,7 @@ const StudentRegisterComponent = () => {
                             중복 체크
                         </button>
                     </div>
-                    {errors.memId && <div className="text-red-500 text-sm text-left ml-32">{errors.memId}</div>}
+                    {errors.memId && <div className="text-red-500 text-sm text-left ml-36">{errors.memId}</div>}
                 </div>
 
                 {/* 비밀번호 */}
@@ -200,10 +200,10 @@ const StudentRegisterComponent = () => {
                             placeholder="비밀번호"
                             value={form.pw}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.pw && <div className="text-red-500 text-sm text-left ml-32">{errors.pw}</div>}
+                    {errors.pw && <div className="text-red-500 text-sm text-left ml-36">{errors.pw}</div>}
                 </div>
 
                 {/* 비밀번호 확인 */}
@@ -216,10 +216,10 @@ const StudentRegisterComponent = () => {
                             placeholder="비밀번호 확인"
                             value={form.pwCheck}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.pwCheck && <div className="text-red-500 text-sm text-left ml-32">{errors.pwCheck}</div>}
+                    {errors.pwCheck && <div className="text-red-500 text-sm text-left ml-36">{errors.pwCheck}</div>}
                 </div>
 
                 {/* 이름 */}
@@ -231,10 +231,10 @@ const StudentRegisterComponent = () => {
                             placeholder="이름"
                             value={form.name}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.name && <div className="text-red-500 text-sm text-left ml-32">{errors.name}</div>}
+                    {errors.name && <div className="text-red-500 text-sm text-left ml-36">{errors.name}</div>}
                 </div>
 
                 {/* 휴대폰 인증 */}
@@ -243,7 +243,7 @@ const StudentRegisterComponent = () => {
                         <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600'> *</span></div>
                         <PhoneVerification onVerified={setVerifiedPhone} />
                     </div>
-                    {errors.phone && <div className="text-red-500 text-sm text-left ml-32">{errors.phone}</div>}
+                    {errors.phone && <div className="text-red-500 text-sm text-left ml-36">{errors.phone}</div>}
                 </div>
 
                 {/* 이메일 */}
@@ -256,10 +256,10 @@ const StudentRegisterComponent = () => {
                             placeholder="이메일"
                             value={form.email}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.email && <div className="text-red-500 text-sm text-left ml-32">{errors.email}</div>}
+                    {errors.email && <div className="text-red-500 text-sm text-left ml-36">{errors.email}</div>}
                 </div>
 
                 {/* 생년월일 */}
@@ -273,10 +273,10 @@ const StudentRegisterComponent = () => {
                             onChange={handleChange}
                             min="1900-01-01"
                             max={new Date().toISOString().split("T")[0]} // 오늘 날짜까지 제한
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.birthDate && <div className="text-red-500 text-sm text-left ml-32">{errors.birthDate}</div>}
+                    {errors.birthDate && <div className="text-red-500 text-sm text-left ml-36">{errors.birthDate}</div>}
                 </div>
 
                 {/* 성별 */}
@@ -308,7 +308,7 @@ const StudentRegisterComponent = () => {
                             </label>
                         </div>
                     </div>
-                    {errors.gender && <div className="text-red-500 text-sm text-left ml-32">{errors.gender}</div>}
+                    {errors.gender && <div className="text-red-500 text-sm text-left ml-36">{errors.gender}</div>}
                 </div>
 
                 {/* 주소 */}
@@ -322,7 +322,7 @@ const StudentRegisterComponent = () => {
                                 placeholder="주소"
                                 value={form.addr}
                                 readOnly
-                                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full mt-2 bg-gray-100 input-focus"
                             />
                         </div>
                     </div>
@@ -337,7 +337,7 @@ const StudentRegisterComponent = () => {
                             placeholder="상세 주소"
                             value={form.addrDetail}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
                 </div>
@@ -351,14 +351,15 @@ const StudentRegisterComponent = () => {
                             placeholder="학교명"
                             value={form.schoolName}
                             onChange={handleChange}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 input-focus"
                         />
                     </div>
+                    {errors.schoolName && <div className="text-red-500 text-sm text-left ml-36">{errors.schoolName}</div>}
                 </div>
 
                 {/* 수신 동의 체크박스 */}
                 <div className="flex items-center">
-                    <label className="w-36 text-left font-medium">SMS 수신<span className='text-red-600'> *</span></label>
+                    <label className="w-36 text-left font-medium">SMS 수신</label>
                     <input
                         name="checkSms"
                         type="checkbox"
@@ -367,10 +368,9 @@ const StudentRegisterComponent = () => {
                         className="mr-2"
                     />
                 </div>
-                {errors.checkSms && <div className="text-red-500 text-sm text-left ml-32">{errors.checkSms}</div>}
 
                 <div className="flex items-center">
-                    <label className="w-36 text-left font-medium">이메일 수신<span className='text-red-600'> *</span></label>
+                    <label className="w-36 text-left font-medium">이메일 수신</label>
                     <input
                         name="checkEmail"
                         type="checkbox"
@@ -379,12 +379,11 @@ const StudentRegisterComponent = () => {
                         className="mr-2"
                     />
                 </div>
-                {errors.checkEmail && <div className="text-red-500 text-sm text-left ml-32">{errors.checkEmail}</div>}
 
                 {/* 제출 버튼 */}
                 <div>
                     <button
-                        className="rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold"
+                        className="positive-button"
                         onClick={handleSubmit}
                     >
                         회원가입
