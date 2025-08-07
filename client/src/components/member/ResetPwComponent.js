@@ -28,7 +28,7 @@ const ResetPwComponent = () => {
                 };
             })
             .catch((error) => {
-                alert('아이디 확인 중 오류가 발생했습니다.',error);
+                alert('아이디 확인 중 오류가 발생했습니다.', error);
             });
     };
 
@@ -63,11 +63,11 @@ const ResetPwComponent = () => {
 
     return (
 
-        <div className='page-shadow my-10 p-10 w-[500px] space-y-6 text-center'>
-            <div className='text-2xl font-bold'>비밀번호 찾기 / 재설정</div>
+        <div className='page-shadow my-10 p-10 space-y-6 text-center lg:w-[500px] sm:w-[450px] w-[400px]'>
+            <div className='newText-2xl font-bold'>비밀번호 찾기 / 재설정</div>
 
             {step === 'checkId' && (
-                <div className="">
+                <div className="newText-base">
                     <div>
                         <input
                             type="text"
@@ -101,7 +101,7 @@ const ResetPwComponent = () => {
 
             {step === 'resetPw' && (
                 <>
-                    <div>
+                    <div className='newText-base'>
                         <input
                             type="password"
                             placeholder="새 비밀번호 입력"
@@ -110,7 +110,7 @@ const ResetPwComponent = () => {
                             className="flex-1 w-full input-focus"
                         />
                     </div>
-                    <div>
+                    <div className='newText-base'>
                         <input
                             type="password"
                             placeholder="새 비밀번호 확인"
@@ -118,8 +118,9 @@ const ResetPwComponent = () => {
                             onChange={(e) => setPwCheck(e.target.value)}
                             className="flex-1 w-full input-focus"
                         />
-                    </div><div>
-                        <button className="positive-button w-full"
+                    </div>
+                    <div>
+                        <button className="newText-base positive-button w-full"
                             onClick={handleResetPassword}>비밀번호 재설정</button>
                     </div>
                 </>
