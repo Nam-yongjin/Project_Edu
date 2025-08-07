@@ -12,7 +12,9 @@ import lombok.Data;
 public class EventBannerDTO {
 	
 	private Long bannerNum;		// 배너 번호
+	
 	private String originalName;	// 원본파일명
+	
 	private String filePath;		// 파일저장경로
 	
 	// private String fileType;		// 파일 종류 사용하지 않으므로 제거
@@ -21,6 +23,7 @@ public class EventBannerDTO {
 	private Long eventNum;		// 행사 ID
 	
 	private String eventName;		// 행사명
+	
 	private EventCategory category;	// 모집 대상
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

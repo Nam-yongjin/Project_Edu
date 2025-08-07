@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EventApplyRequestDTO {
 	private Long eventNum;
+	
 	private String memId;
 	
-	@Builder.Default
-	private RevState revState = RevState.WAITING;
+    private RevState revState;
 }

@@ -30,5 +30,4 @@ public interface EventBannerRepository extends JpaRepository<EventBanner, Long> 
 			""")
 	long countValidBanners(@Param("today") LocalDateTime today);
 	
-	
 }
