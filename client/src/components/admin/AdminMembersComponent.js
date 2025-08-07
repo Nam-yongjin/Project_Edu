@@ -26,7 +26,7 @@ const AdminMembersComponent = () => {
                 setTotalPages(data?.totalPages ?? 0);
             })
             .catch(error => {
-                console.error("회원 목록 불러오기 실패:", error);
+                alert("회원 목록 불러오기 실패:", error);
                 setMembers([]);
             });
     };
@@ -70,7 +70,7 @@ const AdminMembersComponent = () => {
                 loadMembers();
             })
             .catch((error) => {
-                console.error("상태 변경 실패:", error);
+                alert("상태 변경 실패:", error);
             });
     };
 
@@ -87,8 +87,8 @@ const AdminMembersComponent = () => {
     };
 
     return (
-        <div className="max-w-screen-xl mx-auto my-10">
-            <div className="text-2xl font-bold text-gray-900 mb-4">회원 관리</div>
+        <div className="max-w-screen-xl mx-auto my-10 ">
+            <div className="text-2xl font-bold mb-4">회원 관리</div>
 
             {/* 검색 및 정렬 필터 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 bg-gray-100 rounded-lg shadow-sm">
@@ -96,30 +96,30 @@ const AdminMembersComponent = () => {
                     name="memId"
                     placeholder="회원 ID"
                     onChange={handleSearchChange}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-focus"
                 />
                 <input
                     name="name"
                     placeholder="이름"
                     onChange={handleSearchChange}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-focus"
                 />
                 <input
                     name="email"
                     placeholder="이메일"
                     onChange={handleSearchChange}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-focus"
                 />
                 <input
                     name="phone"
                     placeholder="휴대폰번호"
                     onChange={handleSearchChange}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-focus"
                 />
                 <select
                     name="role"
                     onChange={handleSearchChange}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-focus"
                 >
                     <option value="">역할 선택</option>
                     <option value="STUDENT">학생</option>
@@ -130,7 +130,7 @@ const AdminMembersComponent = () => {
                 <select
                     name="state"
                     onChange={handleSearchChange}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-focus"
                 >
                     <option value="">상태 선택</option>
                     <option value="NORMAL">정상</option>
@@ -143,7 +143,7 @@ const AdminMembersComponent = () => {
                     <select
                         value={sortField}
                         onChange={(e) => setSortField(e.target.value)}
-                        className="p-2 flex-grow border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-grow input-focus"
                     >
                         <option value="createdAt">가입일</option>
                         <option value="name">이름</option>
@@ -151,7 +151,7 @@ const AdminMembersComponent = () => {
                     </select>
                     <button
                         onClick={() => setSortDirection(sortDirection === "ASC" ? "DESC" : "ASC")}
-                        className="rounded-md p-2 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 font-semibold"
+                        className="normal-button"
                     >
                         {sortDirection === "ASC" ? "▲ 오름차순" : "▼ 내림차순"}
                     </button>
@@ -159,15 +159,15 @@ const AdminMembersComponent = () => {
 
                 <button
                     onClick={handleSearch}
-                    className="rounded-md p-2 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold"
+                    className="positive-button"
                 >
                     검색
                 </button>
             </div>
 
             {/* 회원 목록 테이블 */}
-            <div className="overflow-x-auto shadow-lg shadow-gray-400 rounded-lg">
-                <table className="w-full text-sm text-center">
+            <div className="page-shadow overflow-x-auto">
+                <table className="w-full text-sm text-center min-w-[1024px]">
                     <thead className="bg-gray-200">
                         <tr>
                             <th scope="col" className="p-4">
@@ -178,13 +178,13 @@ const AdminMembersComponent = () => {
                                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                                 />
                             </th>
-                            <th scope="col" className="px-6 py-3">ID</th>
-                            <th scope="col" className="px-6 py-3">이름</th>
-                            <th scope="col" className="px-6 py-3">이메일</th>
-                            <th scope="col" className="px-6 py-3">휴대폰번호</th>
-                            <th scope="col" className="px-6 py-3">가입일</th>
-                            <th scope="col" className="px-6 py-3">역할</th>
-                            <th scope="col" className="px-6 py-3">상태</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">ID</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">이름</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">이메일</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">휴대폰번호</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">가입일</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">역할</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">상태</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -199,15 +199,15 @@ const AdminMembersComponent = () => {
                                             className="w-4 h-4"
                                         />
                                     </td>
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{m.memId}</td>
-                                    <td className="px-6 py-4">{m.name}</td>
-                                    <td className="px-6 py-4">{m.email}</td>
-                                    <td className="px-6 py-4">{m.phone}</td>
-                                    <td className="px-6 py-4">
+                                    <td className="lg:px-6 px-2 py-4">{m.memId}</td>
+                                    <td className="lg:px-6 px-2 py-4">{m.name}</td>
+                                    <td className="lg:px-6 px-2 py-4">{m.email}</td>
+                                    <td className="lg:px-6 px-2 py-4">{m.phone}</td>
+                                    <td className="lg:px-6 px-2 py-4">
                                         {new Date(m.createdAt).toLocaleDateString()}
                                     </td>
-                                    <td className="px-6 py-4">{m.role}</td>
-                                    <td className="px-6 py-4">{m.state}</td>
+                                    <td className="lg:px-6 px-2 py-4">{m.role}</td>
+                                    <td className="lg:px-6 px-2 py-4">{m.state}</td>
                                 </tr>
                             ))
                         ) : (
@@ -235,7 +235,7 @@ const AdminMembersComponent = () => {
                 </select>
                 <button
                     onClick={handleChangeState}
-                    className="rounded-md p-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold"
+                    className="nagative-button"
                 >
                     선택 회원 상태 변경
                 </button>

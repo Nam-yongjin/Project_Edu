@@ -1,18 +1,110 @@
 @charset "utf-8";
 
-html, body, #root {
-  height: 100%;
-}
-
-/* 기본값: 스크린  - 푸터 */
+/* BasicLayout 기본값: 스크린  - 푸터 */
 .main-content {
   min-height: calc(100vh - 224px);
 }
-
-/* 모바일 환경에서는 최소 높이를 500px로 고정 */
+/* 모바일 환경 최소 높이 */
 @media (max-width: 768px) {
   .main-content {
     min-height: 500px;
   }
 }
 
+/* 구글폰트 골라쓰기 */
+@import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300..800&display=swap');
+.Asta_Sans{
+  font-family: "Asta Sans", sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+.noto-sans-kr{
+  font-family: "Noto Sans KR", sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+.nanum-gothic {
+  font-family: "Nanum Gothic", sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap');
+.noto-serif-kr {
+  font-family: "Noto Serif KR", serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+.jua {
+  font-family: "Jua", sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Orbit&display=swap');
+.orbit {
+  font-family: "Orbit", sans-serif;
+}
+
+
+/* 페이지 그림자 테두리 */
+.page-shadow{
+   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
+  box-shadow: 0 10px 15px -3px rgba(156, 163, 175, 0.5), 0 4px 6px -4px rgba(156, 163, 175, 0.5); /* shadow-gray-400 */
+  border-radius: 0.5rem; /* rounded-lg */
+}
+
+/* 입력창 */
+.input-focus{
+  padding-left: 1rem; /* px-4 */
+  padding-right: 1rem; /* px-4 */
+  padding-top: 0.5rem; /* py-2 */
+  padding-bottom: 0.5rem; /* py-2 */
+  border: 1px solid #d1d5db; /* border + border-gray-300 */
+  border-radius: 0.375rem; /* rounded-md */
+  outline: none;               /* focus:outline-none */
+}
+.input-focus:focus {
+  box-shadow: 0 0 0 2px #3b82f6; /* focus:ring-2, focus:ring-blue-500 */
+}
+
+/* 파란버튼 */
+.positive-button{
+  border-radius: 0.375rem; /* rounded-md */
+  padding: 0.5rem; /* p-2 */
+  border-width: 1px; /* border */
+  border-color: #3b82f6; /* border-blue-500 */
+  background-color: #3b82f6; /* bg-blue-500 */
+  color: #ffffff; /* text-white */
+  font-weight: 600; /* font-semibold */
+}
+.positive-button:hover {
+  background-color: #2563eb; /* hover:bg-blue-600 */
+}
+.positive-button:active {
+  background-color: #1d4ed8; /* active:bg-blue-700 */
+}
+
+/* 회색버튼 */
+.normal-button{
+border-radius: 0.375rem; /* rounded-md */
+  padding: 0.5rem; /* p-2 */
+  border-width: 1px; /* border */
+  border-color: #d1d5db; /* border-gray-300 */
+  background-color: #f3f4f6; /* bg-gray-100 */
+  font-weight: 600; /* font-semibold */
+}
+.normal-button:hover {
+  background-color: #e5e7eb; /* hover:bg-gray-200 */
+}
+.normal-button:active {
+  background-color: #d1d5db; /* active:bg-gray-300 */
+}
+
+/* 빨간버튼 */
+.nagative-button{
+border-radius: 0.375rem; /* rounded-md */
+  padding: 0.5rem; /* p-2 */
+  border-width: 1px; /* border */
+  border-color: #ef4444; /* border-red-500 */
+  background-color: #ef4444; /* bg-red-500 */
+  color: #ffffff; /* text-white */
+  font-weight: 600; /* font-semibold */
+}
+.nagative-button:hover {
+  background-color: #dc2626; /* hover:bg-red-600 */
+}
+.nagative-button:active {
+  background-color: #b91c1c; /* active:bg-red-700 */
+}

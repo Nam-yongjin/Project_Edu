@@ -1,5 +1,6 @@
 import useMove from "../../hooks/useMove";
 import { useState, useEffect } from "react";
+import "../../App.css";
 
 const initialChecked = { register: false, agree: false, process: false };
 
@@ -18,7 +19,7 @@ const RegisterTermsComponent = () => {
             .then((res) => res.text())
             .then((text) => setRegisterText(text))
             .catch((error) => {
-                setRegisterText("이용약관을 불러올 수 없습니다.");
+                setRegisterText("이용약관을 불러올 수 없습니다.",error);
             });
     }, []);
 
@@ -27,7 +28,7 @@ const RegisterTermsComponent = () => {
             .then((res) => res.text())
             .then((text) => setAgreeText(text))
             .catch((error) => {
-                setAgreeText("이용약관을 불러올 수 없습니다.");
+                setAgreeText("이용약관을 불러올 수 없습니다.",error);
             });
     }, []);
 
@@ -36,7 +37,7 @@ const RegisterTermsComponent = () => {
             .then((res) => res.text())
             .then((text) => setProcessText(text))
             .catch((error) => {
-                setProcessText("이용약관을 불러올 수 없습니다.");
+                setProcessText("이용약관을 불러올 수 없습니다.",error);
             });
     }, []);
 
@@ -162,7 +163,7 @@ const RegisterTermsComponent = () => {
             </div>
             <div className="text-center">
                 <button
-                    className="mt-4 p-2 w-[60px] bg-blue-500 text-white rounded active:bg-blue-600 font-bold"
+                    className="positive-button mt-4 w-[60px]"
                     onClick={handleSubmit}
                 >
                     다음
