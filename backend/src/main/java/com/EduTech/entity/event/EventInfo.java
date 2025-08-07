@@ -60,12 +60,6 @@ public class EventInfo {
     @Column(nullable = false, length = 20)
     private EventState state;
 
-    @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "event_days", joinColumns = @JoinColumn(name = "eventNum"))
-    @Column(nullable = false)
-    private List<Integer> daysOfWeek = new ArrayList<>();
-
     @Column(nullable = false, length = 20)
     private String place;
 
@@ -98,9 +92,6 @@ public class EventInfo {
     @Column(length = 100)
     private String mainImageOriginalName;
     
-    // 배너번호
-    @OneToOne(mappedBy = "eventInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private EventBanner banner;
 
     // 다중 첨부파일
     @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)

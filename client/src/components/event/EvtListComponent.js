@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { getSearchList } from "../../api/eventApi";
 import { useNavigate } from "react-router-dom";
 
@@ -13,64 +14,75 @@ const EventListComponent = () => {
   const [state, setState] = useState("");
   const [category, setCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("DESC");
-
-  const [searchTrigger, setSearchTrigger] = useState(false); // 검색 버튼 클릭 시 트리거
+  const [searchTrigger, setSearchTrigger] = useState(false);
 
   const navigate = useNavigate();
   const host = "http://localhost:8090/view";
 
-  // 검색 API 호출 (keyword는 제외)
+  // 로그인 사용자 정보
+  const memId = useSelector((state) => state.loginState?.memId);
+
+  // 검색 API 호출
   useEffect(() => {
-  const fetchData = async () => {
-    const data = await getSearchList({
-      page,
-      searchType,
-      keyword,
-      state,
-      category,
-      sortOrder,
-    });
-    setEvents(data.content);
-    setTotalPages(data.totalPages);
-  };
+    const fetchData = async () => {
+      try {
+        const searchParams = {
+          page,
+          searchType,
+          keyword,
+          state,
+          category,
+          sortOrder,
+          memId,
+        };
 
-  fetchData();
+        const filteredParams = Object.fromEntries(
+          Object.entries(searchParams).filter(
+            ([_, v]) => v !== "" && v !== null && v !== undefined
+          )
+        );
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [page, state, category, sortOrder, searchTrigger]);
+        const data = await getSearchList(filteredParams);
+        setEvents(data.content);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error("이벤트 목록 조회 실패:", error);
+        alert("이벤트 목록을 불러오지 못했습니다.");
+      }
+    };
+
+    if (memId) fetchData();
+  }, [page, state, category, sortOrder, searchTrigger, memId]);
 
   const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
-};
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
 
+  // ✅ 상태 단순화: 신청 시작 전 / 신청 가능 / 신청 기간 만료
   const getApplyStatus = (event) => {
-    if (event.revState === "APPROVED") return { text: "신청 완료", style: "bg-green-500" };
-    if (event.revState === "CANCEL") return { text: "신청 취소", style: "bg-red-500" };
-
     const now = new Date();
     const start = new Date(event.applyStartPeriod);
     const end = new Date(event.applyEndPeriod);
 
     if (now < start) return { text: "신청 시작 전", style: "bg-gray-400" };
     if (now <= end) return { text: "신청 가능", style: "bg-blue-600" };
-    return { text: "신청 종료", style: "bg-gray-500" };
+    return { text: "신청 기간 만료", style: "bg-gray-500" };
   };
 
   const handleCardClick = (eventNum) => {
     navigate(`/event/detail/${eventNum}`);
   };
 
-  // 검색 버튼 클릭 시에만 keyword 검색
   const handleSearch = () => {
     setPage(1);
-    setSearchTrigger((prev) => !prev); // useEffect 트리거
+    setSearchTrigger((prev) => !prev);
   };
 
   const pageBlockSize = 10;
@@ -94,16 +106,24 @@ const EventListComponent = () => {
               setCategory(value);
               setPage(1);
             }}
-            className={`px-4 py-1 rounded-full border ${category === value ? "bg-gray-700 text-white" : "bg-white text-gray-700"}`}
+            className={`px-4 py-1 rounded-full border ${
+              category === value
+                ? "bg-gray-700 text-white"
+                : "bg-white text-gray-700"
+            }`}
           >
             {label}
           </button>
         ))}
       </div>
 
-      {/* 검색 필터 + 정렬 */}
+      {/* 검색/정렬 */}
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
-        <select className="border p-2 rounded" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+        <select
+          className="border p-2 rounded"
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+        >
           <option value="eventName">행사명</option>
           <option value="eventInfo">내용</option>
           <option value="all">전체</option>
@@ -117,7 +137,6 @@ const EventListComponent = () => {
           onChange={(e) => setKeyword(e.target.value)}
         />
 
-        {/* 신청 상태 드롭다운 (신청취소 제외) */}
         <select
           className="border p-2 rounded"
           value={state}
@@ -144,12 +163,15 @@ const EventListComponent = () => {
           <option value="ASC">오래된순</option>
         </select>
 
-        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button
+          onClick={handleSearch}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
           검색
         </button>
       </div>
 
-      {/* 행사 카드 목록 */}
+      {/* 카드 목록 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {events.map((event) => {
           const status = getApplyStatus(event);
@@ -167,7 +189,8 @@ const EventListComponent = () => {
                   : "일반인"}
               </div>
 
-              {event.mainImagePath && /\.(jpg|jpeg|png|gif)$/i.test(event.mainImagePath) ? (
+              {event.mainImagePath &&
+              /\.(jpg|jpeg|png|gif)$/i.test(event.mainImagePath) ? (
                 <img
                   src={`${host}/${event.mainImagePath}`}
                   alt="대표 이미지"
@@ -179,13 +202,20 @@ const EventListComponent = () => {
                 </div>
               )}
 
-              <h3 className="text-lg font-semibold mb-1 line-clamp-2">{event.eventName}</h3>
+              <h3 className="text-lg font-semibold mb-1 line-clamp-2">
+                {event.eventName}
+              </h3>
               <p className="text-sm text-gray-500 mb-1">
-                신청기간: {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}
+                신청기간: {formatDate(event.applyStartPeriod)} ~{" "}
+                {formatDate(event.applyEndPeriod)}
               </p>
-              <p className="text-sm text-gray-500 mb-3">모집인원: {event.maxCapacity}명</p>
+              <p className="text-sm text-gray-500 mb-3">
+                모집인원: {event.maxCapacity}명
+              </p>
 
-              <div className={`text-white px-3 py-1 rounded font-semibold text-sm text-center w-full ${status.style}`}>
+              <div
+                className={`text-white px-3 py-1 rounded font-semibold text-sm text-center w-full ${status.style}`}
+              >
                 {status.text}
               </div>
             </div>
@@ -195,7 +225,9 @@ const EventListComponent = () => {
 
       {/* 페이지네이션 */}
       <div className="mt-6 flex justify-center gap-2 text-blue-600 font-semibold">
-        {blockStart > 1 && <button onClick={() => setPage(blockStart - 1)}>{"<"}</button>}
+        {blockStart > 1 && (
+          <button onClick={() => setPage(blockStart - 1)}>{"<"}</button>
+        )}
 
         {Array.from({ length: blockEnd - blockStart + 1 }, (_, idx) => {
           const pageNum = blockStart + idx;
@@ -203,14 +235,20 @@ const EventListComponent = () => {
             <button
               key={pageNum}
               onClick={() => setPage(pageNum)}
-              className={page === pageNum ? "underline text-blue-800" : "hover:text-blue-800"}
+              className={
+                page === pageNum
+                  ? "underline text-blue-800"
+                  : "hover:text-blue-800"
+              }
             >
               {pageNum}
             </button>
           );
         })}
 
-        {blockEnd < totalPages && <button onClick={() => setPage(blockEnd + 1)}>{">"}</button>}
+        {blockEnd < totalPages && (
+          <button onClick={() => setPage(blockEnd + 1)}>{">"}</button>
+        )}
       </div>
     </div>
   );
