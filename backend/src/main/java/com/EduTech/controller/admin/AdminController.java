@@ -1,15 +1,21 @@
 package com.EduTech.controller.admin;
 
+import java.util.List;
+
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
@@ -18,7 +24,9 @@ import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.admin.MemberStateChangeDto;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.entity.admin.BannerImage;
 import com.EduTech.service.admin.AdminService;
+import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/admin")
 public class AdminController {
 	private final AdminService adminService;
+	private final FileUtil fileUtil;
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/ResState")
@@ -75,4 +84,41 @@ public class AdminController {
 		adminService.MemberStateChange(memberStateChangeDto.getMemId(), memberStateChangeDto.getState());
 		return ResponseEntity.ok("회원 상태 수정 완료");
 	}
+
+	// 배너 이미지 업로드
+	@PostMapping("/banner/upload")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<List<BannerImage>> uploadBanners(@RequestParam("files") List<MultipartFile> files) {
+		List<BannerImage> banners = adminService.uploadBanners(files);
+		return ResponseEntity.ok(banners);
+	}
+
+	// 모든 배너 목록 조회
+	@GetMapping("/banner/list")
+	public ResponseEntity<List<BannerImage>> getAllBanners() {
+		List<BannerImage> banners = adminService.getAllBanners();
+		return ResponseEntity.ok(banners);
+	}
+
+	// 배너 삭제
+	@DeleteMapping("/banner/delete/{bannerNum}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<String> deleteBanner(@PathVariable("bannerNum") Long bannerNum) {
+		adminService.deleteBanner(bannerNum);
+		return ResponseEntity.ok("배너가 삭제되었습니다.");
+	}
+
+	// 배너 순서 수정
+	@PutMapping("/banner/sequence")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<String> updateBannerSequence(@RequestBody List<Long> bannerNums) {
+		adminService.updateBannerSequence(bannerNums);
+		return ResponseEntity.ok("배너 순서가 변경되었습니다.");
+	}
+	
+	// 배너 이미지 출력
+	@GetMapping("/banner/view")
+    public ResponseEntity<Resource> viewFile(@RequestParam("filePath") String filePath) {
+        return fileUtil.getFile(filePath, "");
+    }
 }

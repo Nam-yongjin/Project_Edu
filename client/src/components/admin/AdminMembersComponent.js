@@ -112,7 +112,7 @@ const AdminMembersComponent = () => {
                 />
                 <input
                     name="phone"
-                    placeholder="휴대폰 번호"
+                    placeholder="휴대폰번호"
                     onChange={handleSearchChange}
                     className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -180,8 +180,8 @@ const AdminMembersComponent = () => {
                             </th>
                             <th scope="col" className="px-6 py-3">ID</th>
                             <th scope="col" className="px-6 py-3">이름</th>
-                            <th scope="col" className="px-6 py-3">전화번호</th>
                             <th scope="col" className="px-6 py-3">이메일</th>
+                            <th scope="col" className="px-6 py-3">휴대폰번호</th>
                             <th scope="col" className="px-6 py-3">가입일</th>
                             <th scope="col" className="px-6 py-3">역할</th>
                             <th scope="col" className="px-6 py-3">상태</th>
@@ -201,8 +201,8 @@ const AdminMembersComponent = () => {
                                     </td>
                                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{m.memId}</td>
                                     <td className="px-6 py-4">{m.name}</td>
-                                    <td className="px-6 py-4">{m.phone}</td>
                                     <td className="px-6 py-4">{m.email}</td>
+                                    <td className="px-6 py-4">{m.phone}</td>
                                     <td className="px-6 py-4">
                                         {new Date(m.createdAt).toLocaleDateString()}
                                     </td>

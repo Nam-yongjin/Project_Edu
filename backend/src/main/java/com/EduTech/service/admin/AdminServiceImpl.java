@@ -2,6 +2,8 @@ package com.EduTech.service.admin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
@@ -19,13 +22,16 @@ import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.entity.admin.BannerImage;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
+import com.EduTech.repository.admin.BannerImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.MemberSpecs;
 import com.EduTech.service.mail.MailService;
+import com.EduTech.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +47,9 @@ public class AdminServiceImpl implements AdminService {
 	MemberRepository memberRepository;
 	@Autowired
 	MailService mailService;
+
+	private final FileUtil fileUtil;
+	private final BannerImageRepository bannerImageRepository;
 
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
@@ -93,8 +102,8 @@ public class AdminServiceImpl implements AdminService {
 		} else if (adminMemberViewReqDTO.getEmail() != null && !adminMemberViewReqDTO.getEmail().isBlank()) {
 			spec = spec.and(MemberSpecs.emailContains(adminMemberViewReqDTO.getEmail()));
 		} else if (adminMemberViewReqDTO.getPhone() != null && !adminMemberViewReqDTO.getPhone().isBlank()) {
-            spec = spec.and(MemberSpecs.phoneContains(adminMemberViewReqDTO.getPhone()));
-        }
+			spec = spec.and(MemberSpecs.phoneContains(adminMemberViewReqDTO.getPhone()));
+		}
 
 		// role, state 조건은 따로
 		if (adminMemberViewReqDTO.getRole() != null) {
@@ -135,4 +144,55 @@ public class AdminServiceImpl implements AdminService {
 
 	}
 
+	// 관리자 메인페이지의 배너 등록 기능
+	@Transactional
+	public List<BannerImage> uploadBanners(List<MultipartFile> files) {
+
+		List<Object> savedFiles = fileUtil.saveFiles(files, "banners");
+
+		int lastSequence = bannerImageRepository.findAll().size();
+		List<BannerImage> newBanners = new ArrayList<>();
+
+		for (Object info : savedFiles) {
+			Map<String, String> map = (Map<String, String>) info;
+			lastSequence++;
+			BannerImage banner = BannerImage.builder()
+					.originalName(map.get("originalName"))
+					.imagePath(map.get("filePath"))
+					.sequence(lastSequence)
+					.build();
+			newBanners.add(banner);
+		}
+		return bannerImageRepository.saveAll(newBanners);
+	}
+
+	// 배너 조회
+	public List<BannerImage> getAllBanners() {
+		return bannerImageRepository.findAll(Sort.by(Sort.Direction.ASC, "sequence"));
+	}
+
+	// 배너 삭제
+	@Transactional
+	public void deleteBanner(Long bannerNum) {
+		BannerImage banner = bannerImageRepository.findById(bannerNum)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 배너입니다."));
+
+		fileUtil.deleteFiles(List.of(banner.getImagePath()));
+
+		bannerImageRepository.deleteById(bannerNum);
+	}
+
+	// 배너 수정
+	@Transactional
+	public void updateBannerSequence(List<Long> bannerNums) {
+		for (int i = 0; i < bannerNums.size(); i++) {
+            final int sequence = i + 1;
+            Long bannerNum = bannerNums.get(i);
+            
+            bannerImageRepository.findById(bannerNum).ifPresent(banner -> {
+                banner.setSequence(sequence);
+                bannerImageRepository.save(banner);
+            });
+        }
+	}
 }

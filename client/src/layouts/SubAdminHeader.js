@@ -29,11 +29,11 @@ const SubAdminHeader = () => {
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/admin/"
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                to="/admin/banner"
+                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
-                                분석1
+                                배너관리
                             </Link>
                         </li>
                         <li className="mr-6 pb-2">
