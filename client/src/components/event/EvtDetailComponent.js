@@ -9,7 +9,7 @@ const API_HOST = "http://localhost:8090/api";
 function EvtDetailComponent({ eventNum }) {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [revState, setRevState] = useState(null);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
 
   const navigate = useNavigate();
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
@@ -27,27 +27,36 @@ function EvtDetailComponent({ eventNum }) {
       }
     };
 
-    const fetchRevState = async () => {
+    const checkIfApplied = async () => {
       if (!memId) return;
+
       try {
         const res = await fetch(`${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`);
-        if (!res.ok) throw new Error("신청 상태 조회 실패");
-        const data = await res.json();
-        setRevState(data.revState); // "APPROVED", "CANCEL", "WAITING", null
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`응답 오류: ${text}`);
+        }
+        const isApplied = await res.json();
+        setAlreadyApplied(isApplied);
       } catch (err) {
-        console.error("신청 상태 조회 실패:", err);
+        console.error("신청 여부 확인 실패:", err);
       }
     };
 
     fetchEvent();
-    fetchRevState();
+    checkIfApplied();
   }, [eventNum, memId]);
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return "없음";
-    const date = new Date(dateStr);
-    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-  };
+  if (!dateStr) return "없음";
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}.${month}.${day} ${hours}:${minutes}`;
+};
 
   const getFullUrl = (path) => {
     return path?.startsWith("http") ? path : `${HOST}/${path}`;
@@ -73,27 +82,18 @@ function EvtDetailComponent({ eventNum }) {
     );
   };
 
-  const isApplyDisabled = () => {
-    return (
-      revState === "APPROVED" ||
-      isCanceled ||
-      !isApplyPeriod() ||
-      isFull()
-    );
-  };
-
   const getApplyButtonText = () => {
-    if (isCanceled) return "행사가 취소되었습니다";
-    if (revState === "APPROVED") return "행사신청 완료";
-    if (!isApplyPeriod()) return "행사신청 기간이 아닙니다.";
+    if (alreadyApplied) return "신청 완료";
+    if (!isApplyPeriod()) return "신청 기간 아님";
     if (isFull()) return "모집 마감";
     return "신청하기";
   };
 
   const getApplyButtonStyle = () => {
-    if (isCanceled || revState === "APPROVED" || !isApplyPeriod() || isFull()) {
+    if (isCanceled) return "bg-gray-300 text-gray-500 cursor-not-allowed";
+    if (alreadyApplied) return "bg-green-400 text-white cursor-not-allowed";
+    if (!isApplyPeriod() || isFull())
       return "bg-gray-300 text-gray-500 cursor-not-allowed";
-    }
     return "bg-blue-500 text-white hover:bg-blue-600";
   };
 
@@ -105,11 +105,13 @@ function EvtDetailComponent({ eventNum }) {
 
     try {
       await applyEvent({ eventNum: event.eventNum, memId });
+      setAlreadyApplied(true);
       alert("신청이 완료되었습니다.");
-      setRevState("APPROVED");
+      navigate("/event/list");
     } catch (err) {
       const message = err.response?.data?.message || err.message;
       alert(`신청 실패: ${message}`);
+      window.location.reload();
     }
   };
 
@@ -132,18 +134,20 @@ function EvtDetailComponent({ eventNum }) {
     }
   };
 
-  const renderDownloadLink = (label, url, name, key) => (
-    <a
-      key={key}
-      href={url}
-      download
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block text-sm text-blue-600 hover:underline"
-    >
-      {name || label}
-    </a>
-  );
+  const renderDownloadLink = (label, url, name, key) => {
+    return (
+      <a
+        key={key}
+        href={url}
+        download
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block text-sm text-blue-600 hover:underline"
+      >
+        {name || label}
+      </a>
+    );
+  };
 
   const categoryLabel = {
     TEACHER: "교사",
@@ -190,7 +194,7 @@ function EvtDetailComponent({ eventNum }) {
           <div className="pt-6 space-y-4">
             <button
               className={`w-full py-3 rounded font-semibold transition ${getApplyButtonStyle()}`}
-              disabled={isApplyDisabled()}
+              disabled={alreadyApplied || !isApplyPeriod() || isFull()}
               onClick={handleApply}
             >
               {getApplyButtonText()}
