@@ -36,7 +36,7 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 	int updateDem(@Param("demName") String demName, @Param("demMfr") String demMfr, @Param("itemNum") Long itemNum,
 			@Param("demInfo") String demInfo, @Param("demNum") Long demNum);
 
-	@Modifying // JPQL에서 업데이트하는 방식 (기업의 실증 등록내용을 수정시켜주는 쿼리문)
+	@Modifying // JPQL에서 업데이트하는 방식 (실증 물품 갯수 업데이트 하는 쿼리문)
 	@Transactional
 	@Query("UPDATE Demonstration d SET d.itemNum = :itemNum WHERE d.demNum = :demNum")
 	int updateItemNum(@Param("itemNum") Long itemNum, @Param("demNum") Long demNum);

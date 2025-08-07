@@ -89,11 +89,12 @@ export const getReserveCheck =async (demNum) => {
 
 
 // 물품 대여 현황 페이지에서 여러가지 정보를 가져오기 위한 요청
-export const getRental =async (pageCount,sort,sortBy) => {
+export const getRental =async (pageCount,sort,sortBy,statusFilter) => {
  const res = await jwtAxios.get(`${demonstration}/demRental`, {
      params: {pageCount:pageCount,
             sort:sort,
-            sortBy:sortBy
+            sortBy:sortBy,
+            statusFilter:statusFilter,
      }
     });
     return res.data;
@@ -101,7 +102,7 @@ export const getRental =async (pageCount,sort,sortBy) => {
 // get요청은 param, requestParma
 // post요청은 json형태로 responsebody
 // 물품 대여 현황 페이지에서 여러가지 정보를 가져오기 위한 요청 (검색어 포함해서)
-export const getRentalSearch=async (search,type,pageCount,sortBy,sort) => {
+export const getRentalSearch=async (search,type,pageCount,sortBy,sort,statusFilter) => {
  const res = await jwtAxios.get(`${demonstration}/demRental`, {
     params: {
     search:search,
@@ -109,7 +110,18 @@ export const getRentalSearch=async (search,type,pageCount,sortBy,sort) => {
     pageCount:pageCount,
     sortBy:sortBy,
     sort:sort,
+    statusFilter:statusFilter,
     }
     });
     return res.data;
 }
+
+// 물품 대여 현황 페이지에서 항목 선택 후, 예약 취소 버튼 클릭 시, 상품 삭제
+export const deleteRental = async (demNum) => {
+    console.log(demNum);
+  const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
+     data: demNum 
+  });
+  return res.data;
+};
+

@@ -2,6 +2,7 @@ package com.EduTech.service.demonstration;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +29,6 @@ import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
 import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationResRentalDTO;
-import com.EduTech.dto.demonstration.DemonstrationReservationCancelDTO;
 import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
@@ -128,7 +128,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		String search = demonstrationSearchDTO.getSearch();
 		String sortBy = demonstrationSearchDTO.getSortBy();
 		String sort = demonstrationSearchDTO.getSort();
-
+		String statusFilter=demonstrationSearchDTO.getStatusFilter();
+		
 		if (pageCount == null || pageCount < 0)
 			pageCount = 0;
 		if (!StringUtils.hasText(sortBy))
@@ -140,7 +141,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Pageable pageable = PageRequest.of(pageCount, 10);
 
 		Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
-				sortBy, sort); // spec를 사용해 동적으로 정렬 및 검색어 기능 처리
+				sortBy, sort,statusFilter); // spec를 사용해 동적으로 정렬 및 검색어 기능 처리
 		
 		Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable); 
 		
@@ -299,37 +300,41 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 	@Override
-	public void demonstrationReservationCancel(DemonstrationReservationCancelDTO demonstrationReservationCancelDTO) {
+	public void demonstrationReservationCancel(List<Long> demNum,String memId) {
 		// 불러온 아이디와 실증 번호를 통해 신청 번호를 받아온 후,
-		DemonstrationReserve demonstrationReserve = demonstrationReserveRepository.findDemRevNum(
-				demonstrationReservationCancelDTO.getMemId(), demonstrationReservationCancelDTO.getDemNum());
+		List<DemonstrationReserve> demonstrationReserve = demonstrationReserveRepository.findDemRevNum(memId,demNum,DemonstrationState.CANCEL);
 
 		if (demonstrationReserve == null) {
 			System.out.println("예약 정보가 없습니다.");
 			return;
 		}
+		Long updateItemNum;
+		for(Long num:demNum) {
+			updateItemNum=demonstrationReserveRepository.getBItemNum(num,memId,DemonstrationState.CANCEL); // 예약 취소한 갯수+기존의 갯수
+			demonstrationRepository.updateItemNum(updateItemNum, num);
+		}
 
-		// 신청 번호를 통해 삭제
-		demonstrationReserveRepository.deleteOneDemRes(demonstrationReserve.getDemRevNum());
+		// 신청 번호를 통한 상태 업데이트 (cancel)
+		demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.CANCEL, memId, demNum);
 		// demonstartionTime테이블에 있는 예약 정보도 삭제
+		
+	for(DemonstrationReserve res:demonstrationReserve) {
 		List<LocalDate> deleteTimeList = new ArrayList<>();
-		for (LocalDate date = demonstrationReserve.getStartDate(); !date
-				.isAfter(demonstrationReserve.getEndDate()); date = date.plusDays(1)) {
+		for (LocalDate date = res.getStartDate(); !date
+				.isAfter(res.getEndDate()); date = date.plusDays(1)) {
 			deleteTimeList.add(date);
 		}
 		// 저장되어 있던 시작 번호와 끝 번호를 가져와
 		// time테이블의 예약 정보도 삭제
 		demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
 	}
+	}
 
 	// 실증 신청 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@Override
-	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO, String memId) {
+	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO,String memId) {
 		// 기존 예약 취소
-		DemonstrationReservationCancelDTO demonstrationReservationcancelDTO = new DemonstrationReservationCancelDTO();
-		demonstrationReservationcancelDTO.setMemId(demonstrationReservationDTO.getMemId());
-		demonstrationReservationcancelDTO.setDemNum(demonstrationReservationDTO.getDemNum());
-		demonstrationReservationCancel(demonstrationReservationcancelDTO);
+		demonstrationReservationCancel(Collections.singletonList(demonstrationReservationDTO.getDemNum()),memId);
 		// 새로운 예약 추가
 		demonstrationReservation(demonstrationReservationDTO, memId);
 	}
@@ -460,7 +465,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
 	@Override
 	public Boolean checkRes(Long demNum, String memId) {
-		Boolean bool = demonstrationReserveRepository.checkRes(demNum, memId).orElse(false);
+		Boolean bool = demonstrationReserveRepository.checkRes(demNum, memId,DemonstrationState.CANCEL).orElse(false);
 		return bool;
 	}
 }
