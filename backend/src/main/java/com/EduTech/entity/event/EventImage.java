@@ -26,4 +26,3 @@ public class EventImage {
     private EventInfo eventInfo;
     
 }
-

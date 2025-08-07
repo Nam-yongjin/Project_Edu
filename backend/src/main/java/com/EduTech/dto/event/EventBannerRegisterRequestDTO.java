@@ -7,8 +7,4 @@ public class EventBannerRegisterRequestDTO {
 	
     private Long eventNum; // 행사 ID만 전송
     
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> refs/heads/Event
