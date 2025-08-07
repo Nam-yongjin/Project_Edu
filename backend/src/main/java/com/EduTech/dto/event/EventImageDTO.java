@@ -9,6 +9,9 @@ import lombok.*;
 @Builder
 public class EventImageDTO {
     private Long id;
+    
     private String filePath;
+    
     private String originalName;
+    
 }

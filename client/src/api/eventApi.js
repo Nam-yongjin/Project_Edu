@@ -20,6 +20,13 @@ export const getEventById = async (eventNum) => {
   return res.data;
 };
 
+export const getUserReserveDetail = async (eventNum, memId) => {
+  const res = await jwtAxios.get(`${event}/userReserveDetail`, {
+    params: { eventNum, memId }
+  });
+  return res.data;
+};
+
 // 행사 수정 요청 (JWT 필요)
 export const updateEvent = async (eventNum, formData) => {
   const res = await jwtAxios.put(`${event}/update?eventNum=${eventNum}`, formData, {
