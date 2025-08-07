@@ -1,10 +1,8 @@
 package com.EduTech.dto.event;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.EduTech.entity.event.RevState;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

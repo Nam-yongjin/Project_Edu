@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EventSearchRequestDTO {
+	
     private String searchType;       // "eventName", "eventInfo", "all"
     
     private String keyword;          // 검색어
