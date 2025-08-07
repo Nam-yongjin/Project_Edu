@@ -22,7 +22,7 @@ const BusinessComponent = () => {
             <div className="mx-auto max-w-screen-xl my-10">
                 <div className="text-2xl font-bold pb-8">주요사업</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:flex-row gap-10 text-center items-center">
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105">
+                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105 ease-in-out duration-300">
                         에듀테크 프로그램 운영
                         <ul className="text-base space-y-8 mt-12 font-normal">
                             <li>
@@ -36,7 +36,7 @@ const BusinessComponent = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105">
+                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105 ease-in-out duration-300">
                         연구회 운영 및 기업지원
                         <ul className="text-base space-y-8 mt-12 font-normal">
                             <li>
@@ -50,7 +50,7 @@ const BusinessComponent = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105">
+                    <div className="text-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold w-[330px] h-[400px] hover:scale-105 ease-in-out duration-300">
                         실증 지원
                         <ul className="text-base space-y-8 mt-12 font-normal">
                             <li>
