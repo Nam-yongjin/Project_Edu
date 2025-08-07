@@ -110,7 +110,7 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 disabled={disable}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full input-focus"
             />
 
             {/* 에러 메시지 공간 고정 */}
@@ -124,10 +124,10 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
             <button
                 onClick={sendOTP}
                 disabled={cooldown > 0 || disable || !isValidPhone(phone)}
-                className={`float-left w-full p-2 rounded-md font-medium transition-colors duration-150 
+                className={`float-left w-full transition-colors duration-150 
                     ${cooldown > 0 || disable || !isValidPhone(phone)
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white'
+                        ? 'bg-gray-300 text-gray-500 p-2 rounded-md cursor-not-allowed'
+                        : 'positive-button'
                     }`}
             >
                 {cooldown > 0 ? `${cooldown}초 후 재요청 가능` : '인증번호 전송'}
@@ -145,12 +145,12 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     disabled={disable}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full input-focus"
                 />
                 <button
                     onClick={verifyOTP}
                     disabled={disable}
-                    className={`float-left w-full p-2 rounded-md font-medium transition-colors duration-150 ${disable
+                    className={`float-left w-full p-2 rounded-md transition-colors duration-150 font-semibold ${disable
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-green-500 hover:bg-green-600 active:bg-green-700 text-white'
                         }`}
