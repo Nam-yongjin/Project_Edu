@@ -17,5 +17,6 @@ public class EventApplyRequestDTO {
 	
 	private String memId;
 	
-    private RevState revState;
+	@Builder.Default
+	private RevState revState = RevState.WAITING;
 }

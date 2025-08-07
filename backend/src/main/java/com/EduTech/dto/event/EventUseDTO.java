@@ -23,7 +23,7 @@ public class EventUseDTO {
 	
 	private LocalDateTime eventEndPeriod;	// 행사종료기간
 	
-    private LocalDateTime applyAt;
+    private LocalDateTime applyAt;			// 등록시간
 	
 	private String place;					// 장소
 	

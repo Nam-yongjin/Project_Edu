@@ -96,7 +96,7 @@ public class EventInfo {
     @Builder.Default
     private List<EventFile> attachList = new ArrayList<>();
 
-    // 다중 이미지
+    // 다중 이미지 
     @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<EventImage> imageList = new ArrayList<>();
