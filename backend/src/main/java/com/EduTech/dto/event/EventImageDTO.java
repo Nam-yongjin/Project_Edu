@@ -8,7 +8,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class EventImageDTO {
+	
     private Long id;
+    
     private String filePath;
+    
     private String originalName;
+    
 }

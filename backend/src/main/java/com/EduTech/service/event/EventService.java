@@ -58,7 +58,7 @@ public interface EventService {
             MultipartFile mainFile,
             List<MultipartFile> attachList); // 수정
     
-    void deleteEvent(Long eventNum); // 삭제
+    void deleteEvent(Long eventNum); // 취소
 
     // =============================
     // 3. 배너 관련
@@ -66,7 +66,7 @@ public interface EventService {
 
     List<EventInfoDTO> getAllBanners(int page); // 배너 목록 조회
     
-    void registerBanner(EventBannerDTO dto, MultipartFile file); // 배너 등록
+    void registerBanner(EventBannerDTO dto); // 배너 등록
     
     void deleteBanner(Long evtFileNum); // 배너 삭제
 
@@ -86,8 +86,8 @@ public interface EventService {
     // 5. 신청 내역 및 관리
     // =============================
 
-    Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable); // 사용자 신청 리스트
+  Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable); // 사용자 신청 리스트
     
-    List<EventUseDTO> getApplicantsByEvent(Long eventNum); // 특정 이벤트 신청자 목록 (관리자용)
+//  List<EventUseDTO> getApplicantsByEvent(Long eventNum); // 특정 이벤트 신청자 목록 (관리자용)
 
 }

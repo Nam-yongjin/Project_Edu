@@ -3,6 +3,7 @@ package com.EduTech.entity.event;
 import java.util.Arrays;
 
 public enum EventState {
+	
 	BEFORE("신청전"),
     OPEN("신청중"),
     CLOSED("신청마감"),
@@ -19,5 +20,7 @@ public enum EventState {
                 .filter(v -> v.label.equals(label))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid label: " + label));
+        
     }
+    
 }
