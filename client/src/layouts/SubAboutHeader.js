@@ -8,7 +8,7 @@ const SubAboutHeader = () => {
          <div className="bg-blue-100 w-full pt-8 pb-8"> 
             <div className="max-w-screen-xl mx-auto ">
                 <div className="flex items-center justify-between">
-                    <div className="text-4xl font-bold text-gray-800">
+                    <div className="newText-4xl font-bold text-gray-800">
                         소프트랩 소개
                     </div>
                     <div className="w-1/4">
@@ -16,12 +16,12 @@ const SubAboutHeader = () => {
                     </div>
                 </div>
                 
-                <div className="border-b-2 border-blue-500 pb-4">
+                <div className="newText-lg border-b-2 border-blue-500 pb-4">
                     <ul className="flex">
                         <li className="mr-6 pb-2">
                             <Link 
                                 to="/about/greeting" 
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
                                     location.pathname.includes("/greeting") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >
@@ -31,7 +31,7 @@ const SubAboutHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link 
                                 to="/about/business" 
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
                                     location.pathname.includes("/business") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >
@@ -41,7 +41,7 @@ const SubAboutHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link 
                                 to="/about/direction"
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
                                     location.pathname.includes("/direction") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >

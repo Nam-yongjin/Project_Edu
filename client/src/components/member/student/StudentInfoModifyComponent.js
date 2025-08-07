@@ -162,7 +162,7 @@ const StudentInfoModifyComponent = () => {
                 setVerifiedPhone(null);
                 setModifying(false);
                 setErrors({});
-                moveToPath('/');
+                moveToPath('/student/myInfo');
             })
             .catch((error) => {
                 alert("회원정보 수정 실패",error);
