@@ -22,7 +22,7 @@ const SubMyInfoHeader = () => {
     return (
         <div className="bg-blue-100 w-full pt-8 pb-8">
             <div className="max-w-screen-xl mx-auto ">
-                <div className="flex items-center justify-between">
+                <div className="min-blank flex items-center justify-between">
                     <div className="newText-4xl font-bold text-gray-800">
                         마이페이지
                     </div>
@@ -31,7 +31,7 @@ const SubMyInfoHeader = () => {
                     </div>
                 </div>
 
-                <div className="newText-lg border-b-2 border-blue-500 pb-4">
+                <div className="newText-lg min-blank border-b-2 border-blue-500 pb-4">
                     <ul className="flex">
                         <li className="mr-6 pb-2">
                             <Link

@@ -51,8 +51,8 @@ const LoginComponent = () => {
     }, [cooldown]);
 
     return (
-        <div className="">
-            <div className="page-shadow my-10 p-10 lg:w-[500px] sm:w-[450px] w-[400px]">
+        <div className="max-w-screen-md mx-auto w-[500px]">
+            <div className="page-shadow min-blank my-10 p-10">
                 <div className="newText-4xl text-center font-bold mb-6">로그인</div>
 
                 <div className="newText-base mb-4">

@@ -15,17 +15,17 @@ const GreetingComponent = () => {
 
     return (
         <div className="">
-            <div className="">
+            <div className="mx-auto max-w-screen-xl">
                 <img
                     src={logo}
                     alt="로고"
-                    className="float-right w-1/2"
+                    className="float-right lg:w-[500px] sm:w-[400px] w-[300px]"
                 />
                 {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
             </div>
             <div className="mx-auto max-w-screen-xl my-10">
-                <div className="newText-2xl font-bold mb-4">인사말</div>
-                <div className="newText-lg py-4" style={{ whiteSpace: 'pre-wrap' }}>{greetText}</div>
+                <div className="newText-2xl min-blank font-bold mb-4">인사말</div>
+                <div className="newText-lg min-blank py-4" style={{ whiteSpace: 'pre-wrap' }}>{greetText}</div>
             </div>
 
         </div>

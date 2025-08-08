@@ -68,10 +68,10 @@ const Header = () => {
       sub: [
         { name: "실증지원 안내", link: "/demonstration" },
         { name: "실증기업 소개", link: "/" },
-        { name: "실증 신청", link: "demonstration/add" },
-        { name: "빌림테스트", link: "demonstration/rentalList" },
-        { name: "빌려줌테스트", link: "demonstration/borrowList" },
-        { name: "실증 물품", link: "demonstration/list" },
+        { name: "실증 신청", link: "/demonstration/add" },
+        { name: "빌림테스트", link: "/demonstration/rentalList" },
+        { name: "빌려줌테스트", link: "/demonstration/borrowList" },
+        { name: "실증 물품", link: "/demonstration/list" },
       ],
     },
     {
@@ -103,7 +103,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 w-full bg-white shadow z-50 ">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between h-20">
         {/* 로고 */}
-        <div className="flex items-center flex-none">
+        <div className="flex items-center flex-none xl:ml-0 md:ml-8 ml-2">
           <img
             src={logo}
             alt="로고"

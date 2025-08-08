@@ -202,15 +202,15 @@ const TeacherInfoModifyComponent = () => {
     };
 
     return (
-        <div>
-            <div className={`page-shadow mx-auto my-10 p-10 space-y-6 text-center ${modifying ? "max-w-screen-md" : "max-w-screen-sm"}`}>
+        <div className={`mx-auto ${modifying ? "max-w-screen-md" : "max-w-screen-sm"}`}>
+            <div className={`page-shadow min-blank my-10 p-10 space-y-6 text-center`}>
                 {modifying ?
-                    <div className="text-3xl font-bold">회원정보수정</div>
+                    <div className="newText-3xl font-bold">회원정보수정</div>
                     :
-                    <div className="text-3xl font-bold">회원상세정보</div>
+                    <div className="newText-3xl font-bold">회원상세정보</div>
                 }
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">아이디<span className='text-red-600' hidden={!modifying}> *</span></label>
                         <input
                             name="memId"
@@ -221,7 +221,7 @@ const TeacherInfoModifyComponent = () => {
                 </div>
                 {modifying ?
                     <div>
-                        <div className="flex items-center">
+                        <div className="newText-base flex items-center">
                             <label className="w-36 text-left font-medium">새 비밀번호<span className='text-red-600' hidden={!modifying}> *</span></label>
                             <input
                                 name="pw"
@@ -230,14 +230,14 @@ const TeacherInfoModifyComponent = () => {
                                 value={form.pw}
                                 onChange={handleChange}
                                 className="flex-1 input-focus" />
-                            {errors.pw && <div className="text-red-500 text-sm text-left ml-36">{errors.pw}</div>}
+                            {errors.pw && <div className="text-red-500 newText-sm text-left ml-36">{errors.pw}</div>}
                         </div>
                     </div>
                     :
                     <></>}
                 {modifying ?
                     <div>
-                        <div className="flex items-center">
+                        <div className="newText-base flex items-center">
                             <label className="w-36 text-left font-medium">새 비밀번호 확인<span className='text-red-600' hidden={!modifying}> *</span></label>
                             <input
                                 name="pwCheck"
@@ -247,13 +247,13 @@ const TeacherInfoModifyComponent = () => {
                                 onChange={handleChange}
                                 className="flex-1 input-focus"
                             />
-                            {errors.pwCheck && <div className="text-red-500 text-sm text-left ml-36">{errors.pwCheck}</div>}
+                            {errors.pwCheck && <div className="text-red-500 newText-sm text-left ml-36">{errors.pwCheck}</div>}
                         </div>
                     </div>
                     :
                     <></>}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">이름<span className='text-red-600' hidden={!modifying}> *</span></label>
                         <input
                             name="name"
@@ -262,21 +262,21 @@ const TeacherInfoModifyComponent = () => {
                             disabled={!modifying}
                             onChange={handleChange}
                             className="flex-1 input-focus" />
-                        {errors.name && <div className="text-red-500 text-sm text-left ml-36">{errors.name}</div>}
+                        {errors.name && <div className="text-red-500 newText-sm text-left ml-36">{errors.name}</div>}
                     </div>
                 </div>
 
                 {modifying ?
                     <div>
-                        <div className="flex items-start">
+                        <div className="newText-base flex items-start">
                             <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
                             <PhoneVerification onVerified={setVerifiedPhone} />
                         </div>
-                        {errors.phone && <div className="text-red-500 text-sm text-left ml-36">{errors.phone}</div>}
+                        {errors.phone && <div className="text-red-500 newText-sm text-left ml-36">{errors.phone}</div>}
                     </div>
                     :
                     <div>
-                        <div className="flex items-start">
+                        <div className="newText-base flex items-start">
                             <div className="w-36 text-left font-medium pt-2">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
                             <input
                                 type="text"
@@ -289,7 +289,7 @@ const TeacherInfoModifyComponent = () => {
                 }
 
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">이메일<span className='text-red-600' hidden={!modifying}> *</span></label>
                         <input
                             name="email"
@@ -299,12 +299,12 @@ const TeacherInfoModifyComponent = () => {
                             disabled={!modifying}
                             onChange={handleChange}
                             className="flex-1 input-focus" />
-                        {errors.email && <div className="text-red-500 text-sm text-left ml-36">{errors.email}</div>}
+                        {errors.email && <div className="text-red-500 newText-sm text-left ml-36">{errors.email}</div>}
                     </div>
                 </div>
 
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">생년월일<span className='text-red-600' hidden={!modifying}> *</span></label>
                         <input
                             name="birthDate"
@@ -316,7 +316,7 @@ const TeacherInfoModifyComponent = () => {
                 </div>
 
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <div className="w-36 text-left font-medium">성별<span className='text-red-600' hidden={!modifying}> *</span></div>
                         <input
                             name="gender"
@@ -328,7 +328,7 @@ const TeacherInfoModifyComponent = () => {
 
                 {modifying ?
                     <div>
-                        <div className="flex items-start">
+                        <div className="newText-base flex items-start">
                             <div className="w-36 text-left font-medium pt-2">주소</div>
                             <div className="flex-1">
                                 <AddressSearch onAddressSelected={handleAddressSelected} />
@@ -344,7 +344,7 @@ const TeacherInfoModifyComponent = () => {
                     </div>
                     :
                     <div>
-                        <div className="flex items-center">
+                        <div className="newText-base flex items-center">
                             <label className="w-36 text-left font-medium">주소</label>
                             <input
                                 name="addr"
@@ -357,7 +357,7 @@ const TeacherInfoModifyComponent = () => {
                 }
 
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">상세 주소</label>
                         <input
                             name="addrDetail"
@@ -370,7 +370,7 @@ const TeacherInfoModifyComponent = () => {
                 </div>
 
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">학교명<span className='text-red-600' hidden={!modifying}> *</span></label>
                         <input
                             name="schoolName"
@@ -380,11 +380,11 @@ const TeacherInfoModifyComponent = () => {
                             disabled={!modifying}
                             onChange={handleChange}
                             className="flex-1 input-focus" />
-                        {errors.schoolName && <div className="text-red-500 text-sm text-left ml-36">{errors.schoolName}</div>}
+                        {errors.schoolName && <div className="text-red-500 newText-sm text-left ml-36">{errors.schoolName}</div>}
                     </div>
                 </div>
 
-                <div className="flex items-center">
+                <div className="newText-base flex items-center">
                     <label className="w-36 text-left font-medium">SMS 수신</label>
                     <input
                         name="checkSms"
@@ -395,7 +395,7 @@ const TeacherInfoModifyComponent = () => {
                         className="mr-2" />
                 </div>
 
-                <div className="flex items-center">
+                <div className="newText-base flex items-center">
                     <label className="w-36 text-left font-medium">이메일 수신</label>
                     <input
                         name="checkEmail"
@@ -406,7 +406,7 @@ const TeacherInfoModifyComponent = () => {
                         className="mr-2" />
                 </div>
 
-                <div className=''>
+                <div className='newText-base pt-4'>
                     {modifying
                         ?
                         <div className='flex justify-center'>

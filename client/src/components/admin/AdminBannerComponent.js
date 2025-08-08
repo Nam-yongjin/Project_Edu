@@ -92,14 +92,14 @@ const AdminBannerComponent = () => {
     };
 
     return (
-        <div className='max-w-screen-xl mx-auto my-10 px-4'>
-            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="text-2xl font-bold">
+        <div className='max-w-screen-xl mx-auto my-10'>
+            <div className="min-blank mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="newText-2xl font-bold">
                     배너 관리
-                    <span className='ml-2 font-medium text-base text-gray-500'>(드래그시 순서 변경)</span>
+                    <span className='newText-base ml-2 font-medium text-gray-500'>(드래그시 순서 변경)</span>
                 </div>
 
-                <div className="flex gap-2 sm:flex-row-reverse mt-4 sm:m-0">
+                <div className="newText-base flex gap-2 sm:flex-row-reverse mt-4 sm:m-0">
 
                     <label className="cursor-pointer normal-button">
                         <span className="truncate">파일 선택</span>
@@ -107,12 +107,12 @@ const AdminBannerComponent = () => {
                     </label>
                     <button
                         onClick={handleUpload}
-                        className='positive-button w-[80px]'
+                        className='positive-button md:w-[80px] w-[70px]'
                     >
                         업로드
                     </button>
                     {selectedFiles.length > 0 && (
-                        <div className="text-sm text-gray-600 py-3">
+                        <div className="newText-sm text-gray-600 py-3">
                             {selectedFiles.length}개의 파일 선택됨
                         </div>
                     )}
@@ -141,8 +141,8 @@ const AdminBannerComponent = () => {
                             </div>
 
                             <div className="w-full mt-3 text-center">
-                                <p className="text-base font-medium truncate">{banner.originalName}</p>
-                                <span className="text-sm text-gray-500">순서: {banner.sequence}</span>
+                                <p className="newText-base font-medium truncate">{banner.originalName}</p>
+                                <span className="newText-sm text-gray-500">순서: {banner.sequence}</span>
                             </div>
 
                             <button
