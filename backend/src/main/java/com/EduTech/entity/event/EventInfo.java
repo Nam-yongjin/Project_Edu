@@ -54,10 +54,6 @@ public class EventInfo {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EventState state;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private EventBannerState bannerState;
 
     @Column(nullable = false, length = 20)
     private String place;
@@ -100,14 +96,11 @@ public class EventInfo {
     @OneToMany(mappedBy = "eventInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<EventImage> imageList = new ArrayList<>();
-
+    
     @PrePersist
     public void prePersist() {
         if (this.state == null) {
             this.state = EventState.BEFORE;
-        }
-        if (this.bannerState == null) {
-            this.bannerState = EventBannerState.NO;
         }
     }
     
