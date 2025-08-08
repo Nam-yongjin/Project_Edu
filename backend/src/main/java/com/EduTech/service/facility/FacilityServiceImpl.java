@@ -1,19 +1,19 @@
 package com.EduTech.service.facility;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
@@ -30,6 +30,7 @@ import com.EduTech.entity.facility.FacilityHoliday;
 import com.EduTech.entity.facility.FacilityImage;
 import com.EduTech.entity.facility.FacilityReserve;
 import com.EduTech.entity.facility.FacilityState;
+import com.EduTech.entity.facility.PublicHoliday;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberRole;
 import com.EduTech.repository.facility.FacilityHolidayRepository;
@@ -37,10 +38,10 @@ import com.EduTech.repository.facility.FacilityImageRepository;
 import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
 import com.EduTech.repository.facility.FacilityTimeRepository;
+import com.EduTech.repository.facility.PublicHolidayRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.util.FileUtil;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -52,232 +53,281 @@ public class FacilityServiceImpl implements FacilityService {
     private final FacilityTimeRepository facilityTimeRepository;
     private final FacilityReserveRepository facilityReserveRepository;
     private final FacilityHolidayRepository facilityHolidayRepository;
+    private final PublicHolidayRepository publicHolidayRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
     private final FileUtil fileUtil;
-    
-    //--------------------------------------------------------
-    public String saveImage(MultipartFile file) {
-        String originalName = file.getOriginalFilename();
-        String uuid = UUID.randomUUID().toString();
-        String saveName = uuid + "_" + originalName;
 
-        Path uploadPath = Paths.get("C:/upload/facility"); // 또는 서버 설정 기반 경로
-        Path fullPath = uploadPath.resolve(saveName);
-
-        try {
-            Files.createDirectories(uploadPath);
-            file.transferTo(fullPath.toFile());
-        } catch (IOException e) {
-            throw new RuntimeException("파일 저장 실패", e);
-        }
-
-        return saveName;
+    // ----------------------------------------------------------------------
+    // 이미지 파일 저장 (FileUtil 사용)
+    private FacilityImage toFacilityImage(MultipartFile file) {
+        Map<String, String> saved = fileUtil.saveImage(file, "facility");
+        String originalName = saved.get("originalName");
+        String imagePath   = saved.get("filePath");
+        // 엔티티에 @Builder 없으므로 생성자/세터 사용
+        FacilityImage entity = new FacilityImage(originalName, "/upload/" + imagePath, false);
+        return entity;
     }
 
-    //--------------------------------------------------------
-    
+    // 요일 매핑: Java(MON=1..SUN=7) -> 시스템 규칙(SUN=1..SAT=7)
+    private int mapJavaDayOfWeekTo1to7(LocalDate date) {
+        int javaDow = date.getDayOfWeek().getValue(); // MON=1..SUN=7
+        return (javaDow == DayOfWeek.SUNDAY.getValue()) ? 1 : javaDow + 1; // SUN->1, MON->2 .. SAT->7
+    }
+    // ----------------------------------------------------------------------
+
+    // 공휴일 + 시설 휴무일 집합 (중복 제거, 정렬 유지)
+    private Set<LocalDate> getClosedDates(Long facRevNum, LocalDate start, LocalDate end) {
+        List<PublicHoliday> ph = publicHolidayRepository.findByDateBetween(start, end);
+        List<FacilityHoliday> fh = facilityHolidayRepository
+                .findByFacility_FacRevNumAndHolidayDateBetween(facRevNum, start, end);
+
+        return Stream.concat(
+                    ph.stream().map(PublicHoliday::getDate),
+                    fh.stream().map(FacilityHoliday::getHolidayDate)
+               )
+               .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     @Override
     @Transactional
     public void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images) {
         Facility facility = modelMapper.map(dto, Facility.class);
 
-        for (MultipartFile image : images) {
-            if (!image.isEmpty()) {
-                Map<String, String> saved = fileUtil.saveImage(image, "facility");
-
-                String originalName = saved.get("originalName");
-                String imagePath = saved.get("filePath");
-
-                FacilityImage imageEntity = FacilityImage.builder()
-                    .imageName(originalName)
-                    .imageUrl("/upload/" + imagePath)
-                    .build();
-
-                facility.addImage(imageEntity);  // 연관 관계 편의 메서드
+        if (images != null) {
+            for (MultipartFile image : images) {
+                if (image != null && !image.isEmpty()) {
+                    FacilityImage imgEntity = toFacilityImage(image);
+                    facility.addImage(imgEntity); // 편의 메서드(양방향 동기화)
+                }
             }
         }
-
         facilityRepository.save(facility);
     }
-    
-    // 시설 상세 정보 조회 (이미지 포함)
+
+    // 시설 상세 (이미지 포함)
     @Override
+    @Transactional(readOnly = true)
     public FacilityDetailDTO getFacilityDetail(String facName) {
         Facility facility = facilityRepository.findByFacName(facName)
                 .orElseThrow(() -> new RuntimeException("시설 정보를 찾을 수 없습니다."));
 
-        List<FacilityImageDTO> imageDTOs = facilityImageRepository.findByFacility_FacilityNum(facility.getFacilityNum())
+        List<FacilityImageDTO> imageDTOs = facilityImageRepository
+                .findByFacility_FacRevNum(facility.getFacRevNum())
                 .stream()
                 .map(img -> {
-                    FacilityImageDTO dto = new FacilityImageDTO();
-                    dto.setFacImageNum(img.getFacImageNum());
-                    dto.setImageName(img.getImageName());
-                    dto.setImageUrl(img.getImageUrl());
-                    return dto;
+                    FacilityImageDTO d = new FacilityImageDTO();
+                    d.setFacImageNum(img.getFacImageNum());
+                    d.setImageName(img.getImageName());
+                    d.setImageUrl(img.getImageUrl());
+                    return d;
                 }).collect(Collectors.toList());
 
-        FacilityDetailDTO dto = new FacilityDetailDTO();
-        dto.setFacName(facility.getFacName());
-        dto.setFacInfo(facility.getFacInfo());
-        dto.setCapacity(facility.getCapacity());
-        dto.setFacItem(facility.getFacItem());
-        dto.setEtc(facility.getEtc());
-        dto.setAvailableTime("09:00 ~ 18:00");
-        dto.setImages(imageDTOs);
-
-        return dto;
+        FacilityDetailDTO d = new FacilityDetailDTO();
+        d.setFacRevNum(facility.getFacRevNum()); // 있으면 프론트 라우팅에 편함
+        d.setFacName(facility.getFacName());
+        d.setFacInfo(facility.getFacInfo());
+        d.setCapacity(facility.getCapacity());
+        d.setFacItem(facility.getFacItem());
+        d.setEtc(facility.getEtc());
+        // TODO: 실제 운영시간 요약을 계산해 넣을 수 있음
+        d.setAvailableTime("09:00 ~ 18:00");
+        d.setImages(imageDTOs);
+        return d;
     }
 
-    // 예약 가능 시간대 조회
+    // 특정 날짜의 예약 가능 시간대 계산
     @Override
-    public List<FacilityTimeDTO> getAvailableTimes(Long facilityNum, LocalDate date) {
-        return facilityTimeRepository.findByFacility_FacilityNumAndFacDate(facilityNum, date)
-                .stream()
-                .map(t -> {
-                    FacilityTimeDTO dto = new FacilityTimeDTO();
-                    dto.setFacDate(t.getFacDate());
-                    dto.setStartTime(t.getStartTime());
-                    dto.setEndTime(t.getEndTime());
-                    dto.setAvailable(t.isAvailable());
-                    return dto;
-                }).collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public List<FacilityTimeDTO> getAvailableTimes(Long facRevNum, LocalDate date) {
+        int dow = mapJavaDayOfWeekTo1to7(date);
+
+        // 공휴일 + 시설휴무 통합 체크 (해당 날짜만 조회)
+        boolean holiday = getClosedDates(facRevNum, date, date).contains(date);
+
+        var baseSlots = facilityTimeRepository
+                .findByFacility_FacRevNumAndDayOfWeek(facRevNum, dow);
+
+        return baseSlots.stream().map(t -> {
+            boolean overlap = facilityReserveRepository
+                    .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
+                            facRevNum, date, t.getEndTime(), t.getStartTime(),
+                            List.of(FacilityState.WAITING, FacilityState.APPROVED));
+
+            FacilityTimeDTO d = new FacilityTimeDTO();
+            d.setFacDate(date);
+            d.setStartTime(t.getStartTime());
+            d.setEndTime(t.getEndTime());
+            d.setAvailable(!holiday
+                    && !overlap
+                    && LocalDateTime.of(date, t.getEndTime()).isAfter(LocalDateTime.now()));
+            return d;
+        }).collect(Collectors.toList());
     }
 
-    // 예약 가능 여부 판단
+    // 예약 가능 여부
     @Override
-    public boolean isReservable(Long facilityNum, LocalDate date, LocalTime start, LocalTime end) {
+    @Transactional(readOnly = true)
+    public boolean isReservable(Long facRevNum, LocalDate date, LocalTime start, LocalTime end) {
         if (LocalDateTime.of(date, end).isBefore(LocalDateTime.now())) return false;
-        if (isHoliday(facilityNum, date)) return false;
-        return !facilityReserveRepository.existsByFacility_FacilityNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
-                facilityNum, date, end, start, List.of(FacilityState.WAITING, FacilityState.APPROVED));
+        if (getClosedDates(facRevNum, date, date).contains(date)) return false; // 휴무일 통합 체크
+
+        return !facilityReserveRepository
+                .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
+                        facRevNum, date, end, start,
+                        List.of(FacilityState.WAITING, FacilityState.APPROVED));
     }
 
     // 예약 신청 처리
     @Override
     @Transactional
     public void reserveFacility(FacilityReserveRequestDTO requestDTO) {
-        Facility facility = facilityRepository.findByFacName(requestDTO.getFacName())
+        Facility facility = facilityRepository.findById(requestDTO.getFacRevNum())
                 .orElseThrow(() -> new RuntimeException("시설 정보가 존재하지 않습니다."));
 
-        if (!isReservable(facility.getFacilityNum(), requestDTO.getFacDate(), requestDTO.getStartTime(), requestDTO.getEndTime())) {
-            throw new IllegalStateException("해당 시간은 이미 예약되어 있거나 예약할 수 없습니다.");
+        if (!isReservable(facility.getFacRevNum(),
+                requestDTO.getFacDate(),
+                requestDTO.getStartTime(),
+                requestDTO.getEndTime())) {
+            throw new IllegalStateException("해당 시간은 이미 예약되었거나 예약할 수 없습니다.");
         }
 
-        Member member = memberRepository.findById(requestDTO.getMemId())
-        	    .orElseThrow(() -> new RuntimeException("회원 정보가 존재하지 않습니다."));
-        
         FacilityReserve reserve = new FacilityReserve();
         reserve.setFacility(facility);
         reserve.setFacDate(requestDTO.getFacDate());
         reserve.setStartTime(requestDTO.getStartTime());
         reserve.setEndTime(requestDTO.getEndTime());
-        reserve.setMember(member);
+        // ★ 권장: JWT에서 현재 사용자 ID 추출해 Member 주입
+        // String currentMemId = SecurityContextHolder.getContext().getAuthentication().getName();
+        // Member member = memberRepository.findById(currentMemId)
+        //         .orElseThrow(() -> new RuntimeException("회원 정보가 존재하지 않습니다."));
+        // reserve.setMember(member);
+
         reserve.setReserveAt(LocalDateTime.now());
         reserve.setState(FacilityState.WAITING);
 
         facilityReserveRepository.save(reserve);
     }
 
-    // 내 예약 목록 조회
+    // 내 예약 목록 (마이페이지)
     @Override
+    @Transactional(readOnly = true)
     public List<FacilityReserveListDTO> getMyReservations(String memId) {
         return facilityReserveRepository.findByMember_MemIdOrderByReserveAtDesc(memId)
                 .stream()
                 .map(r -> {
-                    FacilityReserveListDTO dto = new FacilityReserveListDTO();
-                    dto.setFacRevNum(r.getFacRevNum());
-                    dto.setFacName(r.getFacility().getFacName());
-                    dto.setFacDate(r.getFacDate());
-                    dto.setStartTime(r.getStartTime());
-                    dto.setEndTime(r.getEndTime());
-                    dto.setState(r.getState());
-                    return dto;
+                    FacilityReserveListDTO d = new FacilityReserveListDTO();
+                    d.setReserveId(r.getReserveId());                    // 예약 PK
+                    d.setFacRevNum(r.getFacility().getFacRevNum());      // 시설 PK(옵션)
+                    d.setFacName(r.getFacility().getFacName());
+                    d.setFacDate(r.getFacDate());
+                    d.setStartTime(r.getStartTime());
+                    d.setEndTime(r.getEndTime());
+                    d.setState(r.getState());
+                    return d;
                 }).collect(Collectors.toList());
     }
 
-    // 관리자 예약 목록 조회
+    // 관리자 예약 목록
     @Override
+    @Transactional(readOnly = true)
     public List<FacilityReserveAdminDTO> getReservationsForAdmin(FacilityState state, LocalDate from, LocalDate to) {
         return facilityReserveRepository.searchForAdmin(state, from, to)
                 .stream()
                 .map(r -> {
-                    FacilityReserveAdminDTO dto = new FacilityReserveAdminDTO();
-                    dto.setFacRevNum(r.getFacRevNum());
-                    dto.setFacName(r.getFacility().getFacName());
-                    dto.setMemId(r.getMember().getMemId());
-                    dto.setFacDate(r.getFacDate());
-                    dto.setStartTime(r.getStartTime());
-                    dto.setEndTime(r.getEndTime());
-                    dto.setState(r.getState());
-                    dto.setReserveAt(r.getReserveAt());
-                    return dto;
+                    FacilityReserveAdminDTO d = new FacilityReserveAdminDTO();
+                    d.setReserveId(r.getReserveId());
+                    d.setFacRevNum(r.getFacility().getFacRevNum());
+                    d.setFacName(r.getFacility().getFacName());
+                    d.setMemId(r.getMember() != null ? r.getMember().getMemId() : null);
+                    d.setFacDate(r.getFacDate());
+                    d.setStartTime(r.getStartTime());
+                    d.setEndTime(r.getEndTime());
+                    d.setState(r.getState());
+                    d.setReserveAt(r.getReserveAt());
+                    return d;
                 }).collect(Collectors.toList());
     }
 
-    // 관리자 승인/거절 처리
+    // 관리자: 승인/거절 (현재 WAITING일 때만 상태 변경)
     @Override
     @Transactional
     public boolean updateReservationState(FacilityReserveApproveRequestDTO approveRequest) {
         int updated = facilityReserveRepository.updateStateIfCurrent(
-                approveRequest.getFacRevNum(),
+                approveRequest.getReserveId(),     // ← reserveId 로 변경
                 approveRequest.getState(),
-                FacilityState.WAITING);
+                FacilityState.WAITING
+        );
         return updated > 0;
     }
-    
-    // 사용자/관리자 에약 취소 처리 
+
+    // 예약 취소 (reserveId 기준)
     @Override
     @Transactional
-    public boolean cancelReservation(Long facRevNum, String requesterId) {
-        FacilityReserve reserve = facilityReserveRepository.findById(facRevNum)
-            .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+    public boolean cancelReservation(Long reserveId, String requesterId) {
+        FacilityReserve reserve = facilityReserveRepository.findById(reserveId)
+                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
 
-        Member member = memberRepository.findById(requesterId)
-            .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+        Member requester = memberRepository.findById(requesterId)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
-        boolean isAdmin = member.getRole() == MemberRole.ADMIN;
+        boolean isAdmin = requester.getRole() == MemberRole.ADMIN;
 
-        if (!isAdmin && !reserve.getMember().getMemId().equals(requesterId)) {
+        if (!isAdmin && (reserve.getMember() == null || !reserve.getMember().getMemId().equals(requesterId))) {
             throw new SecurityException("본인의 예약만 취소할 수 있습니다.");
         }
-
         if (reserve.getState() == FacilityState.CANCELLED || reserve.getState() == FacilityState.REJECTED) {
-            throw new IllegalStateException("이미 취소되었거나 처리된 예약입니다.");
+            throw new IllegalStateException("이미 취소/처리된 예약입니다.");
         }
-
         if (LocalDateTime.of(reserve.getFacDate(), reserve.getStartTime()).isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("이미 시작된 예약은 취소할 수 없습니다.");
         }
 
+        // 쿼리 업데이트 방식 대신 엔티티 변경(더 안전, 캐시 일관성)
         reserve.setState(FacilityState.CANCELLED);
         return true;
     }
 
-    // 휴무일 여부 확인
+    // 휴무일 여부 (단건)
     @Override
-    public boolean isHoliday(Long facilityNum, LocalDate date) {
-        return facilityHolidayRepository.existsByFacility_FacilityNumAndHolidayDate(facilityNum, date);
+    @Transactional(readOnly = true)
+    public boolean isHoliday(Long facRevNum, LocalDate date) {
+        return getClosedDates(facRevNum, date, date).contains(date);
     }
 
-    // 휴무일 리스트 조회
+    // 휴무일 리스트 (전체)
     @Override
-    public List<LocalDate> getHolidayDates(Long facilityNum) {
-        return facilityHolidayRepository.findByFacility_FacilityNum(facilityNum)
-                .stream()
-                .map(FacilityHoliday::getHolidayDate)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public List<LocalDate> getHolidayDates(Long facRevNum) {
+        // 기존 로직 유지: 전체 조회 후 합치기
+        var nat = publicHolidayRepository.findAll().stream().map(PublicHoliday::getDate);
+        var fac = facilityHolidayRepository.findByFacility_FacRevNum(facRevNum)
+                .stream().map(FacilityHoliday::getHolidayDate);
+
+        return Stream.concat(nat, fac)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    // 휴무일 리스트 (기간)
+    @Transactional(readOnly = true)
+    public List<LocalDate> getHolidayDates(Long facRevNum, LocalDate start, LocalDate end) {
+        return getClosedDates(facRevNum, start, end).stream()
+                .filter(d -> !d.isBefore(start) && !d.isAfter(end))
+                .sorted()
+                .toList();
     }
 
     // 휴무일 등록
     @Override
     @Transactional
     public void registerHoliday(FacilityHolidayDTO dto) {
-        if (facilityHolidayRepository.existsByFacility_FacilityNumAndHolidayDate(dto.getFacilityNum(), dto.getHolidayDate())) {
+        if (facilityHolidayRepository.existsByFacility_FacRevNumAndHolidayDate(dto.getFacRevNum(), dto.getHolidayDate())) {
             throw new IllegalStateException("이미 등록된 휴무일입니다.");
         }
 
-        Facility facility = facilityRepository.findById(dto.getFacilityNum())
+        Facility facility = facilityRepository.findById(dto.getFacRevNum())
                 .orElseThrow(() -> new RuntimeException("해당 시설을 찾을 수 없습니다."));
 
         FacilityHoliday holiday = new FacilityHoliday();
@@ -293,7 +343,7 @@ public class FacilityServiceImpl implements FacilityService {
     @Transactional
     public void deleteHoliday(Long holidayId) {
         FacilityHoliday holiday = facilityHolidayRepository.findById(holidayId)
-                .orElseThrow(() -> new RuntimeException("휴무일 정보를 찾을 수 없습니다"));
+                .orElseThrow(() -> new RuntimeException("휴무일 정보를 찾을 수 없습니다."));
         facilityHolidayRepository.delete(holiday);
     }
 }

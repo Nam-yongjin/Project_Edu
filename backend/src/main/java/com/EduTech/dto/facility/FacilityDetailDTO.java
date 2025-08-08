@@ -9,12 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FacilityDetailDTO {
-    private String facName;			// 장소명.
-    private int capacity;			// 수용인원
-    private String facItem;			// 구비품목
-    private String etc;				// 기타 유의사항
-    private String availableTime;	// 에약 가능 시간
-    private String facInfo;       	// 시설 소개
-
-    private List<FacilityImageDTO> images;  // 이미지 정보 리스트
+    private Long facRevNum;         // 추가 권장: 장소 식별자
+    private String facName;
+    private int capacity;
+    private String facItem;
+    private String etc;
+    private String availableTime;
+    private String facInfo;
+    private List<FacilityImageDTO> images;
 }

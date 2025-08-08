@@ -8,5 +8,5 @@ import java.util.List;
 public interface FacilityImageRepository extends JpaRepository<FacilityImage, Long> {
 
     // 특정 시설에 연결된 이미지 리스트.
-    List<FacilityImage> findByFacility_FacilityNum(Long facilityNum);
+	List<FacilityImage> findByFacility_FacRevNum(Long facRevNum);
 }
