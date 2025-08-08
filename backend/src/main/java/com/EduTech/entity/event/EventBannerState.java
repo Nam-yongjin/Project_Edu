@@ -1,6 +1,7 @@
 package com.EduTech.entity.event;
 
 public enum EventBannerState {
+	
 	YES("배너 등록"),
     NO("배너 등록");
 
@@ -13,4 +14,5 @@ public enum EventBannerState {
     public String getLabel() {
         return label;
     }
+    
 }

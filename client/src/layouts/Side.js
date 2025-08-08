@@ -35,17 +35,17 @@ const Side = ({ isOpen, onClose }) => {
             ></div>
 
             {/* 사이드바 */}
-            <div className={`fixed top-0 right-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+            <div className={`fixed top-0 right-0 h-full lg:w-64 sm:w-56 w-48 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h2 className="text-xl font-bold">🛠 메뉴</h2>
+                    <h2 className="newText-xl font-bold">🛠 메뉴</h2>
                     <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                         <img src={cancel} alt="검색" className="h-[20px] w-[20px] cursor-pointer active:bg-gray-200" />
                         {/*<a href="https://www.flaticon.com/kr/free-icons/" title="닫기 아이콘">닫기 아이콘 제작자: Roundicons - Flaticon</a>*/}
                     </button>
                 </div>
 
-                <nav className="p-4">
+                <nav className="newText-base p-4">
                     <ul className="space-y-2">
                         {loginState && loginState.memId ?
                             <>

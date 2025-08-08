@@ -47,11 +47,17 @@ const EvtBannerList = () => {
     } catch (err) {
       console.error("배너 등록 실패:", err);
       if (err.response && err.response.data) {
-        alert(err.response.data); // 예: "해당 프로그램에는 이미 배너가 등록되어 있습니다."
+        alert(err.response.data);
       } else {
         alert("배너 등록 중 오류가 발생했습니다.");
       }
     }
+  };
+
+  // 배너 삭제 요청 (기능 미구현 상태 - 틀만 존재)
+  const handleBannerDelete = (eventNum) => {
+    console.log("배너 삭제 요청:", eventNum);
+    // TODO: 삭제 API 연동 예정
   };
 
   return (
@@ -83,16 +89,28 @@ const EvtBannerList = () => {
               <p><strong>상태:</strong> <span className="text-blue-600">{event.state || '정보 없음'}</span></p>
             </div>
 
-            {/* 배너 등록 버튼 */}
-            <div className="ml-4">
-              {event.evtFileNum ? (
-                <button
-                  disabled
-                  className="px-4 py-2 bg-gray-400 text-white text-sm rounded cursor-not-allowed"
-                >
-                  배너 등록 완료
-                </button>
+            {/* 버튼 영역 */}
+            <div className="ml-4 flex flex-col items-end space-y-2">
+              {event.bannerState === "YES" ? (
+                <>
+                  {/* 배너 등록 완료 버튼 */}
+                  <button
+                    disabled
+                    className="px-4 py-2 bg-gray-400 text-white text-sm rounded cursor-not-allowed"
+                  >
+                    배너 등록 완료
+                  </button>
+
+                  {/* 배너 등록 제거 버튼 (기능은 틀만 존재) */}
+                  <button
+                    onClick={() => handleBannerDelete(event.eventNum)}
+                    className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                  >
+                    배너 등록 제거
+                  </button>
+                </>
               ) : (
+                // 배너 등록 버튼
                 <button
                   onClick={() => handleBannerRegister(event.eventNum)}
                   className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"

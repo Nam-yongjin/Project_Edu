@@ -8,7 +8,7 @@ const SubAdminHeader = () => {
         <div className="bg-blue-100 w-full pt-8 pb-8">
             <div className="max-w-screen-xl mx-auto ">
                 <div className="flex items-center justify-between">
-                    <div className="text-4xl font-bold text-gray-800">
+                    <div className="newText-4xl font-bold text-gray-800">
                         관리자 페이지
                     </div>
                     <div className="w-1/4">
@@ -16,12 +16,12 @@ const SubAdminHeader = () => {
                     </div>
                 </div>
 
-                <div className="border-b-2 border-blue-500 pb-4">
+                <div className="newText-lg border-b-2 border-blue-500 pb-4">
                     <ul className="flex">
                         <li className="mr-6 pb-2">
                             <Link
                                 to={`/admin/members`}
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/members") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/members") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 회원관리
@@ -30,7 +30,7 @@ const SubAdminHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link
                                 to="/admin/banner"
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 배너관리
@@ -39,7 +39,7 @@ const SubAdminHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link
                                 to="/event/banner"
-                                className={`text-lg font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/event/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 프로그램 배너 관리

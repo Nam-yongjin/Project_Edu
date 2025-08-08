@@ -23,11 +23,12 @@ public interface EventBannerRepository extends JpaRepository<EventBanner, Long> 
 			""")
 	List<EventBanner> findValidBanners(@Param("today") LocalDateTime today);
 
-	// MAX 3개로 제한
+	// MAX 3개로 제한 
 	@Query("""
 			    SELECT COUNT(pb) FROM EventBanner pb
 			    WHERE pb.eventInfo.eventEndPeriod >= :today
 			""")
 	long countValidBanners(@Param("today") LocalDateTime today);
+	
 	
 }

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import SearchComponent from "../../components/demonstration/SearchComponent";
-import { getRental, getRentalSearch, deleteRental } from "../../api/demApi";
+import { getRental, getRentalSearch, deleteRental, getResDate } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import { useNavigate } from "react-router-dom";
-
+import CalendarComponent from "./CalendarComponent";
 const RentalComponent = () => {
     const initState = {
         content: [],
@@ -11,17 +11,20 @@ const RentalComponent = () => {
         currentPage: 0,
     };
 
-    const [search, setSearch] = useState();
-    const [type, setType] = useState("companyName");
-    const [pageData, setPageData] = useState(initState);
-    const [current, setCurrent] = useState(0);
-    const [listData, setListData] = useState({ content: [] });
-    const [sortBy, setSortBy] = useState("applyAt");
-    const [sort, setSort] = useState("asc");
-    const [statusFilter, setStatusFilter] = useState("total");
-    const navigate = useNavigate();
-    const [selectedItems, setSelectedItems] = useState(new Set());
-
+    const [search, setSearch] = useState(); // 검색어
+    const [type, setType] = useState("companyName"); // 검색 타입
+    const [pageData, setPageData] = useState(initState); // 페이지 데이터
+    const [current, setCurrent] = useState(0); // 현재 페이지
+    const [listData, setListData] = useState({ content: [] }); // 받아올 content 데이터
+    const [sortBy, setSortBy] = useState("applyAt"); // 정렬 칼럼명
+    const [sort, setSort] = useState("asc"); // 정렬 방식
+    const [statusFilter, setStatusFilter] = useState("total"); // state에 따라 필터링(ex wait,accept)
+    const navigate = useNavigate(); // 원하는 곳으로 이동할 변수
+    const [selectedItems, setSelectedItems] = useState(new Set()); // 체크박스 선택 항목(중복 방지를 위해 set사용)
+    const [showModifyModal, setShowModifyModal] = useState(false);
+    const [selectedDemNum, setSelectedDemNum] = useState();
+    const [disabledDates, setDisabledDates] = useState([]);
+    const [selectedDates, setSelectedDates] = useState([]);
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
@@ -91,7 +94,7 @@ const RentalComponent = () => {
             .some(item => item.state === "WAIT");
 
         if (invalidItems) {
-            alert("선택한 항목 중 'WAIT' 상태가 하나도 없습니다. 예약 취소가 불가능합니다.");
+            alert("예약 취소가 불가능한 상태입니다.");
             return;
         }
 
@@ -101,30 +104,32 @@ const RentalComponent = () => {
         window.location.reload();
     };
 
-    const handleActionClick = (demNum, action) => {
+    const handleActionClick = async (demNum, action) => {
         const item = listData.content.find((item) => item.demNum === demNum);
         if (!item) return;
 
         if (action === "예약변경") {
             if (item.state !== "WAIT") {
-                alert(`${item.state} 상태이므로 예약 변경이 불가능합니다.`);
+                alert(`대기 상태에서만 예약 변경이 가능합니다.`);
                 return;
             }
-            alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
-        } else if (action === "대여연장") {
-            if (item.state !== "ACCEPT") {
-                alert(`${item.state} 상태이므로 대여 연장이 불가능합니다.`);
-                return;
+
+            try {
+                setSelectedDemNum(demNum);
+                setSelectedDates([]); // 초기화
+
+                const resDisabled = await getResDate(
+                    demNum
+                );
+                console.log(resDisabled);
+                setDisabledDates(resDisabled);
+               // setShowModifyModal(true);
+            } catch (err) {
+                console.error("예약 정보 조회 실패", err);
             }
-            alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
-        } else if (action === "반납") {
-            if (item.state !== "ACCEPT") {
-                alert(`${item.state} 상태이므로 반납이 불가능합니다.`);
-                return;
-            }
-            alert(`상품 ${demNum}에 대해 '${action}' 동작 실행`);
         }
     };
+
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -155,7 +160,7 @@ const RentalComponent = () => {
                             <th className="py-3 px-4 text-left">기업명</th>
                             <th className="py-3 px-4 text-left">대여개수</th>
 
-                            {["대여시작일", "대여종료일", "신청일"].map((col) => (
+                            {["startDate", "endDate", "applyAt"].map((col) => (
                                 <th
                                     key={col}
                                     onClick={() => handleSortChange(col)}
@@ -211,11 +216,10 @@ const RentalComponent = () => {
                             const isCancelled = item.state === "CANCEL";
 
                             return (
-                                <tr
-                                    key={item.demNum}
-                                    className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${
-                                        isCancelled ? "bg-gray-100 text-gray-400" : ""
-                                    }`}
+
+                                <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}`}
+                                    className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : ""
+                                        }`}
                                 >
                                     {/* 체크박스 */}
                                     <td className="py-3 px-4 text-center">
@@ -294,6 +298,55 @@ const RentalComponent = () => {
                     예약 취소
                 </button>
             </div>
+
+            {showModifyModal && (
+                <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded shadow-md w-[500px]">
+                        <h2 className="text-xl mb-4 font-bold">예약 날짜 변경</h2>
+
+                        <CalendarComponent
+                            selectedDate={selectedDates}
+                            setSelectedDate={setSelectedDates}
+                            reservationQty={1} // 고정 or 전달된 값 사용
+                            disabledDates={disabledDates}
+                        />
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                className="bg-gray-300 px-4 py-2 rounded"
+                                onClick={() => setShowModifyModal(false)}
+                            >
+                                취소
+                            </button>
+                            <button
+                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                onClick={async () => {
+                                    if (selectedDates.length < 1) {
+                                        alert("변경할 날짜를 선택하세요.");
+                                        return;
+                                    }
+                                    const sortedDates = [...selectedDates].sort();
+                                    const startDate = sortedDates[0];
+                                    const endDate = sortedDates[sortedDates.length - 1];
+
+                                    try {
+                                        //await postRes(startDate, endDate, selectedDemNum, 1); // 변경된 값으로 업데이트
+                                        alert("예약이 변경되었습니다.");
+                                        setShowModifyModal(false);
+                                        // 데이터 다시 로딩
+                                        //fetchData(currentPage, selected);  // currentPage: 현재 페이지 번호  selected: 선택된 날짜 (또는 항목)
+                                    } catch (err) {
+                                        alert("예약 변경에 실패했습니다.");
+                                        console.error(err);
+                                    }
+                                }}
+                            >
+                                변경
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="flex justify-center mt-6">
                 <PageComponent

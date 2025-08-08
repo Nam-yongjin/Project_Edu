@@ -10,7 +10,7 @@ const SocialLoginComponent = () => {
 
     return (
         <div className="flex flex-col mt-8">
-            <div className="text-center font-bold text-blue-600">로그인시 자동 가입</div>
+            <div className="newText-base text-center font-bold text-blue-600">로그인시 자동 가입</div>
             <div className="flex justify-center	w-full">
                 <div className="m-3">
                     <Link to={kakaoLink}><img className="active:bg-gray-200" src={kakaoLogo} /></Link>

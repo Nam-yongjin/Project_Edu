@@ -119,57 +119,59 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
-	// 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
-	@Override
-	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
-			DemonstrationSearchDTO demonstrationSearchDTO) {
-		Integer pageCount = demonstrationSearchDTO.getPageCount();
-		String type = demonstrationSearchDTO.getType();
-		String search = demonstrationSearchDTO.getSearch();
-		String sortBy = demonstrationSearchDTO.getSortBy();
-		String sort = demonstrationSearchDTO.getSort();
-		String statusFilter=demonstrationSearchDTO.getStatusFilter();
-		
-		if (pageCount == null || pageCount < 0)
-			pageCount = 0;
-		if (!StringUtils.hasText(sortBy))
-			sortBy = "applyAt";
-		if (!StringUtils.hasText(sort))
-			sort = "desc";
-
-		// 페이지 사이즈를 10으로 고정
-		Pageable pageable = PageRequest.of(pageCount, 10);
-
-		Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
-				sortBy, sort,statusFilter); // spec를 사용해 동적으로 정렬 및 검색어 기능 처리
-		
-		Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable); 
-		
 	
-		Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
-			Demonstration dem = reserve.getDemonstration();
-			DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
-			dto.setDemNum(dem.getDemNum());
-			dto.setDemName(dem.getDemName());
-			dto.setBItemNum(reserve.getBItemNum());
-			dto.setStartDate(reserve.getStartDate());
-			dto.setEndDate(reserve.getEndDate());
-			dto.setApplyAt(reserve.getApplyAt());
-			dto.setState(reserve.getState());
-			
-			// spec에서 demNum을 받아와 그를 통해 reg에서 memId를 가져와 company에서 기업명 받아오는 코드. 
-			Optional<Company> optionalCompany = memberRepository.findCompanyById(demonstrationRegistrationRepository.selectRegMemId(reserve.getDemonstration().getDemNum())); 
-			String companyName = optionalCompany.map(Company::getCompanyName) // Optional<Company> -> Optional<String>
-					.orElse("회사명 없음"); // 값이 없으면 기본값 지정
-			// 이미지 리스트 및 기업 이름 추가
-			dto.setCompanyName(companyName);
-			dto.setImageList(demonstrationImageRepository.selectDemImage(dem.getDemNum()));
-			return dto;
-		});
-		
-		return new PageResponseDTO<>(dtoPage);
-	}
+	   @Override
+	   public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
+	         DemonstrationSearchDTO demonstrationSearchDTO) {
+	      Integer pageCount = demonstrationSearchDTO.getPageCount();
+	      String type = demonstrationSearchDTO.getType();
+	      String search = demonstrationSearchDTO.getSearch();
+	      String sortBy = demonstrationSearchDTO.getSortBy();
+	      String sort = demonstrationSearchDTO.getSort();
+	      String statusFilter=demonstrationSearchDTO.getStatusFilter();
+	      
+	      if (pageCount == null || pageCount < 0)
+	         pageCount = 0;
+	      if (!StringUtils.hasText(sortBy))
+	         sortBy = "applyAt";
+	      if (!StringUtils.hasText(sort))
+	         sort = "desc";
 
+	      // 페이지 사이즈를 10으로 고정
+	      Pageable pageable = PageRequest.of(pageCount, 10);
+
+	      Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
+	            sortBy, sort,statusFilter); // spec를 사용해 동적으로 정렬 및 검색어 기능 처리
+	      
+	      Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable); 
+	      
+	   
+	      Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
+	         Demonstration dem = reserve.getDemonstration();
+	         DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
+	         dto.setDemNum(dem.getDemNum());
+	         dto.setDemName(dem.getDemName());
+	         dto.setBItemNum(reserve.getBItemNum());
+	         dto.setStartDate(reserve.getStartDate());
+	         dto.setEndDate(reserve.getEndDate());
+	         dto.setApplyAt(reserve.getApplyAt());
+	         dto.setState(reserve.getState());
+	         
+	         // spec에서 demNum을 받아와 그를 통해 reg에서 memId를 가져와 company에서 기업명 받아오는 코드. 
+	         Optional<Company> optionalCompany = memberRepository.findCompanyById(demonstrationRegistrationRepository.selectRegMemId(reserve.getDemonstration().getDemNum())); 
+	         String companyName = optionalCompany.map(Company::getCompanyName) // Optional<Company> -> Optional<String>
+	               .orElse("회사명 없음"); // 값이 없으면 기본값 지정
+	         // 이미지 리스트 및 기업 이름 추가
+	         dto.setCompanyName(companyName);
+	         dto.setImageList(demonstrationImageRepository.selectDemImage(dem.getDemNum())); 
+	         return dto;
+	      });
+	      
+	      return new PageResponseDTO<>(dtoPage);
+	   }
+
+
+	
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
 	@Override
 	public void rentalDateChange(DemonstrationResRentalDTO demonstrationResRentalDTO) {

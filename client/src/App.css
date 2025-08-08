@@ -40,8 +40,8 @@
 
 /* 페이지 그림자 테두리 */
 .page-shadow{
-   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
-  box-shadow: 0 10px 15px -3px rgba(156, 163, 175, 0.5), 0 4px 6px -4px rgba(156, 163, 175, 0.5); /* shadow-gray-400 */
+   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-xl */
+  box-shadow: 0 20px 25px -5px rgba(156, 163, 175, 0.5), 0 10px 10px -5px rgba(156, 163, 175, 0.5); /* shadow-gray-400 */
   border-radius: 0.5rem; /* rounded-lg */
 }
 
@@ -57,6 +57,106 @@
 }
 .input-focus:focus {
   box-shadow: 0 0 0 2px #3b82f6; /* focus:ring-2, focus:ring-blue-500 */
+}
+
+/*text-sm*/
+.newText-sm {
+  font-size: 0.75rem;
+}
+@media (min-width: 1024px) {
+  .newText-sm {
+    font-size: 0.875rem;
+  }
+}
+
+/*기본 글자: text-base*/
+.newText-base {
+  font-size: 0.75rem;
+}
+@media (min-width: 640px) {
+  .newText-base {
+    font-size: 0.875rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-base {
+    font-size: 1rem;
+  }
+}
+
+/*text-lg*/
+.newText-lg {
+  font-size: 0.875rem;
+}
+@media (min-width: 640px) {
+  .newText-lg {
+    font-size: 1rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-lg {
+    font-size: 1.125rem;
+  }
+}
+
+/*text-xl*/
+.newText-xl {
+  font-size: 1rem;
+}
+@media (min-width: 640px) {
+  .newText-xl {
+    font-size: 1.125rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-xl {
+    font-size: 1.25rem;
+  }
+}
+
+/*text-2xl*/
+.newText-2xl {
+  font-size: 1.125rem;
+}
+@media (min-width: 640px) {
+  .newText-2xl {
+    font-size: 1.25rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-2xl {
+    font-size: 1.5rem;
+  }
+}
+
+/*text-3xl*/
+.newText-3xl {
+  font-size: 1.25rem;
+}
+@media (min-width: 640px) {
+  .newText-3xl {
+    font-size: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-3xl {
+    font-size: 1.875rem;
+  }
+}
+
+/*text-4xl*/
+.newText-4xl {
+  font-size: 1.5rem;
+}
+@media (min-width: 640px) {
+  .newText-4xl {
+    font-size: 1.875rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-4xl {
+    font-size: 2.25rem;
+  }
 }
 
 /* 파란버튼 */

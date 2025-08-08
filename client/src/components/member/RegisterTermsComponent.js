@@ -78,15 +78,15 @@ const RegisterTermsComponent = () => {
         <div className="mb-20 pt-20">
             <div className="max-w-screen-md">
 
-                <div className="text-center text-2xl font-bold mb-4">이용 약관 동의</div>
+                <div className="newText-2xl text-center font-bold mb-4">이용 약관 동의</div>
 
                 <div className="mt-20">
-                    <div className="text-lg font-bold mb-4">서울 에듀테크 소프트랩 이용약관</div>
+                    <div className="newText-lg font-bold mb-4">서울 에듀테크 소프트랩 이용약관</div>
 
-                    <div className="p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
+                    <div className="newText-base p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
                         {registerText}
                     </div>
-                    <label className="float-right pt-4">
+                    <label className="newText-base float-right pt-4">
                         <input
                             type="checkbox"
                             name="register"
@@ -98,11 +98,11 @@ const RegisterTermsComponent = () => {
                     </label>
                 </div>
                 <div className="mt-20">
-                    <div className="text-lg font-bold mb-4">개인 정보 수집 및 이용 동의</div>
-                    <div className="p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
+                    <div className="newText-lg font-bold mb-4">개인 정보 수집 및 이용 동의</div>
+                    <div className="newText-base p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
                         {agreeText}
                     </div>
-                    <label className="float-right pt-4">
+                    <label className="newText-base float-right pt-4">
                         <input
                             type="checkbox"
                             name="agree"
@@ -114,11 +114,11 @@ const RegisterTermsComponent = () => {
                     </label>
                 </div>
                 <div className="mt-20">
-                    <div className="text-lg font-bold mb-4">개인정보 처리 방침</div>
-                    <div className="p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
+                    <div className="newText-lg font-bold mb-4">개인정보 처리 방침</div>
+                    <div className="newText-base p-4 border border-gray-400 h-64 overflow-y-scroll text-left whitespace-pre-wrap bg-gray-100 rounded">
                         {processText}
                     </div>
-                    <label className="float-right pt-4">
+                    <label className="newText-base float-right pt-4">
                         <input
                             type="checkbox"
                             name="process"
@@ -129,7 +129,7 @@ const RegisterTermsComponent = () => {
                         개인정보 처리 동의 <strong className="text-red-600">[필수]</strong>
                     </label>
                 </div>
-                <div className="py-10">
+                <div className="newText-base py-10">
                     <label className="float-right pt-8">
                         <input
                             type="checkbox"
@@ -143,8 +143,8 @@ const RegisterTermsComponent = () => {
             </div>
 
             <div className="mt-20 py-2 text-center">
-                <h2 className="text-xl font-bold mb-4">회원 유형 선택</h2>
-                <div className="border border-gray-400 flex flex-row gap-3 justify-center bg-gray-200 mx-auto w-1/3 p-2 rounded">
+                <h2 className="newText-xl font-bold mb-4">회원 유형 선택</h2>
+                <div className="newText-base w-[250px] border border-gray-400 flex flex-row gap-3 justify-center bg-gray-200 mx-auto p-2 rounded">
                     {['member', 'student', 'teacher', 'company'].map((type) => (
                         <label key={type}>
                             <input
@@ -163,7 +163,7 @@ const RegisterTermsComponent = () => {
             </div>
             <div className="text-center">
                 <button
-                    className="positive-button mt-4 w-[60px]"
+                    className="newText-base positive-button mt-4 w-[60px]"
                     onClick={handleSubmit}
                 >
                     다음

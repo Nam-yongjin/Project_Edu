@@ -1,6 +1,7 @@
 package com.EduTech.entity.event;
 
 public enum RevState {
+	
     APPROVED("수락"),
     WAITING("대기"),
     CANCEL("취소");
@@ -14,4 +15,5 @@ public enum RevState {
     public String getLabel() {
         return label;
     }
+    
 }

@@ -21,6 +21,7 @@ const DetailComponent = ({ demNum }) => {
     const [showQtyModal, setShowQtyModal] = useState(false);
     const [reservationQty, setReservationQty] = useState(1);
     const [reserveCheck, setReserveCheck] = useState(false);
+    const [selectedDate, setSelectedDate] = useState([]); // 캘린더에서 선택한 날짜를 저장하는 state 변수
     const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
@@ -31,7 +32,6 @@ const DetailComponent = ({ demNum }) => {
         d.setDate(d.getDate() + 1);
         return d;
     });
-    const [selectedDate, setSelectedDate] = useState([]); // 캘린더에서 선택한 날짜를 저장하는 state 변수
 
     useEffect(() => {
         const loadData = async () => { // 상세페이지의 정보 및 이미지 불러오는 코드

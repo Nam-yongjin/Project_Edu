@@ -74,7 +74,7 @@ const NoticeAddComponent = () => {
 
         try {
             const formData = new FormData();
-            //dto 객체를 JSON으로 감싸서 Blod로 만들기(하나의 개체로 구성된 바이너리 데이터의 집합)
+            //dto 객체를 JSON으로 감싸서 Blob로 만들기(하나의 개체로 구성된 바이너리 데이터의 집합)
             const dto = {
                 title: notice.title || "",
                 content: notice.content || "",
@@ -160,7 +160,7 @@ const NoticeAddComponent = () => {
                     )}
                 </div>
                 {/* 고정 설정 */}
-                <div className="p-4 bg-blue-5- border-l-4 border-blue-400 rounded-md">
+                <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-md">
                     <label className="flex items-center cursor-pointer">
                         <input
                             type="checkbox"

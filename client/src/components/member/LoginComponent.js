@@ -52,10 +52,10 @@ const LoginComponent = () => {
 
     return (
         <div className="">
-            <div className="page-shadow my-10 p-10 w-[500px]">
-                <div className="text-4xl text-center font-bold mb-6">로그인</div>
+            <div className="page-shadow my-10 p-10 lg:w-[500px] sm:w-[450px] w-[400px]">
+                <div className="newText-4xl text-center font-bold mb-6">로그인</div>
 
-                <div className="mb-4">
+                <div className="newText-base mb-4">
                     <label className="font-bold block">아이디</label>
                     <input
                         name="memId"
@@ -67,7 +67,7 @@ const LoginComponent = () => {
                     />
                 </div>
 
-                <div className="mb-4">
+                <div className="newText-base mb-4">
                     <label className="font-bold block">비밀번호</label>
                     <input
                         name="pw"
@@ -81,8 +81,8 @@ const LoginComponent = () => {
 
                 {cooldown > 0 ?
                     <>
-                        <div className="flex justify-center font-bold">{cooldown}초 후 로그인 재시도</div>
-                        <div className="flex justify-center">
+                        <div className="newText-base flex justify-center font-bold">{cooldown}초 후 로그인 재시도</div>
+                        <div className="newText-base flex justify-center">
 
                             <button
                                 className="positive-button w-full"
@@ -92,7 +92,7 @@ const LoginComponent = () => {
                         </div>
                     </>
                     :
-                    <div className="flex justify-center">
+                    <div className="newText-base flex justify-center">
                         <button
                             onClick={handleClickLogin}
                             className="positive-button w-full"
@@ -102,10 +102,10 @@ const LoginComponent = () => {
                     </div>}
 
 
-                <div className="text-center mt-4">
-                    <Link to="/findId" className="text-sm text-gray-600 hover:underline">아이디 찾기</Link>
+                <div className="newText-sm text-center mt-4">
+                    <Link to="/findId" className="text-gray-600 hover:underline">아이디 찾기</Link>
                     <span className="mx-2">|</span>
-                    <Link to="/resetPw" className="text-sm text-gray-600 hover:underline">비밀번호 재설정</Link>
+                    <Link to="/resetPw" className="text-gray-600 hover:underline">비밀번호 재설정</Link>
                 </div>
                 <SocialLoginComponent />
             </div>
