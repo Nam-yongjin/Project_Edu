@@ -22,7 +22,7 @@ const SubAboutHeader = () => {
                             <Link 
                                 to="/about/greeting" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
-                                    location.pathname.includes("/greeting") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    location.pathname.includes("/about/greeting") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >
                                 인사말
@@ -32,7 +32,7 @@ const SubAboutHeader = () => {
                             <Link 
                                 to="/about/business" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
-                                    location.pathname.includes("/business") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    location.pathname.includes("/about/business") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >
                                 사업소개
@@ -42,7 +42,7 @@ const SubAboutHeader = () => {
                             <Link 
                                 to="/about/direction"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
-                                    location.pathname.includes("/direction") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    location.pathname.includes("/about/direction") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >
                                 오시는 길

@@ -40,8 +40,8 @@
 
 /* 페이지 그림자 테두리 */
 .page-shadow{
-   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
-  box-shadow: 0 10px 15px -3px rgba(156, 163, 175, 0.5), 0 4px 6px -4px rgba(156, 163, 175, 0.5); /* shadow-gray-400 */
+   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-xl */
+  box-shadow: 0 20px 25px -5px rgba(156, 163, 175, 0.5), 0 10px 10px -5px rgba(156, 163, 175, 0.5); /* shadow-gray-400 */
   border-radius: 0.5rem; /* rounded-lg */
 }
 
