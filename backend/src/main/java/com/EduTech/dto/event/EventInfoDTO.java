@@ -32,20 +32,21 @@ public class EventInfoDTO {
 
     private EventState state;
     
-    private RevState revState;
-    
     private EventCategory category;
     
-    @Builder.Default
-    private EventBannerState bannerState  = EventBannerState.NO;
+    private EventBannerState bannerState;
 
     @NotNull(message = "모집 인원은 필수입니다.")
     private Integer maxCapacity;
 
     private Integer currCapacity; // 현재 신청 인원
+    
     private String place;
     
     private String etc;
+//
+    @Builder.Default
+    private RevState revState = RevState.WAITING;
 
     @NotNull(message = "신청 시작일은 필수입니다.")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
@@ -83,5 +84,5 @@ public class EventInfoDTO {
     // 첨부파일 리스트
     @Builder.Default
     private List<EventFileDTO> attachList = new ArrayList<>();
-    
+
 }
