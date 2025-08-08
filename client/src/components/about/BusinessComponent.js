@@ -13,15 +13,15 @@ const BusinessComponent = () => {
     }, []);
 
     return (
-        <div className="">
-            <div className="mx-auto max-w-screen-xl my-10 border-b border-gray-300">
+        <div className="mx-auto max-w-screen-xl">
+            <div className="min-blank my-10 border-b border-gray-300">
                 <div className="newText-2xl font-bold">사업소개</div>
                 <div className="newText-xl font-semibold py-8">에듀테크 소프트랩이란?</div>
                 <div className="newText-lg pb-8" style={{ whiteSpace: 'pre-wrap' }}>{businessText}</div>
             </div>
-            <div className="mx-auto max-w-screen-xl my-10">
+            <div className="min-blank my-10">
                 <div className="newText-2xl font-bold pb-8">주요사업</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:flex-row gap-10 text-center items-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:flex-row gap-10 text-center items-center justify-items-center">
                     <div className="newText-xl shadow-2xl shadow-gray-500 rounded-3xl px-16 py-16 font-semibold 
                     lg:w-[330px] sm:w-[310px] w-[290px] lg:h-[400px] sm:h-[370px] h-[340px] hover:scale-105 ease-in-out duration-300">
                         에듀테크 프로그램 운영

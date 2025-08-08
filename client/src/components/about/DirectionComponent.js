@@ -74,17 +74,17 @@ const DirectionComponent = () => {
     return (
         <div>
             <div className="mx-auto max-w-screen-xl my-10">
-                <div className="newText-2xl font-bold mb-8">오시는 길</div>
+                <div className="newText-2xl min-blank font-bold mb-8">오시는 길</div>
                 {mapError ? (
                     <img src={defaultImage} alt="지도 로딩 실패" className="lg:h-[600px] md:h-[500px] sm:h-[400px] h-[300px] w-full object-cover" />
                 ) : (
-                    <div id="map" className="lg:h-[600px] md:h-[500px] sm:h-[400px] h-[300px] mt-4" />
+                    <div id="map" className="min-blank lg:h-[600px] md:h-[500px] sm:h-[400px] h-[300px]" />
                 )}
             </div>
 
             <div className="pb-4 mx-auto max-w-screen-xl border-b border-gray-300">
-                <div className="newText-2xl font-bold my-8">주소 및 연락처</div>
-                <div className="newText-base my-4">
+                <div className="newText-2xl min-blank font-bold my-8">주소 및 연락처</div>
+                <div className="newText-base min-blank my-4">
                     {addr}
                     <br />
                     {addrDetail}

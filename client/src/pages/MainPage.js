@@ -61,8 +61,8 @@ const MainPage = () => {
                         </Swiper>
                     )}
 
-                    <div className="absolute top-1/4 left-0 w-full z-20 pointer-events-none select-none ">
-                        <div className="max-w-screen-xl mx-auto px-4">
+                    <div className="min-blank absolute top-1/4 left-0 w-full z-20 pointer-events-none select-none">
+                        <div className="max-w-screen-xl mx-auto">
                             <div className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
                                 서울<br />
                                 에듀테크<br />
@@ -72,11 +72,11 @@ const MainPage = () => {
                     </div>
                 </div>
                 <div className="my-10 max-w-screen-xl mx-auto">
-                    <div className="my-10">소개 요약 칸</div>
-                    <div className="my-10">프로그램소개 칸</div>
-                    <div className="my-10">지원사업 소개 칸</div>
-                    <div className="my-10">기업 소개 칸</div>
-                    <div className="my-10">공지사항 칸</div>
+                    <div className="min-blank my-10">소개 요약 칸</div>
+                    <div className="min-blank my-10">프로그램소개 칸</div>
+                    <div className="min-blank my-10">지원사업 소개 칸</div>
+                    <div className="min-blank my-10">기업 소개 칸</div>
+                    <div className="min-blank my-10">공지사항 칸</div>
                 </div>
             </BasicLayout>
         </div>
