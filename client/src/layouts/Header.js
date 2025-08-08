@@ -91,6 +91,7 @@ const Header = () => {
       link: "/admin",
       sub: [
         { name: "회원 관리", link: "/admin/members" },
+        { name: "배너 관리", link: "/admin/banner" },
         { name: "프로그램 관리", link: "/event/banner" },
         { name: "공간 관리", link: "/" },
         { name: "실증 관리", link: "/" },
@@ -119,7 +120,7 @@ const Header = () => {
               <div key={idx} className="relative text-center flex-1">
                 <Link
                   to={menu.link}
-                  className="text-lg font-semibold hover:text-blue-400 active:text-blue-600 block"
+                  className="text-lg font-semibold hover:text-blue-400 active:text-blue-600 block hover:scale-105 ease-in-out duration-300"
                 >
                   {menu.name}
                 </Link>
@@ -139,12 +140,12 @@ const Header = () => {
           >
             <div className={`mx-auto grid gap-6 text-base text-gray-700 px-4 ${loginState.role === "ADMIN" ? "grid-cols-6" : "grid-cols-5"}`}>
               {mainMenus.map((menu, idx) => (
-                <div key={idx} className="space-y-3 text-center">
+                <div key={idx} className="space-y-3 text-center ">
                   {menu.sub.map((item, subIdx) => (
                     <div key={subIdx}>
                       <Link
                         to={item.link}
-                        className="hover:text-blue-400 active:text-blue-600 block px-2 py-2 rounded hover:bg-blue-100 active:bg-blue-200"
+                        className="hover:text-blue-400 active:text-blue-600 block px-2 py-2 rounded hover:bg-blue-100 active:bg-blue-200 hover:scale-105 ease-in-out duration-300"
                       >
                         {item.name}
                       </Link>

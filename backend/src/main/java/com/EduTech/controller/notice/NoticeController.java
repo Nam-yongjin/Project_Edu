@@ -99,8 +99,8 @@ public class NoticeController {
     // 공지사항 수정
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/UpdateNotice/{noticeNum}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateNotice(
-            @PathVariable Long noticeNum,
+    public ResponseEntity<String> updateNotice(			//@PathVariable은 상세 조회, 수정, 삭제 같은 작업에서 리소스 식별자로 사용
+            @PathVariable("noticeNum") Long noticeNum, //@PathVariable에 이름 꼭 명시해줘야 함!!!! --> ("noticeNum") 이런 식으로
             @RequestPart("dto") NoticeUpdateRegisterDTO dto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
     	System.out.println("공지사항 수정!!");
@@ -114,7 +114,7 @@ public class NoticeController {
     }
 
     // 공지사항 삭제(단일)
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/DeleteNotice/{noticeNum}")
     public ResponseEntity<String> deleteNotice(@PathVariable("noticeNum") Long noticeNum) {
     	System.out.println("공지사항 삭제(단일)!!");

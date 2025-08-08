@@ -18,6 +18,8 @@ import lombok.Setter;
 @Builder
 @Data
 public class NoticeFileDTO { //파일저장
+	
+	private Long notFileNum; //파일 번호
 		
 	private String originalName; //원본파일명
 	

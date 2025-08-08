@@ -24,5 +24,5 @@ public class EventImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_num")
     private EventInfo eventInfo;
+    
 }
-

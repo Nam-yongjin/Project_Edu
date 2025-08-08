@@ -13,7 +13,6 @@ import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventInfo;
 import com.EduTech.entity.event.EventState;
-import com.EduTech.entity.event.RevState;
 import com.EduTech.entity.member.Member;
 
 public interface EventService {
@@ -33,8 +32,6 @@ public interface EventService {
     Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, EventState state); // 사용자 검색
     
     Page<EventInfoDTO> getUserEventList(Member member, Pageable pageable); // 사용자의 이벤트 목록
-    
-    RevState getUserRevState(Long eventNum, String memId);
     
     Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String option, String query, EventState state); // 관리자 검색 목록
     
@@ -61,7 +58,7 @@ public interface EventService {
             MultipartFile mainFile,
             List<MultipartFile> attachList); // 수정
     
-    void deleteEvent(Long eventNum); // 삭제
+    void deleteEvent(Long eventNum); // 취소
 
     // =============================
     // 3. 배너 관련
@@ -89,8 +86,8 @@ public interface EventService {
     // 5. 신청 내역 및 관리
     // =============================
 
-    Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable); // 사용자 신청 리스트
+  Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable); // 사용자 신청 리스트
     
-    List<EventUseDTO> getApplicantsByEvent(Long eventNum); // 특정 이벤트 신청자 목록 (관리자용)
+//  List<EventUseDTO> getApplicantsByEvent(Long eventNum); // 특정 이벤트 신청자 목록 (관리자용)
 
 }

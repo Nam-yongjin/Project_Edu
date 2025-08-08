@@ -44,8 +44,9 @@ public class EventUse {
 	@JoinColumn(name = "eventNum", nullable = false)
 	private EventInfo eventInfo;
 
-	// FK 회원id
+	// FK 회원id 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "memId", nullable = false)
 	private Member member;
+	
 }

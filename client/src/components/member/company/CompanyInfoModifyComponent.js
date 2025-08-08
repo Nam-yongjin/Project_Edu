@@ -167,7 +167,7 @@ const CompanyInfoModifyComponent = () => {
                 setVerifiedPhone(null);
                 setModifying(false);
                 setErrors({});
-                moveToPath('/');
+                moveToPath('/company/myInfo');
             })
             .catch((error) => {
                 alert("회원정보 수정 실패", error);
