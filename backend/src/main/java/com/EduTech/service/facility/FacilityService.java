@@ -1,15 +1,27 @@
 package com.EduTech.service.facility;
 
-import com.EduTech.dto.facility.*;
-import com.EduTech.entity.facility.FacilityState;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.EduTech.dto.facility.FacilityDetailDTO;
+import com.EduTech.dto.facility.FacilityHolidayDTO;
+import com.EduTech.dto.facility.FacilityRegisterDTO;
+import com.EduTech.dto.facility.FacilityReserveAdminDTO;
+import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
+import com.EduTech.dto.facility.FacilityReserveListDTO;
+import com.EduTech.dto.facility.FacilityReserveRequestDTO;
+import com.EduTech.dto.facility.FacilityTimeDTO;
+import com.EduTech.entity.facility.FacilityState;
+
 //시설 예약 관련 서비스 인터페이스
 public interface FacilityService {
 
+	// 시설 추가
+	void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images);
+	
     // 시설 상세 정보 조회 (이미지 포함) 
     FacilityDetailDTO getFacilityDetail(String facName);
 
