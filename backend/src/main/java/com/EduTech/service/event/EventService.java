@@ -7,87 +7,80 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.event.EventApplyRequestDTO;
-import com.EduTech.dto.event.EventBannerDTO;
 import com.EduTech.dto.event.EventInfoDTO;
 import com.EduTech.dto.event.EventSearchRequestDTO;
 import com.EduTech.dto.event.EventUseDTO;
 import com.EduTech.entity.event.EventInfo;
-import com.EduTech.entity.event.EventState;
-import com.EduTech.entity.member.Member;
 
 public interface EventService {
 
-    // =============================
-    // 1. 이벤트 조회
-    // =============================
+    // ─────────────────────────────────────────────
+    // 1. 행사 조회
+    // ─────────────────────────────────────────────
 
-    List<EventInfoDTO> getAllEvents(); // 전체 이벤트 조회
-    
-    List<EventInfoDTO> getAllEventsWithoutFilter(int page); //(use)
-    
-    Page<EventInfoDTO> searchEventList(EventSearchRequestDTO dto, int page); // 리스트에서 검색
-    
-    Page<EventInfoDTO> getEventList(Pageable pageable, String title, String eventInfo, EventState state); // 관리자/운영자용
-    
-    Page<EventInfoDTO> searchEventList(Pageable pageable, String option, String query, EventState state); // 사용자 검색
-    
-    Page<EventInfoDTO> getUserEventList(Member member, Pageable pageable); // 사용자의 이벤트 목록
-    
-    Page<EventInfoDTO> searchAdminEventList(Pageable pageable, String option, String query, EventState state); // 관리자 검색 목록
-    
-    EventInfoDTO getEvent(Long eventNum); // 이벤트 상세 조회
+    // 전체 행사 조회 (필터링 없이 페이징)
+    List<EventInfoDTO> getAllEventsWithoutFilter(int page);
+
+    // 조건 검색 (분류, 키워드 등)
+    Page<EventInfoDTO> searchEventList(EventSearchRequestDTO dto, int page);
+
+    // 행사 상세 조회
+    EventInfoDTO getEvent(Long eventNum);
+
+    // 이달의 OPEN 행사 목록 (배너용)
+    List<EventInfoDTO> getMonthlyOpenEvents();
     
     EventInfo getEventEntity(Long eventNum); // 내부용 Entity 직접 조회
 
-    List<EventInfoDTO> searchNotEndEventList(); // 진행 중인 이벤트만 조회
 
-    // =============================
-    // 2. 이벤트 등록/수정/삭제
-    // =============================
+    // ─────────────────────────────────────────────
+    // 2. 행사 등록 / 수정 / 취소 (관리자)
+    // ─────────────────────────────────────────────
 
-    void registerEvent(EventInfoDTO dto,
-            MultipartFile mainImage,
-            List<MultipartFile> imageList,
-            MultipartFile mainFile,
-            List<MultipartFile> attachList); // 파일 포함 등록
-    
-    void updateEvent(Long eventNum,
-            EventInfoDTO dto,
-            MultipartFile mainImage,
-            List<MultipartFile> imageList,
-            MultipartFile mainFile,
-            List<MultipartFile> attachList); // 수정
-    
-    void deleteEvent(Long eventNum); // 취소
+    // 행사 등록 (파일 포함)
+    void registerEvent(
+        EventInfoDTO dto,
+        MultipartFile mainImage,
+        List<MultipartFile> imageList,
+        MultipartFile mainFile,
+        List<MultipartFile> attachList
+    );
 
-    // =============================
-    // 3. 배너 관련
-    // =============================
+    // 행사 수정 (파일 포함)
+    void updateEvent(
+        Long eventNum,
+        EventInfoDTO dto,
+        MultipartFile mainImage,
+        List<MultipartFile> imageList,
+        MultipartFile mainFile,
+        List<MultipartFile> attachList
+    );
 
-    List<EventInfoDTO> getAllBanners(int page); // 배너 목록 조회
-    
-    void registerBanner(EventBannerDTO dto); // 배너 등록
-    
-    void deleteBanner(Long evtFileNum); // 배너 삭제
+    // 행사 취소 처리
+    void deleteEvent(Long eventNum);
 
-    // =============================
-    // 4. 사용자 신청 관련
-    // =============================
 
-    void applyEvent(EventApplyRequestDTO dto); // 이벤트 신청
-    
-    void cancelEvent(Long evtRevNum, String memId); // 신청 취소
+    // ─────────────────────────────────────────────
+    // 3. 사용자 신청 관련
+    // ─────────────────────────────────────────────
 
-    boolean isAlreadyApplied(Long eventNum, String memId); // 중복 신청 여부
-    
-    boolean isAvailable(Long eventNum); // 신청 가능 여부
+    // 행사 신청
+    void applyEvent(EventApplyRequestDTO dto);
 
-    // =============================
-    // 5. 신청 내역 및 관리
-    // =============================
+    // 행사 신청 취소
+    void cancelEvent(Long evtRevNum, String memId);
 
-  Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable); // 사용자 신청 리스트
-    
-//  List<EventUseDTO> getApplicantsByEvent(Long eventNum); // 특정 이벤트 신청자 목록 (관리자용)
+    // 중복 신청 여부 확인
+    boolean isAlreadyApplied(Long eventNum, String memId);
 
+    // 신청 가능 여부 확인 (기간 기준)
+    boolean isAvailable(Long eventNum);
+
+
+    // ─────────────────────────────────────────────
+    // 4. 사용자 신청 내역
+    // ─────────────────────────────────────────────
+
+    // 사용자별 신청 내역 조회 (페이징)
+    Page<EventUseDTO> getUseListByMemberPaged(String memId, Pageable pageable);
 }

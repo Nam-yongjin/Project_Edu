@@ -7,7 +7,8 @@ public enum EventState {
 	BEFORE("신청전"),
     OPEN("신청중"),
     CLOSED("신청마감"),
-    CANCEL("신청취소");
+    CANCEL("신청취소"),
+    COMPLETE("행사완료");
 
     private final String label;
 
