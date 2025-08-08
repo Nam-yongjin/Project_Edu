@@ -19,6 +19,7 @@ public class DemonstrationRentalListDTO {
 	private LocalDate endDate;
 	private LocalDate applyAt;
 	private String companyName;
+	private Long itemNum; 
 	private List<DemonstrationImageDTO> imageList; 
 	private DemonstrationState state;
 	// 물품 대여 조회 페이지용 생성자

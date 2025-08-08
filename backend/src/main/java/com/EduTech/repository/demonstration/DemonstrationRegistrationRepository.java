@@ -62,6 +62,10 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Query("SELECT reg.demonstration.demNum, reg.member.memId FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum IN :demNums")
 	List<Object[]> findDemNumAndMemId(@Param("demNums") Set<Long> demNums);
 	
+	// demonstrationRegistrationRepository
+	List<DemonstrationRegistration> findByDemonstration_DemNumIn(List<Long> demNums);
+
+
 }
 
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SearchComponent from "../../components/demonstration/SearchComponent";
-import { getRental, getRentalSearch, deleteRental, getResExceptDate, updateRental} from "../../api/demApi";
+import { getRental, getRentalSearch, deleteRental, getResExceptDate, updateRental, addRequest } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import { useNavigate } from "react-router-dom";
 import CalendarComponent from "./CalendarComponent";
@@ -28,6 +28,12 @@ const RentalComponent = () => {
     const [exceptDate, setExceptDate] = useState([]); // 회원이 예약한 물품에 대해 예약날짜를 가져오는 변수
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [showQtyModal, setShowQtyModal] = useState(false); // 아이템 모달
+    const [reservationQty, setReservationQty] = useState(1); // 수량 설정
+    let updatedItemNum = 0; // 예약 한 수량 만큼 뺀 itemNum
+    const currentItem = listData.content?.find(
+        (item) => item.demNum === selectedDemNum && item.state === "WAIT"
+    );
+    const maxQty = currentItem?.itemNum || 0;
     const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
@@ -120,7 +126,7 @@ const RentalComponent = () => {
 
         const invalidItems = !listData.content
             .filter(item => selectedItems.has(item.demNum))
-            .some(item => item.state === "WAIT");
+            .some(item => item.state === "WAIT"); // 상품번호를 가지고 잇고 wait가 아닌 데이터에 대해 취소불가능
 
         if (invalidItems) {
             alert("예약 취소가 불가능한 상태입니다.");
@@ -135,6 +141,7 @@ const RentalComponent = () => {
 
     const handleActionClick = async (demNum, action) => {
         // 같은 demNum을 가진 모든 항목을 찾음
+        // reject랑 cancel은 버튼 자체가 존재 하지 않으므로 고려 x
         const items = listData.content.filter((item) => item.demNum === demNum);
         if (items.length === 0) return;
 
@@ -155,6 +162,29 @@ const RentalComponent = () => {
                 console.error("예약 정보 조회 실패", err);
             }
         }
+        else if (action === "대여연장") {
+            const hasAccept = items.some(item => item.state === "ACCEPT");
+            if(!hasAccept) {
+            alert(`승인 상태에서만 대여 연장 신청이 가능합니다.`);
+                return;
+            }
+            const type = "EXTEND";
+            addRequest(demNum, type);
+             alert(`연장 신청 완료`);
+              window.location.reload();
+        }
+        else if (action === "반납") {
+            const hasAccept = items.some(item => item.state === "ACCEPT");
+             if(!hasAccept) {
+            alert(`승인 상태에서만 반납 신청이 가능합니다.`);
+                return;
+            }
+            const type = "RENTAL";
+            addRequest(demNum, type);
+             alert(`반납 신청 완료`);
+              window.location.reload();
+        }
+
     };
 
 
@@ -191,8 +221,8 @@ const RentalComponent = () => {
             }
 
             try {
-                /*   await updateRental(
-                       toLocalDateString(startDate), toLocalDateString(endDate), updatedItemNum, updatedItemNum); */
+                await updateRental(
+                    toLocalDateString(startDate), toLocalDateString(endDate), selectedDemNum, updatedItemNum);
                 alert('예약 신청 완료');
                 window.location.reload();
             } catch (error) {
@@ -240,27 +270,27 @@ const RentalComponent = () => {
                             <th className="py-3 px-4 text-left">기업명</th>
                             <th className="py-3 px-4 text-left">대여개수</th>
 
-                            {["startDate", "endDate", "applyAt"].map((col) => (
+                            {[
+                                { label: "시작일", value: "startDate" },
+                                { label: "마감일", value: "endDate" },
+                                { label: "등록일", value: "applyAt" },
+                            ].map(({ label, value }) => (
                                 <th
-                                    key={col}
-                                    onClick={() => handleSortChange(col)}
+                                    key={value}
+                                    onClick={() => handleSortChange(value)}
                                     className="cursor-pointer text-center select-none py-3 px-4"
                                 >
                                     <div className="flex items-center justify-center space-x-1">
-                                        <span>{col}</span>
+                                        <span>{label}</span>
                                         <div className="flex flex-col">
                                             <span
-                                                className={`text-xs leading-none ${sortBy === col && sort === "asc"
-                                                    ? "text-black"
-                                                    : "text-gray-300"
+                                                className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"
                                                     }`}
                                             >
                                                 ▲
                                             </span>
                                             <span
-                                                className={`text-xs leading-none ${sortBy === col && sort === "desc"
-                                                    ? "text-black"
-                                                    : "text-gray-300"
+                                                className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"
                                                     }`}
                                             >
                                                 ▼
@@ -269,6 +299,7 @@ const RentalComponent = () => {
                                     </div>
                                 </th>
                             ))}
+
                             <th className="py-3 px-4 text-left">
                                 상태
                                 <select
@@ -294,7 +325,7 @@ const RentalComponent = () => {
                         {listData.content.map((item) => {
                             const mainImage = item.imageList?.find((img) => img.isMain === true);
                             const isCancelled = item.state === "CANCEL";
-
+                            const isRejected = item.state === "REJECT"
                             return (
 
                                 <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}`}
@@ -303,14 +334,14 @@ const RentalComponent = () => {
                                 >
                                     {/* 체크박스 */}
                                     <td className="py-3 px-4 text-center">
-                                        {!isCancelled ? (
+                                        {item.state === "WAIT" ? (
                                             <input
                                                 type="checkbox"
                                                 checked={selectedItems.has(item.demNum)}
                                                 onChange={(e) => handleSelectOne(e, item.demNum)}
                                             />
                                         ) : (
-                                            <span>취소됨</span>
+                                            <span></span>
                                         )}
                                     </td>
                                     <td className="py-3 px-4">
@@ -337,7 +368,11 @@ const RentalComponent = () => {
 
                                     {/* 버튼 3개 */}
                                     <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
-                                        {!isCancelled ? (
+                                        {isCancelled ? (
+                                            <span className="text-gray-500 mt-[30px]">취소됨</span>
+                                        ) : isRejected ? (
+                                            <span className="text-gray-500 mt-[30px]">거절됨</span>
+                                        ) : (
                                             <>
                                                 <button
                                                     onClick={() => handleActionClick(item.demNum, "예약변경")}
@@ -358,10 +393,9 @@ const RentalComponent = () => {
                                                     반납
                                                 </button>
                                             </>
-                                        ) : (
-                                            <span className="text-gray-500 mt-[30px]">취소됨</span>
                                         )}
                                     </td>
+
                                 </tr>
                             );
                         })}
@@ -403,7 +437,7 @@ const RentalComponent = () => {
                             <button
                                 className="bg-blue-500 text-white px-4 py-2 rounded"
                                 onClick={() => {
-                                    reservationUpdate(selectedDemNum);
+                                    setShowQtyModal(true);
                                 }}
                             >
                                 변경
@@ -413,6 +447,20 @@ const RentalComponent = () => {
                 </div>
             )}
 
+            {showQtyModal && (
+                <ItemModal
+                    maxQty={maxQty}
+                    value={reservationQty}
+                    onChange={(val) => setReservationQty(val)}
+                    onConfirm={() => {
+                        const selectedItem = listData.content.find(item => item.demNum === selectedDemNum);
+                        const updatedItemNum = maxQty - reservationQty + (selectedItem?.bitemNum ?? 0);
+                        reservationUpdate(updatedItemNum);
+                        setShowQtyModal(false);
+                    }}
+                    onClose={() => setShowQtyModal(false)}
+                />
+            )}
 
             <div className="flex justify-center mt-6">
                 <PageComponent

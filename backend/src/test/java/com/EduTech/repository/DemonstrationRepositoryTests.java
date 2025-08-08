@@ -443,10 +443,12 @@ public class DemonstrationRepositoryTests {
 			
 		}
 		
-		 //@Test
+		 @Test
 		public void testDemonstrationReserve1() {
-			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT, "poi2484", 250L);
-				
+			List<Long> list=new ArrayList<>();
+			list.add(200L);
+			int result=demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT, "poi2484", list);
+				System.out.println(result);
 			}
 		
 }
