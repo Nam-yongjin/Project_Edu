@@ -65,9 +65,9 @@ public class EventController {
     // ─────────────────────────────────────────────
 
     // 1. 이달의 배너 (진행 중인 행사)
-    @GetMapping("/monthlyBanner")
-    public ResponseEntity<List<EventInfoDTO>> getMonthlyOpenEvents() {
-        List<EventInfoDTO> events = eventService.getMonthlyOpenEvents();
+    @GetMapping("/banner")
+    public ResponseEntity<List<EventInfoDTO>> getbannerEvent() {
+        List<EventInfoDTO> events = eventService.getbannerEvent();
         return ResponseEntity.ok(events);
     }
 
