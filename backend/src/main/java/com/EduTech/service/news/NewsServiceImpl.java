@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,7 @@ import com.EduTech.dto.news.NewsListDTO;
 import com.EduTech.dto.news.NewsSearchDTO;
 import com.EduTech.dto.news.NewsUpdateRegisterDTO;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.news.News;
 import com.EduTech.entity.news.NewsFile;
 import com.EduTech.repository.member.MemberRepository;
@@ -45,6 +48,7 @@ public class NewsServiceImpl implements NewsService {
     private static final List<String> ALLOWED_FILE_TYPES = //파일 유형
             List.of("jpg", "jpeg", "png", "pdf", "hwp", "doc", "docx");
     
+    //뉴스 등록
     @Override
     public Long createNews(NewsCreateRegisterDTO registerDto) {
         // 권한 검증(현재 로그인한 사용자)
@@ -67,7 +71,7 @@ public class NewsServiceImpl implements NewsService {
         News savedNews = newsRepository.save(news);
         return savedNews.getNewsNum();
     }
-    
+    //뉴스 수정
     @Override
     public void updateNews(Long newsNum, NewsUpdateRegisterDTO registerDto) {
         // 권한 검증
@@ -86,8 +90,9 @@ public class NewsServiceImpl implements NewsService {
         
         newsRepository.save(news);
     }
-    
+    //뉴스 삭제(단일)
     @Override
+    @Transactional
     public void deleteNews(Long newsNum) {
         Member currentMember = getCurrentMember();
         validateAdminRole(currentMember);
@@ -98,11 +103,15 @@ public class NewsServiceImpl implements NewsService {
         // 파일 삭제 (orphanRemoval = true로 인해 자동으로 삭제되지만, 물리적 파일은 직접 삭제 필요)
         deleteNewsFiles(news.getNewsNum());
         
+        // 연관관계 끊기(orphanRemoval 반영을 위한 작업)
+        news.getNewsFiles().clear(); // JPA 영속성 컨텍스트에서 관계 해제
+        
         // 뉴스 삭제
         newsRepository.delete(news);
     }
-    
+    //뉴스 삭제(일괄)
     @Override
+    @Transactional
     public void deleteNewsByIds(List<Long> newsNums) {
         Member currentMember = getCurrentMember();
         validateAdminRole(currentMember);
@@ -120,29 +129,36 @@ public class NewsServiceImpl implements NewsService {
             throw new EntityNotFoundException("존재하지 않는 뉴스: " + notFoundIds);
         }
         
-        // 파일들 삭제
-        newsNums.forEach(this::deleteNewsFiles);
-        
-        // 뉴스 삭제
-        newsRepository.deleteAll(newsByIds);
+        for (News news : newsByIds) {
+        	deleteNewsFiles(news.getNewsNum()); //파일 삭제
+        	news.getNewsFiles().clear(); //관계 해제
+        	newsRepository.delete(news); //하나씩 삭제 --> orphanRemoval 정상 작동
+        }
+       
     }
-    
+    //뉴스 상세조회
     @Override
     @Transactional(readOnly = true)
     public NewsDetailDTO getNewsDetail(Long newsNum) {
-        News news = newsRepository.findById(newsNum)
+        News news = newsRepository.findByIdWithFiles(newsNum)
                 .orElseThrow(() -> new EntityNotFoundException("뉴스를 찾을 수 없습니다. ID: " + newsNum));
+        
+        System.out.println("뉴스 첨부파일 수: " + news.getNewsFiles().size());
         
         return mapToDetailDTO(news);
     }
-    
+    //뉴스 목록 조회
     @Override
     @Transactional(readOnly = true)
     public Page<NewsListDTO> getNewsList(NewsSearchDTO searchDto) {
         // 정렬 설정
+//        Sort sort = Sort.by(
+//                Sort.Direction.fromString(searchDto.getSortDirection()),
+//                searchDto.getSortBy()
+//        );
+    	// 정렬 설정
         Sort sort = Sort.by(
-                Sort.Direction.fromString(searchDto.getSortDirection()),
-                searchDto.getSortBy()
+                Sort.Order.desc("createdAt") //최신순으로 정렬
         );
         
         Pageable pageable = PageRequest.of(searchDto.getPage(), searchDto.getSize(), sort);
@@ -155,7 +171,7 @@ public class NewsServiceImpl implements NewsService {
         
         return newsByIds.map(this::mapToListDTO);
     }
-    
+    //뉴스 조회수 증가
     @Override
     public void increaseViewCount(Long newsNum) {
         News news = newsRepository.findById(newsNum)
@@ -173,9 +189,14 @@ public class NewsServiceImpl implements NewsService {
     }
     
     private void validateAdminRole(Member member) {
-        if (!"ADMIN".equals(member.getRole())) {
-            throw new AccessDeniedException("관리자 권한이 필요합니다.");
-        }
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	System.out.println("권한 목록: " + authentication.getAuthorities());
+    	System.out.println("인증된 사용자: " + authentication.getName());
+    	System.out.println("현재 로그인한 사용자 권한: " + member.getRole());
+    	
+    	if (!MemberRole.ADMIN.equals(member.getRole())) {
+    	    throw new AccessDeniedException("관리자 권한이 필요합니다.");
+    	}
     }
     
     private boolean hasValidFiles(List<MultipartFile> files) {
@@ -187,16 +208,27 @@ public class NewsServiceImpl implements NewsService {
         String dirName = "news-files";
         List<Object> fileDataList = fileUtil.saveFiles(files, dirName);
         
-        return fileDataList.stream()
+        System.out.println("파일 저장 결과: " + fileDataList.size() + "개");
+        
+        List<NewsFile> result = fileDataList.stream()
                 .map(obj -> (Map<String, String>) obj)
-                .filter(this::isAllowedFileType)
-                .map(fileData -> NewsFile.builder()
-                        .originalName(fileData.get("originalName"))
-                        .filePath(fileData.get("filePath"))
-                        .fileType(fileData.get("fileType").toLowerCase())
-                        .news(news)
-                        .build())
+                .peek(fileData -> System.out.println("파일 데이터: " + fileData))
+                .map(fileData -> {
+                    //originalName에서 추출
+                    String originalName = fileData.get("originalName");
+                    String fileType = extractFileType(originalName);
+                    
+                    return NewsFile.builder()
+                            .originalName(originalName)
+                            .filePath(fileData.get("filePath"))
+                            .fileType(fileType) //추출한 fileType 사용
+                            .news(news)
+                            .build();
+                })
+                .filter(newsFile -> isAllowedFileType(newsFile.getFileType())) //필터링 로직 변경
+                .peek(newsFile -> System.out.println("허용된 파일: " + newsFile.getOriginalName()))
                 .toList();
+		return result;
     }
     
     private boolean isAllowedFileType(Map<String, String> fileData) {
@@ -286,10 +318,47 @@ public class NewsServiceImpl implements NewsService {
     
     private NewsFileDTO mapToFileDTO(NewsFile newsFile) {
         NewsFileDTO fileDTO = new NewsFileDTO();
+        fileDTO.setNewsFileNum(newsFile.getNewsFileNum()); //첨부파일 삭제할 때 필요
         fileDTO.setOriginalName(newsFile.getOriginalName());
         fileDTO.setFilePath(newsFile.getFilePath());
         fileDTO.setFileType(newsFile.getFileType());
+        //파일 다운로드 오류로 절대 경로로 변경!! - 백엔드 서버 주소 포함하기
+        String downloadUrl = "http://localhost:8090/api/news/files/" + newsFile.getNewsFileNum() + "/download";
+        fileDTO.setDownloadUrl(downloadUrl);
+        //프론트엔드랑 백엔드가 다른 포드에서 실행되어서 상대 경로가 프론트엔드 서버로 요청이 가고 있었음
+        //네트워크에서 실제 요청 url 확인 -> 프론트, 백엔드 포트가 다를 경우 절대경로 사용
+        //브라우저에 직접 url입력해서 API 테스트 하기
+        
+        System.out.println("생성된 downloadUrl: " + downloadUrl);
+
+     // 파일 경로에서 파일명만 추출
+        String savedName = extractSavedNameFromPath(newsFile.getFilePath());
+        fileDTO.setSavedName(savedName);
         
         return fileDTO;
+    }
+        
+    //파일 경로에서 저장된 파일명 추출
+    private String extractSavedNameFromPath(String filePath) {
+        if (filePath == null) return null;
+
+        int lastSlashIndex = filePath.lastIndexOf("/");
+        if (lastSlashIndex != -1) {
+            return filePath.substring(lastSlashIndex + 1);
+        }
+        return filePath;
+    }
+    
+    //파일 확장자 추출 메서드 추가
+    private String extractFileType(String originalName) {
+        if (originalName == null || !originalName.contains(".")) {
+            return "";
+        }
+        return originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
+    }
+
+    //필터링 메서드 수정
+    private boolean isAllowedFileType(String fileType) {
+        return fileType != null && ALLOWED_FILE_TYPES.contains(fileType.toLowerCase());
     }
 }
