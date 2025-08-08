@@ -1,10 +1,8 @@
-import NoticeTitleComponent from "../../components/notice/NoticeTitleComponent";
 import NoticeListComponent from "../../components/notice/NoticeListComponent";
 
 const NoticeListPage = () => {
     return (
         <div> 
-            <NoticeTitleComponent title="공지사항" />
             <NoticeListComponent />
         </div>
     );
