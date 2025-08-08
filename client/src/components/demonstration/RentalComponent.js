@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import SearchComponent from "../../components/demonstration/SearchComponent";
-import { getRental, getRentalSearch, deleteRental, getResDate } from "../../api/demApi";
+import { getRental, getRentalSearch, deleteRental, getResExceptDate, updateRental} from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import { useNavigate } from "react-router-dom";
 import CalendarComponent from "./CalendarComponent";
+import ItemModal from "./itemModal";
 const RentalComponent = () => {
     const initState = {
         content: [],
@@ -21,10 +22,22 @@ const RentalComponent = () => {
     const [statusFilter, setStatusFilter] = useState("total"); // state에 따라 필터링(ex wait,accept)
     const navigate = useNavigate(); // 원하는 곳으로 이동할 변수
     const [selectedItems, setSelectedItems] = useState(new Set()); // 체크박스 선택 항목(중복 방지를 위해 set사용)
-    const [showModifyModal, setShowModifyModal] = useState(false);
-    const [selectedDemNum, setSelectedDemNum] = useState();
-    const [disabledDates, setDisabledDates] = useState([]);
-    const [selectedDates, setSelectedDates] = useState([]);
+    const [showModifyModal, setShowModifyModal] = useState(false); // 캘린더 모달 변수
+    const [selectedDemNum, setSelectedDemNum] = useState(); // 캘린더에 넘겨줄 demNum 
+    const [selectedDate, setSelectedDate] = useState([]); // 선택된 날짜를 가져오는 변수
+    const [exceptDate, setExceptDate] = useState([]); // 회원이 예약한 물품에 대해 예약날짜를 가져오는 변수
+    const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
+    const [showQtyModal, setShowQtyModal] = useState(false); // 아이템 모달
+    const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        return d;
+    });
+    const [endDate, setEndDate] = useState(() => { // endDate 초기값 저장
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        return d;
+    });
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
@@ -42,6 +55,22 @@ const RentalComponent = () => {
     useEffect(() => {
         fetchData();
     }, [current, sort, sortBy, statusFilter]);
+
+
+    useEffect(() => {
+        if (selectedDate && selectedDate.length > 0) { // selectedDates를 통해 datepicker 날짜 조정
+            const dates = selectedDate.map(d => (d instanceof Date ? d : new Date(d))); // date객체 형태가 아닐경우 변환(날짜 비교를 위해)
+            // selectedDate가 변경 시에 startDate, endDate를 변경 시킴
+            // 가장 빠른 날짜 (min)
+            const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+
+            // 가장 늦은 날짜 (max)
+            const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+
+            setStartDate(minDate);
+            setEndDate(maxDate);
+        }
+    }, [selectedDate]);
 
     const onSearchClick = () => {
         fetchData();
@@ -105,31 +134,82 @@ const RentalComponent = () => {
     };
 
     const handleActionClick = async (demNum, action) => {
-        const item = listData.content.find((item) => item.demNum === demNum);
-        if (!item) return;
+        // 같은 demNum을 가진 모든 항목을 찾음
+        const items = listData.content.filter((item) => item.demNum === demNum);
+        if (items.length === 0) return;
 
         if (action === "예약변경") {
-            if (item.state !== "WAIT") {
+            // demNum에 해당하는 항목 중 WAIT 상태가 하나라도 있는지 확인
+            const hasWait = items.some(item => item.state === "WAIT");
+            if (!hasWait) {
                 alert(`대기 상태에서만 예약 변경이 가능합니다.`);
                 return;
             }
 
             try {
                 setSelectedDemNum(demNum);
-                setSelectedDates([]); // 초기화
-
-                const resDisabled = await getResDate(
-                    demNum
-                );
-                console.log(resDisabled);
-                setDisabledDates(resDisabled);
-               // setShowModifyModal(true);
+                const exceptDate = await getResExceptDate(demNum);
+                setExceptDate(exceptDate);
+                setShowModifyModal(true);
             } catch (err) {
                 console.error("예약 정보 조회 실패", err);
             }
         }
     };
 
+
+    const reservationUpdate = (updatedItemNum) => {
+        const loadData = async () => {
+            if (!selectedDate || selectedDate.length === 0) {
+                alert('날짜를 선택해주세요!');
+                return;
+            }
+
+            if (selectedDate.length > 90) {
+                alert('최대 90일까지만 선택할 수 있습니다!');
+                return;
+            }
+
+            let sortedDates = [...selectedDate]
+                .map(d => new Date(d)) // 문자열일 경우 Date로 변환
+                .sort((a, b) => a.getTime() - b.getTime()); // getTime으로 정렬
+            sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d))); // 데이트 타입이 아닐경우 데이트 타입으로 파싱
+
+            for (let i = 0; i < sortedDates.length - 1; i++) {
+                const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime(); // 두 날을 뺀 값 (ms)단위
+                const diffDays = diffTime / (1000 * 60 * 60 * 24); // ms단위 이므로 하루 단위로 변경
+
+                if (diffDays !== 1) {
+                    alert('연속된 날짜만 선택 가능합니다!');
+                    return;
+                }
+            }
+
+            if (selectedDate.some(date => disabledDates.includes(date))) {
+                alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
+                return;
+            }
+
+            try {
+                /*   await updateRental(
+                       toLocalDateString(startDate), toLocalDateString(endDate), updatedItemNum, updatedItemNum); */
+                alert('예약 신청 완료');
+                window.location.reload();
+            } catch (error) {
+                console.error('예약 실패:', error);
+                alert('예약에 실패했습니다.');
+            }
+        };
+
+        loadData();
+    };
+
+    function toLocalDateString(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -305,10 +385,12 @@ const RentalComponent = () => {
                         <h2 className="text-xl mb-4 font-bold">예약 날짜 변경</h2>
 
                         <CalendarComponent
-                            selectedDate={selectedDates}
-                            setSelectedDate={setSelectedDates}
-                            reservationQty={1} // 고정 or 전달된 값 사용
+                            selectedDate={selectedDate}
+                            setSelectedDate={setSelectedDate}
+                            demNum={selectedDemNum}
                             disabledDates={disabledDates}
+                            setDisabledDates={setDisabledDates}
+                            exceptDate={exceptDate}
                         />
 
                         <div className="mt-6 flex justify-end gap-3">
@@ -320,25 +402,8 @@ const RentalComponent = () => {
                             </button>
                             <button
                                 className="bg-blue-500 text-white px-4 py-2 rounded"
-                                onClick={async () => {
-                                    if (selectedDates.length < 1) {
-                                        alert("변경할 날짜를 선택하세요.");
-                                        return;
-                                    }
-                                    const sortedDates = [...selectedDates].sort();
-                                    const startDate = sortedDates[0];
-                                    const endDate = sortedDates[sortedDates.length - 1];
-
-                                    try {
-                                        //await postRes(startDate, endDate, selectedDemNum, 1); // 변경된 값으로 업데이트
-                                        alert("예약이 변경되었습니다.");
-                                        setShowModifyModal(false);
-                                        // 데이터 다시 로딩
-                                        //fetchData(currentPage, selected);  // currentPage: 현재 페이지 번호  selected: 선택된 날짜 (또는 항목)
-                                    } catch (err) {
-                                        alert("예약 변경에 실패했습니다.");
-                                        console.error(err);
-                                    }
+                                onClick={() => {
+                                    reservationUpdate(selectedDemNum);
                                 }}
                             >
                                 변경
@@ -347,6 +412,7 @@ const RentalComponent = () => {
                     </div>
                 </div>
             )}
+
 
             <div className="flex justify-center mt-6">
                 <PageComponent
