@@ -1,16 +1,25 @@
 package com.EduTech.service.facility;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
 import com.EduTech.dto.facility.FacilityHolidayDTO;
 import com.EduTech.dto.facility.FacilityImageDTO;
+import com.EduTech.dto.facility.FacilityRegisterDTO;
 import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
@@ -18,6 +27,7 @@ import com.EduTech.dto.facility.FacilityReserveRequestDTO;
 import com.EduTech.dto.facility.FacilityTimeDTO;
 import com.EduTech.entity.facility.Facility;
 import com.EduTech.entity.facility.FacilityHoliday;
+import com.EduTech.entity.facility.FacilityImage;
 import com.EduTech.entity.facility.FacilityReserve;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.entity.member.Member;
@@ -28,6 +38,7 @@ import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
 import com.EduTech.repository.facility.FacilityTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
+import com.EduTech.util.FileUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +53,55 @@ public class FacilityServiceImpl implements FacilityService {
     private final FacilityReserveRepository facilityReserveRepository;
     private final FacilityHolidayRepository facilityHolidayRepository;
     private final MemberRepository memberRepository;
+    private final ModelMapper modelMapper;
+    private final FileUtil fileUtil;
+    
+    //--------------------------------------------------------
+    public String saveImage(MultipartFile file) {
+        String originalName = file.getOriginalFilename();
+        String uuid = UUID.randomUUID().toString();
+        String saveName = uuid + "_" + originalName;
+
+        Path uploadPath = Paths.get("C:/upload/facility"); // 또는 서버 설정 기반 경로
+        Path fullPath = uploadPath.resolve(saveName);
+
+        try {
+            Files.createDirectories(uploadPath);
+            file.transferTo(fullPath.toFile());
+        } catch (IOException e) {
+            throw new RuntimeException("파일 저장 실패", e);
+        }
+
+        return saveName;
+    }
+
+    //--------------------------------------------------------
+    
+    @Override
+    @Transactional
+    public void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images) {
+        Facility facility = modelMapper.map(dto, Facility.class);
+
+        // 이미지 저장 처리
+        for (MultipartFile image : images) {
+            if (!image.isEmpty()) {
+                Map<String, String> saved = fileUtil.saveImage(image, "facility");
+
+                String originalName = saved.get("originalName");
+                String imagePath = saved.get("filePath"); // 예: facility/uuid_abc.jpg
+
+                FacilityImage imageEntity = FacilityImage.builder()
+                    .imageName(originalName)
+                    .imageUrl("/upload/" + imagePath)  // 또는 정적 경로에 따라 경로 조정
+                    .build();
+
+                facility.addImage(imageEntity);
+            }
+        }
+
+        facilityRepository.save(facility);
+    }
+    
     // 시설 상세 정보 조회 (이미지 포함)
     @Override
     public FacilityDetailDTO getFacilityDetail(String facName) {
