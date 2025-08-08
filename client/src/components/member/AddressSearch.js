@@ -12,7 +12,7 @@ const AddressSearch = ({ onAddressSelected }) => {
         <div>
             <button
                 onClick={openPostcode}
-                className="newText-base normal-button float-left"
+                className="newText-base normal-button float-right"
             >
                 주소 찾기
             </button>

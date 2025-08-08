@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
 import useMove from "../hooks/useMove";
 import useLogin from "../hooks/useLogin";
 import cancel from "../assets/cancel.png";
@@ -8,6 +9,7 @@ const Side = ({ isOpen, onClose }) => {
     const loginState = useSelector((state) => state.loginState);
     const { moveToPath } = useMove();
     const { doLogout } = useLogin();
+    const [openMenus, setOpenMenus] = useState({});
 
     const getMyPageLink = (role) => {
         switch (role) {
@@ -25,6 +27,13 @@ const Side = ({ isOpen, onClose }) => {
     const handleLogout = () => {
         doLogout();
         moveToPath("/");
+    };
+
+    const handleMenuToggle = (menuName) => {
+        setOpenMenus(prevState => ({
+            ...prevState,
+            [menuName]: !prevState[menuName]
+        }));
     };
 
     return (
@@ -78,36 +87,134 @@ const Side = ({ isOpen, onClose }) => {
                             </>
                         }
                         <li>
-                            <Link to={"/about"} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                💡 소개
-                            </Link>
+                            <div
+                                className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleMenuToggle('about')}
+                            >
+                                <span>💡 소개</span>
+                                <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['about'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                            </div>
+                            <ul
+                                className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['about'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                    }`}
+                            >
+                                <li>
+                                    <Link to="/about/greeting" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>인사말</Link>
+                                </li>
+                                <li>
+                                    <Link to="/about/business" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>사업소개</Link>
+                                </li>
+                                <li>
+                                    <Link to="/about/direction" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>오시는길</Link>
+                                </li>
+                            </ul>
                         </li>
                         <li>
-                            <Link to={"/event"} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                📅 프로그램
-                            </Link>
+                            <div
+                                className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleMenuToggle('event')}
+                            >
+                                <span>📅 프로그램</span>
+                                <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['event'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                            </div>
+                            <ul
+                                className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['event'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                    }`}
+                            >
+                                <li>
+                                    <Link to="/event/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>프로그램 안내</Link>
+                                </li>
+                            </ul>
                         </li>
                         <li>
-                            <Link to={"/facility"} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                🏢 공간 운영
-                            </Link>
+                            <div
+                                className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleMenuToggle('facility')}
+                            >
+                                <span>🏢 공간 운영</span>
+                                <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['facility'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                            </div>
+                            <ul
+                                className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['facility'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                    }`}
+                            >
+                                <li>
+                                    <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 안내</Link>
+                                </li>
+                            </ul>
                         </li>
                         <li>
-                            <Link to={"/demonstration"} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                💻 실증 지원
-                            </Link>
+                            <div
+                                className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleMenuToggle('demonstration')}
+                            >
+                                <span>💻 실증 지원</span>
+                                <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['demonstration'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                            </div>
+                            <ul
+                                className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['demonstration'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                    }`}
+                            >
+                                <li>
+                                    <Link to="/demonstration/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 물품</Link>
+                                </li>
+                                <li>
+                                    <Link to="/demonstration/add" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청</Link>
+                                </li>
+                                <li>
+                                    <Link to="/demonstration/rentalList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>빌림테스트</Link>
+                                </li>
+                                <li>
+                                    <Link to="/demonstration/borrowList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>빌려줌테스트</Link>
+                                </li>
+                            </ul>
                         </li>
                         <li>
-                            <Link to={"/notice"} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                📢 알림마당
-                            </Link>
+                            <div
+                                className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleMenuToggle('notice')}
+                            >
+                                <span>📢 알림마당</span>
+                                <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['notice'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                            </div>
+                            <ul
+                                className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['notice'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                    }`}
+                            >
+                                <li>
+                                    <Link to="/notice" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공지사항</Link>
+                                </li>
+                                <li>
+                                    <Link to="/question" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>문의사항</Link>
+                                </li>
+                                <li>
+                                    <Link to="/news" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>언론보도</Link>
+                                </li>
+                            </ul>
                         </li>
                         {loginState.role === "ADMIN" ?
-                            <><li>
-                                <Link to={"/admin"} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                    🔧 관리자
-                                </Link>
-                            </li></> : <></>}
+                            <>
+                                <li>
+                                    <div
+                                        className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                        onClick={() => handleMenuToggle('admin')}
+                                    >
+                                        <span>🔧 관리자</span>
+                                        <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['admin'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                                    </div>
+                                    <ul
+                                        className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['admin'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                            }`}
+                                    >
+                                        <li>
+                                            <Link to="/admin/members" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>회원 관리</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/admin/banner" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>배너 관리</Link>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </> : <></>}
                     </ul>
                 </nav>
             </div>

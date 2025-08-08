@@ -48,7 +48,7 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 	// 아이디와 휴대폰번호 일치 확인(비빌먼호 변경)
 	boolean existsByMemIdAndPhone(String memId, String phone);
 
-	// 회원탈퇴 신청한지 일주일지난 회원정보 자동삭제(LEAVE로 업데이트한 시각과의 차이를 매일 0시에 비교하고 삭제)
+	// 회원탈퇴 신청한지 일주일지난 회원정보 자동삭제(LEAVE로 업데이트한 시각과의 차이를 10분간격마다 비교하고 삭제)
 	@Modifying
 	@Transactional
 	@Query(value = "DELETE FROM member WHERE state = 'LEAVE' AND updated_at <= DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
