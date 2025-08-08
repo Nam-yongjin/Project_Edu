@@ -1,53 +1,64 @@
 package com.EduTech.repository.event;
 
-import java.util.List;
-
+import com.EduTech.entity.event.EventUse;
+import com.EduTech.entity.event.RevState;
+import com.EduTech.entity.member.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.EduTech.entity.event.EventUse;
-import com.EduTech.entity.event.RevState;
-import com.EduTech.entity.member.Member;
+import java.util.List;
 
+// EventUseRepository
+// 행사 신청(예약) 관련 DB 작업 처리 인터페이스
 public interface EventUseRepository extends JpaRepository<EventUse, Long> {
 
-	boolean existsByEventInfo_EventNumAndMember_MemIdAndRevState(Long eventNum, String memId, RevState revState);
+    // ================================
+    // 1. 신청 여부 및 신청자 수 관련
+    // ================================
+
+    // ✅ 중복 신청 여부 확인
+    boolean existsByEventInfo_EventNumAndMember_MemIdAndRevState(Long eventNum, String memId, RevState revState);
+
+    // ✅ 신청 인원 수 count
+    long countByEventInfo_EventNum(Long eventNum);
+
+    // ✅ JPQL 버전의 count (특정 상황에서 사용)
+    @Query("SELECT COUNT(p) FROM EventUse p WHERE p.eventInfo.eventNum = :eventNum")
+    int countByEventInfo(@Param("eventNum") Long eventNum);
 
 
-	long countByEventInfo_EventNum(Long eventNum); // 신청자수 확인
-	
-//	Optional<EventUse> findByEventInfo_EventNumAndMember_MemId(Long eventNum, String memId);	
+    // ================================
+    // 2. 사용자 신청 내역 조회
+    // ================================
 
-	@Query("SELECT COUNT(p) FROM EventUse p WHERE p.eventInfo.eventNum = :eventNum") // 신청자 수 카운트
-	int countByEventInfo(@Param("eventNum") Long eventNum);
+    // ✅ 사용자 신청 목록 (List)
+    List<EventUse> findByMember_MemId(String memId);
 
-	List<EventUse> findByMember_MemId(String memId); // 회원별 신청목록 조회(리스트 형태)
+    // ✅ 사용자 신청 목록 (Page)
+    Page<EventUse> findByMember_MemId(String memId, Pageable pageable);
 
-	Page<EventUse> findByMember_MemId(String memId, Pageable pageable); // 회원별 신청목록 조회(페이지 형태)
+    // ❌ 사용되지 않음 → 주석 처리
+    // Page<EventUse> findByMember(Member member, Pageable pageable);
 
-	List<EventUse> findByEventInfo_EventNum(Long eventNum); // 신청한 프로그램의 모든정보 조회
+    // ✅ 행사별 신청 내역 전체
+    List<EventUse> findByEventInfo_EventNum(Long eventNum);
 
-	Page<EventUse> findByMember(Member member, Pageable pageable); // Member기준으로 예약내역 조회
-	
-//	Optional<EventUse> findTopByEventInfo_EventNumAndMember_MemIdOrderByApplyAtDesc(Long eventNum, String memId);	
+    // ✅ N+1 방지용 Fetch Join
+    @Query("SELECT pu FROM EventUse pu JOIN FETCH pu.member WHERE pu.eventInfo.eventNum = :eventNum")
+    List<EventUse> findWithMemberByEventInfo_EventNum(@Param("eventNum") Long eventNum);
 
-	// member 함께 로딩해서 DTO 변환시 NPE(널포인터예외) 방지
-	@Query("SELECT pu FROM EventUse pu JOIN FETCH pu.member WHERE pu.eventInfo.eventNum = :eventNum")
-	List<EventUse> findWithMemberByEventInfo_EventNum(@Param("eventNum") Long eventNum);
 
-	// ---------- 탈퇴 회원 프로그램 신청 내역 삭제 ----------
+    // ================================
+    // 3. 회원 탈퇴 관련
+    // ================================
 
-	// 특정 회원 프로그램 신청 내역 모두 삭제(DB에서 바로 DELETE쿼리 실행) 
-	void deleteByMember_MemId(String memId);
+    // ✅ 회원의 신청 내역 일괄 삭제
+    void deleteByMember_MemId(String memId);
 
-	// 특정 회원 프로그램 신청 내역을 모두 조회(필요시 사용하면 됨, 현재는 필요 없음)
-	List<EventUse> findAllByMember_MemId(String memId);
-
-	// 회원 탈퇴할때, 행사 신청 완료 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
-	@Query("SELECT COUNT(e) > 0 FROM EventUse e WHERE e.member.memId = :memId AND e.revState = 'APPROVED'")
-	boolean existsApprovedReservationByMemId(@Param("memId") String memId);
-
+    // ✅ 신청 승인 상태가 남아있는지 확인
+    @Query("SELECT COUNT(e) > 0 FROM EventUse e WHERE e.member.memId = :memId AND e.revState = 'APPROVED'")
+    boolean existsApprovedReservationByMemId(@Param("memId") String memId);
 }

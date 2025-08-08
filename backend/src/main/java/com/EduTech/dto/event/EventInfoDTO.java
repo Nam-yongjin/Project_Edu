@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.EduTech.entity.event.EventBannerState;
 import com.EduTech.entity.event.EventCategory;
 import com.EduTech.entity.event.EventState;
 import com.EduTech.entity.event.RevState;
@@ -33,8 +32,6 @@ public class EventInfoDTO {
     private EventState state;
     
     private EventCategory category;
-    
-    private EventBannerState bannerState;
 
     @NotNull(message = "모집 인원은 필수입니다.")
     private Integer maxCapacity;
