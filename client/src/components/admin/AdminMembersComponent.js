@@ -88,10 +88,10 @@ const AdminMembersComponent = () => {
 
     return (
         <div className="max-w-screen-xl mx-auto my-10 ">
-            <div className="text-2xl font-bold mb-4">회원 관리</div>
+            <div className="newText-2xl min-blank font-bold mb-4">회원 관리</div>
 
             {/* 검색 및 정렬 필터 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 bg-gray-100 rounded-lg shadow-sm">
+            <div className="min-blank newText-base grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 bg-gray-100 rounded-lg shadow-sm">
                 <input
                     name="memId"
                     placeholder="회원 ID"
@@ -166,8 +166,8 @@ const AdminMembersComponent = () => {
             </div>
 
             {/* 회원 목록 테이블 */}
-            <div className="page-shadow overflow-x-auto">
-                <table className="w-full text-sm text-center min-w-[1024px]">
+            <div className="page-shadow min-blank overflow-x-auto">
+                <table className="newText-sm w-full text-center min-w-[1024px]">
                     <thead className="bg-gray-200">
                         <tr>
                             <th scope="col" className="p-4">
@@ -222,7 +222,7 @@ const AdminMembersComponent = () => {
             </div>
 
             {/* 상태 변경 드롭다운 */}
-            <div className="flex items-center gap-4 mt-10 mb-6">
+            <div className="min-blank newText-base flex items-center gap-4 mt-10 mb-6">
                 <select
                     value={selectedState}
                     onChange={(e) => setSelectedState(e.target.value)}
@@ -246,7 +246,7 @@ const AdminMembersComponent = () => {
                 {Array.from({ length: totalPages }, (_, idx) => (
                     <button
                         key={idx}
-                        className={`px-4 py-2 rounded-md text-sm font-semibold ${page === idx
+                        className={`newText-sm px-4 py-2 rounded-md font-semibold ${page === idx
                             ? "bg-blue-600 text-white"
                             : "bg-gray-200 hover:bg-gray-300 active:bg-gray-400"
                             }`}

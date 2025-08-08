@@ -75,8 +75,8 @@ const RegisterTermsComponent = () => {
     };
 
     return (
-        <div className="mb-20 pt-20">
-            <div className="max-w-screen-md">
+        <div className="max-w-screen-md mx-auto mb-20 pt-20">
+            <div className="min-blank">
 
                 <div className="newText-2xl text-center font-bold mb-4">이용 약관 동의</div>
 

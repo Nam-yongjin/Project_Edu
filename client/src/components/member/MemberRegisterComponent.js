@@ -159,14 +159,14 @@ const MemberRegisterComponent = () => {
     };
 
     return (
-        <div>
-            <div className="page-shadow my-10 p-10 space-y-6 text-center">
+        <div className='max-w-screen-md mx-auto'>
+            <div className="page-shadow min-blank my-10 p-10 space-y-6 text-center">
                 <div className="newText-3xl font-bold">회원가입</div>
 
                 {/* 아이디 */}
                 <div>
                     <div className="newText-base flex items-center gap-4">
-                        <label className="newText-base w-32 text-left font-medium">아이디<span className='text-red-600'> *</span></label>
+                        <label className="w-32 text-left font-medium">아이디<span className='text-red-600'> *</span></label>
                         <input
                             name="memId"
                             placeholder="아이디"
@@ -176,7 +176,7 @@ const MemberRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                         <button
-                            className="text-center normal-button"
+                            className="text-center normal-button lg:w-[100px] w-[90px]"
                             onClick={handleCheckDuplicateId}
                         >
                             중복 체크
@@ -361,7 +361,7 @@ const MemberRegisterComponent = () => {
                 </div>
 
                 {/* 제출 버튼 */}
-                <div>
+                <div className='pt-4'>
                     <button
                         className="newText-base positive-button"
                         onClick={handleSubmit}

@@ -62,69 +62,70 @@ const ResetPwComponent = () => {
     };
 
     return (
+        <div className='max-w-screen-md mx-auto w-[500px]'>
+            <div className='page-shadow min-blank my-10 p-10 space-y-6 text-center '>
+                <div className='newText-2xl font-bold'>비밀번호 찾기 / 재설정</div>
 
-        <div className='page-shadow my-10 p-10 space-y-6 text-center lg:w-[500px] sm:w-[450px] w-[400px]'>
-            <div className='newText-2xl font-bold'>비밀번호 찾기 / 재설정</div>
+                {step === 'checkId' && (
+                    <div className="newText-base">
+                        <div>
+                            <input
+                                type="text"
+                                placeholder="아이디 입력"
+                                value={memId}
+                                onChange={(e) => setMemId(e.target.value)}
+                                className="w-full my-3 input-focus"
+                            />
+                        </div>
+                        <div>
+                            <input
+                                type="text"
+                                placeholder="휴대폰번호 입력 ('-' 없이)"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="w-full input-focus"
+                            />
+                        </div>
+                        <button className="normal-button p-2 my-3 w-full"
+                            onClick={handleCheckIdPhone}>아이디 확인</button>
+                    </div>
 
-            {step === 'checkId' && (
-                <div className="newText-base">
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="아이디 입력"
-                            value={memId}
-                            onChange={(e) => setMemId(e.target.value)}
-                            className="w-full my-3 input-focus"
-                        />
-                    </div>
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="휴대폰번호 입력 ('-' 없이)"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="w-full input-focus"
-                        />
-                    </div>
-                    <button className="normal-button p-2 my-3 w-full"
-                        onClick={handleCheckIdPhone}>아이디 확인</button>
-                </div>
+                )}
 
-            )}
+                {step === 'verifyPhone' && (
+                    <PhoneVerification
+                        onVerified={handleVerified}
+                        initialPhone={phone} // `phone` 상태를 `initialPhone` prop으로 전달
+                    />
+                )}
 
-            {step === 'verifyPhone' && (
-                <PhoneVerification
-                    onVerified={handleVerified}
-                    initialPhone={phone} // `phone` 상태를 `initialPhone` prop으로 전달
-                />
-            )}
-
-            {step === 'resetPw' && (
-                <>
-                    <div className='newText-base'>
-                        <input
-                            type="password"
-                            placeholder="새 비밀번호 입력"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className="flex-1 w-full input-focus"
-                        />
-                    </div>
-                    <div className='newText-base'>
-                        <input
-                            type="password"
-                            placeholder="새 비밀번호 확인"
-                            value={pwCheck}
-                            onChange={(e) => setPwCheck(e.target.value)}
-                            className="flex-1 w-full input-focus"
-                        />
-                    </div>
-                    <div>
-                        <button className="newText-base positive-button w-full"
-                            onClick={handleResetPassword}>비밀번호 재설정</button>
-                    </div>
-                </>
-            )}
+                {step === 'resetPw' && (
+                    <>
+                        <div className='newText-base'>
+                            <input
+                                type="password"
+                                placeholder="새 비밀번호 입력"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="flex-1 w-full input-focus"
+                            />
+                        </div>
+                        <div className='newText-base'>
+                            <input
+                                type="password"
+                                placeholder="새 비밀번호 확인"
+                                value={pwCheck}
+                                onChange={(e) => setPwCheck(e.target.value)}
+                                className="flex-1 w-full input-focus"
+                            />
+                        </div>
+                        <div>
+                            <button className="newText-base positive-button w-full"
+                                onClick={handleResetPassword}>비밀번호 재설정</button>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 };

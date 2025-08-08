@@ -23,8 +23,8 @@ const FindIdComponent = () => {
     };
 
     return (
-        <div>
-            <div className='page-shadow my-10 p-10 lg:w-[500px] sm:w-[450px] w-[400px] space-y-6 text-center'>
+        <div className='max-w-screen-md mx-auto w-[500px]'>
+            <div className='page-shadow min-blank my-10 p-10 space-y-6 text-center'>
                 <div className='newText-2xl font-bold'>아이디 찾기</div>
                 {!foundId ? (
                     <PhoneVerification onVerified={handleVerified} />
