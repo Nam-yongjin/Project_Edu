@@ -29,5 +29,7 @@ public class NewsCreateRegisterDTO {
 	private String content; //내용
 	
 	private List<MultipartFile> files; //첨부할 파일
+	
+	private String link; //외부 뉴스 링크(링크만 분리하기 위해 따로 만들었음)
 
 }
