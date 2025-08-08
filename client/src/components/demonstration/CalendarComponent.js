@@ -1,9 +1,9 @@
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Calendar from "react-calendar";
 import { getResDate } from "../../api/demApi";
 import 'react-calendar/dist/Calendar.css';
 
-const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDates, setDisabledDates,exceptDate }) => {
+const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDates, setDisabledDates, exceptDate }) => {
   const today = new Date(); // 날짜 객체 생성
   today.setHours(0, 0, 0, 0); // 오늘 날짜의 자정으로 초기화
   // hours, minutes, seconds, milliseconds
@@ -20,10 +20,21 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
 
       const { monthStart, monthEnd } = getMonthDates(calendarDate.year, calendarDate.month);
       const data = await getResDate(monthStart, monthEnd, demNum);
-      
+
       if (Array.isArray(data)) {
-        const newDates = data.map(item => item.demDate);
-        setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));
+        const newDates = data.map(item => toLocalDateString(new Date(item.demDate)));
+
+        const exceptDatesArray = Array.isArray(exceptDate)
+          ? exceptDate.map(item => toLocalDateString(new Date(item.demDate)))
+          : [];
+
+        const filteredDates = newDates.filter(
+          date => !exceptDatesArray.includes(date)
+        );
+
+        setDisabledDates(prev =>
+          Array.from(new Set([...prev, ...filteredDates]))
+        );
       }
     };
 
@@ -170,7 +181,7 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
                 </div>
               ) : (
                 <button
-                  className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                  className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 w-[50px] text-center rounded bg-blue-600 text-white hover:bg-blue-700"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleReserve(date);
@@ -178,6 +189,7 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
                 >
                   예약
                 </button>
+
               )}
             </>
           );

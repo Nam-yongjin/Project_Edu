@@ -97,4 +97,9 @@ public interface DemonstrationReserveRepository
 		@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeReqDTO(r.startDate,r.endDate) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
 		DemonstrationTimeReqDTO getResDate(@Param("demNum") Long demNum, @Param("memId") String memId,
 				@Param("state") DemonstrationState state);
+		
+	// res테이블에서 아이디와 상품 번호를 받아와 실증 신청 번호를 받아오는 쿼리문
+		@Query("SELECT r FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
+		DemonstrationReserve getRev(@Param("demNum") Long demNum, @Param("memId") String memId,
+				@Param("state") DemonstrationState state);
 }
