@@ -9,6 +9,7 @@ import companyRouter from "./companyRouter";
 import demonstrationRouter from "./demonstrationRouter";
 import noticeRouter from "./noticeRouter";
 import eventRouter from "./eventRouter";
+import facilityRouter from "./facilityRouter";
 import aboutRouter from "./aboutRouter";
 import adminRouter from "./adminRouter";
 
@@ -26,6 +27,7 @@ const NaverRedirect = lazy(() => import("../pages/member/NaverRedirectPage"))
 const Demonstration = lazy(() => import("../pages/demonstration/demonstrationPage"))
 const Notice = lazy(() => import("../pages/notice/noticePage"))
 const Event = lazy(() => import("../pages/event/eventPage"))
+const Facility = lazy(() => import("../pages/facility/facilityPage"))
 const About = lazy(() => import("../pages/about/AboutPage"))
 const Admin = lazy(() => import("../pages/admin/AdminPage"))
 
@@ -95,6 +97,11 @@ const root = createBrowserRouter([
         path: "event",
         element: <Suspense fallback={<Loading />}><Event /></Suspense>,
         children: eventRouter()
+    },
+    {
+        path: "facility",
+        element: <Suspense fallback={<Loading />}><Facility /></Suspense>,
+        children: facilityRouter()
     },
     {
         path: "about",

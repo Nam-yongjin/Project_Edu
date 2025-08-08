@@ -82,20 +82,19 @@ public class FacilityServiceImpl implements FacilityService {
     public void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images) {
         Facility facility = modelMapper.map(dto, Facility.class);
 
-        // 이미지 저장 처리
         for (MultipartFile image : images) {
             if (!image.isEmpty()) {
                 Map<String, String> saved = fileUtil.saveImage(image, "facility");
 
                 String originalName = saved.get("originalName");
-                String imagePath = saved.get("filePath"); // 예: facility/uuid_abc.jpg
+                String imagePath = saved.get("filePath");
 
                 FacilityImage imageEntity = FacilityImage.builder()
                     .imageName(originalName)
-                    .imageUrl("/upload/" + imagePath)  // 또는 정적 경로에 따라 경로 조정
+                    .imageUrl("/upload/" + imagePath)
                     .build();
 
-                facility.addImage(imageEntity);
+                facility.addImage(imageEntity);  // 연관 관계 편의 메서드
             }
         }
 

@@ -52,9 +52,9 @@ public class Facility {
     private List<FacilityImage> images = new ArrayList<>();
 
     // FK 회원id
- 	@ManyToOne(fetch = FetchType.LAZY)
- 	@JoinColumn(name = "memId", nullable = false)
- 	private Member member;
+    @ManyToOne(fetch = FetchType.LAZY, optional = true) // 🔄 optional = true
+    @JoinColumn(name = "mem_id", nullable = true)        // 🔄 nullable = true
+    private Member member;
  	
     public void addImage(FacilityImage image) {
         images.add(image);

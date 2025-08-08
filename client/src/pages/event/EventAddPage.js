@@ -1,6 +1,6 @@
 import EvtTitleComponent from "../../components/event/EvtTitleComponent";
-import "react-datepicker/dist/react-datepicker.css";
 import EvtAddComponent from "../../components/event/EvtAddComponent";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AddEvtPage = () => {
 
