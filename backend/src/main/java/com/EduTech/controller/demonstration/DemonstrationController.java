@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
+import com.EduTech.dto.demonstration.DemonstrationBorrowListDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
@@ -192,6 +193,15 @@ public class DemonstrationController {
 		Boolean bool = demonstrationService.checkRes(demNum, memId);
 		return bool;
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
+	}
+	
+	// 실증 물품 현황 페이지에서 물품에 대한 정보를 받아오는 기능
+	@GetMapping("/getBorrow")
+	public PageResponseDTO<DemonstrationBorrowListDTO> getBorrow(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		String memId = JWTFilter.getMemId();
+		System.out.println(memId);
+		PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow = demonstrationService.AllgetBorrow(memId,demonstrationSearchDTO);
+		return AllgetBorrow;
 	}
 
 }
