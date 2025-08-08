@@ -30,7 +30,7 @@ const SubAdminHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link
                                 to="/admin/banner"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 배너관리
@@ -39,7 +39,7 @@ const SubAdminHeader = () => {
                         <li className="mr-6 pb-2">
                             <Link
                                 to="/event/banner"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/1") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/event/banner") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 프로그램 배너 관리

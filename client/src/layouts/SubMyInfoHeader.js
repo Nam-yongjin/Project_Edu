@@ -53,7 +53,7 @@ const SubMyInfoHeader = () => {
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/"
+                                to="/facility"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/facility") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
@@ -62,7 +62,7 @@ const SubMyInfoHeader = () => {
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/"
+                                to="/demonstration"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
