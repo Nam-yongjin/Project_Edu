@@ -7,7 +7,9 @@ import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.member.MemberRepository;
+import com.EduTech.service.facility.HolidaySyncService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +24,8 @@ public class Scheduler {
 
 	private final DemonstrationReserveRepository resRepository;
 	
+	private final HolidaySyncService holidaySyncService;
+	
 	// 회원탈퇴 일주일지난 회원정보 자동삭제
     @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul") // 10분 마다 실행
     public void cleanUpLeaveMembers() {
@@ -35,6 +39,18 @@ public class Scheduler {
         int closed = infoRepository.updateStateToClosed();
 
         log.info("상태 갱신 완료 - BEFORE: {}, OPEN: {}, CLOSED: {}", before, open, closed);
+    }
+    
+    @PostConstruct
+    public void initHolidaySync() {
+        int count = holidaySyncService.syncThisAndNextYear();
+        log.info("앱 시작 시 공휴일 동기화 완료: {}건 추가됨", count);
+    }
+    
+    @Scheduled(cron = "0 0 12 * * *", zone = "Asia/Seoul")
+    public void dailyHolidaySync() {
+        int count = holidaySyncService.syncThisAndNextYear();
+        log.info("정기 공휴일 동기화 완료: {}건 추가됨", count);
     }
     
     @Scheduled(cron = "0 0 0 * * 0", zone = "Asia/Seoul")
