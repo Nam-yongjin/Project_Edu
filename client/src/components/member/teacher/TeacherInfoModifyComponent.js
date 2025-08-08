@@ -87,7 +87,7 @@ const TeacherInfoModifyComponent = () => {
         const errs = {};
 
         if (!/^[A-Za-z0-9!@#$.]{6,16}$/.test(form.pw)) {
-            errs.pw = '비밀번호는 6~16자, 특수문자(!@#$.) 사용 가능.';
+            errs.pw = '비밀번호는 6~16자, 영문/숫자, 특수문자(!@#$.)만 사용 가능합니다.';
         };
 
         if (form.pw !== form.pwCheck) {
@@ -125,7 +125,7 @@ const TeacherInfoModifyComponent = () => {
             try {
                 isDuplicated = await checkEmail({ email: form.email });
             } catch (error) {
-                alert("이메일 중복 확인 중 오류가 발생했습니다.",error);
+                alert("이메일 중복 확인 중 오류가 발생했습니다.", error);
                 return;
             }
 
@@ -165,7 +165,7 @@ const TeacherInfoModifyComponent = () => {
                 moveToPath('/teacher/myInfo');
             })
             .catch((error) => {
-                alert("회원정보 수정 실패",error);
+                alert("회원정보 수정 실패", error);
             });
     };
 
@@ -193,7 +193,7 @@ const TeacherInfoModifyComponent = () => {
                 if (error.response && error.response.data) {
                     alert(error.response.data);
                 } else {
-                    alert("탈퇴에 실패했습니다.",error);
+                    alert("탈퇴에 실패했습니다.", error);
                 }
             }
         } else {
@@ -328,18 +328,16 @@ const TeacherInfoModifyComponent = () => {
 
                 {modifying ?
                     <div>
-                        <div className="newText-base flex items-start">
-                            <div className="w-36 text-left font-medium pt-2">주소</div>
-                            <div className="flex-1">
-                                <AddressSearch onAddressSelected={handleAddressSelected} />
-                                <input
-                                    name="addr"
-                                    placeholder="주소"
-                                    value={form.addr}
-                                    readOnly
-                                    className="w-full mt-2 bg-gray-100 input-focus"
-                                />
-                            </div>
+                        <div className="newText-base flex items-center gap-4">
+                            <div className="w-32 text-left font-medium">주소</div>
+                            <input
+                                name="addr"
+                                placeholder="주소"
+                                value={form.addr}
+                                readOnly
+                                className="flex-1 w-full bg-gray-100 input-focus"
+                            />
+                            <AddressSearch onAddressSelected={handleAddressSelected} />
                         </div>
                     </div>
                     :
