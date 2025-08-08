@@ -97,8 +97,8 @@ const EventListComponent = () => {
         {[
           { label: "전체", value: "" },
           { label: "교사", value: "TEACHER" },
-          { label: "학생참여", value: "STUDENT" },
-          { label: "시민참여", value: "USER" },
+          { label: "학생", value: "STUDENT" },
+          { label: "시민", value: "USER" },
         ].map(({ label, value }) => (
           <button
             key={value}

@@ -67,7 +67,7 @@ export const applyEvent = async (dto) => {
 // 사용자 예약행사 조회
 export const getReservationList = async ({ page = 0, size = 5 }) => {
   const res = await jwtAxios.get(`${event}/reservation`, {
-    params: { page, size },
+    params: { page, size, sort: "applyAt,DESC", },
   });
   return res.data;
 };
@@ -93,4 +93,15 @@ export const getBannerList = async (current) => {
 export const registerBanner = async (formData) => {
   const response = await axios.post(`${event}/banners/register`, formData);
   return response.data;
+};
+
+export const deleteBanner = (bannerNum) => {
+  return axios.delete(`${event}/banners/delete`, {
+    params: { bannerNum },
+  });
+};
+
+export const getMonthlyBannerList = async () => {
+  const res = await axios.get(`${event}/monthlyBanner`);
+  return res.data; // List<EventInfoDTO>
 };

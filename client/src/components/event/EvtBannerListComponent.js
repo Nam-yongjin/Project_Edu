@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getBannerList, registerBanner } from '../../api/eventApi';
+import { getBannerList, registerBanner, deleteBanner } from '../../api/eventApi';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,11 +35,23 @@ const EvtBannerList = () => {
     }
   };
 
+  // 날짜 포맷 함수
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    return `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
+  };
+
   // 배너 등록 요청
   const handleBannerRegister = async (eventNum) => {
     try {
       const formData = new FormData();
-      formData.append("eventNum", eventNum); // ✅ 서버에서 DTO 필드명과 일치해야 함
+      formData.append("eventNum", eventNum); // 서버 DTO 필드명과 일치
 
       await registerBanner(formData);
       alert("배너 등록이 완료되었습니다.");
@@ -54,10 +66,22 @@ const EvtBannerList = () => {
     }
   };
 
-  // 배너 삭제 요청 (기능 미구현 상태 - 틀만 존재)
-  const handleBannerDelete = (eventNum) => {
-    console.log("배너 삭제 요청:", eventNum);
-    // TODO: 삭제 API 연동 예정
+  // 배너 삭제 요청
+  const handleBannerDelete = async (eventNum) => {
+    if (!window.confirm("정말 이 행사에서 배너를 제거하시겠습니까?")) return;
+
+    try {
+      await deleteBanner(eventNum);
+      alert("배너가 정상적으로 제거되었습니다.");
+      fetchBannerList(); // 리스트 갱신
+    } catch (err) {
+      console.error("배너 삭제 실패:", err);
+      if (err.response?.data) {
+        alert(err.response.data);
+      } else {
+        alert("배너 제거 중 오류가 발생했습니다.");
+      }
+    }
   };
 
   return (
@@ -93,7 +117,6 @@ const EvtBannerList = () => {
             <div className="ml-4 flex flex-col items-end space-y-2">
               {event.bannerState === "YES" ? (
                 <>
-                  {/* 배너 등록 완료 버튼 */}
                   <button
                     disabled
                     className="px-4 py-2 bg-gray-400 text-white text-sm rounded cursor-not-allowed"
@@ -101,16 +124,14 @@ const EvtBannerList = () => {
                     배너 등록 완료
                   </button>
 
-                  {/* 배너 등록 제거 버튼 (기능은 틀만 존재) */}
                   <button
-                    onClick={() => handleBannerDelete(event.eventNum)}
+                    onClick={() => handleBannerDelete(event.bannerNum)}
                     className="px-4 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600"
                   >
                     배너 등록 제거
                   </button>
                 </>
               ) : (
-                // 배너 등록 버튼
                 <button
                   onClick={() => handleBannerRegister(event.eventNum)}
                   className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
@@ -124,18 +145,6 @@ const EvtBannerList = () => {
       </div>
     </div>
   );
-};
-
-// 날짜 포맷 함수
-const formatDateTime = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  const hh = String(date.getHours()).padStart(2, '0');
-  const mi = String(date.getMinutes()).padStart(2, '0');
-  return `${yyyy}.${mm}.${dd} ${hh}:${mi}`;
 };
 
 export default EvtBannerList;
