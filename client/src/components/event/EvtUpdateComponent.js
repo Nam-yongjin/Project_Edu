@@ -29,7 +29,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
         daysOfWeek: data.daysOfWeek || [],
       });
     } catch (err) {
-      console.error("❌ 행사 조회 실패", err);
+      console.error("행사 조회 실패", err);
       alert("행사 정보를 불러오는 데 실패했습니다.");
       moveToReturn();
     }

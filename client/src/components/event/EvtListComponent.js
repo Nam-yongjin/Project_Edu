@@ -65,7 +65,7 @@ const EventListComponent = () => {
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
-  // ✅ 상태 단순화: 신청 시작 전 / 신청 가능 / 신청 기간 만료
+  // 신청 시작 전 / 신청 가능 / 신청 기간 만료
   const getApplyStatus = (event) => {
     const now = new Date();
     const start = new Date(event.applyStartPeriod);
