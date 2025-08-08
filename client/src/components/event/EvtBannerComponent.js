@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import { getMonthlyBannerList } from '../../api/eventApi';
+import { getBannerEvent } from '../../api/eventApi';
 import { useNavigate } from 'react-router-dom';
 
 import 'swiper/css';
@@ -10,12 +10,12 @@ import 'swiper/css/pagination';
 
 const HOST = "http://localhost:8090/view"; // 이미지 경로
 
-const MonthlyBannerSwiper = () => {
+const EvtBannerList = () => {
   const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getMonthlyBannerList()
+    getBannerEvent()
       .then(data => setBanners(data))
       .catch(err => console.error('배너 불러오기 실패:', err));
   }, []);
@@ -73,4 +73,4 @@ const MonthlyBannerSwiper = () => {
   );
 };
 
-export default MonthlyBannerSwiper;
+export default EvtBannerList;

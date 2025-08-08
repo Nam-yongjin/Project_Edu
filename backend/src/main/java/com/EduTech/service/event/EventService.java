@@ -28,7 +28,7 @@ public interface EventService {
     EventInfoDTO getEvent(Long eventNum);
 
     // 이달의 OPEN 행사 목록 (배너용)
-    List<EventInfoDTO> getMonthlyOpenEvents();
+    List<EventInfoDTO> getbannerEvent();
     
     EventInfo getEventEntity(Long eventNum); // 내부용 Entity 직접 조회
 
