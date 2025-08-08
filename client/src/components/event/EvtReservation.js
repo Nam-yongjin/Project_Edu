@@ -11,17 +11,19 @@ const ReservationListComponent = () => {
   const navigate = useNavigate();
   const host = "http://localhost:8090/view";
 
-  // 📡 예약 리스트 조회 함수
+  // 예약 리스트 조회
   const fetchReservations = async (targetPage = page) => {
-    console.log("📡 예약 리스트 조회 요청");
     try {
-      const data = await getReservationList({ page: targetPage, size: pageSize });
-      console.log("✅ 예약 리스트 응답:", data);
+      const data = await getReservationList({
+        page: targetPage,
+        size: pageSize,
+        sort: "applyAt,DESC",
+      });
       setReservations(data.content);
       setTotalPages(data.totalPages);
       setPage(targetPage);
     } catch (error) {
-      console.error("❌ 예약 이력 불러오기 실패:", error);
+      console.error("예약 이력 불러오기 실패:", error);
       if (error.response?.status === 401) {
         alert("로그인이 필요합니다.");
         navigate("/login");
@@ -31,38 +33,39 @@ const ReservationListComponent = () => {
     }
   };
 
-  // 컴포넌트 mount 및 page 변경 시 호출
   useEffect(() => {
     fetchReservations();
   }, [page]);
 
-  // ❌ 예약 취소 처리
+  // 예약 취소 처리
   const handleCancelReservation = async (evtRevNum) => {
     if (!window.confirm("예약을 취소하시겠습니까?")) return;
 
     try {
-      console.log("⛔ 예약 취소 요청:", evtRevNum);
       await cancelReservation(evtRevNum);
       alert("예약이 취소되었습니다.");
-      fetchReservations(0); // 첫 페이지부터 다시 조회
+      fetchReservations(0);
     } catch (error) {
-      console.error("❌ 예약 취소 실패:", error);
-      alert("예약 취소 중 오류가 발생했습니다.");
+      console.error("예약 취소 실패:", error);
+      if (error.response?.data) {
+        alert(error.response.data);
+      } else {
+        alert("예약 취소 중 오류가 발생했습니다.");
+      }
     }
   };
 
   const formatDate = (dateStr) => {
-  if (!dateStr) return "없음";
-  const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
-};
+    if (!dateStr) return "없음";
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
 
-  // 🏷 상태 텍스트 반환 함수
   const getStatusLabel = (state) => {
     switch (state) {
       case "APPROVED":
@@ -72,6 +75,28 @@ const ReservationListComponent = () => {
       default:
         return "대기 중";
     }
+  };
+
+  const getCancelButtonLabel = (item) => {
+    const now = new Date();
+    const start = new Date(item.eventStartPeriod);
+    const end = new Date(item.eventEndPeriod);
+
+    if (item.revState === "CANCEL") return "취소완료";
+    if (now >= start && now <= end) return "행사 진행 중";
+    if (now > end) return "행사 완료";
+    return "취소하기";
+  };
+
+  const isCancelable = (item) => {
+    const now = new Date();
+    const start = new Date(item.eventStartPeriod);
+    const end = new Date(item.eventEndPeriod);
+
+    return (
+      item.revState !== "CANCEL" &&
+      now < start // 시작 전만 취소 가능
+    );
   };
 
   return (
@@ -97,7 +122,7 @@ const ReservationListComponent = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  "이미지 없음"
+                  <span>이미지 없음</span>
                 )}
               </div>
 
@@ -107,7 +132,8 @@ const ReservationListComponent = () => {
                   <strong>행사이름:</strong> {item.eventName}
                 </p>
                 <p className="mb-1">
-                  <strong>행사 일정:</strong> {formatDate(item.eventStartPeriod)} ~{" "}
+                  <strong>행사 일정:</strong>{" "}
+                  {formatDate(item.eventStartPeriod)} ~{" "}
                   {formatDate(item.eventEndPeriod)}
                 </p>
                 <p className="mb-1">
@@ -133,15 +159,14 @@ const ReservationListComponent = () => {
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => handleCancelReservation(item.evtRevNum)}
-                  disabled={item.revState === "CANCEL"}
-                  className={`px-3 py-1 rounded text-sm
-                    ${
-                      item.revState === "CANCEL"
-                        ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                        : "bg-red-500 text-white hover:bg-red-600"
-                    }`}
+                  disabled={!isCancelable(item)}
+                  className={`px-3 py-1 rounded text-sm ${
+                    !isCancelable(item)
+                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      : "bg-red-500 text-white hover:bg-red-600"
+                  }`}
                 >
-                  {item.revState === "CANCEL" ? "취소완료" : "취소하기"}
+                  {getCancelButtonLabel(item)}
                 </button>
 
                 <button
