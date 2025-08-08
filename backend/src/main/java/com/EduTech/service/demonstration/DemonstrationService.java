@@ -17,6 +17,7 @@ import com.EduTech.dto.demonstration.DemonstrationReservationDTO;
 import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
+import com.EduTech.dto.demonstration.ResRequestDTO;
 
 
 public interface DemonstrationService {
@@ -37,4 +38,5 @@ public interface DemonstrationService {
 		void deleteDemonstration(Long demNum); // 실증 번호를 받아 실증 상품을 삭제하는 기능
 		DemonstrationFormResDTO selectOne(Long demNum); // 실증 번호를 받아 실증 상품 하나의 정보를 받아오는 기능
 		Boolean checkRes(Long demNum,String memId);// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
+		void addRequest(ResRequestDTO resRequestDTO,String memId); // 물품 대여 목록 페이지에서 반납 신청, 연기 신청하는 기능
 }
