@@ -3,7 +3,7 @@ import Calendar from "react-calendar";
 import { getResDate } from "../../api/demApi";
 import 'react-calendar/dist/Calendar.css';
 
-const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDates, setDisabledDates }) => {
+const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDates, setDisabledDates,exceptDate }) => {
   const today = new Date(); // 날짜 객체 생성
   today.setHours(0, 0, 0, 0); // 오늘 날짜의 자정으로 초기화
   // hours, minutes, seconds, milliseconds
@@ -20,7 +20,7 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
 
       const { monthStart, monthEnd } = getMonthDates(calendarDate.year, calendarDate.month);
       const data = await getResDate(monthStart, monthEnd, demNum);
-
+      
       if (Array.isArray(data)) {
         const newDates = data.map(item => item.demDate);
         setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));
