@@ -186,4 +186,41 @@ public class FileUtil {   // 파일 데이터의 입출력
 	    return ResponseEntity.ok().headers(headers).body(resource);
 	}
    
+   public Map<String, String> saveImage(MultipartFile file, String dirName) {
+	    if (file == null || file.isEmpty() || dirName == null) {
+	        return null;
+	    }
+
+	    Path dirPath = Paths.get(uploadPath, dirName);
+	    if (!Files.exists(dirPath)) {
+	        try {
+	            Files.createDirectories(dirPath);
+	        } catch (IOException e) {
+	            throw new RuntimeException(e.getMessage());
+	        }
+	    }
+
+	    String originalName = file.getOriginalFilename();
+	    String ext = originalName.substring(originalName.lastIndexOf("."));
+	    String savedName = UUID.randomUUID().toString() + ext;
+	    Path savePath = Paths.get(uploadPath, dirName, savedName);
+
+	    try {
+	        Files.copy(file.getInputStream(), savePath);
+
+	        // 썸네일 생성
+	        if (file.getContentType() != null && file.getContentType().startsWith("image")) {
+	            Path thumbnailPath = Paths.get(uploadPath, dirName, "s_" + savedName);
+	            Thumbnails.of(savePath.toFile()).size(400, 400).toFile(thumbnailPath.toFile());
+	        }
+
+	        return Map.of(
+	            "originalName", originalName,
+	            "filePath", pathEncode(dirName, savedName)
+	        );
+	    } catch (IOException e) {
+	        throw new RuntimeException(e.getMessage());
+	    }
+	}
+   
 }
