@@ -274,7 +274,7 @@ const CompanyInfoModifyComponent = () => {
                 {modifying ?
                     <div>
                         <div className="newText-base flex items-start">
-                            <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
+                            <div className="xl:w-[182px] sm:w-[188px] w-[234px] text-left font-medium pt-4">휴대폰<span className='text-red-600' hidden={!modifying}> *</span></div>
                             <PhoneVerification onVerified={setVerifiedPhone} />
                         </div>
                         {errors.phone && <div className="text-red-500 newText-sm text-left ml-36">{errors.phone}</div>}

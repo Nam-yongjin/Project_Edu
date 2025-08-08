@@ -101,7 +101,7 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
     };
 
     return (
-        <div className="space-y-2 ">
+        <div className="space-y-2 w-full">
             <div id="recaptcha-container"></div>
 
             <input
@@ -124,7 +124,7 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
             <button
                 onClick={sendOTP}
                 disabled={cooldown > 0 || disable || !isValidPhone(phone)}
-                className={`newText-base float-left w-full transition-colors duration-150 
+                className={`newText-base float-left w-full
                     ${cooldown > 0 || disable || !isValidPhone(phone)
                         ? 'bg-gray-300 text-gray-500 p-2 rounded-md cursor-not-allowed'
                         : 'positive-button'
@@ -150,9 +150,9 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
                 <button
                     onClick={verifyOTP}
                     disabled={disable}
-                    className={`newText-base float-left w-full p-2 rounded-md transition-colors duration-150 font-semibold ${disable
+                    className={`newText-base float-left w-full   ${disable
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-green-500 hover:bg-green-600 active:bg-green-700 text-white'
+                        : 'green-button'
                         }`}
                 >
                     인증번호 확인

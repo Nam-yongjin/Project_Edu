@@ -119,42 +119,47 @@ const AdminBannerComponent = () => {
                 </div>
             </div>
 
-            <div className='bg-white p-6 page-shadow'>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {banners.map((banner, index) => (
-                        <li
-                            key={banner.bannerNum}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, index)}
-                            onDragEnter={(e) => handleDragEnter(e, index)}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={handleDrop}
-                            className='relative group flex flex-col items-center p-3 bg-gray-100 rounded-lg border border-gray-300 hover:shadow-lg transition-shadow duration-300 
-                            ease-in-out cursor-grab active:cursor-grabbing'
-                        >
-                            <div className="w-full aspect-[4/3] flex items-center justify-center overflow-hidden rounded-md bg-white">
-                                <img
-                                    src={getBannerImage(banner.imagePath)}
-                                    alt={banner.originalName}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
-                                />
-                            </div>
-
-                            <div className="w-full mt-3 text-center">
-                                <p className="newText-base font-medium truncate">{banner.originalName}</p>
-                                <span className="newText-sm text-gray-500">순서: {banner.sequence}</span>
-                            </div>
-
-                            <button
-                                onClick={() => handleDelete(banner.bannerNum)}
-                                className='absolute top-2 right-2 p-1 w-[28px] h-[28px] rounded-full bg-white border hover:bg-red-100 hover:border-red-300 active:bg-red-200 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out'
-                                aria-label="배너 삭제"
+            <div className='min-blank bg-white p-6 page-shadow'>
+                {banners.length > 0 ? (
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {banners.map((banner, index) => (
+                            <li
+                                key={banner.bannerNum}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, index)}
+                                onDragEnter={(e) => handleDragEnter(e, index)}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={handleDrop}
+                                className='relative group flex flex-col items-center p-3 bg-gray-100 rounded-lg border border-gray-300 hover:shadow-lg transition-shadow duration-300 ease-in-out cursor-grab active:cursor-grabbing'
                             >
-                                <img src={cancel} className='w-full h-full object-contain' />
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+                                <div className="w-full aspect-[4/3] flex items-center justify-center overflow-hidden rounded-md bg-white">
+                                    <img
+                                        src={getBannerImage(banner.imagePath)}
+                                        alt={banner.originalName}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
+                                    />
+                                </div>
+
+                                <div className="w-full mt-3 text-center">
+                                    <p className="newText-base font-medium truncate">{banner.originalName}</p>
+                                    <span className="newText-sm text-gray-500">순서: {banner.sequence}</span>
+                                </div>
+
+                                <button
+                                    onClick={() => handleDelete(banner.bannerNum)}
+                                    className='absolute top-2 right-2 p-1 w-[28px] h-[28px] rounded-full bg-white border hover:bg-red-100 hover:border-red-300 active:bg-red-200 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out'
+                                    aria-label="배너 삭제"
+                                >
+                                    <img src={cancel} className='w-full h-full object-contain' />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="newText-base text-center py-10 text-gray-500">
+                        배너가 존재하지 않습니다.
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -173,10 +173,10 @@ const MemberRegisterComponent = () => {
                             value={form.memId}
                             onChange={handleChange}
                             autoFocus
-                            className="flex-1 input-focus"
+                            className="flex-1 w-full input-focus"
                         />
                         <button
-                            className="text-center normal-button lg:w-[100px] w-[90px]"
+                            className="text-center normal-button sm:w-[100px] w-[80px]"
                             onClick={handleCheckDuplicateId}
                         >
                             중복 체크
@@ -235,7 +235,7 @@ const MemberRegisterComponent = () => {
                 {/* 휴대폰 인증 */}
                 <div>
                     <div className="newText-base flex items-start">
-                        <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600'> *</span></div>
+                        <div className="xl:w-[182px] sm:w-[188px] w-[234px] text-left font-medium pt-4">휴대폰<span className='text-red-600'> *</span></div>
                         <PhoneVerification onVerified={setVerifiedPhone} />
                     </div>
                     {errors.phone && <div className="text-red-500 text-sm text-left ml-36">{errors.phone}</div>}
