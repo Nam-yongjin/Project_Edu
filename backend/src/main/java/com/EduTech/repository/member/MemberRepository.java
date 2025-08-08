@@ -61,8 +61,8 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 	@Modifying
 	@Query("update Member m set m.state = :state where m.memId in :memId")
 	void updateMemberState(@Param("state") MemberState state, @Param("memId") List<String> memId);
-
+	
 	// 아이디들을 가져와서 기업 목록들을 가져오는 쿼리문
-	@Query("select c from Company c where c.memId in :memIds")
-	List<Company> findCompaniesByMemIds(@Param("memIds") Set<String> memIds);
+	@Query("SELECT c FROM Company c WHERE c.memId IN :memIds")
+	List<Company> findCompanyByMemIdIn(@Param("memIds") Set<String> memIds);
 }

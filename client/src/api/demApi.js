@@ -141,3 +141,12 @@ export const updateRental = async (startDate,endDate,demNum,itemNum) => {
   });
   return res.data;
 };
+
+// 물품 대여 현황 페이지에서 반납 및 대여 연장을 시키는 요청
+export const addRequest = async (demNum,type) => {
+  const res = await jwtAxios.post(`${demonstration}/AddRequest`, {
+        demNum: demNum,
+        type:type
+  });
+  return res.data;
+};
