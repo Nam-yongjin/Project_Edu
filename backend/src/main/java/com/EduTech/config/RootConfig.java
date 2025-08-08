@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Configuration;
 
 import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
 import com.EduTech.dto.event.EventInfoDTO;
+import com.EduTech.dto.facility.FacilityRegisterDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.event.EventInfo;
+import com.EduTech.entity.facility.Facility;
 
 @Configuration
 public class RootConfig {
@@ -21,6 +23,7 @@ public class RootConfig {
 			.setFieldMatchingEnabled(true)
 			.setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
 			.setMatchingStrategy(MatchingStrategies.LOOSE)
+			.setAmbiguityIgnored(true)
 			.setSkipNullEnabled(true);	//event에 등록시간null 중복입력 방지를 위한 코드 추가
 		
 		// 필드 매핑 방지 (중요)
@@ -32,6 +35,11 @@ public class RootConfig {
                 mapper.skip(EventInfo::setFilePath);          // null로 덮어쓰기 방지
                 mapper.skip(EventInfo::setOriginalName);	  // null로 덮어쓰기 방지
         	});
+		
+		modelMapper.typeMap(FacilityRegisterDTO.class, Facility.class)
+			.addMappings(mmapper -> 
+				mmapper.skip(Facility::setFacRevNum)
+			);
 
 		// Demonstration -> DemonstrationFormResDTO 매핑 간에 오류가 잇어 충돌나는 칼럼에 대해 skip 처리
 		modelMapper.typeMap(Demonstration.class, DemonstrationFormResDTO.class)
