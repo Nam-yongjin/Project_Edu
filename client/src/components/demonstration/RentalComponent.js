@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 import { getRental, getRentalSearch, deleteRental, getResExceptDate, updateRental, addRequest } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
-import { useNavigate } from "react-router-dom";
+import useMove from "../../hooks/useMove";
 import CalendarComponent from "./CalendarComponent";
 import ItemModal from "./itemModal";
 const RentalComponent = () => {
@@ -12,6 +12,10 @@ const RentalComponent = () => {
         currentPage: 0,
     };
 
+    const searchOptions = [
+  { value: "demName", label: "상품명" },
+  { value: "companyName", label: "기업명" },
+];
     const [search, setSearch] = useState(); // 검색어
     const [type, setType] = useState("companyName"); // 검색 타입
     const [pageData, setPageData] = useState(initState); // 페이지 데이터
@@ -20,7 +24,7 @@ const RentalComponent = () => {
     const [sortBy, setSortBy] = useState("applyAt"); // 정렬 칼럼명
     const [sort, setSort] = useState("asc"); // 정렬 방식
     const [statusFilter, setStatusFilter] = useState("total"); // state에 따라 필터링(ex wait,accept)
-    const navigate = useNavigate(); // 원하는 곳으로 이동할 변수
+   const { moveToPath} = useMove(); // 원하는 곳으로 이동할 변수
     const [selectedItems, setSelectedItems] = useState(new Set()); // 체크박스 선택 항목(중복 방지를 위해 set사용)
     const [showModifyModal, setShowModifyModal] = useState(false); // 캘린더 모달 변수
     const [selectedDemNum, setSelectedDemNum] = useState(); // 캘린더에 넘겨줄 demNum 
@@ -91,9 +95,6 @@ const RentalComponent = () => {
         }
     };
 
-    const moveToPath = (path) => {
-        navigate(path);
-    };
 
     // 전체선택 체크박스 핸들러
     const handleSelectAll = (e) => {
@@ -249,6 +250,7 @@ const RentalComponent = () => {
                 type={type}
                 setType={setType}
                 onSearchClick={onSearchClick}
+                 searchOptions={searchOptions}
             />
             <div className="overflow-x-auto mt-6">
                 <table className="min-w-full bg-white rounded-lg shadow-md">

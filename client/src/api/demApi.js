@@ -150,3 +150,32 @@ export const addRequest = async (demNum,type) => {
   });
   return res.data;
 };
+
+// 실증 물품 현황 페이지에서 등록 물품 정보를 받아오는 요청
+export const getBorrowSearch= async (search,type,pageCount,sortBy,sort,statusFilter) => {
+  const res = await jwtAxios.get(`${demonstration}/getBorrow`,{
+    params: {
+    search:search,
+    type:type,   
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort,
+    statusFilter:statusFilter,
+    }
+    });
+  return res.data;
+};
+
+// 실증 물품 현황 페이지에서 등록 물품 정보를 받아오는 요청
+export const getBorrow= async (pageCount, sort, sortBy, statusFilter) => {
+  const res = await jwtAxios.get(`${demonstration}/getBorrow`,{
+    params: {
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort,
+    statusFilter:statusFilter,
+    }
+    });
+  return res.data;
+};
+
