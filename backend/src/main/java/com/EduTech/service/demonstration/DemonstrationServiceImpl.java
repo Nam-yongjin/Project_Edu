@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
+import com.EduTech.dto.demonstration.DemonstrationBorrowListDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
@@ -47,6 +49,8 @@ import com.EduTech.entity.member.Member;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
+import com.EduTech.repository.demonstration.DemonstrationRequestRepository;
+import com.EduTech.repository.demonstration.DemonstrationReservationSpecs;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveSpecs;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
@@ -72,7 +76,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	DemonstrationImageRepository demonstrationImageRepository;
 	@Autowired
 	FileUtil fileUtil;
-
+	@Autowired
+	DemonstrationRequestRepository demonstrationRequestRepository;
 	@Autowired
 	MemberRepository memberRepository;
 	@Autowired
@@ -125,87 +130,82 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 물품 대여 현황 페이지에서 여러가지 항목들을 가져오는 기능
 	@Override
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
-	      DemonstrationSearchDTO demonstrationSearchDTO) {
-	      
-	    Integer pageCount = demonstrationSearchDTO.getPageCount();
-	    String type = demonstrationSearchDTO.getType();
-	    String search = demonstrationSearchDTO.getSearch();
-	    String sortBy = demonstrationSearchDTO.getSortBy();
-	    String sort = demonstrationSearchDTO.getSort();
-	    String statusFilter = demonstrationSearchDTO.getStatusFilter();
+			DemonstrationSearchDTO demonstrationSearchDTO) {
 
-	    if (pageCount == null || pageCount < 0)
-	        pageCount = 0;
-	    if (!StringUtils.hasText(sortBy))
-	        sortBy = "applyAt";
-	    if (!StringUtils.hasText(sort))
-	        sort = "desc";
+		Integer pageCount = demonstrationSearchDTO.getPageCount();
+		String type = demonstrationSearchDTO.getType();
+		String search = demonstrationSearchDTO.getSearch();
+		String sortBy = demonstrationSearchDTO.getSortBy();
+		String sort = demonstrationSearchDTO.getSort();
+		String statusFilter = demonstrationSearchDTO.getStatusFilter();
 
-	    Pageable pageable = PageRequest.of(pageCount, 10);
+		if (pageCount == null || pageCount < 0)
+			pageCount = 0;
+		if (!StringUtils.hasText(sortBy))
+			sortBy = "applyAt";
+		if (!StringUtils.hasText(sort))
+			sort = "desc";
 
-	    Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
-	          sortBy, sort, statusFilter);
+		Pageable pageable = PageRequest.of(pageCount, 10);
 
-	    Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable);
+		Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withSearchAndSort(memId, type, search,
+				sortBy, sort, statusFilter);
 
-	    // 1. reservePage에서 demNum 리스트 추출 (중복제거)
-	    List<Long> demNums = reservePage.stream()
-	        .map(r -> r.getDemonstration().getDemNum())
-	        .distinct()
-	        .toList();
+		Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable);
 
-	    // 2. demonstration_registration 일괄 조회
-	    List<DemonstrationRegistration> regs = demonstrationRegistrationRepository.findByDemonstration_DemNumIn(demNums);
+		// 1. reservePage에서 demNum 리스트 추출 (중복제거)
+		List<Long> demNums = reservePage.stream().map(r -> r.getDemonstration().getDemNum()).distinct().toList();
 
-	    // 3. memId 리스트 추출
-	    Set<String> memIds = regs.stream()
-	        .map(r -> r.getMember().getMemId())
-	        .collect(Collectors.toSet());
+		// 2. demonstration_registration 일괄 조회
+		List<DemonstrationRegistration> regs = demonstrationRegistrationRepository
+				.findByDemonstration_DemNumIn(demNums);
 
-	    // 4. company 일괄 조회
-	    List<Company> companies = memberRepository.findCompanyByMemIdIn(memIds);
+		// 3. memId 리스트 추출
+		Set<String> memIds = regs.stream().map(r -> r.getMember().getMemId()).collect(Collectors.toSet());
 
-	    // 5. Map 생성: demNum -> memId
-	    Map<Long, String> demNumToMemId = regs.stream()
-	        .collect(Collectors.toMap(r -> r.getDemonstration().getDemNum(), r -> r.getMember().getMemId()));
+		// 4. company 일괄 조회
+		List<Company> companies = memberRepository.findCompanyByMemIdIn(memIds);
 
-	    // 6. Map 생성: memId -> companyName
-	    Map<String, String> memIdToCompanyName = companies.stream()
-	        .collect(Collectors.toMap(Company::getMemId, Company::getCompanyName));
+		// 5. Map 생성: demNum -> memId
+		Map<Long, String> demNumToMemId = regs.stream()
+				.collect(Collectors.toMap(r -> r.getDemonstration().getDemNum(), r -> r.getMember().getMemId()));
 
-	    // 7. 이미지 리스트 일괄 조회
-	    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
+		// 6. Map 생성: memId -> companyName
+		Map<String, String> memIdToCompanyName = companies.stream()
+				.collect(Collectors.toMap(Company::getMemId, Company::getCompanyName));
 
-	    // 8. Map 생성: demNum -> List<DemonstrationImageDTO>
-	    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
-	        .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
+		// 7. 이미지 리스트 일괄 조회
+		List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
 
-	    // 9. DTO 매핑
-	    Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
-	        Demonstration dem = reserve.getDemonstration();
-	        DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
+		// 8. Map 생성: demNum -> List<DemonstrationImageDTO>
+		Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
+				.collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
 
-	        dto.setDemNum(dem.getDemNum());
-	        dto.setDemName(dem.getDemName());
-	        dto.setItemNum(dem.getItemNum());
-	        dto.setBItemNum(reserve.getBItemNum());
-	        dto.setStartDate(reserve.getStartDate());
-	        dto.setEndDate(reserve.getEndDate());
-	        dto.setApplyAt(reserve.getApplyAt());
-	        dto.setState(reserve.getState());
+		// 9. DTO 매핑
+		Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
+			Demonstration dem = reserve.getDemonstration();
+			DemonstrationRentalListDTO dto = new DemonstrationRentalListDTO();
 
-	        String regMemId = demNumToMemId.get(dem.getDemNum());
-	        String companyName = memIdToCompanyName.getOrDefault(regMemId, "회사명 없음");
-	        dto.setCompanyName(companyName);
+			dto.setDemNum(dem.getDemNum());
+			dto.setDemName(dem.getDemName());
+			dto.setItemNum(dem.getItemNum());
+			dto.setBItemNum(reserve.getBItemNum());
+			dto.setStartDate(reserve.getStartDate());
+			dto.setEndDate(reserve.getEndDate());
+			dto.setApplyAt(reserve.getApplyAt());
+			dto.setState(reserve.getState());
 
-	        dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
+			String regMemId = demNumToMemId.get(dem.getDemNum());
+			String companyName = memIdToCompanyName.getOrDefault(regMemId, "회사명 없음");
+			dto.setCompanyName(companyName);
 
-	        return dto;
-	    });
+			dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
 
-	    return new PageResponseDTO<>(dtoPage);
+			return dto;
+		});
+
+		return new PageResponseDTO<>(dtoPage);
 	}
-
 
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
 	@Override
@@ -531,6 +531,73 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		request.setReserve(reserve);
 		request.setState(DemonstrationState.WAIT);
 		request.setType(resRequestDTO.getType());
-
+		demonstrationRequestRepository.save(request);
 	}
+
+	@Override
+	public PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow(String memId, DemonstrationSearchDTO demonstrationSearchDTO) {
+
+	    Integer pageCount = demonstrationSearchDTO.getPageCount();
+	    String type = demonstrationSearchDTO.getType();
+	    String search = demonstrationSearchDTO.getSearch();
+	    String sortBy = demonstrationSearchDTO.getSortBy();
+	    String sort = demonstrationSearchDTO.getSort();
+	    String statusFilter = demonstrationSearchDTO.getStatusFilter();
+
+	    if (pageCount == null || pageCount < 0) {
+	        pageCount = 0;
+	    }
+
+	    Sort.Direction direction = "desc".equalsIgnoreCase(sort) ? Sort.Direction.DESC : Sort.Direction.ASC;
+	    Sort sortObj;
+	    if ("expDate".equalsIgnoreCase(sortBy)) {
+	        sortObj = Sort.by(direction, "expDate");
+	    } else {
+	        sortObj = Sort.by(direction, "regDate");
+	    }
+
+	    Pageable pageable = PageRequest.of(pageCount, 10, sortObj);
+
+	    Specification<DemonstrationRegistration> spec = DemonstrationReservationSpecs.withSearchAndSort(
+	            memId, type, search, sortBy, sort, statusFilter);
+
+	    Page<DemonstrationRegistration> entityPage = demonstrationRegistrationRepository.findAll(spec, pageable);
+	    
+	   // System.out.println(entityPage.getContent());
+	    // demNum 리스트 추출 (중복 제거)
+	    List<Long> demNums = entityPage.stream()
+	            .map(r -> r.getDemonstration().getDemNum())
+	            .distinct()
+	            .toList();
+
+	    // 이미지 리스트 일괄 조회
+	    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
+
+	    // demNum -> 이미지 리스트 매핑
+	    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
+	            .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
+
+	    // DTO 매핑
+	    Page<DemonstrationBorrowListDTO> dtoPage = entityPage.map(reg -> {
+	        Demonstration dem = reg.getDemonstration();
+
+	        DemonstrationBorrowListDTO dto = new DemonstrationBorrowListDTO(
+	                dem.getDemNum(),
+	                dem.getDemName(),
+	                dem.getItemNum(),
+	                dem.getDemMfr(),
+	                reg.getExpDate(),
+	                reg.getRegDate(),
+	                reg.getState()
+	        );
+
+	        dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
+
+	        return dto;
+	    });
+
+	    return new PageResponseDTO<>(dtoPage);
+	}
+
+
 }
