@@ -67,7 +67,6 @@ public class DemonstrationController {
 		String memId = JWTFilter.getMemId();
 		PageResponseDTO<DemonstrationRentalListDTO> AllDemRental = demonstrationService
 				.getAllDemRental(memId,demonstrationSearchDTO);
-		System.out.println(AllDemRental);
 		return AllDemRental;
 	}
 
@@ -92,9 +91,18 @@ public class DemonstrationController {
 	@GetMapping("/demResCon")
 	public List<DemonstrationTimeResDTO> checkReservationStateList(
 			 DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
-		String memId = JWTFilter.getMemId();
 		List<DemonstrationTimeResDTO> checkResList = demonstrationService
 				.checkReservationState(demonstrationTimeReqDTO);
+		return checkResList;
+	}
+	
+	// 현재 회원을 제외한 예약 날짜 확인
+	@GetMapping("/demResConExcept")
+	public List<DemonstrationTimeResDTO> checkReservationStateExcept(
+			 DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
+		String memId = JWTFilter.getMemId();
+		List<DemonstrationTimeResDTO> checkResList = demonstrationService
+				.checkReservationStateExcept(demonstrationTimeReqDTO,memId);
 		return checkResList;
 	}
 
@@ -125,7 +133,7 @@ public class DemonstrationController {
 		return ResponseEntity.ok("예약 취소 완료");
 	}
 	
-	// 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
+	// 물품 대여 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@PutMapping("/ChangeRes")
 	public ResponseEntity<String> DemResChange(@RequestBody DemonstrationReservationDTO demonstrationReservationDTO)
 	{

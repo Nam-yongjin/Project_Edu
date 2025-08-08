@@ -68,6 +68,13 @@ export const getResDate = async (startDate, endDate, demNum) => {
     return res.data;
 }
 
+export const getResExceptDate = async (demNum) => {
+    const res = await jwtAxios.get(`${demonstration}/demResConExcept`, {
+        params: {demNum }
+    });
+    return res.data;
+}
+
 // 상세 페이지에서 날짜 선택 후, 예약하기 위한 요청
 export const postRes = async (startDate, endDate, demNum,itemNum) => {
  const res = await jwtAxios.post(`${demonstration}/ReservationRes`, {
@@ -118,10 +125,19 @@ export const getRentalSearch=async (search,type,pageCount,sortBy,sort,statusFilt
 
 // 물품 대여 현황 페이지에서 항목 선택 후, 예약 취소 버튼 클릭 시, 상품 삭제
 export const deleteRental = async (demNum) => {
-    console.log(demNum);
   const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
      data: demNum 
   });
   return res.data;
 };
 
+// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
+export const updateRental = async (startDate,endDate,demNum,itemNum) => {
+  const res = await jwtAxios.put(`${demonstration}/ChangeRes`, {
+      startDate: startDate,
+        endDate: endDate,
+        demNum: demNum,
+        itemNum:itemNum
+  });
+  return res.data;
+};
