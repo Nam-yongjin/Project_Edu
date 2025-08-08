@@ -10,14 +10,25 @@ import com.EduTech.entity.facility.Facility;
 
 public interface FacilityRepository extends JpaRepository<Facility, Long> {
 
-    // 시설 이름으로 상세 조회.
+    // 시설 이름으로 상세 조회
     Optional<Facility> findByFacName(String facName);
 
-    // 시설 + 이미지 fetch join 조회 (옵션).
-    @Query("SELECT f FROM Facility f LEFT JOIN FETCH f.images WHERE f.facName = :facName")
+    // 이름 기반 fetch join
+    @Query("""
+           SELECT f FROM Facility f
+           LEFT JOIN FETCH f.images
+           WHERE f.facName = :facName
+           """)
     Optional<Facility> findWithImagesByFacName(@Param("facName") String facName);
-    
-    // 시설 이름 존재 여부 확인 (중복 방지용 등)
-    boolean existsByFacName(String facName);
 
+    // PK 기반 fetch join (선택)
+    @Query("""
+           SELECT f FROM Facility f
+           LEFT JOIN FETCH f.images
+           WHERE f.facRevNum = :facRevNum
+           """)
+    Optional<Facility> findWithImagesById(@Param("facRevNum") Long facRevNum);
+
+    // 이름 중복 체크
+    boolean existsByFacName(String facName);
 }

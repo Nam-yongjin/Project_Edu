@@ -8,10 +8,6 @@ const facility = `${host}${API_MAPPING.facility}`;
 
 // 시설 등록 요청 (JWT 필요)
 export const registerFacility = async (formData) => {
-  const res = await jwtAxios.post(`${facility}/register`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const res = await jwtAxios.post(`${facility}/register`, formData);
   return res.data;
 };

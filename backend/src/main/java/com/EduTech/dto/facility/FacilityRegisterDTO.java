@@ -6,11 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FacilityRegisterDTO {
-	private String facName;
+    private String facName;
     private String facInfo;
     private int capacity;
     private String facItem;
     private String etc;
-    private String reserveStart;
-    private String reserveEnd;
 }

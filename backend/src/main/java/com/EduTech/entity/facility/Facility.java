@@ -1,67 +1,57 @@
 package com.EduTech.entity.facility;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.EduTech.entity.member.Member;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Getter
-@Setter
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "facility")
-public class Facility {
+@Getter @Setter
+@NoArgsConstructor
+public class Facility { // 장소 정보
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facilityNum;		// 장소번호.
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long facRevNum;
 
-    @Column(length = 100)
-    private String facName;			// 장소명
+    @Column(nullable = false, length = 50)
+    private String facName;
 
-    private String facInfo;			// 소개
-
-    private int capacity;			// 수용인원
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String facInfo;
 
     @Column(nullable = false)
-    private String facItem;			// 구비품목
+    private Integer capacity;
 
-    private String etc;				// 기타유의사항
-    
-    @Builder.Default
-    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Column(nullable = false, length = 255)
+    private String facItem;
+
+    @Column(columnDefinition = "TEXT")
+    private String etc;
+
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FacilityImage> images = new ArrayList<>();
 
-    // FK 회원id
-    @ManyToOne(fetch = FetchType.LAZY, optional = true) // 🔄 optional = true
-    @JoinColumn(name = "mem_id", nullable = true)        // 🔄 nullable = true
-    private Member member;
- 	
-    public void addImage(FacilityImage image) {
-        images.add(image);
-        image.setFacility(this);
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FacilityReserve> reserves = new ArrayList<>();
+
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FacilityTime> times = new ArrayList<>();
+
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FacilityHoliday> holidays = new ArrayList<>();
+
+    // ---- 연관관계 편의 메서드 ----
+    public void addImage(FacilityImage img) {
+        images.add(img);
+        img.setFacility(this); // 한쪽만 add, 중복 방지
     }
-    
-    public List<FacilityImage> getImages() {
-        return images;
+
+    public void removeImage(FacilityImage img) {
+        images.remove(img);
+        img.setFacility(null);
     }
 }

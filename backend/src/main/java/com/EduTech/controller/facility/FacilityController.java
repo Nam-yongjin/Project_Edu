@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,8 +31,10 @@ import com.EduTech.dto.facility.FacilityTimeDTO;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.service.facility.FacilityService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Validated
 @RestController
 @RequestMapping("/api/facility")
 @RequiredArgsConstructor
@@ -39,34 +42,34 @@ public class FacilityController {
 
     private final FacilityService facilityService;
 
-    // 시설 추가
+    // 시설 추가 (이미지 없어도 OK)
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerFacility(
-        @RequestPart("dto") FacilityRegisterDTO dto,
-        @RequestPart("images") List<MultipartFile> images
+        @RequestPart("dto") @Valid FacilityRegisterDTO dto,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        facilityService.registerFacility(dto, images);
+        facilityService.registerFacility(dto, images == null ? List.of() : images);
         return ResponseEntity.ok().build();
     }
-    
-    // 시설 상세 조회
+
+    // 시설 상세 조회 (facName 기준)
     @GetMapping("/detail/{facName}")
     public ResponseEntity<FacilityDetailDTO> getFacilityDetail(@PathVariable String facName) {
         return ResponseEntity.ok(facilityService.getFacilityDetail(facName));
     }
 
-    // 예약 가능 시간 조회
+    // 특정 날짜의 예약 가능 시간 조회 (시설 PK: facRevNum)
     @GetMapping("/times")
     public ResponseEntity<List<FacilityTimeDTO>> getAvailableTimes(
-            @RequestParam Long facilityNum,
+            @RequestParam("facRevNum") Long facRevNum,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return ResponseEntity.ok(facilityService.getAvailableTimes(facilityNum, date));
+        return ResponseEntity.ok(facilityService.getAvailableTimes(facRevNum, date));
     }
 
     // 예약 신청
     @PostMapping("/reserve")
-    public ResponseEntity<Void> reserveFacility(@RequestBody FacilityReserveRequestDTO dto) {
+    public ResponseEntity<Void> reserveFacility(@RequestBody @Valid FacilityReserveRequestDTO dto) {
         facilityService.reserveFacility(dto);
         return ResponseEntity.ok().build();
     }
@@ -74,21 +77,21 @@ public class FacilityController {
     // 예약 가능 여부 확인
     @GetMapping("/reservable")
     public ResponseEntity<Boolean> checkReservable(
-            @RequestParam Long facilityNum,
+            @RequestParam("facRevNum") Long facRevNum,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime end
     ) {
-        return ResponseEntity.ok(facilityService.isReservable(facilityNum, date, start, end));
+        return ResponseEntity.ok(facilityService.isReservable(facRevNum, date, start, end));
     }
 
-    // 사용자 예약 목록
+    // 사용자 예약 목록 (JWT 도입 전 임시로 memId 파라미터)
     @GetMapping("/my-reservations")
     public ResponseEntity<List<FacilityReserveListDTO>> getMyReservations(@RequestParam String memId) {
         return ResponseEntity.ok(facilityService.getMyReservations(memId));
     }
 
-    // 관리자 예약 목록
+    // 관리자 예약 목록 (상태/기간 필터)
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<FacilityReserveAdminDTO>> getReservationsForAdmin(
             @RequestParam(required = false) FacilityState state,
@@ -98,36 +101,36 @@ public class FacilityController {
         return ResponseEntity.ok(facilityService.getReservationsForAdmin(state, from, to));
     }
 
-    // 관리자 승인/거절 처리
+    // 관리자: 예약 승인/거절 (reserveId 기준)
     @PostMapping("/admin/approve")
-    public ResponseEntity<Void> updateReservationState(@RequestBody FacilityReserveApproveRequestDTO dto) {
+    public ResponseEntity<Void> updateReservationState(@RequestBody @Valid FacilityReserveApproveRequestDTO dto) {
         facilityService.updateReservationState(dto);
         return ResponseEntity.ok().build();
     }
-/*    
-    // 사용자 예약 취소
-    @PatchMapping("/my/reservation/{facRevNum}/cancel")
-    public ResponseEntity<?> userCancel(
-            @PathVariable Long facRevNum,
-            @AuthenticationPrincipal CustomUserDetails user // 로그인 사용자
+
+    // 사용자 예약 취소 (reserveId 기준)
+    @PatchMapping("/my/reservation/{reserveId}/cancel")
+    public ResponseEntity<String> userCancel(
+            @PathVariable Long reserveId,
+            @RequestParam String requesterId
     ) {
-        boolean success = facilityService.cancelReservation(facRevNum, false, user.getUsername());
+        boolean success = facilityService.cancelReservation(reserveId, requesterId);
         return ResponseEntity.ok(success ? "취소 완료" : "취소 실패");
     }
-*/    
-    //관치자 에약 취소
-    @PatchMapping("/admin/reservation/{facRevNum}/cancel")
-    public ResponseEntity<?> adminCancel(
-            @PathVariable Long facRevNum,
-            @RequestParam String requesterId  // 예: 로그인한 관리자 ID
+
+    // 관리자 강제 취소 (reserveId 기준)
+    @PatchMapping("/admin/reservation/{reserveId}/cancel")
+    public ResponseEntity<String> adminCancel(
+            @PathVariable Long reserveId,
+            @RequestParam String requesterId
     ) {
-        boolean success = facilityService.cancelReservation(facRevNum, requesterId);
+        boolean success = facilityService.cancelReservation(reserveId, requesterId);
         return ResponseEntity.ok(success ? "강제 취소 완료" : "취소 실패");
     }
-    
-    // 휴무일 등록
+
+    // 휴무일 등록 (dto.facRevNum 사용)
     @PostMapping("/admin/holiday")
-    public ResponseEntity<Void> registerHoliday(@RequestBody FacilityHolidayDTO dto) {
+    public ResponseEntity<Void> registerHoliday(@RequestBody @Valid FacilityHolidayDTO dto) {
         facilityService.registerHoliday(dto);
         return ResponseEntity.ok().build();
     }
@@ -139,18 +142,18 @@ public class FacilityController {
         return ResponseEntity.ok().build();
     }
 
-    // 휴무일 목록 조회
+    // 휴무일 목록 조회 (시설 PK 기준)
     @GetMapping("/holidays")
-    public ResponseEntity<List<LocalDate>> getHolidayDates(@RequestParam Long facilityNum) {
-        return ResponseEntity.ok(facilityService.getHolidayDates(facilityNum));
+    public ResponseEntity<List<LocalDate>> getHolidayDates(@RequestParam("facRevNum") Long facRevNum) {
+        return ResponseEntity.ok(facilityService.getHolidayDates(facRevNum));
     }
 
-    // 특정 날짜가 휴무일인지 여부 확인
+    // 특정 날짜 휴무 여부 (시설 PK 기준)
     @GetMapping("/holiday/check")
     public ResponseEntity<Boolean> isHoliday(
-            @RequestParam Long facilityNum,
+            @RequestParam("facRevNum") Long facRevNum,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        return ResponseEntity.ok(facilityService.isHoliday(facilityNum, date));
+        return ResponseEntity.ok(facilityService.isHoliday(facRevNum, date));
     }
 }

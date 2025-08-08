@@ -11,10 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FacilityReserveListDTO {
-    private Long facRevNum;         // 예약 번호.
-    private String facName;         // 시설명
-    private LocalDate facDate;      // 예약일
-    private LocalTime startTime;	// 시작시간
-    private LocalTime endTime;		// 종료시간
-    private FacilityState state; 	// WAITING / ACCEPT / REJECT
+    private Long reserveId;     // 예약 번호 (PK)
+    private Long facRevNum;     // 시설 번호(옵션)
+    private String facName;
+    private LocalDate facDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private FacilityState state;
 }
