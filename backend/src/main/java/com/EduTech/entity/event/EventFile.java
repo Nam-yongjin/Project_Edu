@@ -22,4 +22,5 @@ public class EventFile {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_num")
     private EventInfo eventInfo;
+    
 }
