@@ -198,8 +198,8 @@ const MemberInfoModifyComponent = () => {
     };
 
     return (
-        <div className=' '>
-            <div className={`page-shadow mx-auto my-10 p-10 space-y-6 text-center ${modifying ? "max-w-screen-md" : "max-w-screen-sm"}`}>
+        <div className={`mx-auto ${modifying ? "max-w-screen-md" : "max-w-screen-sm"}`}>
+            <div className={`page-shadow min-blank my-10 p-10 space-y-6 text-center`}>
                 {modifying ?
                     <div className="newText-3xl font-bold">회원정보수정</div>
                     :
@@ -387,7 +387,7 @@ const MemberInfoModifyComponent = () => {
                         className="mr-2" />
                 </div>
 
-                <div className='newText-base'>
+                <div className='newText-base pt-4'>
                     {modifying
                         ?
                         <div className='flex justify-center'>

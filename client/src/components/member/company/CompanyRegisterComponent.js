@@ -169,13 +169,13 @@ const CompanyRegisterComponent = () => {
     };
 
     return (
-        <div>
-            <div className="page-shadow my-10 p-10 space-y-6 text-center">
-                <div className="text-3xl font-bold">회원가입</div>
+        <div className='max-w-screen-md mx-auto'>
+            <div className="page-shadow min-blank my-10 p-10 space-y-6 text-center">
+                <div className="newText-3xl font-bold">회원가입</div>
 
                 {/* 아이디 */}
                 <div>
-                    <div className="flex items-center gap-4">
+                    <div className="newText-base flex items-center gap-4">
                         <label className="w-32 text-left font-medium">아이디<span className='text-red-600'> *</span></label>
                         <input
                             name="memId"
@@ -186,18 +186,18 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                         <button
-                            className="text-center p-2 bg-gray-200 rounded-md hover:bg-gray-300 active:bg-gray-400 border border-gray-400 text-sm font-medium"
+                            className="text-center normal-button lg:w-[100px] w-[90px]"
                             onClick={handleCheckDuplicateId}
                         >
                             중복 체크
                         </button>
                     </div>
-                    {errors.memId && <div className="text-red-500 text-sm text-left ml-36">{errors.memId}</div>}
+                    {errors.memId && <div className="text-red-500 newText-sm text-left ml-36">{errors.memId}</div>}
                 </div>
 
                 {/* 비밀번호 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">비밀번호<span className='text-red-600'> *</span></label>
                         <input
                             name="pw"
@@ -208,12 +208,12 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.pw && <div className="text-red-500 text-sm text-left ml-36">{errors.pw}</div>}
+                    {errors.pw && <div className="text-red-500 newText-sm text-left ml-36">{errors.pw}</div>}
                 </div>
 
                 {/* 비밀번호 확인 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">비밀번호 확인<span className='text-red-600'> *</span></label>
                         <input
                             name="pwCheck"
@@ -224,12 +224,12 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.pwCheck && <div className="text-red-500 text-sm text-left ml-36">{errors.pwCheck}</div>}
+                    {errors.pwCheck && <div className="text-red-500 newText-sm text-left ml-36">{errors.pwCheck}</div>}
                 </div>
 
                 {/* 이름 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">이름<span className='text-red-600'> *</span></label>
                         <input
                             name="name"
@@ -239,21 +239,21 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.name && <div className="text-red-500 text-sm text-left ml-36">{errors.name}</div>}
+                    {errors.name && <div className="text-red-500 newText-sm text-left ml-36">{errors.name}</div>}
                 </div>
 
                 {/* 휴대폰 인증 */}
                 <div>
-                    <div className="flex items-start">
+                    <div className="newText-base flex items-start">
                         <div className="w-36 text-left font-medium pt-4">휴대폰<span className='text-red-600'> *</span></div>
                         <PhoneVerification onVerified={setVerifiedPhone} />
                     </div>
-                    {errors.phone && <div className="text-red-500 text-sm text-left ml-36">{errors.phone}</div>}
+                    {errors.phone && <div className="text-red-500 newText-sm text-left ml-36">{errors.phone}</div>}
                 </div>
 
                 {/* 이메일 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">이메일<span className='text-red-600'> *</span></label>
                         <input
                             name="email"
@@ -264,12 +264,12 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.email && <div className="text-red-500 text-sm text-left ml-36">{errors.email}</div>}
+                    {errors.email && <div className="text-red-500 newText-sm text-left ml-36">{errors.email}</div>}
                 </div>
 
                 {/* 생년월일 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">생년월일<span className='text-red-600'> *</span></label>
                         <input
                             name="birthDate"
@@ -281,12 +281,12 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.birthDate && <div className="text-red-500 text-sm text-left ml-36">{errors.birthDate}</div>}
+                    {errors.birthDate && <div className="text-red-500 newText-sm text-left ml-36">{errors.birthDate}</div>}
                 </div>
 
                 {/* 성별 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <div className="w-36 text-left font-medium">성별<span className='text-red-600'> *</span></div>
                         <div className="flex gap-6">
                             <label className="inline-flex items-center gap-1">
@@ -313,12 +313,12 @@ const CompanyRegisterComponent = () => {
                             </label>
                         </div>
                     </div>
-                    {errors.gender && <div className="text-red-500 text-sm text-left ml-36">{errors.gender}</div>}
+                    {errors.gender && <div className="text-red-500 newText-sm text-left ml-36">{errors.gender}</div>}
                 </div>
 
                 {/* 주소 */}
                 <div>
-                    <div className="flex items-start">
+                    <div className="newText-base flex items-start">
                         <div className="w-36 text-left font-medium pt-2">주소</div>
                         <div className="flex-1">
                             <AddressSearch onAddressSelected={handleAddressSelected} />
@@ -335,7 +335,7 @@ const CompanyRegisterComponent = () => {
 
                 {/* 상세 주소 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">상세 주소</label>
                         <input
                             name="addrDetail"
@@ -349,7 +349,7 @@ const CompanyRegisterComponent = () => {
 
                 {/* 기업명 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">기업명<span className='text-red-600'> *</span></label>
                         <input
                             name="companyName"
@@ -359,12 +359,12 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.companyName && <div className="text-red-500 text-sm text-left ml-36">{errors.companyName}</div>}
+                    {errors.companyName && <div className="text-red-500 newText-sm text-left ml-36">{errors.companyName}</div>}
                 </div>
 
                 {/* 직급 */}
                 <div>
-                    <div className="flex items-center">
+                    <div className="newText-base flex items-center">
                         <label className="w-36 text-left font-medium">직급<span className='text-red-600'> *</span></label>
                         <input
                             name="position"
@@ -374,11 +374,11 @@ const CompanyRegisterComponent = () => {
                             className="flex-1 input-focus"
                         />
                     </div>
-                    {errors.position && <div className="text-red-500 text-sm text-left ml-36">{errors.position}</div>}
+                    {errors.position && <div className="text-red-500 newText-sm text-left ml-36">{errors.position}</div>}
                 </div>
 
                 {/* 수신 동의 체크박스 */}
-                <div className="flex items-center">
+                <div className="newText-base flex items-center">
                     <label className="w-36 text-left font-medium">SMS 수신</label>
                     <input
                         name="checkSms"
@@ -389,7 +389,7 @@ const CompanyRegisterComponent = () => {
                     />
                 </div>
 
-                <div className="flex items-center">
+                <div className="newText-base flex items-center">
                     <label className="w-36 text-left font-medium">이메일 수신</label>
                     <input
                         name="checkEmail"
@@ -401,9 +401,9 @@ const CompanyRegisterComponent = () => {
                 </div>
 
                 {/* 제출 버튼 */}
-                <div>
+                <div className='pt-4'>
                     <button
-                        className="positive-button"
+                        className="newText-base positive-button"
                         onClick={handleSubmit}
                     >
                         회원가입
