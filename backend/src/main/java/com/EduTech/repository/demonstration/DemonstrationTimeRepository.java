@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.entity.demonstration.DemonstrationTime;
 
@@ -25,6 +26,13 @@ public interface DemonstrationTimeRepository extends JpaRepository<Demonstration
 	    @Param("demNum") Long demNum
 	);
 
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeResDTO(dt.demDate,dt.demonstration.demNum) FROM DemonstrationTime dt WHERE dt.demDate BETWEEN :startDate AND :endDate AND dt.demonstration.demNum = :demNum ORDER BY dt.demDate ASC")
+	List<DemonstrationTimeReqDTO> findReservedDatesExcpet(
+	    @Param("startDate") LocalDate startDate,
+	    @Param("endDate") LocalDate endDate,
+	    @Param("demNum") Long demNum
+	);
+	
 	// 기존 날짜 정보를 가져와 삭제하는 쿼리문
 	@Modifying
 	@Transactional

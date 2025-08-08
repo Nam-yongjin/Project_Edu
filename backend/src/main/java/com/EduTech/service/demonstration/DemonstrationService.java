@@ -26,7 +26,8 @@ public interface DemonstrationService {
 		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, DemonstrationSearchDTO demonstrationSearchDTO); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount,String type,String search); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
 		DemonstrationDetailDTO getDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지
-		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태인지 확인 가능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
+		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태를 불러오는 기능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
+		List<DemonstrationTimeResDTO> checkReservationStateExcept(DemonstrationTimeReqDTO demonstrationTimeReqDTO,String memId); // 현재 회원의 예약 정보를 제외한 상품의 예약 정보를 불러오는 기능
 		void rentalDateChange(DemonstrationResRentalDTO demonstrationResRentalDTO); // 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
 		void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO, String memId); // 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 		void demonstrationReservationCancel(List<Long> demNum,String memId); // 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소

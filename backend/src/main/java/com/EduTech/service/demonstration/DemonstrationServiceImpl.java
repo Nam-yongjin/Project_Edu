@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -119,7 +120,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
-	
+	// 물품 대여 현황 페이지에서 여러가지 항목들을 가져오는 기능
 	   @Override
 	   public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
 	         DemonstrationSearchDTO demonstrationSearchDTO) {
@@ -239,7 +240,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		return new PageResponseDTO<DemonstrationPageListDTO>(currentPage);
 	}
 
-	// 해당 상품이 예약 상태인지 확인 가능 (실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
+	// 해당 상품의 예약 정보를 가져오는 기능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
 	@Override
 	public List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
 		// 시작 날짜와 끝 날짜, 실증 번호를 통해 예약 날짜 리스트를 불러와 리턴
@@ -247,6 +248,18 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 				demonstrationTimeReqDTO.getStartDate(), demonstrationTimeReqDTO.getEndDate(),
 				demonstrationTimeReqDTO.getDemNum());
 		return DateList;
+	}
+	
+	// 현재 회원의 예약 정보를 제외하기 위해 해당 상품의 예약 정보를 가져오는 기능
+	@Override
+	public List<DemonstrationTimeResDTO> checkReservationStateExcept(DemonstrationTimeReqDTO demonstrationTimeReqDTO,String memId)
+	{
+		// 현재 회원의 예약을 제외한 해당 물품의 예약 시작 날짜와 끝 날짜를 받아옴
+		DemonstrationTimeReqDTO dto=demonstrationReserveRepository.getResDate(demonstrationTimeReqDTO.getDemNum(),memId,DemonstrationState.CANCEL);
+		List<DemonstrationTimeResDTO> DateList = demonstrationTimeRepository.findReservedDates(
+				dto.getStartDate(), dto.getEndDate(),
+				demonstrationTimeReqDTO.getDemNum());
+		return DateList; 
 	}
 
 	// 실증 장비 신청 상세 페이지
