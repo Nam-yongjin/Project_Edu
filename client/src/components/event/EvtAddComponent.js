@@ -1,6 +1,5 @@
-// ✅ 필요한 모듈 임포트
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux"; // ✅ 추가
+import { useSelector } from "react-redux";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
@@ -14,7 +13,7 @@ const EvtAddComponent = () => {
 
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN"); // ✅ Redux로 권한 확인
 
-  // ✅ 권한 체크 useEffect
+  // 권한 체크 useEffect
   useEffect(() => {
     if (!isAdmin) {
       alert("권한이 없습니다.");

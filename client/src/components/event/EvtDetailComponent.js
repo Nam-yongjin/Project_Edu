@@ -48,24 +48,27 @@ function EvtDetailComponent({ eventNum }) {
   }, [eventNum, memId]);
 
   const formatDate = (dateStr) => {
-  if (!dateStr) return "없음";
-  const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
-};
+    if (!dateStr) return "없음";
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
 
   const getFullUrl = (path) => {
     return path?.startsWith("http") ? path : `${HOST}/${path}`;
   };
 
+  const now = new Date();
   const isCanceled = event?.state === "CANCEL";
+  const isComplete = event?.state === "COMPLETE";
+  const isEventStarted = event?.eventStartPeriod && now >= new Date(event.eventStartPeriod);
+  const isEventEnded = event?.eventEndPeriod && now > new Date(event.eventEndPeriod);
 
   const isApplyPeriod = () => {
-    const now = new Date();
     return (
       event?.applyStartPeriod &&
       event?.applyEndPeriod &&
@@ -82,7 +85,12 @@ function EvtDetailComponent({ eventNum }) {
     );
   };
 
+  const isDisabled = isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
+
   const getApplyButtonText = () => {
+    if (isCanceled) return "취소된 행사";
+    if (isEventEnded) return "행사 완료";
+    if (isEventStarted) return "행사 진행 중";
     if (alreadyApplied) return "신청 완료";
     if (!isApplyPeriod()) return "신청 기간 아님";
     if (isFull()) return "모집 마감";
@@ -90,10 +98,7 @@ function EvtDetailComponent({ eventNum }) {
   };
 
   const getApplyButtonStyle = () => {
-    if (isCanceled) return "bg-gray-300 text-gray-500 cursor-not-allowed";
-    if (alreadyApplied) return "bg-green-400 text-white cursor-not-allowed";
-    if (!isApplyPeriod() || isFull())
-      return "bg-gray-300 text-gray-500 cursor-not-allowed";
+    if (isDisabled) return "bg-gray-300 text-gray-500 cursor-not-allowed";
     return "bg-blue-500 text-white hover:bg-blue-600";
   };
 
@@ -134,20 +139,18 @@ function EvtDetailComponent({ eventNum }) {
     }
   };
 
-  const renderDownloadLink = (label, url, name, key) => {
-    return (
-      <a
-        key={key}
-        href={url}
-        download
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block text-sm text-blue-600 hover:underline"
-      >
-        {name || label}
-      </a>
-    );
-  };
+  const renderDownloadLink = (label, url, name, key) => (
+    <a
+      key={key}
+      href={url}
+      download
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block text-sm text-blue-600 hover:underline"
+    >
+      {name || label}
+    </a>
+  );
 
   const categoryLabel = {
     TEACHER: "교사",
@@ -194,7 +197,7 @@ function EvtDetailComponent({ eventNum }) {
           <div className="pt-6 space-y-4">
             <button
               className={`w-full py-3 rounded font-semibold transition ${getApplyButtonStyle()}`}
-              disabled={alreadyApplied || !isApplyPeriod() || isFull()}
+              disabled={isDisabled}
               onClick={handleApply}
             >
               {getApplyButtonText()}
@@ -234,32 +237,14 @@ function EvtDetailComponent({ eventNum }) {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">📎 첨부파일 목록</h3>
           <div className="space-y-1">
             {event.filePath &&
-              renderDownloadLink(
-                "대표 첨부파일",
-                `${API_HOST}/event/download/main-file/${event.eventNum}`,
-                event.originalName
-              )}
+              renderDownloadLink("대표 첨부파일", `${API_HOST}/event/download/main-file/${event.eventNum}`, event.originalName)}
             {event.mainImagePath &&
-              renderDownloadLink(
-                "대표 이미지",
-                `${API_HOST}/event/download/main-image/${event.eventNum}`,
-                event.mainImageOriginalName
-              )}
+              renderDownloadLink("대표 이미지", `${API_HOST}/event/download/main-image/${event.eventNum}`, event.mainImageOriginalName)}
             {event.attachList?.map((file) =>
-              renderDownloadLink(
-                "첨부파일",
-                `${API_HOST}/event/download/file/${file.id}`,
-                file.originalName,
-                file.id
-              )
+              renderDownloadLink("첨부파일", `${API_HOST}/event/download/file/${file.id}`, file.originalName, file.id)
             )}
             {event.imageList?.map((img) =>
-              renderDownloadLink(
-                "이미지",
-                `${API_HOST}/event/download/image/${img.id}`,
-                img.originalName,
-                img.id
-              )
+              renderDownloadLink("이미지", `${API_HOST}/event/download/image/${img.id}`, img.originalName, img.id)
             )}
           </div>
         </div>
