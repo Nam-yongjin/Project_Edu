@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.EduTech.entity.BaseEntity;
 import com.EduTech.entity.member.Member;
 
@@ -36,12 +38,13 @@ public class News extends BaseEntity{
 	@Builder.Default
 	private Long viewCount = 0L;	//0으로 초기화 해서 Null값 방지
 	
-	@ManyToOne //여러 개의 언론보도 게시글을 한 명의 Admin이 작성 가능
+	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 언론보도 게시글을 한 명의 Admin이 작성 가능
 	@JoinColumn(name = "mem_id", nullable = false)
 	private Member member;
 	
 	//하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
 	@Builder.Default
+	@BatchSize(size = 10)
 	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<NewsFile> newsFiles = new ArrayList<>();
 	

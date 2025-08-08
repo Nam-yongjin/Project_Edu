@@ -98,10 +98,10 @@ public class NoticeController {
 
     // 공지사항 수정
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(value = "/UpdateNotice/{noticeNum}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/UpdateNotice/{noticeNum}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)//noticeUpdate API가 멀티파트 요청만 받게 설정
     public ResponseEntity<String> updateNotice(			//@PathVariable은 상세 조회, 수정, 삭제 같은 작업에서 리소스 식별자로 사용
             @PathVariable("noticeNum") Long noticeNum, //@PathVariable에 이름 꼭 명시해줘야 함!!!! --> ("noticeNum") 이런 식으로
-            @RequestPart("dto") NoticeUpdateRegisterDTO dto,
+            @RequestPart("dto") NoticeUpdateRegisterDTO dto, //@RequestPart --> JSON과 파일을 분리해서 받음
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
     	System.out.println("공지사항 수정!!");
         // DTO에 새 파일들 설정

@@ -95,7 +95,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional
     public void deleteNotice(Long noticeNum) {
     	//단일 삭제에서 권한 충돌이 나서 주석처리 함 @PreAuthorize("hasRole('ADMIN')")도 같이
-    	//프론트에서 관리자만 버튼이 보이도록 설정했기 때문에 없어도 괜찮을 것 같다고 판단....
+    	//프론트에서 관리자만 버튼이 보이도록 설정했기 때문에 없어도 괜찮을 것 같다고 판단.... --> 프론트에서 axios로 직접 경로 지정해서 그런 거였음 (JWTaxios사용하기)
         Member currentMember = getCurrentMember();
         validateAdminRole(currentMember);
         
