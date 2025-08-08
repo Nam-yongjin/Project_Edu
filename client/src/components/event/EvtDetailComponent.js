@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getEventById, deleteEvent, applyEvent } from "../../api/eventApi";
@@ -15,75 +15,58 @@ function EvtDetailComponent({ eventNum }) {
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
   const memId = useSelector((state) => state.loginState?.memId);
 
+  const now = new Date();
+
+  const fetchEvent = useCallback(async () => {
+    try {
+      const data = await getEventById(eventNum);
+      setEvent(data);
+    } catch (err) {
+      console.error("행사 정보 조회 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [eventNum]);
+
+  const checkIfApplied = useCallback(async () => {
+    if (!memId) return;
+    try {
+      const res = await fetch(`${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`);
+      if (!res.ok) throw new Error(await res.text());
+      const isApplied = await res.json();
+      setAlreadyApplied(isApplied);
+    } catch (err) {
+      console.error("신청 여부 확인 실패:", err);
+    }
+  }, [eventNum, memId]);
+
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const data = await getEventById(eventNum);
-        setEvent(data);
-      } catch (err) {
-        console.error("행사 정보 조회 실패:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const checkIfApplied = async () => {
-      if (!memId) return;
-
-      try {
-        const res = await fetch(`${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`);
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`응답 오류: ${text}`);
-        }
-        const isApplied = await res.json();
-        setAlreadyApplied(isApplied);
-      } catch (err) {
-        console.error("신청 여부 확인 실패:", err);
-      }
-    };
-
     fetchEvent();
     checkIfApplied();
-  }, [eventNum, memId]);
+  }, [fetchEvent, checkIfApplied]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "없음";
     const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   };
 
-  const getFullUrl = (path) => {
-    return path?.startsWith("http") ? path : `${HOST}/${path}`;
-  };
+  const getFullUrl = (path) => path?.startsWith("http") ? path : `${HOST}/${path}`;
 
-  const now = new Date();
   const isCanceled = event?.state === "CANCEL";
-  const isComplete = event?.state === "COMPLETE";
   const isEventStarted = event?.eventStartPeriod && now >= new Date(event.eventStartPeriod);
   const isEventEnded = event?.eventEndPeriod && now > new Date(event.eventEndPeriod);
 
-  const isApplyPeriod = () => {
-    return (
-      event?.applyStartPeriod &&
-      event?.applyEndPeriod &&
-      now >= new Date(event.applyStartPeriod) &&
-      now <= new Date(event.applyEndPeriod)
-    );
-  };
+  const isApplyPeriod = () =>
+    event?.applyStartPeriod &&
+    event?.applyEndPeriod &&
+    now >= new Date(event.applyStartPeriod) &&
+    now <= new Date(event.applyEndPeriod);
 
-  const isFull = () => {
-    return (
-      event?.currCapacity != null &&
-      event?.maxCapacity != null &&
-      event.currCapacity >= event.maxCapacity
-    );
-  };
+  const isFull = () =>
+    event?.currCapacity != null &&
+    event?.maxCapacity != null &&
+    event.currCapacity >= event.maxCapacity;
 
   const isDisabled = isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
 
@@ -97,17 +80,14 @@ function EvtDetailComponent({ eventNum }) {
     return "신청하기";
   };
 
-  const getApplyButtonStyle = () => {
-    if (isDisabled) return "bg-gray-300 text-gray-500 cursor-not-allowed";
-    return "bg-blue-500 text-white hover:bg-blue-600";
-  };
+  const getApplyButtonStyle = () =>
+    isDisabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600";
 
   const handleApply = async () => {
     if (!memId) {
       alert("로그인한 사용자만 신청할 수 있습니다.");
       return;
     }
-
     try {
       await applyEvent({ eventNum: event.eventNum, memId });
       setAlreadyApplied(true);

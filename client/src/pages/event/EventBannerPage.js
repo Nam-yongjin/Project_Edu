@@ -1,12 +1,10 @@
 import "react-datepicker/dist/react-datepicker.css";
-import EvtBannerListComponent from "../../components/event/EvtBannerListComponent";
-import SubAdminHeader from "../../layouts/SubAdminHeader";
+import EvtBannerComponent from "../../components/event/EvtBannerComponent";
 
 const EventBannerPage = () => {
     return (
         <div>
-            <SubAdminHeader />
-            <EvtBannerListComponent />
+            <EvtBannerComponent />
         </div>
     );
 }

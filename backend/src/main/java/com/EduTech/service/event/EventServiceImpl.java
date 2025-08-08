@@ -362,7 +362,7 @@ public class EventServiceImpl implements EventService {
 
     // 현재 신청 가능한 행사 배너
     @Override
-    public List<EventInfoDTO> getMonthlyOpenEvents() {
+    public List<EventInfoDTO> getbannerEvent() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = now.withDayOfMonth(1).withHour(0).withMinute(0);
         LocalDateTime end = now.withDayOfMonth(now.toLocalDate().lengthOfMonth()).withHour(23).withMinute(59);

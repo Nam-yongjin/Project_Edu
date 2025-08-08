@@ -83,25 +83,12 @@ export const cancelReservation = async (evtRevNum) => {
 
 //============================================
 // 배너로 사용할 행사 불러오는 코드
-export const getBannerList = async (current) => {
-  const res = await axios.get(`${event}/banners`, {
-    params: { page: current }
-  });
-  return res.data;
-};
-
-export const registerBanner = async (formData) => {
-  const response = await axios.post(`${event}/banners/register`, formData);
-  return response.data;
-};
-
-export const deleteBanner = (bannerNum) => {
-  return axios.delete(`${event}/banners/delete`, {
-    params: { bannerNum },
-  });
-};
-
-export const getMonthlyBannerList = async () => {
-  const res = await axios.get(`${event}/monthlyBanner`);
+export const getBannerEvent = async (current) => {
+  const res = await axios.get(`${event}/banner`);
   return res.data; // List<EventInfoDTO>
 };
+
+// export const getMonthlyBannerList = async () => {
+//   const res = await axios.get(`${event}/monthlyBanner`);
+//   return res.data; // List<EventInfoDTO>
+// };
