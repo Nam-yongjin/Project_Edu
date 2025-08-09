@@ -3,6 +3,7 @@ package com.EduTech.controller.demonstration;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -44,6 +45,7 @@ public class DemonstrationController {
 	private final DemonstrationService demonstrationService;
 
 	// 교사 실증 신청 조회
+	//@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/demRes")
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(
 			@RequestParam(value = "search", required = false, defaultValue = "") String search,
@@ -54,6 +56,7 @@ public class DemonstrationController {
 	}
 
 	// 기업 실증 신청 조회
+	//@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/demReg")
 	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(
 			@RequestParam(value = "search", required = false, defaultValue = "") String search,
@@ -64,6 +67,7 @@ public class DemonstrationController {
 	}
 
 	// 신청한 물품 대여 조회
+	//@PreAuthorize("hasRole('TEACHER')")
 	@GetMapping("/demRental")
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRentalPage(
 			@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
@@ -109,6 +113,7 @@ public class DemonstrationController {
 	}
 
 	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
+	//@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/RentalDate")
 	public ResponseEntity<String> DemRentalDateChange(
 			@RequestBody DemonstrationResRentalDTO demonstrationResRentalDTO) {
@@ -117,6 +122,7 @@ public class DemonstrationController {
 	}
 
 	// 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
+	//@PreAuthorize("hasRole('TEACHER')")
 	@PostMapping("/ReservationRes")
 	public ResponseEntity<String> DemResReservation(
 			@RequestBody DemonstrationReservationDTO demonstrationReservationDTO) {
@@ -126,14 +132,16 @@ public class DemonstrationController {
 	}
 
 	// 물품 대여 목록 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
+	//@PreAuthorize("hasRole('TEACHER')")
 	@DeleteMapping("/CancelRes")
-	public ResponseEntity<String> DemResCancel(@RequestBody List<Long> demNum) {
+	public ResponseEntity<String> DemResCancel(@RequestParam List<Long> demNum) {
 		String memId = JWTFilter.getMemId();
 		demonstrationService.demonstrationReservationCancel(demNum, memId);
 		return ResponseEntity.ok("예약 취소 완료");
 	}
 
 	// 물품 대여 목록 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
+	//@PreAuthorize("hasRole('TEACHER')")
 	@PutMapping("/ChangeRes")
 	public ResponseEntity<String> DemResChange(@RequestBody DemonstrationReservationDTO demonstrationReservationDTO) {
 		String memId = JWTFilter.getMemId();
@@ -142,13 +150,14 @@ public class DemonstrationController {
 	}
 
 	// 물품 대여 목록 페이지에서 대여 연장 / 반납 버튼 클릭 시 해당 정보가 db에 저장
+	//@PreAuthorize("hasRole('TEACHER')")
 	@PostMapping("/AddRequest")
 	public ResponseEntity<String> addRequest(@RequestBody ResRequestDTO resRequestDTO) {
 		String memId = JWTFilter.getMemId();
 		demonstrationService.addRequest(resRequestDTO, memId);
 		return ResponseEntity.ok("요청 성공");
 	}
-
+	//@PreAuthorize("hasRole('COMPANY')")
 	@PostMapping("/addDem") // 이미지 파일 업로드 관련해서 8개까지 밖에 컨트롤러에 도달 못함(아마 톰켓 서버 관련 설정일듯, 톰켓 서버 설정 바꿔도 안먹음)
 	public ResponseEntity<String> DemAdd(
 			@RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
@@ -160,7 +169,8 @@ public class DemonstrationController {
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
 
-	// 실증 상품 수정하는 기능
+	// 실증 상품 수정하는 기능\
+	//@PreAuthorize("hasRole('COMPANY')")
 	@PutMapping("/UpdateDem")
 	public ResponseEntity<String> DemUpdate(
 			@RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
@@ -171,6 +181,7 @@ public class DemonstrationController {
 	}
 
 	// 실증 번호를 받아 실증 상품을 삭제하는 기능
+	//@PreAuthorize("hasRole('COMPANY')")
 	@DeleteMapping("/DeleteDem")
 	public ResponseEntity<String> demDelete(@RequestParam("demNum") Long demNum) {
 		demonstrationService.deleteDemonstration(demNum);
@@ -179,6 +190,7 @@ public class DemonstrationController {
 	}
 
 	// 실증 등록 수정 페이지에서 실증번호를 받아와 실증 상품의 정보를 받아오는 기능
+	//@PreAuthorize("hasRole('COMPANY')")
 	@GetMapping("/SelectOne")
 	public DemonstrationFormResDTO SelectOne(@RequestParam("demNum") Long demNum) {
 		DemonstrationFormResDTO dto = demonstrationService.selectOne(demNum);
@@ -196,10 +208,11 @@ public class DemonstrationController {
 	}
 	
 	// 실증 물품 현황 페이지에서 물품에 대한 정보를 받아오는 기능
-	@GetMapping("/getBorrow")
+	//@PreAuthorize("hasRole('TEACHER')")
+	@GetMapping("/getBorrow") 
 	public PageResponseDTO<DemonstrationBorrowListDTO> getBorrow(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
 		String memId = JWTFilter.getMemId();
-		System.out.println(memId);
+		System.out.println(memId); 
 		PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow = demonstrationService.AllgetBorrow(memId,demonstrationSearchDTO);
 		return AllgetBorrow;
 	}

@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
+import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.member.Company;
