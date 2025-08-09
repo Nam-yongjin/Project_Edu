@@ -15,16 +15,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
-import com.EduTech.dto.demonstration.DemonstrationTimeResDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationImage;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
@@ -71,7 +68,16 @@ public class DemonstrationRepositoryTests {
 
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
-
+	
+	@MockBean
+	private EventBannerRepositoryTest eventBannerRepository;
+	
+	@MockBean
+	private EventInfoRepositoryTest eventInfoRepository;
+	
+	@MockBean
+	private EventUseRepositoryTest eventUseRepository;
+	
 	@MockBean
 	MemberRepositoryTests memberRepositoryTests;
 	@Autowired
@@ -143,6 +149,7 @@ public class DemonstrationRepositoryTests {
 		}
 	}
 
+	/*
 	// @Test
 	public void testDemonstrationTime() {
 
@@ -155,7 +162,7 @@ public class DemonstrationRepositoryTests {
 			demonstrationTimeRepository.save(demonstrationTimeRegistory);
 
 		}
-	}
+	} */
 
 	// -------------------------------------------------여기까지 엔티티 테스트
 
@@ -399,11 +406,12 @@ public class DemonstrationRepositoryTests {
 		demonstrationReserveRepository.updateDemResChangeDate(LocalDate.parse("2222-12-22"),Long.valueOf(0));
 	}
 	*/
+	/*
 	//@Test // 실증 교사 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, 상태를 변경하는 테스트  (정상)
 		public void demonstrationResUpdate3Test() {
 			demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT,"user1",Long.valueOf(10));
 	}
-		
+		*/
 		
 	// --------------------------------- demonstrationReserve 테스트
 		
@@ -446,8 +454,8 @@ public class DemonstrationRepositoryTests {
 		 @Test
 		public void testDemonstrationReserve1() {
 			List<Long> list=new ArrayList<>();
-			list.add(200L);
-			int result=demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.REJECT, "poi2484", list);
+			list.add(4L);
+			int result=demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.ACCEPT, "teacher", list);
 				System.out.println(result);
 			}
 		

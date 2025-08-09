@@ -33,12 +33,6 @@ export const putUpdate = async (formData) => {
     return res.data;
 }
 
-// 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청 (임시)
-export const delDem = async (demNum) => {
-    const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, demNum);
-    return res.data;
-}
-
 // 실증 상품 리스트 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
 export const getList = async (current,searchType,search) => {
     console.log(searchType);
@@ -125,11 +119,12 @@ export const getRentalSearch=async (search,type,pageCount,sortBy,sort,statusFilt
 
 // 물품 대여 현황 페이지에서 항목 선택 후, 예약 취소 버튼 클릭 시, 상품 삭제
 export const deleteRental = async (demNum) => {
-  const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
-     data: demNum 
-  });
-  return res.data;
+    const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
+        params: { demNum }
+    });
+    return res.data;
 };
+
 
 // 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
 export const updateRental = async (startDate,endDate,demNum,itemNum) => {
@@ -178,4 +173,13 @@ export const getBorrow= async (pageCount, sort, sortBy, statusFilter) => {
     });
   return res.data;
 };
+
+// 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청
+export const delDem = async (demNum) => {
+    const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, {
+        params: { demNum } // 쿼리 파라미터로 전송
+    });
+    return res.data;
+};
+
 
