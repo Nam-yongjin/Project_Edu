@@ -15,4 +15,6 @@ import lombok.NoArgsConstructor;
 public class ResRequestDTO {
 	private Long demNum; // 실증 번호
 	private RequestType type; // 요청 타입 ex) 반납/연기
+	private DemonstrationState state;
+	private Long requestId;
 }

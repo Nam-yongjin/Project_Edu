@@ -2,6 +2,8 @@ package com.EduTech.dto.demonstration;
 
 import java.util.List;
 
+import com.EduTech.entity.demonstration.DemonstrationState;
+
 import lombok.Data;
 
 @Data
@@ -12,11 +14,13 @@ public class DemonstrationPageListDTO {
 	private String demName;
 	private String demMfr;
 	private Long itemNum;
+	private DemonstrationState state;
 	private List<DemonstrationImageDTO> imageList;
-	public DemonstrationPageListDTO(Long demNum, String demName, String demMfr, Long itemNum) {
+	public DemonstrationPageListDTO(Long demNum, String demName, String demMfr, Long itemNum,DemonstrationState state) {
 	    this.demNum = demNum;
 	    this.demName = demName;
 	    this.demMfr = demMfr;
 	    this.itemNum = itemNum;
+	    this.state=state;
 }
 }
