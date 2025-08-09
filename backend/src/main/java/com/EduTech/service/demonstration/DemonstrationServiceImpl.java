@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -81,7 +80,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	@Autowired
 	MemberRepository memberRepository;
 	@Autowired
-	ModelMapper modelMapper;
+	ModelMapper modelMapper; 
+
 
 	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
 	@Override
@@ -153,9 +153,10 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 		Page<DemonstrationReserve> reservePage = demonstrationReserveRepository.findAll(spec, pageable);
 
-		// 1. reservePage에서 demNum 리스트 추출 (중복제거)
+		// 1. reservePage에서 demNum 리스트 추출 (중복제거) (statae가 cancel인 목록 제거)
 		List<Long> demNums = reservePage.stream().map(r -> r.getDemonstration().getDemNum()).distinct().toList();
 
+		List<Long> demRevNums=reservePage.stream().map(r -> r.getDemRevNum()).distinct().toList();
 		// 2. demonstration_registration 일괄 조회
 		List<DemonstrationRegistration> regs = demonstrationRegistrationRepository
 				.findByDemonstration_DemNumIn(demNums);
@@ -177,10 +178,15 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		// 7. 이미지 리스트 일괄 조회
 		List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
 
+		
 		// 8. Map 생성: demNum -> List<DemonstrationImageDTO>
 		Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
 				.collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
 
+		// 대여, 반납 상태 가져옴
+		
+		List<DemonstrationRequest> requests=demonstrationRequestRepository.findStateByDemRevNumIn(demRevNums);
+		
 		// 9. DTO 매핑
 		Page<DemonstrationRentalListDTO> dtoPage = reservePage.map(reserve -> {
 			Demonstration dem = reserve.getDemonstration();
@@ -200,7 +206,20 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			dto.setCompanyName(companyName);
 
 			dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
+			
+			DemonstrationRequest req = requests.stream()
+				    .filter(r -> r.getReserve().getDemRevNum().equals(reserve.getDemRevNum()))
+				    .findFirst()
+				    .orElse(null);
 
+				if (req != null) {
+				    dto.setRequestType(req.getType());
+				    dto.setReqState(req.getState());
+				} else {
+				    dto.setRequestType(null);
+				    dto.setReqState(null);
+				}
+				
 			return dto;
 		});
 
@@ -319,7 +338,6 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
 		int result = demonstrationRepository.updateItemNum(demonstrationReservationDTO.getItemNum(),
 				demonstrationReservationDTO.getDemNum());
-		System.out.println(result);
 		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 		if (ResState == null || ResState.isEmpty()) {
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
@@ -534,6 +552,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationRequestRepository.save(request);
 	}
 
+	// 실증 등록한 기업의 물품 리스트를 보여주는 기능
 	@Override
 	public PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow(String memId, DemonstrationSearchDTO demonstrationSearchDTO) {
 

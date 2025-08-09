@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getBorrow, getBorrowSearch } from "../../api/demApi";
+import { getBorrow, getBorrowSearch,delDem } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 import useMove from "../../hooks/useMove";
@@ -56,7 +56,16 @@ const BorrowComponent = () => {
         setCurrent(0); // 정렬 변경 시 페이지 초기화
     };
 
-
+    const onDeleteDem = (demNum)=> {
+        if(demNum===null)
+        {
+            alert('물품 번호가 없습니다');
+            return;
+        }
+        delDem(demNum);
+        alert('물품이 삭제되었습니다.');
+        window.location.reload();
+    }
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
             <SearchComponent
@@ -76,6 +85,7 @@ const BorrowComponent = () => {
                                 <th className="py-3 px-4 text-left rounded-tl-lg">대표 이미지</th>
                                 <th className="py-3 px-4 text-left">상품명</th>
                                 <th className="py-3 px-4 text-left">제조사</th>
+                                <th className="py-3 px-4 text-left">개수</th>
                                 <th className="py-3 px-4 text-center cursor-pointer select-none rounded-tl-lg"
                                     onClick={() => handleSortChange("expDate")}>
                                     <div className="flex items-center justify-center space-x-1">
@@ -140,6 +150,7 @@ const BorrowComponent = () => {
                                         </td>
                                         <td className="py-3 px-4">{item.demName}</td>
                                         <td className="py-3 px-4">{item.demMfr}</td>
+                                        <td className="py-3 px-4">{item.itemNum}</td>
                                         <td className="py-3 px-4 text-center">
                                             {item.expDate ? new Date(item.expDate).toLocaleDateString() : "-"}
                                         </td>
@@ -155,17 +166,16 @@ const BorrowComponent = () => {
                                                     transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full"
                                                      onClick={() => moveToPath(`/demonstration/update/${item.demNum}`)}
                                             >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-4 w-4"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                    strokeWidth={2}
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M16.5 3.75a2.25 2.25 0 013.182 3.182L7.5 19.5H4.5v-3l12-12z" />
-                                                </svg>
                                                 상품 수정하기
+                                            </button>
+
+                                            <button
+                                                className="bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700
+                                                 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-md
+                                                    transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full"
+                                                     onClick={() => onDeleteDem(item.demNum)}
+                                            >
+                                                상품 삭제하기
                                             </button>
                                         </td>
                                     </tr>

@@ -13,9 +13,9 @@ const RentalComponent = () => {
     };
 
     const searchOptions = [
-  { value: "demName", label: "상품명" },
-  { value: "companyName", label: "기업명" },
-];
+        { value: "demName", label: "상품명" },
+        { value: "companyName", label: "기업명" },
+    ];
     const [search, setSearch] = useState(); // 검색어
     const [type, setType] = useState("companyName"); // 검색 타입
     const [pageData, setPageData] = useState(initState); // 페이지 데이터
@@ -24,7 +24,7 @@ const RentalComponent = () => {
     const [sortBy, setSortBy] = useState("applyAt"); // 정렬 칼럼명
     const [sort, setSort] = useState("asc"); // 정렬 방식
     const [statusFilter, setStatusFilter] = useState("total"); // state에 따라 필터링(ex wait,accept)
-   const { moveToPath} = useMove(); // 원하는 곳으로 이동할 변수
+    const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
     const [selectedItems, setSelectedItems] = useState(new Set()); // 체크박스 선택 항목(중복 방지를 위해 set사용)
     const [showModifyModal, setShowModifyModal] = useState(false); // 캘린더 모달 변수
     const [selectedDemNum, setSelectedDemNum] = useState(); // 캘린더에 넘겨줄 demNum 
@@ -165,25 +165,25 @@ const RentalComponent = () => {
         }
         else if (action === "대여연장") {
             const hasAccept = items.some(item => item.state === "ACCEPT");
-            if(!hasAccept) {
-            alert(`승인 상태에서만 대여 연장 신청이 가능합니다.`);
+            if (!hasAccept) {
+                alert(`승인 상태에서만 대여 연장 신청이 가능합니다.`);
                 return;
             }
             const type = "EXTEND";
             addRequest(demNum, type);
-             alert(`연장 신청 완료`);
-              window.location.reload();
+            alert(`연장 신청 완료`);
+            window.location.reload();
         }
         else if (action === "반납") {
             const hasAccept = items.some(item => item.state === "ACCEPT");
-             if(!hasAccept) {
-            alert(`승인 상태에서만 반납 신청이 가능합니다.`);
+            if (!hasAccept) {
+                alert(`승인 상태에서만 반납 신청이 가능합니다.`);
                 return;
             }
             const type = "RENTAL";
             addRequest(demNum, type);
-             alert(`반납 신청 완료`);
-              window.location.reload();
+            alert(`반납 신청 완료`);
+            window.location.reload();
         }
 
     };
@@ -250,7 +250,7 @@ const RentalComponent = () => {
                 type={type}
                 setType={setType}
                 onSearchClick={onSearchClick}
-                 searchOptions={searchOptions}
+                searchOptions={searchOptions}
             />
             <div className="overflow-x-auto mt-6">
                 <table className="min-w-full bg-white rounded-lg shadow-md">
@@ -321,16 +321,25 @@ const RentalComponent = () => {
                             </th>
                             {/* 버튼 3개 컬럼 */}
                             <th className="py-3 px-4 text-center"></th>
+                            <th className="py-3 px-4 text-left"></th>
                         </tr>
                     </thead>
                     <tbody className="text-gray-600 text-sm">
                         {listData.content.map((item) => {
                             const mainImage = item.imageList?.find((img) => img.isMain === true);
                             const isCancelled = item.state === "CANCEL";
-                            const isRejected = item.state === "REJECT"
-                            return (
+                            const isRejected = item.state === "REJECT";
+                            // 진행중 요청만 필터링 (WAIT 상태)
+                            const pendingRequests =
+                                item.requestType !== null && item.reqState !== null
+                                    ? [{ type: item.requestType, state: item.reqState }].filter(
+                                        (req) => req.state === "WAIT"
+                                    )
+                                    : [];
 
-                                <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}`}
+                            return (
+                                <tr
+                                    key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}`}
                                     className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : ""
                                         }`}
                                 >
@@ -346,6 +355,8 @@ const RentalComponent = () => {
                                             <span></span>
                                         )}
                                     </td>
+
+                                    {/* 이미지 */}
                                     <td className="py-3 px-4">
                                         {mainImage ? (
                                             <img
@@ -360,48 +371,79 @@ const RentalComponent = () => {
                                             </div>
                                         )}
                                     </td>
+
+                                    {/* 기본 정보 */}
                                     <td className="py-3 px-4">{item.demName}</td>
                                     <td className="py-3 px-4">{item.companyName}</td>
                                     <td className="py-3 px-4">{item.bitemNum}</td>
                                     <td className="py-3 px-4 text-center">{item.startDate}</td>
                                     <td className="py-3 px-4 text-center">{item.endDate}</td>
                                     <td className="py-3 px-4 text-center">{item.applyAt}</td>
-                                    <td className="py-3 px-4 text-center">{item.state}</td>
 
-                                    {/* 버튼 3개 */}
-                                    <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
-                                        {isCancelled ? (
-                                            <span className="text-gray-500 mt-[30px]">취소됨</span>
-                                        ) : isRejected ? (
-                                            <span className="text-gray-500 mt-[30px]">거절됨</span>
+                                    {/* 상태 표시 칸 (item.state만) */}
+                                    <td className="py-3 px-4 text-center align-top">
+                                        <div>{item.state}</div>
+                                    </td>
+
+                                    {/* 진행중 요청 별도 칸 (반납신청, 연장신청 등) */}
+                                    <td className="py-3 px-4 text-center align-top text-xs text-blue-600">
+                                        {pendingRequests.length > 0 ? (
+                                            <ul className="list-disc list-inside">
+                                                {pendingRequests.map((req, idx) => {
+                                                    if (req.type === "RENTAL") return <li key={idx}>반납신청 진행중</li>;
+                                                    if (req.type === "EXTEND") return <li key={idx}>기한연장 진행중</li>;
+                                                    return null;
+                                                })}
+                                            </ul>
                                         ) : (
-                                            <>
-                                                <button
-                                                    onClick={() => handleActionClick(item.demNum, "예약변경")}
-                                                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs w-full"
-                                                >
-                                                    예약변경
-                                                </button>
-                                                <button
-                                                    onClick={() => handleActionClick(item.demNum, "대여연장")}
-                                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs w-full"
-                                                >
-                                                    대여연장
-                                                </button>
-                                                <button
-                                                    onClick={() => handleActionClick(item.demNum, "반납")}
-                                                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs w-full"
-                                                >
-                                                    반납
-                                                </button>
-                                            </>
+                                            <span>-</span>
                                         )}
                                     </td>
 
+                                    {/* 버튼 3개 칸 */}
+                                    <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
+                                        {/* 예약변경 버튼: WAIT 상태에서만 활성 */}
+                                        <button
+                                            disabled={item.state !== "WAIT"}
+                                            onClick={() => handleActionClick(item.demNum, "예약변경")}
+                                            className={`px-2 py-1 rounded text-xs w-full ${item.state === "WAIT"
+                                                ? "bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
+                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                }`}
+                                        >
+                                            예약변경
+                                        </button>
+
+                                        {/* 대여연장 버튼: ACCEPT 상태에서만 활성 */}
+                                        <button
+                                            disabled={item.state !== "ACCEPT" || item.reqState === "WAIT"}
+                                            onClick={() => handleActionClick(item.demNum, "대여연장")}
+                                            className={`px-2 py-1 rounded text-xs w-full ${item.state === "ACCEPT" && item.reqState !== "WAIT"
+                                                    ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                }`}
+                                        >
+                                            대여연장
+                                        </button>
+
+                                        <button
+                                            disabled={item.state !== "ACCEPT" || item.reqState === "WAIT"}
+                                            onClick={() => handleActionClick(item.demNum, "반납")}
+                                            className={`px-2 py-1 rounded text-xs w-full ${item.state === "ACCEPT" && item.reqState !== "WAIT"
+                                                    ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                }`}
+                                        >
+                                            반납
+                                        </button>
+
+                                    </td>
                                 </tr>
                             );
                         })}
                     </tbody>
+
+
                 </table>
             </div>
 

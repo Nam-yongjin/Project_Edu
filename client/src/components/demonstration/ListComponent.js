@@ -43,6 +43,7 @@ const ListComponent = () => {
       : defaultImg;
 
     return (
+      item.state==="ACCEPT"?
       <div
         key={item.demNum}
         className="w-[300px] h-[500px] bg-blue-200 p-4 flex flex-col items-center justify-center gap-4 text-center rounded-md shadow-md"
@@ -88,6 +89,7 @@ const ListComponent = () => {
           {item.itemNum !== 0 ? "대여 가능" : "대여 불가능"}
         </button>
       </div>
+      : <></>
     );
   });
 
