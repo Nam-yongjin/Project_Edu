@@ -20,6 +20,7 @@ import com.EduTech.entity.demonstration.DemonstrationState;
 //실증 물품 등록 관련 레포지토리
 public interface DemonstrationRegistrationRepository extends JpaRepository<DemonstrationRegistration, Long>,JpaSpecificationExecutor<DemonstrationRegistration>{ 
 
+	/*
 	//  (관리자 실증기업 신청 조회 페이지) 받아올 dto 추가 필요함 (조인추가해서)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(reg.demRegNum,reg.regDate, reg.expDate, reg.state, reg.member.memId, c.companyName, c.position )FROM DemonstrationRegistration reg, Demonstration dem, Company c  WHERE reg.demonstration.demNum=dem.demNum AND reg.member.memId=c.memId")
 	Page<DemonstrationListRegistrationDTO> selectPageDemReg( Pageable pageable); 
@@ -28,7 +29,7 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	 //  (관리자 실증기업 신청 조회 페이지 검색 추가 ) 받아올 dto 추가 필요함 (조인추가해서)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(reg.demRegNum,reg.regDate, reg.expDate, reg.state, reg.member.memId, c.companyName, c.position )FROM DemonstrationRegistration reg, Demonstration dem, Company c  WHERE reg.demonstration.demNum=dem.demNum AND reg.member.memId=c.memId AND c.companyName LIKE %:search%")
 	Page<DemonstrationListRegistrationDTO> selectPageDemRegSearch( Pageable pageable,@Param("search") String search);
-	
+	*/
 	// 실증 기업 신청 페이지에서 반납 날짜를 불러오는 쿼리문
 	@Query("SELECT reg.expDate FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum=:demNum")
 	LocalDate selectDemRegExpDate(@Param("demNum") Long demNum);

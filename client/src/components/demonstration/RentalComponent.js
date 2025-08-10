@@ -33,7 +33,6 @@ const RentalComponent = () => {
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [showQtyModal, setShowQtyModal] = useState(false); // 아이템 모달
     const [reservationQty, setReservationQty] = useState(1); // 수량 설정
-    let updatedItemNum = 0; // 예약 한 수량 만큼 뺀 itemNum
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );

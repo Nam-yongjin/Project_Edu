@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getMemberInfoByDemNum } from "../../api/demApi";
+import {getBorrowResInfoSearch,getBorrowResInfo } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 
-const MemberInfoModal = ({ demNum, onClose }) => {
+const RentalMemberInfoModal = ({ demNum, onClose }) => {
+        const initState = {
+        content: [],
+        totalPages: 0,
+        currentPage: 0,
+    };
     const [search, setSearch] = useState("");
     const [type, setType] = useState("memId");
     const searchOptions = [
@@ -15,57 +20,48 @@ const MemberInfoModal = ({ demNum, onClose }) => {
     const [sortBy, setSortBy] = useState("applyAt");
     const [sort, setSort] = useState("desc");
 
-    const [memberInfo, setMemberInfo] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [memberInfo, setMemberInfo] = useState({ content: [] });
     const [current, setCurrent] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+     const [pageData, setPageData] = useState(initState); // 페이지 데이터
 
     const [statusFilter, setStatusFilter] = useState("");
 
-    const statusOptions = [
-        { value: "", label: "전체" },
-        { value: "wait", label: "대기" },
-        { value: "accept", label: "승인" },
-        { value: "reject", label: "거절" },
-        { value: "cancel", label: "취소" },
-    ];
-
     useEffect(() => {
-        if (!demNum) return;
-        fetchPage(current, search, type, sortBy, sort);
-    }, [demNum, current, sortBy, sort, search, type]);
+         fetchData(current, search, type, sortBy, sort);
+    }, [current, sortBy, sort,statusFilter]);
 
-    const fetchPage = (page, search, type, sortBy, sort) => {
-        setLoading(true);
-        getMemberInfoByDemNum(demNum, page, search, type, sortBy, sort)
-            .then((data) => {
-                setMemberInfo(data.content || []);
-                setTotalPages(data.totalPages || 1);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
-    };
+   const fetchData = () => {
+           if (search && search.trim() !== "") {
+               getBorrowResInfoSearch(demNum, current, search, type, sortBy, sort,statusFilter).then((data) => {
+                   setMemberInfo(data);
+                   setPageData(data);
+               });
+           } else {
+               getBorrowResInfo(demNum, current, sort, sortBy, statusFilter).then((data) => {
+                   setMemberInfo(data);
+                   setPageData(data);
+               });
+           }
+       };
 
-    const handleSortChange = (field) => {
-        if (sortBy === field) {
-            setSort(sort === "asc" ? "desc" : "asc");
+  const handleSortChange = (column) => {
+        if (sortBy === column) {
+            setSort((prev) => (prev === "asc" ? "desc" : "asc"));
         } else {
-            setSortBy(field);
+            setSortBy(column);
             setSort("asc");
         }
-        setCurrent(0);
     };
 
     const onSearchClick = () => {
-        setCurrent(0);
+        fetchData();
     };
 
     // 상태 필터링
     const filteredMemberInfo = statusFilter
-        ? memberInfo.filter((m) => m.state === statusFilter)
-        : memberInfo;
+        ? memberInfo.content.filter((m) => m.state === statusFilter)
+        : memberInfo.content;
 
-    if (!demNum) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -92,12 +88,6 @@ const MemberInfoModal = ({ demNum, onClose }) => {
                         searchOptions={searchOptions}
                     />
                 </div>
-
-                {loading ? (
-                    <p className="text-center text-gray-500 mt-20">불러오는 중...</p>
-                ) : filteredMemberInfo.length === 0 ? (
-                    <p className="text-center text-red-500 mt-20">회원 정보를 불러올 수 없습니다.</p>
-                ) : (
                     <>
                         <div className="overflow-x-auto flex-grow">
                             <table className="min-w-full bg-white border border-gray-300 rounded-lg">
@@ -109,24 +99,13 @@ const MemberInfoModal = ({ demNum, onClose }) => {
                                         >
                                             <div className="flex justify-between items-center">
                                                 <span>아이디</span>
-                                                <span className="flex flex-col ml-1 text-xs">
-                                                    <span className={`leading-none ${sortBy === "memId" && sort === "asc" ? "text-black" : "text-gray-300"}`}>▲</span>
-                                                    <span className={`leading-none ${sortBy === "memId" && sort === "desc" ? "text-black" : "text-gray-300"}`}>▼</span>
-                                                </span>
                                             </div>
                                         </th>
                                         <th className="py-3 px-4 border-b">전화번호</th>
                                         <th className="py-3 px-4 border-b">주소</th>
-                                        <th
-                                            className="py-3 px-4 border-b cursor-pointer select-none"
-                                            onClick={() => handleSortChange("schoolName")}
-                                        >
+                                        <th className="py-3 px-4 border-b cursor-pointer select-none">
                                             <div className="flex justify-between items-center">
                                                 <span>학교명</span>
-                                                <span className="flex flex-col ml-1 text-xs">
-                                                    <span className={`leading-none ${sortBy === "schoolName" && sort === "asc" ? "text-black" : "text-gray-300"}`}>▲</span>
-                                                    <span className={`leading-none ${sortBy === "schoolName" && sort === "desc" ? "text-black" : "text-gray-300"}`}>▼</span>
-                                                </span>
                                             </div>
                                         </th>
                                         <th className="py-3 px-4 border-b">신청상품명</th>
@@ -140,42 +119,45 @@ const MemberInfoModal = ({ demNum, onClose }) => {
                                                     setStatusFilter(e.target.value);
                                                     setCurrent(0);
                                                 }}
-                                                className="border rounded px-2 py-1 text-sm"
-                                                aria-label="신청상태 필터"
+                                                className="ml-2 border rounded px-1 text-sm"
                                             >
-                                                {statusOptions.map((opt) => (
-                                                    <option key={opt.value} value={opt.value}>
-                                                        {opt.label}
-                                                    </option>
-                                                ))}
+                                                <option value="">전체</option>
+                                                <option value="REJECT">거부</option>
+                                                <option value="ACCEPT">수락</option>
+                                                <option value="WAIT">대기</option>
+                                                <option value="CANCEL">취소</option>
                                             </select>
                                         </th>
 
-                                        <th
-                                            className="py-3 px-4 border-b cursor-pointer select-none"
-                                            onClick={() => handleSortChange("applyAt")}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <span>신청일</span>
-                                                <span className="flex flex-col ml-1 text-xs">
-                                                    <span className={`leading-none ${sortBy === "applyAt" && sort === "asc" ? "text-black" : "text-gray-300"}`}>▲</span>
-                                                    <span className={`leading-none ${sortBy === "applyAt" && sort === "desc" ? "text-black" : "text-gray-300"}`}>▼</span>
-                                                </span>
-                                            </div>
-                                        </th>
-
-                                        <th
-                                            className="py-3 px-4 border-b cursor-pointer select-none"
-                                            onClick={() => handleSortChange("expDate")}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <span>반납예정일</span>
-                                                <span className="flex flex-col ml-1 text-xs">
-                                                    <span className={`leading-none ${sortBy === "expDate" && sort === "asc" ? "text-black" : "text-gray-300"}`}>▲</span>
-                                                    <span className={`leading-none ${sortBy === "expDate" && sort === "desc" ? "text-black" : "text-gray-300"}`}>▼</span>
-                                                </span>
-                                            </div>
-                                        </th>
+                                        {[
+                                            { label: "시작일", value: "startDate" },
+                                            { label: "마감일", value: "endDate" },
+                                            { label: "등록일", value: "applyAt" },
+                                        ].map(({ label, value }) => (
+                                            <th
+                                                key={value}
+                                                onClick={() => handleSortChange(value)}
+                                                className="cursor-pointer text-center select-none py-3 px-4"
+                                            >
+                                                <div className="flex items-center justify-center space-x-1">
+                                                    <span>{label}</span>
+                                                    <div className="flex flex-col">
+                                                        <span
+                                                            className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"
+                                                                }`}
+                                                        >
+                                                            ▲
+                                                        </span>
+                                                        <span
+                                                            className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"
+                                                                }`}
+                                                        >
+                                                            ▼
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody className="text-gray-600 text-sm">
@@ -187,22 +169,27 @@ const MemberInfoModal = ({ demNum, onClose }) => {
                                             <td className="py-2 px-4">{member.schoolName || "-"}</td>
                                             <td className="py-2 px-4">{member.demName || "-"}</td>
                                             <td className="py-2 px-4 font-semibold">{member.state || "-"}</td>
-                                            <td className="py-2 px-4">{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
+                                            <td className="py-2 px-4">{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
                                             <td className="py-2 px-4">{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
+                                            <td className="py-2 px-4">{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
 
-                        <div className="flex justify-center mt-4">
-                            <PageComponent current={current} totalPages={totalPages} setCurrent={setCurrent} />
-                        </div>
+                        <div className="flex justify-center mt-6">
+                <PageComponent
+                    totalPages={pageData.totalPages}
+                    current={current}
+                    setCurrent={setCurrent}
+                />
+            </div>
                     </>
-                )}
+                
             </div>
         </div>
     );
 };
 
-export default MemberInfoModal;
+export default RentalMemberInfoModal;
