@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getBorrow, getBorrowSearch,delDem } from "../../api/demApi";
+import { getBorrow, getBorrowSearch, delDem } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 import useMove from "../../hooks/useMove";
+import MemberInfoModal from "../../components/demonstration/RentalMemberInfoModal";
+
 const BorrowComponent = () => {
     const initState = {
         content: [],
@@ -13,17 +15,20 @@ const BorrowComponent = () => {
         { value: "demName", label: "상품명" },
         { value: "demMfr", label: "제조사" },
     ];
-    // 검색/필터 상태 (필요하면 추가)
+
     const [search, setSearch] = useState("");
     const [type, setType] = useState("demName");
     const [sortBy, setSortBy] = useState("regDate");
     const [sort, setSort] = useState("desc");
     const [statusFilter, setStatusFilter] = useState("total");
-    const { moveToPath} = useMove(); // 원하는 곳으로 이동할 변수
-    const [listData, setListData] = useState({ content: [] }); // 받아올 content 데이터
-    const [pageData, setPageData] = useState(initState); // 페이지 데이터
-    // 현재 페이지
+    const { moveToPath } = useMove();
+    const [listData, setListData] = useState({ content: [] });
+    const [pageData, setPageData] = useState(initState);
     const [current, setCurrent] = useState(0);
+
+    const [selectedDemNum, setSelectedDemNum] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getBorrowSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
@@ -53,19 +58,19 @@ const BorrowComponent = () => {
             setSortBy(value);
             setSort("asc");
         }
-        setCurrent(0); // 정렬 변경 시 페이지 초기화
+        setCurrent(0);
     };
 
-    const onDeleteDem = (demNum)=> {
-        if(demNum===null)
-        {
+    const onDeleteDem = (demNum) => {
+        if (demNum === null) {
             alert('물품 번호가 없습니다');
             return;
         }
         delDem(demNum);
         alert('물품이 삭제되었습니다.');
         window.location.reload();
-    }
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
             <SearchComponent
@@ -86,8 +91,10 @@ const BorrowComponent = () => {
                                 <th className="py-3 px-4 text-left">상품명</th>
                                 <th className="py-3 px-4 text-left">제조사</th>
                                 <th className="py-3 px-4 text-left">개수</th>
-                                <th className="py-3 px-4 text-center cursor-pointer select-none rounded-tl-lg"
-                                    onClick={() => handleSortChange("expDate")}>
+                                <th
+                                    className="py-3 px-4 text-center cursor-pointer select-none rounded-tl-lg"
+                                    onClick={() => handleSortChange("expDate")}
+                                >
                                     <div className="flex items-center justify-center space-x-1">
                                         <span>반납 예정일</span>
                                         <div className="flex flex-col">
@@ -96,9 +103,10 @@ const BorrowComponent = () => {
                                         </div>
                                     </div>
                                 </th>
-
-                                <th className="py-3 px-4 text-center cursor-pointer select-none"
-                                    onClick={() => handleSortChange("regDate")}>
+                                <th
+                                    className="py-3 px-4 text-center cursor-pointer select-none"
+                                    onClick={() => handleSortChange("regDate")}
+                                >
                                     <div className="flex items-center justify-center space-x-1">
                                         <span>등록일</span>
                                         <div className="flex flex-col">
@@ -130,16 +138,19 @@ const BorrowComponent = () => {
                         <tbody className="text-gray-600 text-sm">
                             {listData.content.map((item) => {
                                 const mainImage = item.imageList?.find((img) => img.isMain === true);
+                                const isCancelled = item.state === "CANCEL";
+
                                 return (
                                     <tr
                                         key={item.demNum}
-                                        className="border-b border-gray-200 hover:bg-gray-50 cursor-default"
+                                        className={`border-b border-gray-200 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}
                                     >
                                         <td className="py-3 px-4">
                                             {mainImage ? (
                                                 <img
                                                     src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                     alt={item.demName}
+                                                    onClick={() => moveToPath(`../detail/${item.demNum}`)}
                                                     className="w-20 h-20 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer"
                                                 />
                                             ) : (
@@ -159,23 +170,55 @@ const BorrowComponent = () => {
                                         </td>
                                         <td className="py-3 px-4 text-center">{item.state}</td>
                                         <td className="py-3 px-4 text-center space-y-2">
-
+                                            {/* 수정 버튼 */}
                                             <button
-                                                className="bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700
-                                                 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-md
-                                                    transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full"
-                                                     onClick={() => moveToPath(`/demonstration/update/${item.demNum}`)}
+                                                className={`${item.state === 'CANCEL'
+                                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    : "bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700 text-white"
+                                                    } px-3 py-1 rounded-lg text-xs font-semibold shadow-md transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full`}
+                                                onClick={() => {
+                                                    if (item.state !== 'WAIT') {
+                                                        alert('대기 상태에서만 수정 가능합니다.');
+                                                        return;
+                                                    }
+                                                    moveToPath(`/demonstration/update/${item.demNum}`);
+                                                }}
+                                                disabled={item.state === 'CANCEL'}
                                             >
                                                 상품 수정하기
                                             </button>
 
+                                            {/* 삭제 버튼 */}
                                             <button
-                                                className="bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700
-                                                 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-md
-                                                    transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full"
-                                                     onClick={() => onDeleteDem(item.demNum)}
+                                                className={`${item.state === 'CANCEL'
+                                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    : "bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700 text-white"
+                                                    } px-3 py-1 rounded-lg text-xs font-semibold shadow-md transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full`}
+                                                onClick={() => {
+                                                    if (item.state !== 'WAIT') {
+                                                        alert('대기 상태에서만 삭제 가능합니다.');
+                                                        return;
+                                                    }
+                                                    onDeleteDem(item.demNum);
+                                                }}
+                                                disabled={item.state === 'CANCEL'}
                                             >
                                                 상품 삭제하기
+                                            </button>
+
+                                            {/* 회원 정보 보기 버튼 */}
+                                            <button
+                                                className={`${item.state === 'CANCEL'
+                                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    : "bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700 text-white"
+                                                    } px-3 py-1 rounded-lg text-xs font-semibold shadow-md transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full`}
+                                                onClick={() => {
+                                                    setSelectedDemNum(item.demNum); // ✅ demNum 저장
+                                                    setIsModalOpen(true); // ✅ 모달 열기
+                                                }}
+                                                disabled={item.state === 'CANCEL'}
+                                            >
+                                                회원 정보 확인
                                             </button>
                                         </td>
                                     </tr>
@@ -193,6 +236,13 @@ const BorrowComponent = () => {
                     />
                 </div>
             </div>
+
+            {isModalOpen && (
+                <MemberInfoModal
+                    demNum={selectedDemNum}
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
         </div>
     );
 };

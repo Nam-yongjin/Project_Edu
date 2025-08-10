@@ -65,4 +65,6 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 	// 아이디들을 가져와서 기업 목록들을 가져오는 쿼리문
 	@Query("SELECT c FROM Company c WHERE c.memId IN :memIds")
 	List<Company> findCompanyByMemIdIn(@Param("memIds") Set<String> memIds);
+	
+    List<Member> findByMemIdIn(List<String> memIds);
 }

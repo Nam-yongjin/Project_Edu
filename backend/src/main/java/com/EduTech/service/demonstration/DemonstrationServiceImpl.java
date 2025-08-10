@@ -45,6 +45,7 @@ import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.demonstration.DemonstrationTime;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.Teacher;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
@@ -105,6 +106,118 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
+	// 서비스 메소드 - DemonstrationReserve 기준으로 페이징 조회 및 DTO 매핑
+	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResRental(DemonstrationSearchDTO searchDTO, String memId) {
+
+	    Integer pageCount = searchDTO.getPageCount();
+	    String type = searchDTO.getType();
+	    String search = searchDTO.getSearch();
+	    String sortBy = searchDTO.getSortBy();
+	    String sort = searchDTO.getSort();
+	    String statusFilter = searchDTO.getStatusFilter();
+	    Long demNum = searchDTO.getDemNum();
+
+	    if (pageCount == null || pageCount < 0)
+	        pageCount = 0;
+	    if (!StringUtils.hasText(sortBy))
+	        sortBy = "applyAt";
+	    if (!StringUtils.hasText(sort))
+	        sort = "desc";
+
+	    Pageable pageable = PageRequest.of(pageCount, 10);
+
+	    Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withResSearchAndSort(
+	        memId,
+	        type,
+	        search,
+	        sortBy,
+	        sort,
+	        statusFilter,
+	        demNum
+	    );
+
+	    // DemonstrationReserve 페이징 조회
+	    Page<DemonstrationReserve> resPage = demonstrationReserveRepository.findAll(spec, pageable);
+
+	    // 관련 demNum 리스트 추출 (중복 제거)
+	    List<Long> demNums = resPage.stream()
+	        .map(res -> res.getDemonstration().getDemNum())
+	        .distinct()
+	        .toList();
+
+	    // 이미지 리스트 일괄 조회 (demNum 기준)
+	    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
+	    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
+	        .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
+
+	    // 요청 상태 리스트 일괄 조회 (demRevNum 기준)
+	    List<Long> demRevNums = resPage.stream()
+	        .map(DemonstrationReserve::getDemRevNum)
+	        .distinct()
+	        .toList();
+
+	    List<DemonstrationRequest> requests = demonstrationRequestRepository.findStateByDemRevNumIn(demRevNums);
+
+	    // reserves에서 member.memId 리스트 추출 (중복 제거)
+	    List<String> memIds = resPage.stream()
+	        .map(reserve -> reserve.getMember().getMemId())
+	        .distinct()
+	        .toList();
+
+	    // memberRepository에서 memId 리스트로 Member 리스트 조회
+	    List<Member> members = memberRepository.findByMemIdIn(memIds);
+	    Map<String, Member> memIdToMember = members.stream()
+	        .collect(Collectors.toMap(Member::getMemId, m -> m));
+
+	    // DTO 매핑
+	    Page<DemonstrationListReserveDTO> dtoPage = resPage.map(res -> {
+	        Demonstration dem = res.getDemonstration();
+
+	        DemonstrationListReserveDTO dto = new DemonstrationListReserveDTO();
+
+	        dto.setDemRevNum(res.getDemRevNum());
+	        dto.setApplyAt(res.getApplyAt());
+	        dto.setStartDate(res.getStartDate());
+	        dto.setEndDate(res.getEndDate());
+	        dto.setState(res.getState());
+	        dto.setMemId(res.getMember().getMemId());
+	        dto.setBItemNum(res.getBItemNum());
+
+	        // Member 정보 가져오기
+	        Member member = memIdToMember.get(res.getMember().getMemId());
+	        if (member != null) {
+	            if (member.getTeacher() != null) {
+	                dto.setSchoolName(member.getTeacher().getSchoolName());
+	            }
+	            dto.setAddr(member.getAddr());
+	            dto.setPhone(member.getPhone());
+	        }
+
+	        if (dem != null) {
+	            dto.setDemName(dem.getDemName());
+	            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
+	        }
+
+	        DemonstrationRequest req = requests.stream()
+	            .filter(r -> r.getReserve().getDemRevNum().equals(res.getDemRevNum()))
+	            .findFirst()
+	            .orElse(null);
+
+	        if (req != null) {
+	            dto.setRequestDTO(new ResRequestDTO(req.getType(), req.getState()));
+	        }
+
+	        return dto;
+	    });
+
+	    return new PageResponseDTO<>(dtoPage);
+	}
+
+
+
+
+
+	
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
 	@Override
 	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search, Integer pageCount) {
@@ -257,13 +370,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Page<DemonstrationPageListDTO> currentPage; // 페이지 담을 객체
 		if (type.equals("demName") && !search.equals("")) {
 			currentPage = demonstrationRepository
-					.selectPageDemName(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search);
+					.selectPageDemName(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search,DemonstrationState.CANCEL);
 		} else if (type.equals("demMfr") && !search.equals("")) {
 			currentPage = demonstrationRepository
-					.selectPageDemMfr(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search);
+					.selectPageDemMfr(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search,DemonstrationState.CANCEL);
 		} else {
 			currentPage = demonstrationRepository
-					.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()));
+					.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()),DemonstrationState.CANCEL);
 		}
 		// list의 값을 넣지만 currentPage에도 setImage가 적용된다.
 		// 얕은 참조 복사이기 때문에
@@ -365,10 +478,9 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
-	// 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
+	// 물품대여 페이지에서 예약 취소 버튼 클릭 시, 상태값을 cancel로 바꿈
 	@Override
 	public void demonstrationReservationCancel(List<Long> demNum, String memId) {
-		System.out.println(demNum);
 		// 불러온 아이디와 실증 번호를 통해 신청 번호를 받아온 후,
 		List<DemonstrationReserve> demonstrationReserve = demonstrationReserveRepository.findDemRevNum(memId, demNum,
 				DemonstrationState.CANCEL);
@@ -400,6 +512,40 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
+	@Override
+	@Transactional
+	public void demonstrationReservationCancels(List<Long> demNums, List<String> memIds) {
+	    // 해당 memIds와 demNums 조건에 맞는 예약 목록 조회
+	    List<DemonstrationReserve> demonstrationReserves = demonstrationReserveRepository.findDemRevNums(memIds, demNums,
+	            DemonstrationState.CANCEL);
+
+	    if (demonstrationReserves.isEmpty()) {
+	        System.out.println("예약 정보가 없습니다.");
+	        return;
+	    }
+
+	    // 각 demNum별로 취소된 갯수 + 기존 갯수를 업데이트 (batch 처리 메서드로 교체 권장)
+	    for (Long demNum : demNums) {
+	        Long updateItemNum = demonstrationReserveRepository.getBItemNumBatch(demNum, memIds, DemonstrationState.CANCEL);
+	        demonstrationRepository.updateItemNum(updateItemNum, demNum);
+	    }
+
+	    // 상태 업데이트 (cancel) - batch 처리용 메서드
+	    demonstrationReserveRepository.updateDemResChangeStateBatch(DemonstrationState.CANCEL, memIds, demNums);
+
+	    // 데모 예약 시간 삭제
+	    for (DemonstrationReserve res : demonstrationReserves) {
+	        List<LocalDate> deleteTimeList = new ArrayList<>();
+	        for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
+	            deleteTimeList.add(date);
+	        }
+	        demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
+	    }
+	}
+
+
+	
+	
 	// 실증 신청 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@Override
 	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO, String memId) {
@@ -506,11 +652,14 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 	// 실증 번호를 받아서 실증 상품을 삭제하는 기능
 	@Override
-	public void deleteDemonstration(Long demNum) {
-		// 직접 DELETE 쿼리를 날리면 JPA의 영속성 컨텍스트 관리 없이 바로 DB에서 삭제가 실행
-		// 즉, 엔티티의 cascade 실행하지 않아서 오류가 생김
-		demonstrationRepository.deleteById(demNum);
-
+	public void deleteDemonstration(Long demNum,String memId) {
+		demonstrationRegistrationRepository.updateDemRegChangeState(DemonstrationState.CANCEL,memId,demNum);
+		List<Long> demNums=new ArrayList<>();
+		demNums.add(demNum);
+		List<String>rentalMemId=new ArrayList<>();
+		rentalMemId=demonstrationReserveRepository.getResMemId(demNum,DemonstrationState.CANCEL);
+		System.out.println(rentalMemId);
+		demonstrationReservationCancels(demNums, rentalMemId);
 	}
 
 	// 실증 번호를 받아서 실증 상품의 정보를 받아오는 기능

@@ -182,4 +182,9 @@ export const delDem = async (demNum) => {
     return res.data;
 };
 
-
+export const getMemberInfoByDemNum  = async (demNum) => {
+    const res = await jwtAxios.get(`${demonstration}/borrowRes`, {
+        params: { demNum } // 쿼리 파라미터로 전송
+    });
+    return res.data;
+};

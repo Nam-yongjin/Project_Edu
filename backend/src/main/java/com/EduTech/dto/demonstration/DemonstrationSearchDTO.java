@@ -17,4 +17,5 @@ public class DemonstrationSearchDTO {
 	 private String sort;
 	 private Integer pageCount;
 	 private String statusFilter;
+	 private Long demNum;
 }
