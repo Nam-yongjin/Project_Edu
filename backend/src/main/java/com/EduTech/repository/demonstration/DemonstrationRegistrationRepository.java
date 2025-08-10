@@ -40,11 +40,11 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	// 실증 기업 신청 목록 페이지에서 승인 / 거부 버튼 클릭 시, state를 변경하는 쿼리문
 	@Modifying 
 	@Transactional
-    @Query("UPDATE DemonstrationRegistration SET state=:state WHERE member.memId=:memId AND demRegNum=:demRegNum")
+    @Query("UPDATE DemonstrationRegistration SET state=:state WHERE member.memId=:memId AND demonstration.demNum=:demNum")
     int updateDemRegChangeState(
      @Param("state") DemonstrationState state,
      @Param("memId") String memId,
-     @Param("demRegNum") Long demRegNum
+     @Param("demNum") Long demNum
     ); 
 	
 	@Modifying 

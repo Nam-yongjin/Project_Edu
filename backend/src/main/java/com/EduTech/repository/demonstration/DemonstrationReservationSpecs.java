@@ -8,7 +8,10 @@ import org.springframework.util.StringUtils;
 
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
+import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
+import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.Teacher;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -16,7 +19,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
 public class DemonstrationReservationSpecs {
-
+	// 기업 실증 물품 등록 페이지에서 정보들을 가져오는 spec
 	public static Specification<DemonstrationRegistration> withSearchAndSort(
 	        String memId, String type, String search,
 	        String sortBy, String sort, String statusFilter) {

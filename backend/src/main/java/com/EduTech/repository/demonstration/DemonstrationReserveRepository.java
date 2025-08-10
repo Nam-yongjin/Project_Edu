@@ -46,7 +46,7 @@ public interface DemonstrationReserveRepository
 	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.member.memId = :memId AND dr.demonstration.demNum IN :demNum AND dr.state!=:state")
 	List<DemonstrationReserve> findDemRevNum(@Param("memId") String memId, @Param("demNum") List<Long> demNum,
 			@Param("state") DemonstrationState state);
-
+	
 	// 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문 (실증 예약 가능 시간도 업데이트 해줘야함) -
 	// demonstrationReserve 테이블의 값을 수정하니 해당 리포지토리에 작성함.
 	@Modifying
@@ -86,7 +86,7 @@ public interface DemonstrationReserveRepository
 	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
 	Long getBItemNum(@Param("demNum") Long demNum, @Param("memId") String memId,
 			@Param("state") DemonstrationState state);
-
+		
 	// 스케줄러를 이용해 state가 cancel인 값 삭제
 	@Modifying
 	@Transactional
@@ -94,12 +94,38 @@ public interface DemonstrationReserveRepository
 	void deleteResCancel(@Param("state") DemonstrationState state);
 
 	// RES테이블에서 아이디와 상품번호를 받아와 예약 시작날짜와 끝날짜를 받아오는 쿼리문
-		@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeReqDTO(r.startDate,r.endDate) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
+		@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeReqDTO(r.startDate,r.endDate) FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
 		DemonstrationTimeReqDTO getResDate(@Param("demNum") Long demNum, @Param("memId") String memId,
 				@Param("state") DemonstrationState state);
 		
 	// res테이블에서 아이디와 상품 번호를 받아와 실증 신청 번호를 받아오는 쿼리문
-		@Query("SELECT r FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
+		@Query("SELECT r FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
 		DemonstrationReserve getRev(@Param("demNum") Long demNum, @Param("memId") String memId,
 				@Param("state") DemonstrationState state);
+		
+		// res테이블에서 상품번호를 받아와 해당 상품을 신청한 회원 아이디를 받아오는 쿼리문
+		@Query("SELECT r.member.memId FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.state!=:state")
+		List<String> getResMemId(@Param("demNum") Long demNum, @Param("state") DemonstrationState state);
+		
+		 // 여러 memId, 여러 demNum에 대해 취소 상태가 아닌 예약 목록 조회
+	    @Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.member.memId IN :memIds AND dr.demonstration.demNum IN :demNums AND dr.state != :state")
+	    List<DemonstrationReserve> findDemRevNums(@Param("memIds") List<String> memIds,
+	                                              @Param("demNums") List<Long> demNums,
+	                                              @Param("state") DemonstrationState state);
+
+	    // 여러 memId, 한 demNum 기준으로 bItemNum + itemNum 합산 (단일 Long 반환)
+	    @Query("SELECT SUM(r.bItemNum + d.itemNum) FROM DemonstrationReserve r JOIN Demonstration d ON d.demNum = r.demonstration.demNum WHERE r.demonstration.demNum = :demNum AND r.member.memId IN :memIds AND r.state != :state")
+	    Long getBItemNumBatch(@Param("demNum") Long demNum,
+	                         @Param("memIds") List<String> memIds,
+	                         @Param("state") DemonstrationState state);
+
+	    // 여러 memId, 여러 demNum 상태 일괄 변경
+	    @Modifying
+	    @Transactional
+	    @Query("UPDATE DemonstrationReserve dr SET dr.state = :state WHERE dr.member.memId IN :memIds AND dr.demonstration.demNum IN :demNums")
+	    int updateDemResChangeStateBatch(@Param("state") DemonstrationState state,
+	                                     @Param("memIds") List<String> memIds,
+	                                     @Param("demNums") List<Long> demNums);
+		
+	    List<DemonstrationReserve> findByDemonstration_DemNumIn(List<Long> demNums);
 }
