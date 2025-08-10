@@ -64,7 +64,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class DemonstrationServiceImpl implements DemonstrationService {
 
-	@Autowired
+	@Autowired//
 	DemonstrationReserveRepository demonstrationReserveRepository;
 	@Autowired
 	DemonstrationRegistrationRepository demonstrationRegistrationRepository;
