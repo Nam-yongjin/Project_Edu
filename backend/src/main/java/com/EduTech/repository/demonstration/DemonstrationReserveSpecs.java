@@ -98,14 +98,12 @@ public class DemonstrationReserveSpecs {
    }
    
 
-   public static Specification<DemonstrationReserve> withResSearchAndSort(
-	        String memId,
+   public static Specification<DemonstrationReserve> withResSearchAndSortAdmin(
 	        String type,
 	        String search,
 	        String sortBy,
 	        String sort,
-	        String statusFilter,
-	        Long demNum) {
+	        String statusFilter) {
 
 	    return (root, query, cb) -> {
 	        query.distinct(true);
@@ -114,20 +112,10 @@ public class DemonstrationReserveSpecs {
 	        Join<DemonstrationReserve, Member> memberJoin = root.join("member", JoinType.LEFT);
 	        Join<Member, Teacher> teacherJoin = memberJoin.join("teacher", JoinType.LEFT);
 
-	        // demonstration -> demonstrationRegistrations 조인 (복수 연관관계 이름 정확히 확인 필요)
 	        Join<Demonstration, DemonstrationRegistration> regJoin = demJoin.join("demonstrationRegistration", JoinType.LEFT);
 	        Join<DemonstrationRegistration, Member> regMemberJoin = regJoin.join("member", JoinType.LEFT);
 
 	        List<Predicate> predicates = new ArrayList<>();
-
-	        // reg.member.memId 조건 (DemonstrationRegistration 기준)
-	        if (StringUtils.hasText(memId)) {
-	            predicates.add(cb.equal(regMemberJoin.get("memId"), memId));
-	        }
-
-	        if (demNum != null) {
-	            predicates.add(cb.equal(demJoin.get("demNum"), demNum));
-	        }
 
 	        if (StringUtils.hasText(search) && StringUtils.hasText(type)) {
 	            if ("demName".equalsIgnoreCase(type)) {
@@ -136,8 +124,8 @@ public class DemonstrationReserveSpecs {
 	                predicates.add(cb.like(cb.lower(demJoin.get("demMfr")), "%" + search.toLowerCase() + "%"));
 	            } else if ("schoolName".equalsIgnoreCase(type)) {
 	                predicates.add(cb.like(cb.lower(teacherJoin.get("schoolName")), "%" + search.toLowerCase() + "%"));
-	            } else if ("schoolMemId".equalsIgnoreCase(type)) {
-	                predicates.add(cb.equal(teacherJoin.get("memId"), search));
+	            } else if ("memId".equalsIgnoreCase(type)) {
+	                predicates.add(cb.like(cb.lower(memberJoin.get("memId")), "%" + search.toLowerCase() + "%"));
 	            }
 	        }
 
@@ -178,4 +166,82 @@ public class DemonstrationReserveSpecs {
 	}
 
 
+   public static Specification<DemonstrationReserve> withResSearchAndSort(
+	        String memId,
+	        String type,
+	        String search,
+	        String sortBy,
+	        String sort,
+	        String statusFilter,
+	        Long demNum) {
+
+	    return (root, query, cb) -> {
+	        query.distinct(true);
+
+	        Join<DemonstrationReserve, Demonstration> demJoin = root.join("demonstration", JoinType.LEFT);
+	        Join<DemonstrationReserve, Member> memberJoin = root.join("member", JoinType.LEFT);
+	        Join<Member, Teacher> teacherJoin = memberJoin.join("teacher", JoinType.LEFT);
+
+	        // demonstration -> demonstrationRegistrations 조인 (복수 연관관계 이름 정확히 확인 필요)
+	        Join<Demonstration, DemonstrationRegistration> regJoin = demJoin.join("demonstrationRegistration", JoinType.LEFT);
+	        Join<DemonstrationRegistration, Member> regMemberJoin = regJoin.join("member", JoinType.LEFT);
+
+	        List<Predicate> predicates = new ArrayList<>();
+
+	        // reg.member.memId 조건 (DemonstrationRegistration 기준)
+	        if (StringUtils.hasText(memId)) {
+	            predicates.add(cb.equal(regMemberJoin.get("memId"), memId));
+	        }
+
+	        if (demNum != null) {
+	            predicates.add(cb.equal(demJoin.get("demNum"), demNum));
+	        }
+
+	        if (StringUtils.hasText(search) && StringUtils.hasText(type)) {
+	            if ("demName".equalsIgnoreCase(type)) {
+	                predicates.add(cb.like(cb.lower(demJoin.get("demName")), "%" + search.toLowerCase() + "%"));
+	            } else if ("demMfr".equalsIgnoreCase(type)) {
+	                predicates.add(cb.like(cb.lower(demJoin.get("demMfr")), "%" + search.toLowerCase() + "%"));
+	            } else if ("schoolName".equalsIgnoreCase(type)) {
+	                predicates.add(cb.like(cb.lower(teacherJoin.get("schoolName")), "%" + search.toLowerCase() + "%"));
+	            } else if ("memId".equalsIgnoreCase(type)) {
+	                predicates.add(cb.like(cb.lower(memberJoin.get("memId")), "%" + search.toLowerCase() + "%"));
+	            }
+	        }
+
+	        if (StringUtils.hasText(statusFilter) && !"total".equalsIgnoreCase(statusFilter)) {
+	            switch (statusFilter.toLowerCase()) {
+	                case "wait":
+	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.WAIT));
+	                    break;
+	                case "accept":
+	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.ACCEPT));
+	                    break;
+	                case "reject":
+	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.REJECT));
+	                    break;
+	                case "cancel":
+	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
+	                    break;
+	            }
+	        }
+
+	        Path<?> sortPath;
+	        if ("endDate".equalsIgnoreCase(sortBy)) {
+	            sortPath = root.get("endDate");
+	        } else if ("startDate".equalsIgnoreCase(sortBy)) {
+	            sortPath = root.get("startDate");
+	        } else {
+	            sortPath = root.get("applyAt");
+	        }
+
+	        if ("desc".equalsIgnoreCase(sort)) {
+	            query.orderBy(cb.desc(sortPath));
+	        } else {
+	            query.orderBy(cb.asc(sortPath));
+	        }
+
+	        return cb.and(predicates.toArray(new Predicate[0]));
+	    };
+	}
 }

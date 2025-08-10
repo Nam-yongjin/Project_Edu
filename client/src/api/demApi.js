@@ -174,7 +174,7 @@ export const getBorrow= async (pageCount, sort, sortBy, statusFilter) => {
   return res.data;
 };
 
-// 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청
+// 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청 
 export const delDem = async (demNum) => {
     const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, {
         params: { demNum } // 쿼리 파라미터로 전송
@@ -182,9 +182,62 @@ export const delDem = async (demNum) => {
     return res.data;
 };
 
-export const getMemberInfoByDemNum  = async (demNum) => {
-    const res = await jwtAxios.get(`${demonstration}/borrowRes`, {
-        params: { demNum } // 쿼리 파라미터로 전송
+// 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 있음)
+export const getBorrowResInfoSearch  = async (demNum, pageCount, search, type, sortBy, sort,statusFilter) => {
+    const res = await jwtAxios.get(`${demonstration}/borrowRes`,{
+    params: {
+    search:search,
+    type:type,
+    statusFilter:statusFilter,
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort,
+    demNum:demNum,
+    }
     });
     return res.data;
 };
+
+// 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 없음)
+export const getBorrowResInfo  = async (demNum, pageCount, sort, sortBy, statusFilter) => {
+    const res = await jwtAxios.get(`${demonstration}/borrowRes`,{
+    params: {
+    statusFilter:statusFilter,
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort,
+    demNum:demNum,
+    }
+    });
+    return res.data;
+};
+
+// 관리자 물품 대여 관리 페이지에서 회원이 신청한 물품 항목들을 보여주는 요청
+export const getResAdminSearch  = async (pageCount, search, type, sortBy, sort,statusFilter) => {
+    const res = await jwtAxios.get(`${demonstration}/demReg`,{
+    params: {
+    search:search,
+    type:type,
+    statusFilter:statusFilter,
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort
+    }
+    });
+    return res.data;
+};
+
+// 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 없음)
+export const getResAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
+    const res = await jwtAxios.get(`${demonstration}/demReg`,{
+    params: {
+    statusFilter:statusFilter,
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort
+    }
+    });
+    return res.data;
+};
+
+

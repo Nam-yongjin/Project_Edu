@@ -3,7 +3,7 @@ import { getBorrow, getBorrowSearch, delDem } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 import useMove from "../../hooks/useMove";
-import MemberInfoModal from "../../components/demonstration/RentalMemberInfoModal";
+import RentalMemberInfoModal from "../../components/demonstration/RentalMemberInfoModal";
 
 const BorrowComponent = () => {
     const initState = {
@@ -238,7 +238,7 @@ const BorrowComponent = () => {
             </div>
 
             {isModalOpen && (
-                <MemberInfoModal
+                <RentalMemberInfoModal
                     demNum={selectedDemNum}
                     onClose={() => setIsModalOpen(false)}
                 />

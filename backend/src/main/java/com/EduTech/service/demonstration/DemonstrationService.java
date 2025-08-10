@@ -23,9 +23,9 @@ import com.EduTech.dto.demonstration.ResRequestDTO;
 
 public interface DemonstrationService {
 	
-		PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(String search,Integer pageCount); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
+	PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationListReserveDTO> getAllDemResRental(DemonstrationSearchDTO demonstrationSearchDTO,String memId); // 기업의 물품 중 실증 교사 신청목록 조회 기능
-		PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(String search,Integer pageCount); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
+		PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, DemonstrationSearchDTO demonstrationSearchDTO); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount,String type,String search); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
 		DemonstrationDetailDTO getDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지

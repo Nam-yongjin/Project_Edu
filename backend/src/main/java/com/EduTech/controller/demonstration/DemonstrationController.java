@@ -47,22 +47,17 @@ public class DemonstrationController {
 	// 교사 실증 신청 조회
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/demRes")
-	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(
-			@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam("pageCount") Integer pageCount) {
+	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
 
-		PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = demonstrationService.getAllDemRes(search, pageCount);
+		PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = demonstrationService.getAllDemRes(demonstrationSearchDTO);
 		return AllDemRes;
 	}
 
 	// 기업 실증 신청 조회
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/demReg")
-	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(
-			@RequestParam(value = "search", required = false, defaultValue = "") String search,
-			@RequestParam("pageCount") Integer pageCount) {
-		PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = demonstrationService.getAllDemReg(search,
-				pageCount);
+	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = demonstrationService.getAllDemReg(demonstrationSearchDTO);
 		return AllDemReg;
 	}
 
