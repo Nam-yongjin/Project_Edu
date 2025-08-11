@@ -212,6 +212,9 @@ const Side = ({ isOpen, onClose }) => {
                                         <li>
                                             <Link to="/admin/banner" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>배너 관리</Link>
                                         </li>
+                                        <li>
+                                            <Link to="/admin/stats" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>통계 확인</Link>
+                                        </li>
                                     </ul>
                                 </li>
                             </> : <></>}
