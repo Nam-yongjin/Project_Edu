@@ -4,14 +4,18 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,12 +23,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.EduTech.dto.facility.FacilityDetailDTO;
 import com.EduTech.dto.facility.FacilityHolidayDTO;
 import com.EduTech.dto.facility.FacilityImageDTO;
+import com.EduTech.dto.facility.FacilityListDTO;
 import com.EduTech.dto.facility.FacilityRegisterDTO;
 import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
-import com.EduTech.dto.facility.FacilityTimeDTO;
 import com.EduTech.entity.facility.Facility;
 import com.EduTech.entity.facility.FacilityHoliday;
 import com.EduTech.entity.facility.FacilityImage;
@@ -37,7 +41,6 @@ import com.EduTech.repository.facility.FacilityHolidayRepository;
 import com.EduTech.repository.facility.FacilityImageRepository;
 import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
-import com.EduTech.repository.facility.FacilityTimeRepository;
 import com.EduTech.repository.facility.PublicHolidayRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.util.FileUtil;
@@ -50,7 +53,6 @@ public class FacilityServiceImpl implements FacilityService {
 
     private final FacilityRepository facilityRepository;
     private final FacilityImageRepository facilityImageRepository;
-    private final FacilityTimeRepository facilityTimeRepository;
     private final FacilityReserveRepository facilityReserveRepository;
     private final FacilityHolidayRepository facilityHolidayRepository;
     private final PublicHolidayRepository publicHolidayRepository;
@@ -88,82 +90,95 @@ public class FacilityServiceImpl implements FacilityService {
                )
                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
-
+    
+    // 시설 등록
     @Override
     @Transactional
     public void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images) {
+        // 1) 기본 필드 매핑
         Facility facility = modelMapper.map(dto, Facility.class);
 
+        // 2) 예약 요약 시간(선택) 검증: 둘 다 있으면 start < end 확인
+        LocalTime start = facility.getReserveStart();
+        LocalTime end   = facility.getReserveEnd();
+        if (start != null || end != null) {
+            if (start == null || end == null) {
+                throw new IllegalArgumentException("예약 시작/종료 시간은 둘 다 입력하거나 둘 다 비워두세요.");
+            }
+            if (!start.isBefore(end)) {
+                throw new IllegalArgumentException("예약 시작시간은 종료시간보다 앞서야 합니다.");
+            }
+        }
+
+        // 3) 이미지 처리
         if (images != null) {
             for (MultipartFile image : images) {
                 if (image != null && !image.isEmpty()) {
                     FacilityImage imgEntity = toFacilityImage(image);
-                    facility.addImage(imgEntity); // 편의 메서드(양방향 동기화)
+                    facility.addImage(imgEntity);
                 }
             }
         }
+
+        // 4) 저장 (이미지만 cascade)
         facilityRepository.save(facility);
+    }
+    
+    // 시설 조회
+    @Override
+    public Page<FacilityListDTO> getFacilityList(Pageable pageable, String keyword) {
+        // 기본 정렬: facRevNum DESC (pageable에 정렬이 없을 때만)
+        Sort sort = pageable.getSort().isUnsorted()
+                ? Sort.by(Sort.Direction.DESC, "facRevNum")
+                : pageable.getSort();
+
+        Pageable pageReq = PageRequest.of(
+                Math.max(0, pageable.getPageNumber()),
+                Math.max(1, pageable.getPageSize()),
+                sort
+        );
+
+        String kw = (keyword == null) ? "" : keyword.trim();
+
+        Page<Facility> result = kw.isEmpty()
+                ? facilityRepository.findPageWithImages(pageReq)
+                : facilityRepository.searchPageWithImages(kw, pageReq);
+
+        // RootConfig의 typeMap/Converter가 Facility -> FacilityListDTO 매핑/정렬을 처리
+        return result.map(f -> modelMapper.map(f, FacilityListDTO.class));
     }
 
     // 시설 상세 (이미지 포함)
     @Override
     @Transactional(readOnly = true)
-    public FacilityDetailDTO getFacilityDetail(String facName) {
-        Facility facility = facilityRepository.findByFacName(facName)
-                .orElseThrow(() -> new RuntimeException("시설 정보를 찾을 수 없습니다."));
+    public FacilityDetailDTO getFacilityDetail(Long facRevNum) {
+        Facility facility = facilityRepository.findWithImagesById(facRevNum)
+                .orElseThrow(() -> new RuntimeException("시설 정보를 찾을 수 없습니다. (facRevNum=" + facRevNum + ")"));
 
-        List<FacilityImageDTO> imageDTOs = facilityImageRepository
-                .findByFacility_FacRevNum(facility.getFacRevNum())
-                .stream()
+        // fetch join으로 가져온 이미지 매핑
+        List<FacilityImageDTO> imageDTOs = facility.getImages().stream()
                 .map(img -> {
                     FacilityImageDTO d = new FacilityImageDTO();
                     d.setFacImageNum(img.getFacImageNum());
                     d.setImageName(img.getImageName());
                     d.setImageUrl(img.getImageUrl());
                     return d;
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
 
         FacilityDetailDTO d = new FacilityDetailDTO();
-        d.setFacRevNum(facility.getFacRevNum()); // 있으면 프론트 라우팅에 편함
+        d.setFacRevNum(facility.getFacRevNum()); // 프론트 라우팅에 유용
         d.setFacName(facility.getFacName());
         d.setFacInfo(facility.getFacInfo());
         d.setCapacity(facility.getCapacity());
         d.setFacItem(facility.getFacItem());
         d.setEtc(facility.getEtc());
-        // TODO: 실제 운영시간 요약을 계산해 넣을 수 있음
+        // TODO: 실제 운영시간 요약 계산 로직 반영
         d.setAvailableTime("09:00 ~ 18:00");
         d.setImages(imageDTOs);
         return d;
     }
 
-    // 특정 날짜의 예약 가능 시간대 계산
-    @Override
-    @Transactional(readOnly = true)
-    public List<FacilityTimeDTO> getAvailableTimes(Long facRevNum, LocalDate date) {
-        int dow = mapJavaDayOfWeekTo1to7(date);
-
-        // 공휴일 + 시설휴무 통합 체크 (해당 날짜만 조회)
-        boolean holiday = getClosedDates(facRevNum, date, date).contains(date);
-
-        var baseSlots = facilityTimeRepository
-                .findByFacility_FacRevNumAndDayOfWeek(facRevNum, dow);
-
-        return baseSlots.stream().map(t -> {
-            boolean overlap = facilityReserveRepository
-                    .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
-                            facRevNum, date, t.getEndTime(), t.getStartTime(),
-                            List.of(FacilityState.WAITING, FacilityState.APPROVED));
-
-            FacilityTimeDTO d = new FacilityTimeDTO();
-            d.setFacDate(date);
-            d.setStartTime(t.getStartTime());
-            d.setEndTime(t.getEndTime());
-            d.setAvailable(!holiday
-                    && !overlap
-                    && LocalDateTime.of(date, t.getEndTime()).isAfter(LocalDateTime.now()));
-            return d;
-        }).collect(Collectors.toList());
-    }
 
     // 예약 가능 여부
     @Override
