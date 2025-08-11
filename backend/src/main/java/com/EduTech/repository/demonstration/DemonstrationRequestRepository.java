@@ -1,16 +1,26 @@
 package com.EduTech.repository.demonstration;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.entity.demonstration.DemonstrationRequest;
+import com.EduTech.entity.demonstration.DemonstrationState;
+import com.EduTech.entity.demonstration.RequestType;
 
 public interface DemonstrationRequestRepository extends JpaRepository<DemonstrationRequest, Long>{
 	// 아이디들을 가져와서 기업 목록들을 가져오는 쿼리문
 	@Query("SELECT r FROM DemonstrationRequest r WHERE r.reserve.demRevNum IN :demRevNums")
 	List<DemonstrationRequest> findStateByDemRevNumIn(@Param("demRevNums") List<Long> demRevNums);
+	
+	// 반납 / 대여 연기 요청에서 상태값을 업데이트하는 쿼리문
+	@Modifying 
+	@Transactional
+	@Query("UPDATE DemonstrationRequest SET state=:state WHERE reserve.demRevNum =:demRevNum AND type=:type")
+	int updateDemResChangeStateReq(@Param("state") DemonstrationState state,@Param("demRevNum") Long demRevNum,@Param("type") RequestType type);
+	
 }
