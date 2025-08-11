@@ -23,6 +23,7 @@ const ListComponent = () => {
 
   useEffect(() => {
     getList(current, searchType, search).then((data) => {
+      console.log(data);
       setPageData(data);
       setListData(data);
     });

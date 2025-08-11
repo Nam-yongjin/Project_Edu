@@ -11,6 +11,9 @@ import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.admin.BoardListDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
+import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.notice.NoticeCreateRegisterDTO;
 import com.EduTech.entity.admin.BannerImage;
 import com.EduTech.entity.member.MemberState;
@@ -26,5 +29,6 @@ public interface AdminService {
 	List<BannerImage> getAllBanners();	// 배너 조회
 	void deleteBanner(Long bannerNum);	// 배너 삭제
 	void updateBannerSequence(List<Long> bannerNums);	// 배너 순서 수정
-	
+	PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
+	PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
 }
