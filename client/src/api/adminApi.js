@@ -71,7 +71,7 @@ export const getMemberRoleStats = async () => {
     return res.data;
 };
 
-// 프로그램 카테고리별 신청 수, 비율
+// 프로그램 카테고리별 등록 수, 비율
 export const getEventCategoryStats = async () => {
     const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/eventCategory`);
     return res.data;
