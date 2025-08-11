@@ -5,7 +5,18 @@ import PageComponent from "../common/PageComponent";
 import useMove from "../../hooks/useMove";
 import CalendarComponent from "./CalendarComponent";
 import ItemModal from "./itemModal";
+import { useSelector } from "react-redux";
 const RentalComponent = () => {
+    const isTeacher = useSelector((state) => state.loginState?.role === "TEACHER");
+    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+     // 권한 체크 useEffect
+    useEffect(() => {
+        if (!isTeacher&&!isAdmin) {
+            alert("권한이 없습니다.");
+            moveToPath("/");
+        }
+    
+    }, []);
     const initState = {
         content: [],
         totalPages: 0,
@@ -143,7 +154,7 @@ const RentalComponent = () => {
         window.location.reload();
     };
 
-    const handleActionClick = async (demNum, action,date) => {
+    const handleActionClick = async (demNum, action, date) => {
         // 같은 demNum을 가진 모든 항목을 찾음
         // reject랑 cancel은 버튼 자체가 존재 하지 않으므로 고려 x
         const items = listData.content.filter((item) => item.demNum === demNum);
@@ -173,7 +184,7 @@ const RentalComponent = () => {
                 return;
             }
             const type = "EXTEND";
-            addRequest(demNum, type,date);
+            addRequest(demNum, type, date);
             alert(`연장 신청 완료`);
             window.location.reload();
         }
@@ -252,7 +263,24 @@ const RentalComponent = () => {
 
     const handleExtendConfirm = (date) => {
         handleActionClick(selectedDemNum, "대여연장", date);
-          setIsExtendModalOpen(false);
+        setIsExtendModalOpen(false);
+    };
+
+    const getStateLabel = (state) => {
+        switch (state) {
+            case "ACCEPT":
+                return "수락";
+            case "REJECT":
+                return "거부";
+            case "WAIT":
+                return "대기";
+            case "CANCEL":
+                return "취소";
+            case "EXPIRED":
+                return "만료"
+            default:
+                return state || "-";
+        }
     };
 
     return (
@@ -315,21 +343,22 @@ const RentalComponent = () => {
                                 </th>
                             ))}
 
-                            <th className="py-3 px-4 text-left">
-                                상태
+                            <th className="py-3 px-2 border-b flex flex-col items-center space-y-1 whitespace-nowrap w-[90px]">
+                                <span>신청상태</span>
                                 <select
                                     value={statusFilter}
                                     onChange={(e) => {
                                         setStatusFilter(e.target.value);
                                         setCurrent(0);
                                     }}
-                                    className="ml-2 border rounded px-1 text-sm"
+                                    className="border rounded px-1 text-xs w-full"
                                 >
                                     <option value="">전체</option>
-                                    <option value="reject">reject</option>
-                                    <option value="accept">accept</option>
-                                    <option value="wait">wait</option>
-                                    <option value="cancel">cancel</option>
+                                    <option value="REJECT">거부</option>
+                                    <option value="ACCEPT">수락</option>
+                                    <option value="WAIT">대기</option>
+                                    <option value="CANCEL">취소</option>
+                                    <option value="EXPIRED">만료</option>
                                 </select>
                             </th>
                             {/* 버튼 3개 컬럼 */}
@@ -395,19 +424,30 @@ const RentalComponent = () => {
 
                                     {/* 상태 표시 칸 (item.state만) */}
                                     <td className="py-3 px-4 text-center align-top">
-                                        <div>{item.state}</div>
+                                        <div>{getStateLabel(item.state)}</div>
                                     </td>
 
                                     {/* 진행중 요청 별도 칸 (반납신청, 연장신청 등) */}
                                     <td className="py-3 px-4 text-center align-top text-xs text-blue-600">
-                                        {pendingRequests.length > 0 ? (
-                                            <ul className="list-disc list-inside">
-                                                {pendingRequests.map((req, idx) => {
-                                                    if (req.type === "RENTAL") return <li key={idx}>반납신청 진행중</li>;
-                                                    if (req.type === "EXTEND") return <li key={idx}>기한연장 진행중</li>;
-                                                    return null;
-                                                })}
-                                            </ul>
+                                        {Array.isArray(item.reqState) && Array.isArray(item.requestType) ? (
+                                            // reqState 중 WAIT인 인덱스만 필터링해서 그에 맞는 requestType 출력
+                                            item.reqState
+                                                .map((state, idx) => ({ state, type: item.requestType[idx] }))
+                                                .filter(r => r.state === "WAIT")
+                                                .length > 0 ? (
+                                                <ul className="list-disc list-inside">
+                                                    {item.reqState
+                                                        .map((state, idx) => ({ state, type: item.requestType[idx] }))
+                                                        .filter(r => r.state === "WAIT")
+                                                        .map((r, idx) => {
+                                                            if (r.type === "RENTAL") return <li key={idx}>반납신청 진행중</li>;
+                                                            if (r.type === "EXTEND") return <li key={idx}>기한연장 진행중</li>;
+                                                            return null;
+                                                        })}
+                                                </ul>
+                                            ) : (
+                                                <span>-</span>
+                                            )
                                         ) : (
                                             <span>-</span>
                                         )}
@@ -415,43 +455,55 @@ const RentalComponent = () => {
 
                                     {/* 버튼 3개 칸 */}
                                     <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
-                                        {/* 예약변경 버튼: WAIT 상태에서만 활성 */}
-                                        <button
-                                            disabled={item.state !== "WAIT"}
-                                            onClick={() => handleActionClick(item.demNum, "예약변경")}
-                                            className={`px-2 py-1 rounded text-xs w-full ${item.state === "WAIT"
-                                                ? "bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                }`}
-                                        >
-                                            예약변경
-                                        </button>
+                                        {(() => {
+                                            // 안전하게 배열 체크
+                                            const reqStates = Array.isArray(item.reqState) ? item.reqState : [];
+                                            // WAIT 상태가 하나라도 있는지 확인 (대소문자 무시)
+                                            const hasWaitState = reqStates.some(state => String(state).toUpperCase() === "WAIT");
+                                            const itemState = String(item.state).toUpperCase();
 
-                                        {/* 대여연장 버튼: ACCEPT 상태에서만 활성 */}
-                                        <button
-                                            disabled={item.state !== "ACCEPT" || item.reqState === "WAIT"}
-                                            onClick={() => handleExtendButtonClick(item.demNum)}
-                                            className={`px-2 py-1 rounded text-xs w-full ${item.state === "ACCEPT" && item.reqState !== "WAIT"
-                                                ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                }`}
-                                        >
-                                            대여연장
-                                        </button>
+                                            return (
+                                                <>
+                                                    {/* 예약변경 버튼: WAIT 상태에서만 활성 */}
+                                                    <button
+                                                        disabled={itemState !== "WAIT"}
+                                                        onClick={() => handleActionClick(item.demNum, "예약변경")}
+                                                        className={`px-2 py-1 rounded text-xs w-full ${itemState === "WAIT"
+                                                                ? "bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
+                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                            }`}
+                                                    >
+                                                        예약변경
+                                                    </button>
 
+                                                    {/* 대여연장 버튼: ACCEPT 상태에서만 활성, WAIT 상태 요청 없을 때만 */}
+                                                    <button
+                                                        disabled={itemState !== "ACCEPT" || hasWaitState}
+                                                        onClick={() => handleExtendButtonClick(item.demNum)}
+                                                        className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                            }`}
+                                                    >
+                                                        대여연장
+                                                    </button>
 
-                                        <button
-                                            disabled={item.state !== "ACCEPT" || item.reqState === "WAIT"}
-                                            onClick={() => handleActionClick(item.demNum, "반납")}
-                                            className={`px-2 py-1 rounded text-xs w-full ${item.state === "ACCEPT" && item.reqState !== "WAIT"
-                                                ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                }`}
-                                        >
-                                            반납
-                                        </button>
-
+                                                    {/* 반납 버튼: ACCEPT 상태에서만 활성, WAIT 상태 요청 없을 때만 */}
+                                                    <button
+                                                        disabled={itemState !== "ACCEPT" || hasWaitState}
+                                                        onClick={() => handleActionClick(item.demNum, "반납")}
+                                                        className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                            }`}
+                                                    >
+                                                        반납
+                                                    </button>
+                                                </>
+                                            );
+                                        })()}
                                     </td>
+
                                 </tr>
 
                             );
