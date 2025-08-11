@@ -12,6 +12,7 @@ import eventRouter from "./eventRouter";
 import facilityRouter from "./facilityRouter";
 import aboutRouter from "./aboutRouter";
 import adminRouter from "./adminRouter";
+import newsRouter from "./newsRouter";
 
 const Main = lazy(() => import("../pages/MainPage"))
 const Register = lazy(() => import("../pages/member/RegisterPage"))
@@ -30,6 +31,7 @@ const Event = lazy(() => import("../pages/event/eventPage"))
 const Facility = lazy(() => import("../pages/facility/facilityPage"))
 const About = lazy(() => import("../pages/about/AboutPage"))
 const Admin = lazy(() => import("../pages/admin/AdminPage"))
+const News = lazy(() => import("../pages/news/newsPage"))
 
 const root = createBrowserRouter([
     {
@@ -112,6 +114,11 @@ const root = createBrowserRouter([
         path: "admin",
         element: <Suspense fallback={<Loading />}><Admin /></Suspense>,
         children: adminRouter()
+    },
+    {
+        path: "news",
+        element: <Suspense fallback={<Loading />}><News /></Suspense>,
+        children: newsRouter()
     }
 
 ])
