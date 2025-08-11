@@ -141,6 +141,7 @@ public class DemonstrationController {
 	@PreAuthorize("hasRole('TEACHER')")
 	@PostMapping("/AddRequest")
 	public ResponseEntity<String> addRequest(@RequestBody ResRequestDTO resRequestDTO) {
+		System.out.println(resRequestDTO);
 		String memId = JWTFilter.getMemId();
 		demonstrationService.addRequest(resRequestDTO, memId);
 		return ResponseEntity.ok("요청 성공");

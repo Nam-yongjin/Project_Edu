@@ -67,9 +67,14 @@ public interface DemonstrationReserveRepository
 	int updateDemResChangeState(@Param("state") DemonstrationState state, @Param("memId") String memId,
 			@Param("demNum") List<Long> demNum);
 
+	@Modifying
+	@Transactional
+	@Query("UPDATE DemonstrationReserve SET endDate=:endDate WHERE demRevNum=:demRevNum")
+	int updateDemResEndDate(@Param("demRevNum") Long demRevNum,@Param("endDate") LocalDate endDate);
+	
 	@Modifying // demonstration reserve 테이블 상태값 변경 쿼리문 (실증 신청 번호를 받음)
 	@Transactional
-	@Query("UPDATE DemonstrationReserve SET state=:state WHERE member.memId=:memId AND demRevNum =:demRevNum")
+	@Query("UPDATE DemonstrationReserve SET state=:state WHERE demRevNum =:demRevNum")
 	int updateDemResChangeStateRev(@Param("state") DemonstrationState state,@Param("demRevNum") Long demRevNum);
 	
 	// 나중에 회원 탈퇴할때, 실증 신청 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문

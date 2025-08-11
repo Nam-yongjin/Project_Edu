@@ -17,6 +17,7 @@ public class ResRequestDTO {
 	private RequestType type; // 요청 타입 ex) 반납/연기
 	private DemonstrationState state;
 	private Long requestId;
+	private LocalDate updateDate;
 	public ResRequestDTO(RequestType type,DemonstrationState state)
 	{
 		this.type=type;

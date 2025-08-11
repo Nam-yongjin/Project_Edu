@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.demonstration.RequestType;
@@ -23,4 +24,7 @@ public interface DemonstrationRequestRepository extends JpaRepository<Demonstrat
 	@Query("UPDATE DemonstrationRequest SET state=:state WHERE reserve.demRevNum =:demRevNum AND type=:type")
 	int updateDemResChangeStateReq(@Param("state") DemonstrationState state,@Param("demRevNum") Long demRevNum,@Param("type") RequestType type);
 	
+	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지)
+		@Query("SELECT q FROM DemonstrationRequest q WHERE reserve.demRevNum=:demRevNum")
+		DemonstrationRequest selectRequest(@Param("demRevNum") Long demRevNum);
 }
