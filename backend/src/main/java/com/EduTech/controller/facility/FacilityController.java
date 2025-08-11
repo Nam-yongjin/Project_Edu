@@ -4,9 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,12 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
 import com.EduTech.dto.facility.FacilityHolidayDTO;
+import com.EduTech.dto.facility.FacilityListDTO;
 import com.EduTech.dto.facility.FacilityRegisterDTO;
 import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
-import com.EduTech.dto.facility.FacilityTimeDTO;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.service.facility.FacilityService;
 
@@ -44,6 +48,7 @@ public class FacilityController {
 
     // 시설 추가 (이미지 없어도 OK)
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerFacility(
         @RequestPart("dto") @Valid FacilityRegisterDTO dto,
         @RequestPart(value = "images", required = false) List<MultipartFile> images
@@ -51,20 +56,21 @@ public class FacilityController {
         facilityService.registerFacility(dto, images == null ? List.of() : images);
         return ResponseEntity.ok().build();
     }
+    
+    // 시설 조회
+    @GetMapping("/list")
+    public ResponseEntity<Page<FacilityListDTO>> list(
+            @PageableDefault(page = 0, size = 12) Pageable pageable,
+            @RequestParam(name = "keyword", defaultValue = "") String keyword) {
 
-    // 시설 상세 조회 (facName 기준)
-    @GetMapping("/detail/{facName}")
-    public ResponseEntity<FacilityDetailDTO> getFacilityDetail(@PathVariable String facName) {
-        return ResponseEntity.ok(facilityService.getFacilityDetail(facName));
+        Page<FacilityListDTO> res = facilityService.getFacilityList(pageable, keyword);
+        return ResponseEntity.ok(res);
     }
 
-    // 특정 날짜의 예약 가능 시간 조회 (시설 PK: facRevNum)
-    @GetMapping("/times")
-    public ResponseEntity<List<FacilityTimeDTO>> getAvailableTimes(
-            @RequestParam("facRevNum") Long facRevNum,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        return ResponseEntity.ok(facilityService.getAvailableTimes(facRevNum, date));
+    // 시설 상세 조회 (facRevNum 기준)
+    @GetMapping("/facilityDetail")
+    public ResponseEntity<FacilityDetailDTO> getFacilityDetail(@RequestParam("facRevNum") Long facRevNum) {
+        return ResponseEntity.ok(facilityService.getFacilityDetail(facRevNum));
     }
 
     // 예약 신청

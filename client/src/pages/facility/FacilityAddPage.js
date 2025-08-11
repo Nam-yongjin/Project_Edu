@@ -6,7 +6,7 @@ const FacilityAddPage = () => {
 
   return (
     <div className="w-full">
-      <FacilityTitleComponent title="wkdth 등록" />
+      <FacilityTitleComponent title="시설 등록" />
       <FacilityAddComponent />
       </div>
   );
