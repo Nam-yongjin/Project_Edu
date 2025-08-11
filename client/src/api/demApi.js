@@ -4,7 +4,7 @@ import { API_SERVER_HOST } from "./config";
 import { API_MAPPING } from "./config";
 const host = `${API_SERVER_HOST}/api`
 const demonstration = `${host}${API_MAPPING.demonstration}`;
-
+const admin = `${host}${API_MAPPING.admin}`;
 // 실증 상품 등록하는 요청 jwtAxios에서는 헤더를 직접 달아줘야 한다.
 export const postAdd = async (formData) => {
     const res = await jwtAxios.post(`${demonstration}/addDem`, formData, {
@@ -214,7 +214,7 @@ export const getBorrowResInfo  = async (demNum, pageCount, sort, sortBy, statusF
 
 // 관리자 물품 대여 관리 페이지에서 회원이 신청한 물품 항목들을 보여주는 요청
 export const getResAdminSearch  = async (pageCount, search, type, sortBy, sort,statusFilter) => {
-    const res = await jwtAxios.get(`${demonstration}/demReg`,{
+    const res = await jwtAxios.get(`${admin}/demRes`,{
     params: {
     search:search,
     type:type,
@@ -229,7 +229,7 @@ export const getResAdminSearch  = async (pageCount, search, type, sortBy, sort,s
 
 // 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 없음)
 export const getResAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
-    const res = await jwtAxios.get(`${demonstration}/demReg`,{
+    const res = await jwtAxios.get(`${admin}/demRes`,{
     params: {
     statusFilter:statusFilter,
     pageCount:pageCount,
