@@ -44,23 +44,6 @@ public class DemonstrationController {
 
 	private final DemonstrationService demonstrationService;
 
-	// 교사 실증 신청 조회
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/demRes")
-	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
-
-		PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = demonstrationService.getAllDemRes(demonstrationSearchDTO);
-		return AllDemRes;
-	}
-
-	// 기업 실증 신청 조회
-	@PreAuthorize("hasRole('ADMIN')")
-	@GetMapping("/demReg")
-	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
-		PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = demonstrationService.getAllDemReg(demonstrationSearchDTO);
-		return AllDemReg;
-	}
-
 	// 기업들이 등록한 물품들에 대여 중인 선생들의 정보 조회
 	@PreAuthorize("hasRole('COMPANY')")
 	@GetMapping("/borrowRes")

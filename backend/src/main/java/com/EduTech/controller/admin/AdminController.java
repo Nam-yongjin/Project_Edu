@@ -24,6 +24,9 @@ import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.admin.MemberStateChangeDto;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
+import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.entity.admin.BannerImage;
 import com.EduTech.service.admin.AdminService;
 import com.EduTech.util.FileUtil;
@@ -121,4 +124,21 @@ public class AdminController {
     public ResponseEntity<Resource> viewFile(@RequestParam("filePath") String filePath) {
         return fileUtil.getFile(filePath, "");
     }
+	
+	// 교사 실증 신청 조회
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/demRes")
+	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+
+		PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = adminService.getAllDemRes(demonstrationSearchDTO);
+		return AllDemRes;
+	}
+
+	// 기업 실증 신청 조회
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/demReg")
+	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = adminService.getAllDemReg(demonstrationSearchDTO);
+		return AllDemReg;
+	}
 }

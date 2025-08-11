@@ -48,6 +48,15 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
      @Param("demNum") Long demNum
     ); 
 	
+	// demRegNum을 받아 상태 업데이트
+		@Modifying 
+		@Transactional
+	    @Query("UPDATE DemonstrationRegistration SET state=:state WHERE demRegNum=:demRegNum")
+	    int updateDemRegChangeStateReg(
+	     @Param("state") DemonstrationState state,
+	     @Param("demRegNum") Long demRegNum
+	    ); 
+		
 	@Modifying 
 	@Transactional
     @Query("UPDATE DemonstrationRegistration SET expDate=:expDate WHERE member.memId=:memId AND demonstration.demNum=:demNum")
