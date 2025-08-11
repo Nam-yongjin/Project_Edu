@@ -22,12 +22,12 @@ public class DemonstrationRentalListDTO {
 	private String companyName;
 	private Long itemNum; 
 	private List<DemonstrationImageDTO> imageList; 
-	private RequestType requestType;
-	private	DemonstrationState reqState;// 반납 / 연장 상태
+	private List<RequestType> requestType;
+	private	List<DemonstrationState> reqState;// 반납 / 연장 상태
 	private DemonstrationState state; // 물품 대여 상태
 	// 물품 대여 조회 페이지용 생성자
 	public DemonstrationRentalListDTO(Long demNum, String demName, Long bItemNum,String companyName,
-			LocalDate startDate, LocalDate endDate, LocalDate applyAt,DemonstrationState state,RequestType requestType,DemonstrationState reqState) {
+			LocalDate startDate, LocalDate endDate, LocalDate applyAt,DemonstrationState state) {
 		this.demNum = demNum;
 		this.demName = demName;
 		this.bItemNum = bItemNum;
@@ -35,7 +35,5 @@ public class DemonstrationRentalListDTO {
 		this.endDate = endDate;
 		this.applyAt = applyAt;
 		this.state=state;
-		this.requestType=requestType;
-		this.reqState=reqState;
 	}
 }

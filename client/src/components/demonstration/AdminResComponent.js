@@ -3,13 +3,22 @@ import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 import { getResAdminSearch, getResAdmin, updateResState, updateReqState } from "../../api/demApi";
 import useMove from "../../hooks/useMove";
-
+import { useSelector } from "react-redux";
 const AdminResComponent = () => {
+    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
     const initState = {
         content: [],
         totalPages: 0,
         currentPage: 0,
     };
+
+ useEffect(() => {
+        if (!isAdmin) {
+            alert("권한이 없습니다.");
+            moveToPath("/");
+        }
+
+    }, []);
 
     const [search, setSearch] = useState("");
     const [type, setType] = useState("memId");
@@ -114,6 +123,8 @@ const AdminResComponent = () => {
                 return "대기";
             case "CANCEL":
                 return "취소";
+            case "EXPIRED":
+                return "만료"
             default:
                 return state || "-";
         }
@@ -184,6 +195,7 @@ const AdminResComponent = () => {
                                         <option value="ACCEPT">수락</option>
                                         <option value="WAIT">대기</option>
                                         <option value="CANCEL">취소</option>
+                                        <option value="EXPIRED">만료</option>
                                     </select>
                                 </th>
 
@@ -282,6 +294,9 @@ const AdminResComponent = () => {
                                                     <div className="font-semibold mb-1 whitespace-nowrap text-xs">
                                                         {member.requestDTO.type === "EXTEND" && "연장 신청"}
                                                         {member.requestDTO.type === "RENTAL" && "반납 신청"}
+                                                    </div>
+                                                     <div className="font-semibold mb-1 whitespace-nowrap text-xs">
+                                                        {member.requestDTO.type === "EXTEND"?member.requestDTO.updateDate:<></>}
                                                     </div>
                                                     <div className="whitespace-nowrap">
                                                         <button
