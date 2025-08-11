@@ -26,7 +26,7 @@ public class DemonstrationListReserveDTO { // 실증 교사 신청 조회하는 
 	private String addr; 
 	private String phone; 
 	private Long bItemNum;
-	private ResRequestDTO requestDTO;
+	private List<ResRequestDTO> requestDTO;
 	private Long demNum;
 	private List<DemonstrationImageDTO> imageList=new ArrayList<>(); 
 	

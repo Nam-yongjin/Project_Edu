@@ -33,6 +33,9 @@ const RentalComponent = () => {
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [showQtyModal, setShowQtyModal] = useState(false); // 아이템 모달
     const [reservationQty, setReservationQty] = useState(1); // 수량 설정
+    const [isExtendModalOpen, setIsExtendModalOpen] = useState(false); // 날짜 연장용 모달창 상태 변수
+    const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
+
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
@@ -55,6 +58,7 @@ const RentalComponent = () => {
             });
         } else {
             getRental(current, sort, sortBy, statusFilter).then((data) => {
+                console.log(data);
                 setListData(data);
                 setPageData(data);
             });
@@ -115,7 +119,7 @@ const RentalComponent = () => {
         } else {
             newSet.delete(demNum);
         }
-        
+
         setSelectedItems(newSet);
     };
 
@@ -139,7 +143,7 @@ const RentalComponent = () => {
         window.location.reload();
     };
 
-    const handleActionClick = async (demNum, action) => {
+    const handleActionClick = async (demNum, action,date) => {
         // 같은 demNum을 가진 모든 항목을 찾음
         // reject랑 cancel은 버튼 자체가 존재 하지 않으므로 고려 x
         const items = listData.content.filter((item) => item.demNum === demNum);
@@ -169,7 +173,7 @@ const RentalComponent = () => {
                 return;
             }
             const type = "EXTEND";
-            addRequest(demNum, type);
+            addRequest(demNum, type,date);
             alert(`연장 신청 완료`);
             window.location.reload();
         }
@@ -240,6 +244,16 @@ const RentalComponent = () => {
         const d = String(date.getDate()).padStart(2, '0');
         return `${y}-${m}-${d}`;
     }
+
+    const handleExtendButtonClick = (demNum) => {
+        setSelectedDemNum(demNum);
+        setIsExtendModalOpen(true);
+    };
+
+    const handleExtendConfirm = (date) => {
+        handleActionClick(selectedDemNum, "대여연장", date);
+          setIsExtendModalOpen(false);
+    };
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -416,21 +430,22 @@ const RentalComponent = () => {
                                         {/* 대여연장 버튼: ACCEPT 상태에서만 활성 */}
                                         <button
                                             disabled={item.state !== "ACCEPT" || item.reqState === "WAIT"}
-                                            onClick={() => handleActionClick(item.demNum, "대여연장")}
+                                            onClick={() => handleExtendButtonClick(item.demNum)}
                                             className={`px-2 py-1 rounded text-xs w-full ${item.state === "ACCEPT" && item.reqState !== "WAIT"
-                                                    ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
                                         >
                                             대여연장
                                         </button>
 
+
                                         <button
                                             disabled={item.state !== "ACCEPT" || item.reqState === "WAIT"}
                                             onClick={() => handleActionClick(item.demNum, "반납")}
                                             className={`px-2 py-1 rounded text-xs w-full ${item.state === "ACCEPT" && item.reqState !== "WAIT"
-                                                    ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
                                         >
                                             반납
@@ -438,6 +453,7 @@ const RentalComponent = () => {
 
                                     </td>
                                 </tr>
+
                             );
                         })}
                     </tbody>
@@ -445,6 +461,35 @@ const RentalComponent = () => {
 
                 </table>
             </div>
+
+            {isExtendModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h2 className="text-lg font-bold mb-4">대여 연장 신청</h2>
+                        <label className="block mb-2">연장할 날짜</label>
+                        <input
+                            type="date"
+                            className="border rounded p-2 w-full mb-4"
+                            value={extendDate}
+                            onChange={(e) => setExtendDate(e.target.value)}
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                className="px-4 py-2 bg-gray-300 rounded"
+                                onClick={() => setIsExtendModalOpen(false)}
+                            >
+                                취소
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-green-500 text-white rounded"
+                                onClick={() => handleExtendConfirm(extendDate)}  // 날짜 매개변수 전달
+                            >
+                                확인
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* 우측 하단 예약 취소 버튼 */}
             <div className="flex justify-end mt-4">

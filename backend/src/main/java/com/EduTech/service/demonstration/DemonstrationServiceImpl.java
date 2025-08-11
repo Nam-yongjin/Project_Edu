@@ -632,6 +632,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		DemonstrationRequest request = new DemonstrationRequest();
 		request.setApplyAt(LocalDate.now());
 		request.setReserve(reserve);
+		request.setUpdateDate(resRequestDTO.getUpdateDate());
 		request.setState(DemonstrationState.WAIT);
 		request.setType(resRequestDTO.getType());
 		demonstrationRequestRepository.save(request);
