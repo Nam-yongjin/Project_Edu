@@ -45,7 +45,8 @@ const StatsComponent = () => {
                                 title: "일별 방문자 추세",
                                 xaxis: {
                                     title: "날짜",
-                                    tickformat: "%y-%m-%d",
+                                    tickformat: "%Y-%m-%d",
+                                    type: 'date'
                                 },
                                 yaxis: {
                                     title: "방문자 수",

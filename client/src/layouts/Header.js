@@ -101,7 +101,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 w-full bg-white shadow z-50 ">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between h-20">
         {/* 로고 */}
-        <div className="flex items-center flex-none xl:ml-0 md:ml-8 ml-2">
+        <div className="flex items-center flex-none xl:ml-4 md:ml-2 ml-0">
           <img
             src={logo}
             alt="로고"

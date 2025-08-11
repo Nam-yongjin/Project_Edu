@@ -5,14 +5,14 @@ const SubAdminHeader = () => {
     const location = useLocation();
 
     return (
-        <div className="bg-blue-100 w-full pt-8 pb-8">
+        <div className="bg-red-100 w-full h-[300px] pt-8 pb-8">
             <div className="max-w-screen-xl mx-auto ">
                 <div className="min-blank flex items-center justify-between">
                     <div className="newText-4xl font-bold text-gray-800">
                         관리자 페이지
                     </div>
                     <div className="w-1/4">
-                        <img src={admin} className="w-[400px] p-2" />
+                        <img src={admin} className="w-[400px] p-4" />
                     </div>
                 </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { viewMembers, memberStateChange } from "../../api/adminApi";
+import PageComponent from "../common/PageComponent";
 
 const AdminMembersComponent = () => {
     const [members, setMembers] = useState([]);
@@ -242,19 +243,8 @@ const AdminMembersComponent = () => {
             </div>
 
             {/* 페이지네이션 */}
-            <div className="flex justify-center items-center gap-2">
-                {Array.from({ length: totalPages }, (_, idx) => (
-                    <button
-                        key={idx}
-                        className={`newText-sm px-4 py-2 rounded-md font-semibold ${page === idx
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-200 hover:bg-gray-300 active:bg-gray-400"
-                            }`}
-                        onClick={() => setPage(idx)}
-                    >
-                        {idx + 1}
-                    </button>
-                ))}
+            <div className="flex justify-center mt-10">
+                <PageComponent totalPages={totalPages} current={page} setCurrent={setPage} />
             </div>
         </div>
     );
