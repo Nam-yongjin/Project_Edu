@@ -175,7 +175,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	}
 
 	
-
+	// 선생이 빌린 물품 내역 페이지 조회
 	@Override
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId,
 	        DemonstrationSearchDTO demonstrationSearchDTO) {

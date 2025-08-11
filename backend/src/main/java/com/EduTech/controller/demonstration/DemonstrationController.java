@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,6 @@ import com.EduTech.dto.demonstration.DemonstrationBorrowListDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
-import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
 import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
@@ -119,6 +119,7 @@ public class DemonstrationController {
 		return ResponseEntity.ok("예약 성공");
 	}
 
+	// 예약 취소
 	@PreAuthorize("hasRole('TEACHER')")
 	@DeleteMapping("/CancelRes")
 	public ResponseEntity<String> DemResCancel(@RequestBody List<Long> demNum) {
@@ -171,8 +172,8 @@ public class DemonstrationController {
 
 	// 실증 번호를 받아 실증 상품을 삭제하는 기능
 	@PreAuthorize("hasRole('COMPANY')")
-	@DeleteMapping("/DeleteDem")
-	public ResponseEntity<String> demDelete(@RequestParam("demNum") Long demNum) {
+	@DeleteMapping("/DeleteDem/{demNum}")
+	public ResponseEntity<String> demDelete(@PathVariable("demNum") Long demNum) {
 		String memId = JWTFilter.getMemId();
 		demonstrationService.deleteDemonstration(demNum,memId);
 		return ResponseEntity.ok("실증 물품 삭제 완료");
