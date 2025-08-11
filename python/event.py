@@ -1,5 +1,6 @@
 import pymysql
 import pandas as pd
+from datetime import date
 
 def get_connection():
     return pymysql.connect(

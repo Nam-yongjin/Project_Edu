@@ -22,9 +22,6 @@ const StatsComponent = () => {
             });
     }, []);
 
-    const dates = visitors.trend.map(item => item.date);
-    const counts = visitors.trend.map(item => item.count);
-
     return (
         <div className="max-w-screen-xl mx-auto my-10 ">
             <div className="min-blank ">
@@ -39,8 +36,8 @@ const StatsComponent = () => {
                         <Plot
                             data={[
                                 {
-                                    x: dates,
-                                    y: counts,
+                                    x: visitors.trend.map(item => item.date),
+                                    y: visitors.trend.map(item => item.count),
                                     type: "scatter",
                                     mode: "lines+markers",
                                     marker: { color: "blue" }
@@ -82,7 +79,7 @@ const StatsComponent = () => {
                     </div>
                 </div>
 
-                {/* 프로그램 카테고리별 신청 수, 비율 */}
+                {/* 프로그램 카테고리별 등록 수, 비율 */}
                 <div>
                     <div className="newText-2xl font-semibold">프로그램 카테고리</div>
                     <div className="flex justify-center">
