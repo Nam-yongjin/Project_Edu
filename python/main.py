@@ -60,7 +60,7 @@ async def visitor_stats():
 async def memberRole_stats():
     return member_role_stats()
 
-# 프로그램 카테고리별 신청 수, 비율
+# 프로그램 카테고리별 등록 수, 비율
 @app.get("/api/admin/eventCategory")
 async def eventCategory_stats():
     return event_category_stats()
