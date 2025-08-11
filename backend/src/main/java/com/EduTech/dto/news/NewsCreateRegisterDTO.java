@@ -28,8 +28,8 @@ public class NewsCreateRegisterDTO {
 	@NotBlank(message = "내용을 입력하세요.")
 	private String content; //내용
 	
-	private List<MultipartFile> files; //첨부할 파일
+	private String imageUrl; //썸네일 경로
 	
-	private String link; //외부 뉴스 링크(링크만 분리하기 위해 따로 만들었음)
+	private String linkUrl; //외부 뉴스 링크(링크만 분리하기 위해 따로 만들었음)
 
 }
