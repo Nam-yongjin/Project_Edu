@@ -39,8 +39,8 @@
 
 /* 페이지 최소 좌우 여백 */
 .min-blank {
-  margin-left: 1rem;
-  margin-right: 1rem;
+  margin-left: 1.25rem;
+  margin-right: 1.25rem;
 }
 @media (min-width: 768px) {
   .min-blank {
@@ -50,8 +50,8 @@
 }
 @media (min-width: 1280px) {
   .min-blank {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 2.5rem;
+    margin-right: 2.5rem;
   }
 }
 
