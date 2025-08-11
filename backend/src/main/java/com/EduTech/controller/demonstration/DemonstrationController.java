@@ -119,14 +119,14 @@ public class DemonstrationController {
 		return ResponseEntity.ok("예약 성공");
 	}
 
-	// 물품 대여 목록 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 	@PreAuthorize("hasRole('TEACHER')")
 	@DeleteMapping("/CancelRes")
-	public ResponseEntity<String> DemResCancel(@RequestParam List<Long> demNum) {
-		String memId = JWTFilter.getMemId();
-		demonstrationService.demonstrationReservationCancel(demNum, memId);
-		return ResponseEntity.ok("예약 취소 완료");
+	public ResponseEntity<String> DemResCancel(@RequestBody List<Long> demNum) {
+	    String memId = JWTFilter.getMemId();
+	    demonstrationService.demonstrationReservationCancel(demNum, memId);
+	    return ResponseEntity.ok("예약 취소 완료");
 	}
+
 
 	// 물품 대여 목록 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@PreAuthorize("hasRole('TEACHER')")

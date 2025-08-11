@@ -59,7 +59,7 @@ const AdminResComponent = () => {
     fetchData();
   };
 
-  const handleAcceptRental = async (demRevNum) => {
+  const handleAcceptRental = async (demRevNum,state) => {
     try {
       alert("대여 신청이 수락되었습니다.");
       fetchData();
@@ -69,7 +69,7 @@ const AdminResComponent = () => {
     }
   };
 
-  const handleRejectRental = async (demRevNum) => {
+  const handleRejectRental = async (demRevNum,state) => {
     try {
       alert("대여 신청이 거절되었습니다.");
       fetchData();
@@ -79,7 +79,7 @@ const AdminResComponent = () => {
     }
   };
 
-  const handleAcceptRequest = async (requestId) => {
+  const handleAcceptRequest = async (requestId,state) => {
     try {
       alert("요청이 수락되었습니다.");
       fetchData();
@@ -89,7 +89,7 @@ const AdminResComponent = () => {
     }
   };
 
-  const handleRejectRequest = async (requestId) => {
+  const handleRejectRequest = async (requestId,state) => {
     try {
       alert("요청이 거절되었습니다.");
       fetchData();
