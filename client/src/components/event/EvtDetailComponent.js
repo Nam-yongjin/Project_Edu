@@ -1,156 +1,236 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { getFacilityDetail } from "../../api/facilityApi"; // 경로는 프로젝트 구조에 맞게 조정
+import React, { useEffect, useState, useCallback } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getEventById, deleteEvent, applyEvent } from "../../api/eventApi";
 
-export default function FacilityDetailContent({ facRevNum }) {
-  const [data, setData] = useState(null);
-  const [idx, setIdx] = useState(0);
+const HOST = "http://localhost:8090/view";
+const API_HOST = "http://localhost:8090/api";
+
+function EvtDetailComponent({ eventNum }) {
+  const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
 
-  const startX = useRef(null);
+  const navigate = useNavigate();
+  const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+  const memId = useSelector((state) => state.loginState?.memId);
 
-  const images = useMemo(() => data?.images ?? [], [data]);
-  const n = images.length || 1;
+  const now = new Date();
+
+  const fetchEvent = useCallback(async () => {
+    try {
+      const data = await getEventById(eventNum);
+      setEvent(data);
+    } catch (err) {
+      console.error("행사 정보 조회 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [eventNum]);
+
+  const checkIfApplied = useCallback(async () => {
+    if (!memId) return;
+    try {
+      const res = await fetch(`${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`);
+      if (!res.ok) throw new Error(await res.text());
+      const isApplied = await res.json();
+      setAlreadyApplied(isApplied);
+    } catch (err) {
+      console.error("신청 여부 확인 실패:", err);
+    }
+  }, [eventNum, memId]);
 
   useEffect(() => {
-    let mounted = true;
-    setLoading(true);
-    setErr("");
-    getFacilityDetail(facRevNum)
-      .then((d) => {
-        if (!mounted) return;
-        setData(d);
-        setIdx(0);
-      })
-      .catch((e) => {
-        if (!mounted) return;
-        setErr(e?.response?.data?.message || e.message || "시설 정보를 불러오지 못했습니다.");
-      })
-      .finally(() => mounted && setLoading(false));
-    return () => (mounted = false);
-  }, [facRevNum]);
+    fetchEvent();
+    checkIfApplied();
+  }, [fetchEvent, checkIfApplied]);
 
-  const prev = () => setIdx((i) => (i - 1 + n) % n);
-  const next = () => setIdx((i) => (i + 1) % n);
-
-  // 터치 스와이프
-  const onTouchStart = (e) => (startX.current = e.touches[0].clientX);
-  const onTouchEnd = (e) => {
-    if (startX.current == null) return;
-    const dx = e.changedTouches[0].clientX - startX.current;
-    if (Math.abs(dx) > 40) (dx > 0 ? prev() : next());
-    startX.current = null;
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "없음";
+    const date = new Date(dateStr);
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   };
 
-  // 키보드 좌우
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n]);
+  const getFullUrl = (path) => path?.startsWith("http") ? path : `${HOST}/${path}`;
 
-  // 로딩 스켈레톤
-  if (loading) {
-    return (
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="h-[420px] rounded border border-gray-300 bg-gray-100 animate-pulse" />
-        <div className="space-y-4">
-          <div className="h-6 w-3/4 rounded bg-gray-100 animate-pulse" />
-          <div className="h-4 w-full rounded bg-gray-100 animate-pulse" />
-          <div className="h-4 w-5/6 rounded bg-gray-100 animate-pulse" />
-          <div className="h-24 w-full rounded bg-gray-100 animate-pulse" />
-        </div>
-      </div>
-    );
-  }
+  const isCanceled = event?.state === "CANCEL";
+  const isEventStarted = event?.eventStartPeriod && now >= new Date(event.eventStartPeriod);
+  const isEventEnded = event?.eventEndPeriod && now > new Date(event.eventEndPeriod);
 
-  if (err) {
-    return (
-      <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-6 text-red-800">
-        {err}
-      </div>
-    );
-  }
+  const isApplyPeriod = () =>
+    event?.applyStartPeriod &&
+    event?.applyEndPeriod &&
+    now >= new Date(event.applyStartPeriod) &&
+    now <= new Date(event.applyEndPeriod);
+
+  const isFull = () =>
+    event?.currCapacity != null &&
+    event?.maxCapacity != null &&
+    event.currCapacity >= event.maxCapacity;
+
+  const isDisabled = isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
+
+  const getApplyButtonText = () => {
+    if (isCanceled) return "취소된 행사";
+    if (isEventEnded) return "행사 완료";
+    if (isEventStarted) return "행사 진행 중";
+    if (alreadyApplied) return "신청 완료";
+    if (!isApplyPeriod()) return "신청 기간 아님";
+    if (isFull()) return "모집 마감";
+    return "신청하기";
+  };
+
+  const getApplyButtonStyle = () =>
+    isDisabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600";
+
+  const handleApply = async () => {
+    if (!memId) {
+      alert("로그인한 사용자만 신청할 수 있습니다.");
+      return;
+    }
+    try {
+      await applyEvent({ eventNum: event.eventNum, memId });
+      setAlreadyApplied(true);
+      alert("신청이 완료되었습니다.");
+      navigate("/event/list");
+    } catch (err) {
+      const message = err.response?.data?.message || err.message;
+      alert(`신청 실패: ${message}`);
+      window.location.reload();
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!window.confirm("정말 이 행사를 취소하시겠습니까?")) return;
+
+    if ((event.currCapacity ?? 0) > 0) {
+      const confirmCancel = window.confirm(
+        `이미 ${event.currCapacity}명이 신청했습니다.\n그래도 취소하시겠습니까?`
+      );
+      if (!confirmCancel) return;
+    }
+
+    try {
+      await deleteEvent(event.eventNum);
+      alert("행사가 취소되었습니다.");
+      navigate("/event/list");
+    } catch (err) {
+      alert("행사 취소 실패: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const renderDownloadLink = (label, url, name, key) => (
+    <a
+      key={key}
+      href={url}
+      download
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block text-sm text-blue-600 hover:underline"
+    >
+      {name || label}
+    </a>
+  );
+
+  const categoryLabel = {
+    TEACHER: "교사",
+    STUDENT: "학생",
+    USER: "일반인",
+  }[event?.category] || "미지정";
+
+  if (loading) return <div className="text-center p-10">로딩 중...</div>;
+  if (!event) return <div className="text-center p-10">행사 정보를 불러올 수 없습니다.</div>;
 
   return (
-    <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* 좌측: 이미지 캐러셀 */}
-      <div
-        className="relative border border-gray-300 overflow-hidden"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        <div className="h-[420px] flex items-center justify-center bg-white">
-          {images.length > 0 ? (
+    <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow mt-8 space-y-10">
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/2 flex items-center justify-center">
+          {event.mainImagePath ? (
             <img
-              key={images[idx]?.facImageNum ?? idx}
-              src={images[idx].imageUrl}
-              alt={images[idx].imageName ?? `image-${idx + 1}`}
-              className="h-full w-full object-cover"
-              draggable={false}
+              src={getFullUrl(event.mainImagePath)}
+              alt="행사 이미지"
+              className="rounded-xl w-full h-auto object-cover"
             />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-gray-400">
-              이미지를 불러올 수 없습니다.
+            <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center text-gray-500">
+              이미지 없음
             </div>
           )}
         </div>
 
-        {/* 좌우 버튼 (이미지 2장 이상일 때만 노출) */}
-        {images.length > 1 && (
-          <>
-            <button
-              aria-label="이전 이미지"
-              onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 grid place-items-center h-8 w-8 rounded-full bg-white/80 border border-gray-200"
-            >
-              ‹
-            </button>
-            <button
-              aria-label="다음 이미지"
-              onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 grid place-items-center h-8 w-8 rounded-full bg-white/80 border border-gray-200"
-            >
-              ›
-            </button>
-          </>
-        )}
+        <div className="md:w-1/2 space-y-4">
+          <div className="text-sm inline-block border border-blue-400 text-blue-600 px-3 py-1 rounded-full">
+            {categoryLabel}
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800">{event.eventName}</h2>
 
-        {/* 인디케이터 */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-gray-300 text-gray-800 text-xs px-3 py-1">
-          {Math.min(idx + 1, n)} / {n}
+          <div className="space-y-2 text-gray-700 text-sm">
+            <p><strong>장소:</strong> {event.place || "미정"}</p>
+            <p><strong>소개:</strong> {event.description || "내용 없음"}</p>
+            <p><strong>신청기간:</strong> {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}</p>
+            <p><strong>진행기간:</strong> {formatDate(event.eventStartPeriod)} ~ {formatDate(event.eventEndPeriod)}</p>
+            <p><strong>모집인원:</strong> {event.maxCapacity || 0}명</p>
+            <p><strong>현재인원:</strong> {event.currCapacity ?? 0}명</p>
+            <p><strong>기타 유의사항:</strong> {event.etc || "없음"}</p>
+          </div>
+
+          <div className="pt-6 space-y-4">
+            <button
+              className={`w-full py-3 rounded font-semibold transition ${getApplyButtonStyle()}`}
+              disabled={isDisabled}
+              onClick={handleApply}
+            >
+              {getApplyButtonText()}
+            </button>
+
+            {isAdmin && (
+              <div className="flex gap-4">
+                <button
+                  className="flex-1 bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
+                  onClick={() => navigate(`/event/update/${event.eventNum}`)}
+                >
+                  수정
+                </button>
+                {isCanceled ? (
+                  <button
+                    className="flex-1 bg-gray-400 text-white py-2 rounded cursor-not-allowed"
+                    disabled
+                  >
+                    취소 완료
+                  </button>
+                ) : (
+                  <button
+                    className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+                    onClick={handleCancel}
+                  >
+                    행사 취소
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 우측: 상세 정보 */}
-      <div className="p-2">
-        <h2 className="text-lg font-semibold">{data?.facName ?? "시설명"}</h2>
-        <p className="mt-1 text-gray-500">{data?.facInfo ?? "-"}</p>
-
-        <dl className="mt-6 space-y-3">
-          <Row label="예약가능시간" value={data?.availableTime ?? "-"} />
-          <Row
-            label="수용인원"
-            value={data?.capacity != null ? `${data.capacity}명` : "-"}
-          />
-          <Row label="구비품목" value={data?.facItem ?? "-"} />
-          <Row label="유의사항" value={data?.etc ?? "-"} />
-        </dl>
-      </div>
+      {(event.filePath || event.mainImagePath || event.attachList?.length > 0 || event.imageList?.length > 0) && (
+        <div className="w-full">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">📎 첨부파일 목록</h3>
+          <div className="space-y-1">
+            {event.filePath &&
+              renderDownloadLink("대표 첨부파일", `${API_HOST}/event/download/main-file/${event.eventNum}`, event.originalName)}
+            {event.mainImagePath &&
+              renderDownloadLink("대표 이미지", `${API_HOST}/event/download/main-image/${event.eventNum}`, event.mainImageOriginalName)}
+            {event.attachList?.map((file) =>
+              renderDownloadLink("첨부파일", `${API_HOST}/event/download/file/${file.id}`, file.originalName, file.id)
+            )}
+            {event.imageList?.map((img) =>
+              renderDownloadLink("이미지", `${API_HOST}/event/download/image/${img.id}`, img.originalName, img.id)
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-/* —————— helpers —————— */
-function Row({ label, value }) {
-  return (
-    <div className="grid grid-cols-3">
-      <dt className="col-span-1 text-gray-400">{label}</dt>
-      <dd className="col-span-2 text-gray-800 whitespace-pre-line">{value}</dd>
-    </div>
-  );
-}
+export default EvtDetailComponent;
