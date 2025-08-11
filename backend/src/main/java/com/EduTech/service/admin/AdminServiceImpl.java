@@ -22,6 +22,7 @@ import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
+import com.EduTech.dto.demonstration.DemonstrationApprovalReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
@@ -83,6 +84,10 @@ public class AdminServiceImpl implements AdminService {
 		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getDemonstrationState(),demonstrationApprovalRegDTO.getDemRegNum());
 	}
 
+	@Override
+	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
+		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getDemonstrationState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType());
+	}
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
 	public void sendMessageForUser(AdminMessageDTO adminMessageDTO) {

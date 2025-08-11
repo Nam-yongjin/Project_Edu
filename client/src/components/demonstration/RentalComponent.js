@@ -115,6 +115,7 @@ const RentalComponent = () => {
         } else {
             newSet.delete(demNum);
         }
+        
         setSelectedItems(newSet);
     };
 
@@ -132,7 +133,6 @@ const RentalComponent = () => {
             alert("예약 취소가 불가능한 상태입니다.");
             return;
         }
-
         deleteRental(Array.from(selectedItems));
 
         alert("예약이 취소 되었습니다.");
