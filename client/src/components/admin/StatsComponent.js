@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { getVisitorStats, getMemberRoleStats } from "../../api/adminApi";
+import { getVisitorStats, getMemberRoleStats, getEventCategoryStats } from "../../api/adminApi";
 
 const StatsComponent = () => {
     const [visitors, setVisitors] = useState({ total_visitors: 0, daily_visitors: 0, trend: [] });
     const [roles, setRoles] = useState([]);
+    const [evtCategorys, setEvtCategorys] = useState([]);
 
     useEffect(() => {
         getVisitorStats().then(setVisitors)
@@ -14,6 +15,10 @@ const StatsComponent = () => {
         getMemberRoleStats().then(setRoles)
             .catch(error => {
                 console.error("회원유형을 불러올 수 없습니다.:", error);
+            });
+        getEventCategoryStats().then(setEvtCategorys)
+            .catch(error => {
+                console.error("프로그램을 불러올 수 없습니다.:", error);
             });
     }, []);
 
@@ -73,6 +78,24 @@ const StatsComponent = () => {
                                 },
                             ]}
                             layout={{ title: "회원 역할 비율" }}
+                        />
+                    </div>
+                </div>
+
+                {/* 프로그램 카테고리별 신청 수, 비율 */}
+                <div>
+                    <div className="newText-2xl font-semibold">프로그램 카테고리</div>
+                    <div className="flex justify-center">
+                        <Plot
+                            data={[
+                                {
+                                    labels: evtCategorys.map(r => r.category),
+                                    values: evtCategorys.map(r => r.count),
+                                    type: "pie",
+                                    textinfo: "label+percent",
+                                },
+                            ]}
+                            layout={{ title: "프로그램 카테고리 비율" }}
                         />
                     </div>
                 </div>
