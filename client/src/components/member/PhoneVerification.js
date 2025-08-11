@@ -151,7 +151,7 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
                     onClick={verifyOTP}
                     disabled={disable}
                     className={`newText-base float-left w-full   ${disable
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        ? 'bg-gray-300 text-gray-500 p-2 rounded-md cursor-not-allowed'
                         : 'green-button'
                         }`}
                 >

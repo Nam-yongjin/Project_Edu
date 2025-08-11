@@ -3,11 +3,11 @@ import { getAuth } from 'firebase/auth';
 
 // Firebase 초기화
 const firebaseConfig = {
-    apiKey: "AIzaSyBICYanZm5Mrt72oJBcr-IQcGEhM7y4LB8",
+    apiKey: `${process.env.REACT_APP_FIREBASE_API_KEY}`,
     authDomain: "seoul-edutech-a256b.firebaseapp.com",
     projectId: "seoul-edutech-a256b",
-    messagingSenderId: "314519421298",
-    appId: "1:314519421298:web:9f6b67b7d6577e48a55deb",
+    messagingSenderId: `${process.env.REACT_APP_FIREBASE_MESSAGESENDER_ID}`,
+    appId: `${process.env.REACT_APP_FIREBASE_API_ID}`,
 };
 
 const app = initializeApp(firebaseConfig);
