@@ -3,7 +3,8 @@ import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
 
 const Members = lazy(() => import("../pages/admin/AdminMembersPage"));
-const Banner = lazy(() => import("../pages/admin/AdminBannerPage"))
+const Banner = lazy(() => import("../pages/admin/AdminBannerPage"));
+const Stats = lazy(() => import("../pages/admin/StatsPage"));
 
 const adminRouter = () => {
     return [
@@ -19,6 +20,10 @@ const adminRouter = () => {
         {
             path: "banner",
             element: <Suspense fallback={<Loading />}><Banner /></Suspense>,
+        },
+        {
+            path: "stats",
+            element: <Suspense fallback={<Loading />}><Stats /></Suspense>
         },
     ];
 };
