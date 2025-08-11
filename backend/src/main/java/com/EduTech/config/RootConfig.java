@@ -37,8 +37,8 @@ public class RootConfig {
         	});
 		
 		modelMapper.typeMap(FacilityRegisterDTO.class, Facility.class)
-			.addMappings(mmapper -> 
-				mmapper.skip(Facility::setFacRevNum)
+			.addMappings(mapper -> 
+				mapper.skip(Facility::setFacRevNum)
 			);
 
 		// Demonstration -> DemonstrationFormResDTO 매핑 간에 오류가 잇어 충돌나는 칼럼에 대해 skip 처리
