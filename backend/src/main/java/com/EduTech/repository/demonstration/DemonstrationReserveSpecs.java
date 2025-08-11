@@ -120,9 +120,8 @@ public class DemonstrationReserveSpecs {
 	        if (StringUtils.hasText(search) && StringUtils.hasText(type)) {
 	            if ("demName".equalsIgnoreCase(type)) {
 	                predicates.add(cb.like(cb.lower(demJoin.get("demName")), "%" + search.toLowerCase() + "%"));
-	            } else if ("demMfr".equalsIgnoreCase(type)) {
-	                predicates.add(cb.like(cb.lower(demJoin.get("demMfr")), "%" + search.toLowerCase() + "%"));
-	            } else if ("schoolName".equalsIgnoreCase(type)) {
+	            }
+	           else if ("schoolName".equalsIgnoreCase(type)) {
 	                predicates.add(cb.like(cb.lower(teacherJoin.get("schoolName")), "%" + search.toLowerCase() + "%"));
 	            } else if ("memId".equalsIgnoreCase(type)) {
 	                predicates.add(cb.like(cb.lower(memberJoin.get("memId")), "%" + search.toLowerCase() + "%"));

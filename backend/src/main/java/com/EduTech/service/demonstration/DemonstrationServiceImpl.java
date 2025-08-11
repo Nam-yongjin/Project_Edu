@@ -174,190 +174,6 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	    return new PageResponseDTO<>(dtoPage);
 	}
 
-	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
-	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO) {
-
-	    Integer pageCount = searchDTO.getPageCount();
-	    String type = searchDTO.getType();
-	    String search = searchDTO.getSearch();
-	    String sortBy = searchDTO.getSortBy();
-	    String sort = searchDTO.getSort();
-	    String statusFilter = searchDTO.getStatusFilter();
-
-	    if (pageCount == null || pageCount < 0)
-	        pageCount = 0;
-	    if (!StringUtils.hasText(sortBy))
-	        sortBy = "applyAt";
-	    if (!StringUtils.hasText(sort))
-	        sort = "desc";
-
-	    Pageable pageable = PageRequest.of(pageCount, 10);
-
-	    Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withResSearchAndSortAdmin(
-	        type,
-	        search,
-	        sortBy,
-	        sort,
-	        statusFilter
-	    );
-
-	    // DemonstrationReserve 페이징 조회
-	    Page<DemonstrationReserve> resPage = demonstrationReserveRepository.findAll(spec, pageable);
-
-	    // 관련 demNum 리스트 추출 (중복 제거)
-	    List<Long> demNums = resPage.stream()
-	        .map(res -> res.getDemonstration().getDemNum())
-	        .distinct()
-	        .toList();
-
-	    // 이미지 리스트 일괄 조회 (demNum 기준)
-	    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
-	    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
-	        .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
-
-	    // 요청 상태 리스트 일괄 조회 (demRevNum 기준)
-	    List<Long> demRevNums = resPage.stream()
-	        .map(DemonstrationReserve::getDemRevNum)
-	        .distinct()
-	        .toList();
-
-	    List<DemonstrationRequest> requests = demonstrationRequestRepository.findStateByDemRevNumIn(demRevNums);
-
-	    // reserves에서 member.memId 리스트 추출 (중복 제거)
-	    List<String> memIds = resPage.stream()
-	        .map(reserve -> reserve.getMember().getMemId())
-	        .distinct()
-	        .toList();
-
-	    // memberRepository에서 memId 리스트로 Member 리스트 조회
-	    List<Member> members = memberRepository.findByMemIdIn(memIds);
-	    Map<String, Member> memIdToMember = members.stream()
-	        .collect(Collectors.toMap(Member::getMemId, m -> m));
-
-	    // DTO 매핑
-	    Page<DemonstrationListReserveDTO> dtoPage = resPage.map(res -> {
-	        Demonstration dem = res.getDemonstration();
-
-	        DemonstrationListReserveDTO dto = new DemonstrationListReserveDTO();
-
-	        dto.setDemRevNum(res.getDemRevNum());
-	        dto.setApplyAt(res.getApplyAt());
-	        dto.setStartDate(res.getStartDate());
-	        dto.setEndDate(res.getEndDate());
-	        dto.setState(res.getState());
-	        dto.setMemId(res.getMember().getMemId());
-	        dto.setBItemNum(res.getBItemNum());
-
-	        // Member 정보 가져오기
-	        Member member = memIdToMember.get(res.getMember().getMemId());
-	        if (member != null) {
-	            if (member.getTeacher() != null) {
-	                dto.setSchoolName(member.getTeacher().getSchoolName());
-	            }
-	            dto.setAddr(member.getAddr());
-	            dto.setPhone(member.getPhone());
-	        }
-
-	        if (dem != null) {
-	            dto.setDemName(dem.getDemName());
-	            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
-	        }
-
-	        DemonstrationRequest req = requests.stream()
-	            .filter(r -> r.getReserve().getDemRevNum().equals(res.getDemRevNum()))
-	            .findFirst()
-	            .orElse(null);
-
-	        if (req != null) {
-	            dto.setRequestDTO(new ResRequestDTO(req.getType(), req.getState()));
-	        }
-
-	        return dto;
-	    });
-
-	    return new PageResponseDTO<>(dtoPage);
-	}
-
-
-	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
-	@Override
-	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
-		  Integer pageCount = searchDTO.getPageCount();
-		    String type = searchDTO.getType();
-		    String search = searchDTO.getSearch();
-		    String sortBy = searchDTO.getSortBy();
-		    String sort = searchDTO.getSort();
-		    String statusFilter = searchDTO.getStatusFilter();
-
-		    if (pageCount == null || pageCount < 0)
-		        pageCount = 0;
-		    if (!StringUtils.hasText(sortBy))
-		        sortBy = "regDate";
-		    if (!StringUtils.hasText(sort))
-		        sort = "desc";
-
-		    Pageable pageable = PageRequest.of(pageCount, 10);
-
-		    Specification<DemonstrationRegistration>spec = DemonstrationRegistrationSpecs.withSearchAndSortAdmin(type,search,sortBy,sort,statusFilter);
-
-		    // DemonstrationReserve 페이징 조회
-		    Page<DemonstrationRegistration> regPage = demonstrationRegistrationRepository.findAll(spec, pageable);
-
-		    // 관련 demNum 리스트 추출 (중복 제거)
-		    List<Long> demNums = regPage.stream()
-		        .map(reg -> reg.getDemonstration().getDemNum())
-		        .distinct()
-		        .toList();
-
-		    // 이미지 리스트 일괄 조회 (demNum 기준)
-		    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
-		    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
-		        .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
-
-		    // reserves에서 member.memId 리스트 추출 (중복 제거)
-		    List<String> memIds = regPage.stream()
-		        .map(reg -> reg.getMember().getMemId())
-		        .distinct()
-		        .toList();
-
-		    // memberRepository에서 memId 리스트로 Member 리스트 조회
-		    List<Member> members = memberRepository.findByMemIdIn(memIds);
-		    Map<String, Member> memIdToMember = members.stream()
-		        .collect(Collectors.toMap(Member::getMemId, m -> m));
-
-		    // DTO 매핑
-		    Page<DemonstrationListRegistrationDTO> dtoPage = regPage.map(reg -> {
-		        Demonstration dem = reg.getDemonstration();
-
-		        DemonstrationListRegistrationDTO dto = new DemonstrationListRegistrationDTO();
-
-		        dto.setDemRegNum(reg.getDemRegNum());
-		        dto.setRegDate(reg.getRegDate());
-		        dto.setExpDate(reg.getExpDate());
-		        dto.setState(reg.getState());
-		        dto.setMemId(reg.getMember().getMemId());
-
-		        // Member 정보 가져오기
-		        Member member = memIdToMember.get(reg.getMember().getMemId());
-		        if (member != null) {
-		            if (member.getCompany() != null) {
-		                dto.setCompanyName(member.getCompany().getCompanyName());
-		            }
-		            dto.setAddr(member.getAddr());
-		            dto.setPhone(member.getPhone());
-		        }
-
-		        if (dem != null) {
-		            dto.setDemName(dem.getDemName());
-		            dto.setItemNum(dem.getItemNum());
-		            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
-		        }
-
-		        return dto;
-		    });
-
-		    return new PageResponseDTO<>(dtoPage);
-		}
 	
 
 	// 물품 대여 현황 페이지에서 여러가지 항목들을 가져오는 기능
@@ -490,13 +306,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		Page<DemonstrationPageListDTO> currentPage; // 페이지 담을 객체
 		if (type.equals("demName") && !search.equals("")) {
 			currentPage = demonstrationRepository
-					.selectPageDemName(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search,DemonstrationState.CANCEL);
+					.selectPageDemName(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search,DemonstrationState.ACCEPT);
 		} else if (type.equals("demMfr") && !search.equals("")) {
 			currentPage = demonstrationRepository
-					.selectPageDemMfr(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search,DemonstrationState.CANCEL);
+					.selectPageDemMfr(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search,DemonstrationState.ACCEPT);
 		} else {
 			currentPage = demonstrationRepository
-					.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()),DemonstrationState.CANCEL);
+					.selectPageDem(PageRequest.of(pageCount, 4, Sort.by("demNum").descending()),DemonstrationState.ACCEPT);
 		}
 		// list의 값을 넣지만 currentPage에도 setImage가 적용된다.
 		// 얕은 참조 복사이기 때문에
