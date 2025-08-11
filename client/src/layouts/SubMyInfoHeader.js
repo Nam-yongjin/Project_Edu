@@ -20,7 +20,7 @@ const SubMyInfoHeader = () => {
     };
 
     return (
-        <div className="bg-blue-100 w-full h-[300px] pt-8 pb-8">
+        <div className="bg-blue-100 w-full pt-8 pb-8">
             <div className="max-w-screen-xl mx-auto ">
                 <div className="min-blank flex items-center justify-between">
                     <div className="newText-4xl font-bold text-gray-800">
