@@ -181,7 +181,7 @@ const Header = () => {
           )}
 
         </div>
-        <div className="flex mx-3">
+        <div className="flex mx-2">
           {/* <img src={searchIcon} alt="검색" className="h-[24px] w-[24px] cursor-pointer active:bg-gray-200" /> */}
           {/* 아이콘 제작자<a href="https://www.flaticon.com/kr/authors/andy-horvath"title="Andy Horvath">
             Andy Horvath </a> from <a href="https://www.flaticon.com/kr/" title="Flaticon">www.flaticon.com'</a> */}
