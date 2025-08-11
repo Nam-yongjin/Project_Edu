@@ -50,3 +50,23 @@ export const updateBannerSequence = async (params) => {
 export const getBannerImage = (params) => {
     return `${admin}/banner/view?filePath=${encodeURIComponent(params)}`;
 }
+
+
+// FastAPI 통계 API 호출
+// 방문자 카운트
+export const recordVisitor = async () => {
+    const res = await axios.get(`http://127.0.0.1:8000/api/recordVisit`);
+    return res.data;
+}
+
+// 일일 접속자, 총합 접속자
+export const getVisitorStats = async () => {
+    const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/visitors`);
+    return res.data;
+};
+
+// 회원 유형별 가입자 수, 비율
+export const getMemberRoleStats = async () => {
+    const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/memberRole`);
+    return res.data;
+};

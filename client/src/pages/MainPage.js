@@ -7,7 +7,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import '../swiperCss/main.css'
 import { useState, useEffect } from "react";
-import { getAllBanners, getBannerImage } from "../api/adminApi";
+import { getAllBanners, getBannerImage, recordVisitor } from "../api/adminApi";
 
 const MainPage = () => {
     const [banners, setBanners] = useState([]);
@@ -23,6 +23,7 @@ const MainPage = () => {
                 });
         };
         fetchBanners();
+        recordVisitor();    // 방문자 카운트
     }, []);
 
     return (
