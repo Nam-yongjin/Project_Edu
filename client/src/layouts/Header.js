@@ -58,8 +58,8 @@ const Header = () => {
       name: "공간 운영",
       link: "/facility",
       sub: [
-        { name: "공간 안내", link: "/facility" },
-        { name: "공간 예약", link: "/" },
+        { name: "공간 추가", link: "/facility/add" },
+        { name: "공간 목록", link: "/facility/list" },
       ],
     },
     {
