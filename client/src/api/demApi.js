@@ -119,11 +119,12 @@ export const getRentalSearch=async (search,type,pageCount,sortBy,sort,statusFilt
 
 // 물품 대여 현황 페이지에서 항목 선택 후, 예약 취소 버튼 클릭 시, 상품 삭제
 export const deleteRental = async (demNum) => {
-    const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
-        params: { demNum }
-    });
-    return res.data;
+  const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
+    data: demNum,  // 배열을 body에 직접 담아서 보냄
+  });
+  return res.data;
 };
+
 
 
 // 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
@@ -240,4 +241,33 @@ export const getResAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
     return res.data;
 };
 
+// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
+export const updateResState = async (demRevNum,state) => {
+  const res = await jwtAxios.put(`${admin}/ResState`, {
+      demRevNum:demRevNum ,
+        state: state,
+  });
+  return res.data;
+};
 
+// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
+export const updateReqState = async (demRevNum,state,type) => {
+  const res = await jwtAxios.put(`${admin}/ReqState`, {
+      demRevNum:demRevNum ,
+        state: state,
+  });
+  return res.data;
+};
+
+/*
+// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
+export const updateRegState = async (startDate,endDate,demNum,itemNum) => {
+  const res = await jwtAxios.put(`${admin}/ChangeRes`, {
+      startDate: startDate,
+        endDate: endDate,
+        demNum: demNum,
+        itemNum:itemNum
+  });
+  return res.data;
+};
+*/

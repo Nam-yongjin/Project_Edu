@@ -23,6 +23,7 @@ import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.admin.MemberStateChangeDto;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
+import com.EduTech.dto.demonstration.DemonstrationApprovalReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
@@ -57,6 +58,14 @@ public class AdminController {
 		return ResponseEntity.ok("Reg 상태 변경 성공");
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping("/ReqState")
+	public ResponseEntity<String> DemReqStateChange(
+			@RequestBody DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
+		adminService.approveOrRejectDemReq(demonstrationApprovalReqDTO);
+		return ResponseEntity.ok("Res 상태 변경 성공");
+	}
+	
 	// 관리자가 메시지 보내는 기능
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/sendMessage")
