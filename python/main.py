@@ -5,6 +5,7 @@ from datetime import datetime
 
 from visit import visitors
 from member import member_role_stats
+from event import event_category_stats
 
 app = FastAPI()
 
@@ -58,3 +59,8 @@ async def visitor_stats():
 @app.get("/api/admin/memberRole")
 async def memberRole_stats():
     return member_role_stats()
+
+# 프로그램 카테고리별 신청 수, 비율
+@app.get("/api/admin/eventCategory")
+async def eventCategory_stats():
+    return event_category_stats()
