@@ -1,5 +1,6 @@
 package com.EduTech.service.admin;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
 import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
+import com.EduTech.entity.demonstration.RequestType;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.repository.admin.BannerImageRepository;
@@ -70,23 +72,31 @@ public class AdminServiceImpl implements AdminService {
 	private final BannerImageRepository bannerImageRepository;
 
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// String memId = JWTFilter.getMemId(); 나중에 로그인 구현되면 추가
 	
 	@Override
 	public void approveOrRejectDemRes(DemonstrationApprovalResDTO demonstrationApprovalResDTO) {
-		demonstrationReserveRepository.updateDemResChangeStateRev(demonstrationApprovalResDTO.getDemonstrationState(), demonstrationApprovalResDTO.getDemRevNum());
+		demonstrationReserveRepository.updateDemResChangeStateRev(demonstrationApprovalResDTO.getState(), demonstrationApprovalResDTO.getDemRevNum());
 	}
 
 	// 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	@Override
 	public void approveOrRejectDemReg(DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {
-		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getDemonstrationState(),demonstrationApprovalRegDTO.getDemRegNum());
+		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getState(),demonstrationApprovalRegDTO.getDemRegNum());
 	}
 
 	@Override
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
-		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getDemonstrationState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType());
+		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND))
+		{
+			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum());
+			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),request.getUpdateDate());
+		}
+		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL))
+		{
+			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),LocalDate.now());
+		}
+		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType());
 	}
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
@@ -371,6 +381,7 @@ public class AdminServiceImpl implements AdminService {
 		        dto.setMemId(res.getMember().getMemId());
 		        dto.setBItemNum(res.getBItemNum());
 		        dto.setDemNum(dem.getDemNum());
+
 		        // Member 정보 가져오기
 		        Member member = memIdToMember.get(res.getMember().getMemId());
 		        if (member != null) {
@@ -386,18 +397,18 @@ public class AdminServiceImpl implements AdminService {
 		            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
 		        }
 
-		        DemonstrationRequest req = requests.stream()
+		        // demRevNum에 해당하는 모든 요청들을 리스트로 찾아서 DTO에 세팅
+		        List<ResRequestDTO> relatedRequests = requests.stream()
 		            .filter(r -> r.getReserve().getDemRevNum().equals(res.getDemRevNum()))
-		            .findFirst()
-		            .orElse(null);
+		            .map(r -> new ResRequestDTO(r.getType(), r.getState()))
+		            .collect(Collectors.toList());
 
-		        if (req != null) {
-		            dto.setRequestDTO(new ResRequestDTO(req.getType(), req.getState()));
-		        }
+		        dto.setRequestDTO(relatedRequests);
 
 		        return dto;
 		    });
 
 		    return new PageResponseDTO<>(dtoPage);
 		}
+
 }

@@ -39,5 +39,7 @@ public class DemonstrationRequest { // res 반납 요청 및 기한 연장을 �
 	private RequestType type;
 
 	private LocalDate applyAt;
+	
+	private LocalDate updateDate;
 
 }
