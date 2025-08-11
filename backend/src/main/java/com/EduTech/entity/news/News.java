@@ -35,36 +35,29 @@ public class News extends BaseEntity{
 	@Column(columnDefinition = "TEXT")
 	private String content; //내용
 	
+	private String imageUrl; //썸네일 이미지 경로 또는 URL
+	
+	private String linkUrl; //외부 기사 링크
+	
 	@Builder.Default
 	private Long viewCount = 0L;	//0으로 초기화 해서 Null값 방지
+	
+	public void increaseViewCount() { //조회수 증가
+        this.viewCount++;
+    }
 	
 	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 언론보도 게시글을 한 명의 Admin이 작성 가능
 	@JoinColumn(name = "mem_id", nullable = false)
 	private Member member;
 	
-	//하나의 기사에 여러 개의 파일 첨부 가능, 기사가 삭제되면 파일도 같이 삭제
-	@Builder.Default
-	@BatchSize(size = 10)
-	@OneToMany(mappedBy = "news", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<NewsFile> newsFiles = new ArrayList<>();
-	
-	public void increaseViewCount() { //조회수 증가
-        this.viewCount++;
-    }
 	//비즈니스 로직  
-    public void updateContent(String title, String content) {
+    public void updateContent(String title, String content, String imageUrl, String linkUrl) {
         this.title = title;
         this.content = content;
+        this.imageUrl = imageUrl;
+        this.linkUrl = linkUrl;
         this.setUpdatedAt(LocalDateTime.now()); //현재 시간
     }
     
-    public void addNewsFile(NewsFile newsFile) { //새로운 첨부파일 공지사항과 연결
-        this.newsFiles.add(newsFile);
-        newsFile.setNews(this);
-    }
-    
-    public void clearNoticeFiles() { //첨부파일 목록 초기화
-        this.newsFiles.clear();
-    }
 	
 }

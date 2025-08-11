@@ -28,8 +28,8 @@ public class NewsUpdateRegisterDTO {
 	@NotBlank(message = "내용을 입력하세요.")
 	private String content; //내용
 	
-	private List<String> deleteFileIds; // 삭제할 파일 ID 목록
+	private String imageUrl; //썸네일 경로
 	
-	private List<MultipartFile> newFiles; //새로 업로드 할 파일
+	private String linkUrl; //외부 기사 링크
 
 }
