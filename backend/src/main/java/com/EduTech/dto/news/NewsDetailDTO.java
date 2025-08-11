@@ -20,6 +20,10 @@ public class NewsDetailDTO {
 	
 	private String content; //내용
 	
+	private String imageUrl; //썸네일 경로
+	
+	private String linkUrl; //외부 기사 URL
+	
 	private String name; //이름
 	
 	private String mem_id; //회원id
@@ -28,8 +32,6 @@ public class NewsDetailDTO {
 	
 	private LocalDateTime createdAt; //작성일
 	
-	private LocalDateTime updatedAt; //수정일
-	
-	private List<NewsFileDTO> files; //첨부파일목록
+	private LocalDateTime updatedAt; //수정일	
 
 }
