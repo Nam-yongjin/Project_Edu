@@ -139,10 +139,11 @@ export const updateRental = async (startDate,endDate,demNum,itemNum) => {
 };
 
 // 물품 대여 현황 페이지에서 반납 및 대여 연장을 시키는 요청
-export const addRequest = async (demNum,type) => {
+export const addRequest = async (demNum,type,date) => {
   const res = await jwtAxios.post(`${demonstration}/AddRequest`, {
         demNum: demNum,
-        type:type
+        type:type,
+        updateDate:date
   });
   return res.data;
 };
@@ -255,6 +256,7 @@ export const updateReqState = async (demRevNum,state,type) => {
   const res = await jwtAxios.put(`${admin}/ReqState`, {
       demRevNum:demRevNum ,
         state: state,
+        type:type,
   });
   return res.data;
 };
