@@ -4,28 +4,30 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
 import com.EduTech.dto.facility.FacilityHolidayDTO;
+import com.EduTech.dto.facility.FacilityListDTO;
 import com.EduTech.dto.facility.FacilityRegisterDTO;
 import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
-import com.EduTech.dto.facility.FacilityTimeDTO;
 import com.EduTech.entity.facility.FacilityState;
 
 public interface FacilityService {
 
     // 시설 추가
     void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images);
+    
+    // 시설 조회
+    Page<FacilityListDTO> getFacilityList(Pageable pageable, String keyword);
 
     // 시설 상세 (이름으로 조회 유지 OK)
-    FacilityDetailDTO getFacilityDetail(String facName);
-
-    // 예약 가능 시간대 (파라명 통일: facRevNum)
-    List<FacilityTimeDTO> getAvailableTimes(Long facRevNum, LocalDate date);
+    FacilityDetailDTO getFacilityDetail(Long facRevNum);
 
     // 예약 신청
     void reserveFacility(FacilityReserveRequestDTO requestDTO);
