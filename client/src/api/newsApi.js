@@ -19,10 +19,8 @@ export const NewsDetail = async (newsNum) => {
 }
 
 //언론보도 등록
-export const createNews = async (formData) => {
-    const res = await jwtAxios.post(`${news}/AddNews`, formData, {
-        headers: {"Content-Type": "multipart/form-data"},
-    });
+export const createNews = async (data) => { //url로 받기만 할 거라 @RequestBody로 바꾸고 formData --> data로 수정
+    const res = await jwtAxios.post(`${news}/AddNews`, data);
     return res.data;
 }
 
@@ -43,7 +41,7 @@ export const deleteNews = async (newsNum) => {
 
 //언론보도 삭제(일괄)
 export const deleteNewsByIds = async (newsNums) => {
-    const res = await jwtAxios.delete(`${news}//DeleteNewsByIds`, {
+    const res = await jwtAxios.delete(`${news}/DeleteNewsByIds`, {
         data: newsNums //배열로 받기 - 백엔드 @RequestBody List<Long> newsNums
     });
     return res.data;
