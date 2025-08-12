@@ -222,7 +222,7 @@ const Side = ({ isOpen, onClose }) => {
                                             <Link to="/admin/stats" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>통계 확인</Link>
                                         </li>
                                         <li>
-                                            <Link to="/admin/stats" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>통계 확인</Link>
+                                            <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>휴일 관리</Link>
                                         </li>
                                         <li>
                                             <Link to="/admin/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 관리</Link>

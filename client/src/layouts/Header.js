@@ -75,7 +75,7 @@ const Header = () => {
       link: "/notice",
       sub: [
         { name: "공지사항", link: "/notice" },
-        { name: "문의사항", link: "/question" },
+        { name: "문의사항", link: "/question/select" },
         { name: "언론보도", link: "/news" },
       ],
     },
