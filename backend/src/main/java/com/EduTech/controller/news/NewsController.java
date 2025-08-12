@@ -67,6 +67,7 @@ public class NewsController {
         Long newsNum = newsService.createNews(dto);
         return ResponseEntity.ok("뉴스가 등록되었습니다. ID: " + newsNum);
     }
+    
 
     // 언론보도 수정
     @PreAuthorize("hasRole('ADMIN')")
