@@ -51,11 +51,6 @@ public class Facility { // 장소 정보
 
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FacilityReserve> reserves = new ArrayList<>();
-
-
-    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FacilityHoliday> holidays = new ArrayList<>();
-
     
     // ---- 연관관계 편의 메서드 ----
     public void addImage(FacilityImage img) {

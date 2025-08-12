@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
-import com.EduTech.dto.facility.FacilityHolidayDTO;
 import com.EduTech.dto.facility.FacilityListDTO;
 import com.EduTech.dto.facility.FacilityRegisterDTO;
 import com.EduTech.dto.facility.FacilityReserveAdminDTO;
@@ -135,17 +134,20 @@ public class FacilityController {
         return ResponseEntity.ok(success ? "강제 취소 완료" : "취소 실패");
     }
 
-    // 휴무일 등록 (dto.facRevNum 사용)
-    @PostMapping("/admin/holiday")
-    public ResponseEntity<Void> registerHoliday(@RequestBody @Valid FacilityHolidayDTO dto) {
+    // 휴무일 등록
+    @PostMapping("/addholiday")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> registerHoliday(@RequestBody @Valid HolidayDayDTO dto) {
         facilityService.registerHoliday(dto);
         return ResponseEntity.ok().build();
     }
 
     // 휴무일 삭제
-    @DeleteMapping("/admin/holiday/{holidayId}")
-    public ResponseEntity<Void> deleteHoliday(@PathVariable Long holidayId) {
-        facilityService.deleteHoliday(holidayId);
+    @DeleteMapping("/deleteHoliday")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteHolidayByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        facilityService.deletePublicHolidayByDate(date);
         return ResponseEntity.ok().build();
     }
 
@@ -158,10 +160,10 @@ public class FacilityController {
 
 
     // 특정 날짜 휴무 여부 (시설 PK 기준)
-    public ResponseEntity<Boolean> isHoliday(
-            @RequestParam(value = "facRevNum", required = false) Long facRevNum,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(facilityService.isHoliday(facRevNum, date));
-    }
+//    public ResponseEntity<Boolean> isHoliday(
+//            @RequestParam(value = "facRevNum", required = false) Long facRevNum,
+//            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+//        return ResponseEntity.ok(facilityService.isHoliday(facRevNum, date));
+//    }
     
 }
