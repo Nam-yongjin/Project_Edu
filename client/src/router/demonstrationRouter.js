@@ -8,8 +8,6 @@ const DemDetail = lazy(() => import("../pages/demonstration/DemDetailPage"))
 const DemList = lazy(() => import("../pages/demonstration/DemListPage"))
 const RentalList = lazy(() => import("../pages/demonstration/DemRentalPage"))
 const BorrowList = lazy(() => import("../pages/demonstration/DemBorrowPage"))
-const AdminRes = lazy(() => import("../pages/demonstration/AdminResPage"))
-const AdminReg = lazy(() => import("../pages/demonstration/AdminRegPage"))
 
 const demonstrationRouter = () => {
 
@@ -37,14 +35,6 @@ const demonstrationRouter = () => {
         {
             path:"borrowList",
             element: <Suspense fallback={<Loading />}><BorrowList /></Suspense>
-        },
-        {
-            path:"AdminRes",
-            element: <Suspense fallback={<Loading />}><AdminRes /></Suspense>
-        },
-        {
-            path:"AdminReg",
-            element: <Suspense fallback={<Loading />}><AdminReg /></Suspense>
         },
         {
             // 자동 리다이렉션

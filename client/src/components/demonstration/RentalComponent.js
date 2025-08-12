@@ -64,6 +64,7 @@ const RentalComponent = () => {
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
+                console.log(data);
                 setListData(data);
                 setPageData(data);
             });
@@ -381,7 +382,7 @@ const RentalComponent = () => {
 
                             return (
                                 <tr
-                                    key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}`}
+                                    key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`}
                                     className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : ""
                                         }`}
                                 >
@@ -423,7 +424,7 @@ const RentalComponent = () => {
                                     <td className="py-3 px-4 text-center">{item.applyAt}</td>
 
                                     {/* 상태 표시 칸 (item.state만) */}
-                                    <td className="py-3 px-4 text-center align-top">
+                                    <td className="py-3 px-4 text-center align-center">
                                         <div>{getStateLabel(item.state)}</div>
                                     </td>
 

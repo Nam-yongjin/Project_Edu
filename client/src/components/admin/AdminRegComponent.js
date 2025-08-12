@@ -109,7 +109,9 @@ const AdminRegComponent = () => {
     };
 
     return (
-        <div className="w-full flex justify-center mt-6">
+    
+         <div className="max-w-screen-xl mx-auto my-10 ">
+             <div className="newText-2xl min-blank font-bold mb-4">실증 신청 관리</div>
             <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl p-6 flex flex-col">
                 <h2 className="text-2xl font-semibold mb-4 text-center border-b pb-3">회원 정보</h2>
 
