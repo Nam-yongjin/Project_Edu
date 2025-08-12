@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 const FacilityAddPage = lazy(() => import("../pages/facility/FacilityAddPage"))
 const FacilityListPage = lazy(() => import("../pages/facility/FacilityListPage"))
 const FacilityDetailPage = lazy(() => import("../pages/facility/FacilityDetailPage"))
+const FacilityHolidayPage = lazy(() => import("../pages/facility/FacilityHolidayPage"))
 
 const facilityRouter = () => {
 
@@ -20,6 +21,10 @@ const facilityRouter = () => {
         {
             path:"detail/:facRevNum",
             element: <Suspense fallback={<Loading />}><FacilityDetailPage /></Suspense>,
+        },
+        {
+            path:"holiday",
+            element: <Suspense fallback={<Loading />}><FacilityHolidayPage /></Suspense>,
         },
         {
             // 자동 리다이렉션
