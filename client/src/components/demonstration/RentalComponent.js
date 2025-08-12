@@ -64,13 +64,11 @@ const RentalComponent = () => {
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
-                console.log(data);
                 setListData(data);
                 setPageData(data);
             });
         } else {
             getRental(current, sort, sortBy, statusFilter).then((data) => {
-                console.log(data);
                 setListData(data);
                 setPageData(data);
             });
