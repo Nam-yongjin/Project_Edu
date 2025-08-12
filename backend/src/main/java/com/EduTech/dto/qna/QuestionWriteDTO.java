@@ -12,5 +12,4 @@ public class QuestionWriteDTO {
 		private String title; // 질문 제목
 		private String content; // 질문 내용
 		private Boolean state; // 공개 여부
-		private String memId; // 작성자 id
 }
