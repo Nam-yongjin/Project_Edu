@@ -66,7 +66,7 @@ const Header = () => {
       name: "실증 지원",
       link: "/demonstration",
       sub: [
-        { name: "실증기업 소개", link: "/" },
+        { name: "실증기업 소개", link: "/demonstration/demInfo" },
         { name: "실증 물품", link: "/demonstration/list" },
       ],
     },
