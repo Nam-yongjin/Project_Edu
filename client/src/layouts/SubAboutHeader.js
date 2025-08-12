@@ -12,7 +12,7 @@ const SubAboutHeader = () => {
                         소프트랩 소개
                     </div>
                     <div className="w-1/4">
-                        <img src={about} className="w-[240px]"/>
+                        <img src={about} className="w-[235px]"/>
                     </div>
                 </div>
                 

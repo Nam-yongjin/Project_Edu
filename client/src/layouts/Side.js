@@ -139,7 +139,7 @@ const Side = ({ isOpen, onClose }) => {
                                     }`}
                             >
                                 <li>
-                                    <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 안내</Link>
+                                    <Link to="/facility/holiday" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 안내</Link>
                                 </li>
                             </ul>
                         </li>
