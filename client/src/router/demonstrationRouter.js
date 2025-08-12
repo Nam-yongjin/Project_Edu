@@ -43,7 +43,7 @@ const demonstrationRouter = () => {
         {
             // 자동 리다이렉션
             path: "",
-            element: <Navigate replace to="list" />
+            element: <Navigate replace to="demInfo" />
         }
     ]
 
