@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
-import com.EduTech.dto.facility.FacilityHolidayDTO;
 import com.EduTech.dto.facility.FacilityImageDTO;
 import com.EduTech.dto.facility.FacilityListDTO;
 import com.EduTech.dto.facility.FacilityRegisterDTO;
@@ -32,14 +32,12 @@ import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.entity.facility.Facility;
-import com.EduTech.entity.facility.FacilityHoliday;
 import com.EduTech.entity.facility.FacilityImage;
 import com.EduTech.entity.facility.FacilityReserve;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.entity.facility.PublicHoliday;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberRole;
-import com.EduTech.repository.facility.FacilityHolidayRepository;
 import com.EduTech.repository.facility.FacilityImageRepository;
 import com.EduTech.repository.facility.FacilityRepository;
 import com.EduTech.repository.facility.FacilityReserveRepository;
@@ -56,7 +54,6 @@ public class FacilityServiceImpl implements FacilityService {
     private final FacilityRepository facilityRepository;
     private final FacilityImageRepository facilityImageRepository;
     private final FacilityReserveRepository facilityReserveRepository;
-    private final FacilityHolidayRepository facilityHolidayRepository;
     private final PublicHolidayRepository publicHolidayRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
@@ -83,14 +80,8 @@ public class FacilityServiceImpl implements FacilityService {
     // 공휴일 + 시설 휴무일 집합 (중복 제거, 정렬 유지)
     private Set<LocalDate> getClosedDates(Long facRevNum, LocalDate start, LocalDate end) {
         List<PublicHoliday> ph = publicHolidayRepository.findByDateBetween(start, end);
-        List<FacilityHoliday> fh = facilityHolidayRepository
-                .findByFacility_FacRevNumAndHolidayDateBetween(facRevNum, start, end);
-
-        return Stream.concat(
-                    ph.stream().map(PublicHoliday::getDate),
-                    fh.stream().map(FacilityHoliday::getHolidayDate)
-               )
-               .collect(Collectors.toCollection(LinkedHashSet::new));
+        return ph.stream().map(PublicHoliday::getDate)
+                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
     
     // 시설 등록
@@ -306,78 +297,65 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     // 휴무일 여부 (단건)
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isHoliday(Long facRevNum, LocalDate date) {
-        return getClosedDates(facRevNum, date, date).contains(date);
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public boolean isHoliday(@org.springframework.lang.Nullable Long facRevNum, LocalDate date) {
+//        return publicHolidayRepository.existsByDate(date);
+//    }
 
-    // 휴무일 리스트 (전체)
+    // 휴무일 리스트 (사용)
     @Override
     @Transactional(readOnly = true)
     public List<HolidayDayDTO> getHolidayDates(@org.springframework.lang.Nullable Long facRevNum) {
-        // 전국 공휴일 -> (date, name, "PUBLIC")
-        var nat = publicHolidayRepository.findAll()
+        return publicHolidayRepository.findAll()
                 .stream()
                 .map(ph -> HolidayDayDTO.builder()
                         .date(ph.getDate())
-                        .label(ph.getName())   // PublicHoliday.name 그대로 사용
+                        .label(ph.getName())
                         .type("PUBLIC")
-                        .build());
-
-        // 시설 휴무일 -> (holidayDate, reason.label, "FACILITY")
-        var facStream = (facRevNum == null)
-                ? facilityHolidayRepository.findAll().stream()
-                : facilityHolidayRepository.findByFacility_FacRevNum(facRevNum).stream();
-
-        var fac = facStream
-                .map(fh -> HolidayDayDTO.builder()
-                        .date(fh.getHolidayDate())
-                        .label(fh.getReason().getLabel()) // <-- enum 라벨 바로 사용
-                        .type("FACILITY")
-                        .build());
-
-        // 같은 날짜에 공휴일 + 시설휴무가 함께 있을 수 있으니 그대로 합쳐서 반환
-        return Stream.concat(nat, fac)
-                .sorted(Comparator.comparing(HolidayDayDTO::getDate)
-                        .thenComparing(HolidayDayDTO::getType))
+                        .build())
+                .sorted(Comparator.comparing(HolidayDayDTO::getDate))
                 .toList();
     }
 
     // 휴무일 리스트 (기간)
-    @Transactional(readOnly = true)
-    public List<LocalDate> getHolidayDates(Long facRevNum, LocalDate start, LocalDate end) {
-        return getClosedDates(facRevNum, start, end).stream()
-                .filter(d -> !d.isBefore(start) && !d.isAfter(end))
-                .sorted()
-                .toList();
-    }
+//    @Transactional(readOnly = true)
+//    public List<LocalDate> getHolidayDates(Long facRevNum, LocalDate start, LocalDate end) {
+//        return getClosedDates(facRevNum, start, end).stream()
+//                .filter(d -> !d.isBefore(start) && !d.isAfter(end))
+//                .sorted()
+//                .toList();
+//    }
 
     // 휴무일 등록
     @Override
     @Transactional
-    public void registerHoliday(FacilityHolidayDTO dto) {
-        if (facilityHolidayRepository.existsByFacility_FacRevNumAndHolidayDate(dto.getFacRevNum(), dto.getHolidayDate())) {
+    public void registerHoliday(HolidayDayDTO dto) {
+        // 날짜 중복 체크
+        if (publicHolidayRepository.existsByDate(dto.getDate())) {
             throw new IllegalStateException("이미 등록된 휴무일입니다.");
         }
 
-        Facility facility = facilityRepository.findById(dto.getFacRevNum())
-                .orElseThrow(() -> new RuntimeException("해당 시설을 찾을 수 없습니다."));
+        PublicHoliday holiday = PublicHoliday.builder()
+                .date(dto.getDate())                       // 날짜
+                .name(dto.getLabel())                      // 휴일명 (예: 설날, 정기휴무 등)
+                .isLunar(false)                            // 필요에 따라 변경
+                .build();
 
-        FacilityHoliday holiday = new FacilityHoliday();
-        holiday.setFacility(facility);
-        holiday.setHolidayDate(dto.getHolidayDate());
-        holiday.setReason(dto.getReason());
-
-        facilityHolidayRepository.save(holiday);
+        publicHolidayRepository.save(holiday);
     }
 
     // 휴무일 삭제
     @Override
     @Transactional
-    public void deleteHoliday(Long holidayId) {
-        FacilityHoliday holiday = facilityHolidayRepository.findById(holidayId)
-                .orElseThrow(() -> new RuntimeException("휴무일 정보를 찾을 수 없습니다."));
-        facilityHolidayRepository.delete(holiday);
+    public void deletePublicHolidayByDate(LocalDate date) {
+        if (date == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "date가 필요합니다.");
+        }
+        long affected = publicHolidayRepository.deleteByDate(date);
+        if (affected == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 날짜의 공휴일이 없습니다.");
+        }
     }
+    
 }
