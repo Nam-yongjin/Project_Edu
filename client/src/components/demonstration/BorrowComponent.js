@@ -4,8 +4,18 @@ import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 import useMove from "../../hooks/useMove";
 import RentalMemberInfoModal from "../../components/demonstration/RentalMemberInfoModal";
-
+import { useSelector } from "react-redux";
 const BorrowComponent = () => {
+    const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
+    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+    // 권한 체크 useEffect
+    useEffect(() => {
+        if (!isCompany && !isAdmin) {
+            alert("권한이 없습니다.");
+            moveToPath("/");
+        }
+
+    }, []);
     const initState = {
         content: [],
         totalPages: 0,
@@ -71,6 +81,24 @@ const BorrowComponent = () => {
         window.location.reload();
     };
 
+
+    const getStateLabel = (state) => {
+        switch (state) {
+            case "ACCEPT":
+                return "수락";
+            case "REJECT":
+                return "거부";
+            case "WAIT":
+                return "대기";
+            case "CANCEL":
+                return "취소";
+            case "EXPIRED":
+                return "만료"
+            default:
+                return state || "-";
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
             <SearchComponent
@@ -126,10 +154,11 @@ const BorrowComponent = () => {
                                         className="ml-2 border rounded px-1 text-sm"
                                     >
                                         <option value="">전체</option>
-                                        <option value="reject">reject</option>
-                                        <option value="accept">accept</option>
-                                        <option value="wait">wait</option>
-                                        <option value="cancel">cancel</option>
+                                        <option value="REJECT">거부</option>
+                                        <option value="ACCEPT">수락</option>
+                                        <option value="WAIT">대기</option>
+                                        <option value="CANCEL">취소</option>
+                                        <option value="EXPIRED">만료</option>
                                     </select>
                                 </th>
                                 <th className="py-3 px-4 text-center rounded-tr-lg"></th>
@@ -168,7 +197,9 @@ const BorrowComponent = () => {
                                         <td className="py-3 px-4 text-center">
                                             {item.regDate ? new Date(item.regDate).toLocaleDateString() : "-"}
                                         </td>
-                                        <td className="py-3 px-4 text-center">{item.state}</td>
+                                        <td className="py-3 px-4 text-center align-center">
+                                        <div>{getStateLabel(item.state)}</div>
+                                    </td>
                                         <td className="py-3 px-4 text-center space-y-2">
                                             {/* 수정 버튼 */}
                                             <button
@@ -213,8 +244,8 @@ const BorrowComponent = () => {
                                                     : "bg-gradient-to-r from-green-500 to-teal-600 hover:from-teal-600 hover:to-green-700 text-white"
                                                     } px-3 py-1 rounded-lg text-xs font-semibold shadow-md transition duration-300 ease-in-out flex items-center justify-center gap-1 w-full`}
                                                 onClick={() => {
-                                                    setSelectedDemNum(item.demNum); // ✅ demNum 저장
-                                                    setIsModalOpen(true); // ✅ 모달 열기
+                                                    setSelectedDemNum(item.demNum);
+                                                    setIsModalOpen(true);
                                                 }}
                                                 disabled={item.state === 'CANCEL'}
                                             >

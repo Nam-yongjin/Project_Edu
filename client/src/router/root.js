@@ -119,6 +119,11 @@ const root = createBrowserRouter([
         path: "news",
         element: <Suspense fallback={<Loading />}><News /></Suspense>,
         children: newsRouter()
+    },
+    {
+        path: "QnA",
+        element: <Suspense fallback={<Loading />}><News /></Suspense>,
+        children: newsRouter()
     }
 
 ])

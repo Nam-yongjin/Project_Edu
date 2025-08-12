@@ -56,6 +56,9 @@ public class DemonstrationRegistrationSpecs {
 	                case "cancel":
 	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
 	                    break;
+	                case "expired":
+	                      predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
+	                      break;
 	            }
 	        }
 
@@ -86,7 +89,7 @@ public class DemonstrationRegistrationSpecs {
 		        String statusFilter) {
 
 	    return (root, query, cb) -> {
-
+	    	query.distinct(true);
 	        Join<DemonstrationRegistration, Demonstration> demJoin = root.join("demonstration", JoinType.LEFT);
 	        Join<DemonstrationRegistration, Member> memberJoin = root.join("member", JoinType.LEFT);
 	        Join<Member, Company> teacherJoin = memberJoin.join("company", JoinType.LEFT);
@@ -95,10 +98,8 @@ public class DemonstrationRegistrationSpecs {
 	        if (StringUtils.hasText(search) && StringUtils.hasText(type)) {
 	            if ("demName".equalsIgnoreCase(type)) {
 	                predicates.add(cb.like(cb.lower(demJoin.get("demName")), "%" + search.toLowerCase() + "%"));
-	            } else if ("demMfr".equalsIgnoreCase(type)) {
-	                predicates.add(cb.like(cb.lower(demJoin.get("demMfr")), "%" + search.toLowerCase() + "%"));
 	            } else if ("companyName".equalsIgnoreCase(type)) {
-	                predicates.add(cb.like(cb.lower(teacherJoin.get("schoolName")), "%" + search.toLowerCase() + "%"));
+	                predicates.add(cb.like(cb.lower(teacherJoin.get("companyName")), "%" + search.toLowerCase() + "%"));
 	            } else if ("memId".equalsIgnoreCase(type)) {
 	                predicates.add(cb.like(cb.lower(memberJoin.get("memId")), "%" + search.toLowerCase() + "%"));
 	            }
@@ -118,6 +119,9 @@ public class DemonstrationRegistrationSpecs {
 	                case "cancel":
 	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
 	                    break;
+	                case "expired":
+	                      predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
+	                      break;
 	            }
 	        }
 

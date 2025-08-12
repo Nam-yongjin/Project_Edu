@@ -226,7 +226,7 @@ public class AdminServiceImpl implements AdminService {
             });
         }
 	}
-	
+
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
 		@Override
 		public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
@@ -284,7 +284,7 @@ public class AdminServiceImpl implements AdminService {
 			        dto.setExpDate(reg.getExpDate());
 			        dto.setState(reg.getState());
 			        dto.setMemId(reg.getMember().getMemId());
-
+			      
 			        // Member 정보 가져오기
 			        Member member = memIdToMember.get(reg.getMember().getMemId());
 			        if (member != null) {
@@ -298,6 +298,7 @@ public class AdminServiceImpl implements AdminService {
 			        if (dem != null) {
 			            dto.setDemName(dem.getDemName());
 			            dto.setItemNum(dem.getItemNum());
+			            dto.setDemNum(dem.getDemNum());
 			            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
 			        }
 
@@ -306,6 +307,7 @@ public class AdminServiceImpl implements AdminService {
 
 			    return new PageResponseDTO<>(dtoPage);
 			}
+		
 		
 		// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
 		public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO) {
@@ -400,7 +402,7 @@ public class AdminServiceImpl implements AdminService {
 		        // demRevNum에 해당하는 모든 요청들을 리스트로 찾아서 DTO에 세팅
 		        List<ResRequestDTO> relatedRequests = requests.stream()
 		            .filter(r -> r.getReserve().getDemRevNum().equals(res.getDemRevNum()))
-		            .map(r -> new ResRequestDTO(r.getType(), r.getState()))
+		            .map(r -> new ResRequestDTO(r.getType(), r.getState(),r.getUpdateDate()))
 		            .collect(Collectors.toList());
 
 		        dto.setRequestDTO(relatedRequests);

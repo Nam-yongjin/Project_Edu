@@ -18,9 +18,10 @@ public class ResRequestDTO {
 	private DemonstrationState state;
 	private Long requestId;
 	private LocalDate updateDate;
-	public ResRequestDTO(RequestType type,DemonstrationState state)
+	public ResRequestDTO(RequestType type,DemonstrationState state,LocalDate updateDate)
 	{
 		this.type=type;
 		this.state=state;
+		this.updateDate=updateDate;
 	}
 }

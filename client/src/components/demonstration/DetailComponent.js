@@ -241,6 +241,7 @@ const DetailComponent = ({ demNum }) => {
                             <div className="border border-black p-4 rounded space-y-4 w-full">
                                 <div className="flex items-center gap-3">
                                     <img src={calendar} className="w-6 h-6" alt="calendar" />
+                                    {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
                                     <label className="text-base font-semibold w-[100px]">예약 시작일:</label>
                                     <DatePicker
                                         className="border p-1 text-sm flex-1 min-w-0 box-border"
@@ -260,6 +261,7 @@ const DetailComponent = ({ demNum }) => {
 
                                 <div className="flex items-center gap-3">
                                     <img src={calendar} className="w-6 h-6" alt="calendar" />
+                        {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
                                     <label className="text-base font-semibold w-[100px]">예약 종료일:</label>
                                     <DatePicker
                                         className="border p-1 text-sm flex-1 min-w-0 box-border"
@@ -305,6 +307,7 @@ const DetailComponent = ({ demNum }) => {
 
                             <div className="border border-black p-4 rounded flex items-start gap-3 bg-gray-50">
                                 <img src={megaphone} className="w-8 h-8 mt-1" alt="megaphone" />
+                                {/*<a href="https://www.flaticon.com/free-icons/advertising" title="advertising icons">Advertising icons created by Tanah Basah - Flaticon</a> */}
                                 <div className="text-sm leading-relaxed">
                                     관리자의 승인 후 예약이 확정되며, 마이페이지에서 확인하실 수 있습니다.<br />
                                     <span className="text-red-600 font-semibold">* 24시간 이내 승인 (주말 제외)</span>

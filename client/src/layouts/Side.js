@@ -158,15 +158,21 @@ const Side = ({ isOpen, onClose }) => {
                                 <li>
                                     <Link to="/demonstration/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 물품</Link>
                                 </li>
+                                {loginState.role === "TEACHER" ?
+                                <li>
+                                    <Link to="/demonstration/rentalList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 대여 조회</Link>
+                                </li>
+                                : <></> }
+                                {loginState.role === "COMPANY" ?
+                                <>
                                 <li>
                                     <Link to="/demonstration/add" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청</Link>
                                 </li>
                                 <li>
-                                    <Link to="/demonstration/rentalList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>빌림테스트</Link>
+                                    <Link to="/demonstration/borrowList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 조회</Link>
                                 </li>
-                                <li>
-                                    <Link to="/demonstration/borrowList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>빌려줌테스트</Link>
-                                </li>
+                                </>
+                                : <></> }
                             </ul>
                         </li>
                         <li>
@@ -214,6 +220,15 @@ const Side = ({ isOpen, onClose }) => {
                                         </li>
                                         <li>
                                             <Link to="/admin/stats" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>통계 확인</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/admin/stats" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>통계 확인</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/admin/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 관리</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/admin/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 대여 관리</Link>
                                         </li>
                                     </ul>
                                 </li>

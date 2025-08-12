@@ -5,8 +5,20 @@ import { urlListToFileList } from "../../api/urlToFileApi";
 import useMove from "../../hooks/useMove";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import { useSelector } from "react-redux";
 const UpdateComponent = ({ demNum }) => {
+    const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
+    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+
+    // 권한 체크 useEffect
+    useEffect(() => {
+        if (!isCompany && !isAdmin) {
+            alert("권한이 없습니다.");
+            moveToPath("/");
+        }
+
+    }, []);
+
     const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "" }; // form에서 받을 데이터 초기값
     const [fileInputKey, setFileInputKey] = useState(Date.now()); // input 태그 리랜더링 위한 초기값
     const [images, setImages] = useState([]); // 이미지 정보를 담을 상태 배열 지정

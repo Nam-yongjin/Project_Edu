@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ko } from "date-fns/locale";
 import { postAdd } from "../../api/demApi";
 import useMove from "../../hooks/useMove";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useSelector } from "react-redux";
 
 const AddComponent = () => {
     const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date() };
-
+    const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
+    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
     const [images, setImages] = useState([]);
     const [dem, setDem] = useState({ ...initState });
     const [returnDate, setReturnDate] = useState(new Date());
@@ -15,7 +17,18 @@ const AddComponent = () => {
     const [errors, setErrors] = useState({});
     const [fileInputKey, setFileInputKey] = useState(Date.now());
 
+
+    // 권한 체크 useEffect
+    useEffect(() => {
+        if (!isCompany&&!isAdmin) {
+            alert("권한이 없습니다.");
+            moveToPath("/");
+        }
+    
+    }, []);
+
     const addDem = () => {
+
         const newErrors = {};
         if (!dem.demName.trim()) newErrors.demName = "물품명은 필수입니다.";
         if (!dem.demMfr.trim()) newErrors.demMfr = "제조사는 필수입니다.";
