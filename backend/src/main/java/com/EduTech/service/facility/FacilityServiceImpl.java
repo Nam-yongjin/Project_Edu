@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -84,7 +85,7 @@ public class FacilityServiceImpl implements FacilityService {
                  .collect(Collectors.toCollection(LinkedHashSet::new));
     }
     
-    // 시설 등록
+    // 시설 등록(사용중)
     @Override
     @Transactional
     public void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images) {
@@ -117,7 +118,7 @@ public class FacilityServiceImpl implements FacilityService {
         facilityRepository.save(facility);
     }
     
-    // 시설 조회
+    // 시설 조회(사용중)
     @Override
     public Page<FacilityListDTO> getFacilityList(Pageable pageable, String keyword) {
         // 기본 정렬: facRevNum DESC (pageable에 정렬이 없을 때만)
@@ -141,7 +142,7 @@ public class FacilityServiceImpl implements FacilityService {
         return result.map(f -> modelMapper.map(f, FacilityListDTO.class));
     }
 
-    // 시설 상세 (이미지 포함)
+    // 시설 상세 (이미지 포함)(사용중)
     @Override
     @Transactional(readOnly = true)
     public FacilityDetailDTO getFacilityDetail(Long facRevNum) {
@@ -166,9 +167,10 @@ public class FacilityServiceImpl implements FacilityService {
         d.setCapacity(facility.getCapacity());
         d.setFacItem(facility.getFacItem());
         d.setEtc(facility.getEtc());
-        // TODO: 실제 운영시간 요약 계산 로직 반영
-        d.setAvailableTime("09:00 ~ 18:00");
+        d.setReserveStart(facility.getReserveStart());
+        d.setReserveEnd(facility.getReserveEnd());
         d.setImages(imageDTOs);
+
         return d;
     }
 
@@ -177,9 +179,27 @@ public class FacilityServiceImpl implements FacilityService {
     @Override
     @Transactional(readOnly = true)
     public boolean isReservable(Long facRevNum, LocalDate date, LocalTime start, LocalTime end) {
+        if (facRevNum == null || date == null || start == null || end == null) return false;
+        if (!end.isAfter(start)) return false;
         if (LocalDateTime.of(date, end).isBefore(LocalDateTime.now())) return false;
-        if (getClosedDates(facRevNum, date, date).contains(date)) return false; // 휴무일 통합 체크
 
+        // 휴무일(공휴일) 체크
+        if (publicHolidayRepository.existsByDate(date)) return false;
+
+        // 운영시간 범위 체크
+        Facility fac = facilityRepository.findById(facRevNum)
+                .orElse(null);
+        if (fac == null) return false;
+        LocalTime rs = fac.getReserveStart();
+        LocalTime re = fac.getReserveEnd();
+        if (rs != null && re != null) {
+            if (start.isBefore(rs) || end.isAfter(re)) return false;
+        }
+
+        // 최대 4시간 연속
+        if (java.time.Duration.between(start, end).toHours() > 4) return false;
+
+        // 예약 겹침(대기/승인만 충돌로 간주)
         return !facilityReserveRepository
                 .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
                         facRevNum, date, end, start,
@@ -331,18 +351,22 @@ public class FacilityServiceImpl implements FacilityService {
     @Override
     @Transactional
     public void registerHoliday(HolidayDayDTO dto) {
-        // 날짜 중복 체크
-        if (publicHolidayRepository.existsByDate(dto.getDate())) {
-            throw new IllegalStateException("이미 등록된 휴무일입니다.");
+        if (dto.getDate() == null || dto.getLabel() == null || dto.getLabel().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "date/label이 필요합니다.");
         }
-
-        PublicHoliday holiday = PublicHoliday.builder()
-                .date(dto.getDate())                       // 날짜
-                .name(dto.getLabel())                      // 휴일명 (예: 설날, 정기휴무 등)
-                .isLunar(false)                            // 필요에 따라 변경
-                .build();
-
-        publicHolidayRepository.save(holiday);
+        try {
+            if (publicHolidayRepository.existsByDate(dto.getDate())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 등록된 휴무일입니다.");
+            }
+            PublicHoliday holiday = PublicHoliday.builder()
+                    .date(dto.getDate())
+                    .name(dto.getLabel())
+                    .isLunar(false)
+                    .build();
+            publicHolidayRepository.saveAndFlush(holiday);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 등록된 휴무일입니다.", e);
+        }
     }
 
     // 휴무일 삭제
