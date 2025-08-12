@@ -68,9 +68,6 @@ const Header = () => {
       sub: [
         { name: "실증지원 안내", link: "/demonstration" },
         { name: "실증기업 소개", link: "/" },
-        { name: "실증 신청", link: "/demonstration/add" },
-        { name: "빌림테스트", link: "/demonstration/rentalList" },
-        { name: "빌려줌테스트", link: "/demonstration/borrowList" },
         { name: "실증 물품", link: "/demonstration/list" },
       ],
     },
@@ -94,9 +91,22 @@ const Header = () => {
         { name: "배너 관리", link: "/admin/banner" },
         { name: "통계 확인", link: "/admin/stats" },
         { name: "휴일 관리", link: "/facility/list" },
+        {name:"실증신청 관리",link:"/admin/adminReg"},
+        {name:"실증대여 관리",link:"/admin/adminRes"}
       ],
     });
   }
+
+  if (loginState.role === "TEACHER") {
+  const teacherMenu = mainMenus.find(menu => menu.name === "실증 지원");
+    teacherMenu.sub.push({ name: "실증 대여 조회", link: "/demonstration/rentalList" });
+}
+
+if (loginState.role === "COMPANY") {
+  const companyMenu = mainMenus.find(menu => menu.name === "실증 지원");
+    companyMenu.sub.push({ name: "실증 신청", link: "/demonstration/add" },{ name: "실증 신청 조회", link: "/demonstration/borrowList" });
+}
+
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white shadow z-50 ">

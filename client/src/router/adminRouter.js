@@ -5,6 +5,8 @@ import { Navigate } from "react-router-dom";
 const Members = lazy(() => import("../pages/admin/AdminMembersPage"));
 const Banner = lazy(() => import("../pages/admin/AdminBannerPage"));
 const Stats = lazy(() => import("../pages/admin/StatsPage"));
+const AdminRes = lazy(() => import("../pages/admin/AdminResPage"))
+const AdminReg = lazy(() => import("../pages/admin/AdminRegPage"))
 
 const adminRouter = () => {
     return [
@@ -24,6 +26,14 @@ const adminRouter = () => {
         {
             path: "stats",
             element: <Suspense fallback={<Loading />}><Stats /></Suspense>
+        },
+         {
+            path:"adminRes",
+            element: <Suspense fallback={<Loading />}><AdminRes /></Suspense>
+        },
+        {
+            path:"adminReg",
+            element: <Suspense fallback={<Loading />}><AdminReg /></Suspense>
         },
     ];
 };

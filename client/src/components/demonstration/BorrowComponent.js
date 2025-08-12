@@ -197,7 +197,9 @@ const BorrowComponent = () => {
                                         <td className="py-3 px-4 text-center">
                                             {item.regDate ? new Date(item.regDate).toLocaleDateString() : "-"}
                                         </td>
+                                        <td className="py-3 px-4 text-center align-center">
                                         <div>{getStateLabel(item.state)}</div>
+                                    </td>
                                         <td className="py-3 px-4 text-center space-y-2">
                                             {/* 수정 버튼 */}
                                             <button
