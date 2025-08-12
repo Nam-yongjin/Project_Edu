@@ -22,7 +22,5 @@ public class NewsListDTO {
 	private LocalDateTime createdAt; //작성일
 	
 	private Long viewCount; //조회수
-	
-	private Integer fileCount; //파일 개수
 
 }

@@ -1,5 +1,7 @@
 package com.EduTech.repository.demonstration;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,4 +47,9 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 	@Query("SELECT itemNum from Demonstration WHERE demNum= :demNum")
 	Long selectItemNum(@Param("demNum") Long demNum);
 	
+	// 스케줄러에서 state가 cancel인 값들에 대해 상품 번호를 받아와 일괄 삭제시키는 쿼리문
+	@Modifying
+	@Transactional 
+	@Query("DELETE FROM Demonstration WHERE demNum IN:demNum")
+	void deleteDems(@Param("demNum") List<Long> demNum); 
 }

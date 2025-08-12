@@ -63,6 +63,9 @@ public class DemonstrationReserveSpecs {
                   case "cancel":
                       predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
                       break;
+                  case "expired":
+                      predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
+                      break;
               }
           }
 
@@ -142,6 +145,9 @@ public class DemonstrationReserveSpecs {
 	                case "cancel":
 	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
 	                    break;
+	                case "expired":
+	                      predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
+	                      break;
 	            }
 	        }
 
@@ -222,6 +228,9 @@ public class DemonstrationReserveSpecs {
 	                case "cancel":
 	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
 	                    break;
+	                case "expired":
+	                      predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
+	                      break;
 	            }
 	        }
 

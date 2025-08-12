@@ -27,4 +27,10 @@ public interface DemonstrationRequestRepository extends JpaRepository<Demonstrat
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지)
 		@Query("SELECT q FROM DemonstrationRequest q WHERE reserve.demRevNum=:demRevNum")
 		DemonstrationRequest selectRequest(@Param("demRevNum") Long demRevNum);
+		
+		// 스케줄러에서 state가 accpet,reject일때 삭제시키는 쿼리문
+		@Modifying
+		@Transactional 
+		@Query("DELETE FROM DemonstrationRequest WHERE state=:state")
+		void deleteReq(@Param("state") DemonstrationState state); 
 }

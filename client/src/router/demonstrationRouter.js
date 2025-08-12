@@ -8,9 +8,7 @@ const DemDetail = lazy(() => import("../pages/demonstration/DemDetailPage"))
 const DemList = lazy(() => import("../pages/demonstration/DemListPage"))
 const RentalList = lazy(() => import("../pages/demonstration/DemRentalPage"))
 const BorrowList = lazy(() => import("../pages/demonstration/DemBorrowPage"))
-const AdminRes = lazy(() => import("../pages/demonstration/AdminResPage"))
-const AdminReg = lazy(() => import("../pages/demonstration/AdminRegPage"))
-
+const Info=lazy(() => import("../pages/demonstration/InfoPage"))
 const demonstrationRouter = () => {
 
     return [
@@ -23,33 +21,29 @@ const demonstrationRouter = () => {
             element: <Suspense fallback={<Loading />}><UpdateDem /></Suspense>,
         },
         {
-            path:"detail/:demNum",
+            path: "detail/:demNum",
             element: <Suspense fallback={<Loading />}><DemDetail /></Suspense>
         },
         {
-             path:"list",
+            path: "list",
             element: <Suspense fallback={<Loading />}><DemList /></Suspense>
         },
         {
-             path:"rentalList",
+            path: "rentalList",
             element: <Suspense fallback={<Loading />}><RentalList /></Suspense>
         },
         {
-            path:"borrowList",
+            path: "borrowList",
             element: <Suspense fallback={<Loading />}><BorrowList /></Suspense>
         },
         {
-            path:"AdminRes",
-            element: <Suspense fallback={<Loading />}><AdminRes /></Suspense>
-        },
-        {
-            path:"AdminReg",
-            element: <Suspense fallback={<Loading />}><AdminReg /></Suspense>
+            path: "demInfo",
+            element: <Suspense fallback={<Loading />}><Info /></Suspense>
         },
         {
             // 자동 리다이렉션
             path: "",
-            element: <Navigate replace to="list" />
+            element: <Navigate replace to="demInfo" />
         }
     ]
 

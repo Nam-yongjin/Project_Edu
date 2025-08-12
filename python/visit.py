@@ -30,5 +30,5 @@ def visitors():
     return {
         "total_visitors": total_visitors,
         "daily_visitors": daily_visitors,
-        "trend": df.to_dict(orient="records")
+        "trend": df.to_dict(orient="records") # JSON 형태로 변환
     }

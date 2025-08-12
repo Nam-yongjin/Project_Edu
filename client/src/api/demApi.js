@@ -120,7 +120,7 @@ export const getRentalSearch=async (search,type,pageCount,sortBy,sort,statusFilt
 // 물품 대여 현황 페이지에서 항목 선택 후, 예약 취소 버튼 클릭 시, 상품 삭제
 export const deleteRental = async (demNum) => {
   const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
-    data: demNum,  // 배열을 body에 직접 담아서 보냄
+    data:demNum,  // 배열을 body에 직접 담아서 보냄
   });
   return res.data;
 };
@@ -178,11 +178,11 @@ export const getBorrow= async (pageCount, sort, sortBy, statusFilter) => {
 
 // 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청 
 export const delDem = async (demNum) => {
-    const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, {
-        params: { demNum } // 쿼리 파라미터로 전송
-    });
-    return res.data;
+  console.log(`${demonstration}/DeleteDem/${demNum}`);
+  const res = await jwtAxios.delete(`${demonstration}/DeleteDem/${demNum}`);
+  return res.data;
 };
+
 
 // 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 있음)
 export const getBorrowResInfoSearch  = async (demNum, pageCount, search, type, sortBy, sort,statusFilter) => {
@@ -229,7 +229,8 @@ export const getResAdminSearch  = async (pageCount, search, type, sortBy, sort,s
     return res.data;
 };
 
-// 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 없음)
+
+// 관리자 물품 대여 관리 페이지에서 회원이 신청한 물품 항목들을 보여주는 요청 (검색어 없음)
 export const getResAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
     const res = await jwtAxios.get(`${admin}/demRes`,{
     params: {
@@ -251,7 +252,7 @@ export const updateResState = async (demRevNum,state) => {
   return res.data;
 };
 
-// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
+// 관리자 물품 대여 페이지에서 반납 요청 / 반납 기한 연장에 대해 수락 / 거절을 업데이트 하는 요청
 export const updateReqState = async (demRevNum,state,type) => {
   const res = await jwtAxios.put(`${admin}/ReqState`, {
       demRevNum:demRevNum ,
@@ -261,8 +262,8 @@ export const updateReqState = async (demRevNum,state,type) => {
   return res.data;
 };
 
-/*
-// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
+
+// 관리자 물품 대여 페이지에서 물품 대여 신청에 대해 수락 / 거절을 업데이트 하는 요청
 export const updateRegState = async (startDate,endDate,demNum,itemNum) => {
   const res = await jwtAxios.put(`${admin}/ChangeRes`, {
       startDate: startDate,
@@ -272,4 +273,40 @@ export const updateRegState = async (startDate,endDate,demNum,itemNum) => {
   });
   return res.data;
 };
-*/
+
+// 관리자 물품 대여 관리 페이지에서 회원이 등록한 물품 항목들을 보여주는 요청
+export const getRegAdminSearch  = async (pageCount, search, type, sortBy, sort,statusFilter) => {
+    const res = await jwtAxios.get(`${admin}/demReg`,{
+    params: {
+    search:search,
+    type:type,
+    statusFilter:statusFilter,
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort
+    }
+    });
+    return res.data;
+};
+
+// 관리자 물품 대여 관리 페이지에서 회원이 등록한 물품 항목들을 보여주는 요청 (검색어 없음)
+export const getRegAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
+    const res = await jwtAxios.get(`${admin}/demReg`,{
+    params: {
+    statusFilter:statusFilter,
+    pageCount:pageCount,
+    sortBy:sortBy,
+    sort:sort
+    }
+    });
+    return res.data;
+};
+
+// 관리자 물품 대여 페이지에서 반납 요청 / 반납 기한 연장에 대해 수락 / 거절을 업데이트 하는 요청
+export const updateRegstate = async (demRegNum,state) => {
+  const res = await jwtAxios.put(`${admin}/RegState`, {
+      demRegNum:demRegNum ,
+        state: state
+  });
+  return res.data;
+};
