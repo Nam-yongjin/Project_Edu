@@ -39,3 +39,16 @@ export const getFacilityHolidays = async (facRevNum) => {
   });
   return res.data;
 };
+
+export const addPublicHoliday = async ({ date, label }) => {
+  const res = await jwtAxios.post(`${facility}/addholiday`, { 
+    date, label 
+  });
+  return res.data;
+};
+
+export const deleteHoliday = async (date) => {
+  return (await jwtAxios.delete(`${facility}/deleteHoliday`, { 
+    params: { date } 
+  })).data;
+};
