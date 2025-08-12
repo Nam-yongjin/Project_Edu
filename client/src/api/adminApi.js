@@ -76,3 +76,9 @@ export const getEventCategoryStats = async () => {
     const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/eventCategory`);
     return res.data;
 };
+
+// 공간 대여 인기 시간대
+export const getFacTimesStats = async () => {
+    const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/popular_facTimes`);
+    return res.data;
+}
