@@ -71,6 +71,10 @@ public interface FacilityReserveRepository extends JpaRepository<FacilityReserve
 
     // 특정 시설+날짜의 예약들
     List<FacilityReserve> findByFacility_FacRevNumAndFacDate(Long facRevNum, LocalDate facDate);
+    
+    // 특정일시 현재 예약중인지 확인(사용)
+    List<FacilityReserve> findByFacility_FacRevNumAndFacDateAndStateIn(
+            Long facRevNum, LocalDate facDate, List<FacilityState> states);
 
     // 회원 탈퇴 제한 체크
     @Query("""

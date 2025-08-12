@@ -32,6 +32,7 @@ import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
+import com.EduTech.dto.facility.ReservedBlockDTO;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.service.facility.FacilityService;
 
@@ -46,7 +47,7 @@ public class FacilityController {
 
     private final FacilityService facilityService;
 
-    // 시설 추가 (이미지 없어도 OK)
+    // 시설 추가 (이미지 없어도 OK)(사용)
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerFacility(
@@ -57,7 +58,7 @@ public class FacilityController {
         return ResponseEntity.ok().build();
     }
     
-    // 시설 조회
+    // 시설 조회(사용)
     @GetMapping("/list")
     public ResponseEntity<Page<FacilityListDTO>> list(
             @PageableDefault(page = 0, size = 12) Pageable pageable,
@@ -67,17 +68,25 @@ public class FacilityController {
         return ResponseEntity.ok(res);
     }
 
-    // 시설 상세 조회 (facRevNum 기준)
+    // 시설 상세 조회 (facRevNum 기준)(사용)
     @GetMapping("/facilityDetail")
     public ResponseEntity<FacilityDetailDTO> getFacilityDetail(@RequestParam("facRevNum") Long facRevNum) {
         return ResponseEntity.ok(facilityService.getFacilityDetail(facRevNum));
     }
 
-    // 예약 신청
+    // 예약 신청(사용)
     @PostMapping("/reserve")
     public ResponseEntity<Void> reserveFacility(@RequestBody @Valid FacilityReserveRequestDTO dto) {
         facilityService.reserveFacility(dto);
         return ResponseEntity.ok().build();
+    }
+    
+    // 예약 가능 시간 설정(현재 예약중인거 제외처리)
+    @GetMapping("/facility/reserved")
+    public List<ReservedBlockDTO> getReservedBlocks(
+            @RequestParam("facRevNum") Long facRevNum,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return facilityService.getReservedBlocks(facRevNum, date);
     }
 
     // 예약 가능 여부 확인
@@ -91,7 +100,7 @@ public class FacilityController {
         return ResponseEntity.ok(facilityService.isReservable(facRevNum, date, start, end));
     }
 
-    // 사용자 예약 목록 (JWT 도입 전 임시로 memId 파라미터)
+    // 사용자 예약 목록
     @GetMapping("/my-reservations")
     public ResponseEntity<List<FacilityReserveListDTO>> getMyReservations(@RequestParam String memId) {
         return ResponseEntity.ok(facilityService.getMyReservations(memId));
