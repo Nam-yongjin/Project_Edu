@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import board from "../assets/noticeTitle.png";
+import board from "../assets/board.png";
 
 const SubAboutHeader = () => {
     const location = useLocation();
@@ -13,6 +13,7 @@ const SubAboutHeader = () => {
                     </div>
                     <div className="w-1/4">
                         <img src={board} className="w-[185px]"/>
+                        {/* <a href="https://www.flaticon.com/kr/free-icons/-" title="광고 게시판 아이콘">광고 게시판 아이콘 제작자: Freepik - Flaticon</a> */}
                     </div>
                 </div>
                 
