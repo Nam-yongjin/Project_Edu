@@ -4,12 +4,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -32,6 +29,7 @@ import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
+import com.EduTech.dto.facility.ReservedBlockDTO;
 import com.EduTech.entity.facility.Facility;
 import com.EduTech.entity.facility.FacilityImage;
 import com.EduTech.entity.facility.FacilityReserve;
@@ -78,12 +76,12 @@ public class FacilityServiceImpl implements FacilityService {
     }
     // ----------------------------------------------------------------------
 
-    // 공휴일 + 시설 휴무일 집합 (중복 제거, 정렬 유지)
-    private Set<LocalDate> getClosedDates(Long facRevNum, LocalDate start, LocalDate end) {
-        List<PublicHoliday> ph = publicHolidayRepository.findByDateBetween(start, end);
-        return ph.stream().map(PublicHoliday::getDate)
-                 .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
+    // 공휴일 + 시설 휴무일 집합 (중복 제거, 정렬 유지)(사용x)
+//    private Set<LocalDate> getClosedDates(Long facRevNum, LocalDate start, LocalDate end) {
+//        List<PublicHoliday> ph = publicHolidayRepository.findByDateBetween(start, end);
+//        return ph.stream().map(PublicHoliday::getDate)
+//                 .collect(Collectors.toCollection(LinkedHashSet::new));
+//    }
     
     // 시설 등록(사용중)
     @Override
@@ -235,6 +233,41 @@ public class FacilityServiceImpl implements FacilityService {
         reserve.setState(FacilityState.WAITING);
 
         facilityReserveRepository.save(reserve);
+    }
+    
+    // 예약 가능 시간 확인(현재 예약중인 시간 제외)(ㅏ용)
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservedBlockDTO> getReservedBlocks(Long facRevNum, LocalDate date) {
+        if (facRevNum == null || date == null) return List.of();
+        // 대기/승인 상태만 막음
+        var blocks = facilityReserveRepository.findByFacility_FacRevNumAndFacDateAndStateIn(
+                facRevNum, date, List.of(FacilityState.WAITING, FacilityState.APPROVED));
+
+        // (선택) 겹치는 구간 병합
+        var sorted = blocks.stream()
+                .sorted(Comparator.comparing(FacilityReserve::getStartTime))
+                .map(r -> new ReservedBlockDTO(r.getStartTime(), r.getEndTime()))
+                .collect(Collectors.toList());
+
+        if (sorted.isEmpty()) return sorted;
+
+        List<ReservedBlockDTO> merged = new java.util.ArrayList<>();
+        LocalTime curS = sorted.get(0).getStart();
+        LocalTime curE = sorted.get(0).getEnd();
+
+        for (int i = 1; i < sorted.size(); i++) {
+            var b = sorted.get(i);
+            if (!b.getStart().isAfter(curE)) { // 겹치거나 맞닿음
+                if (b.getEnd().isAfter(curE)) curE = b.getEnd();
+            } else {
+                merged.add(new ReservedBlockDTO(curS, curE));
+                curS = b.getStart();
+                curE = b.getEnd();
+            }
+        }
+        merged.add(new ReservedBlockDTO(curS, curE));
+        return merged;
     }
 
     // 내 예약 목록 (마이페이지)

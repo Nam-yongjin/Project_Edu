@@ -17,6 +17,7 @@ import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
+import com.EduTech.dto.facility.ReservedBlockDTO;
 import com.EduTech.entity.facility.FacilityState;
 
 public interface FacilityService {
@@ -35,6 +36,9 @@ public interface FacilityService {
 
     // 예약 가능 여부
     boolean isReservable(Long facRevNum, LocalDate date, LocalTime start, LocalTime end);
+    
+    // 예약중인 시간 확인(사용)
+    List<ReservedBlockDTO> getReservedBlocks(Long facRevNum, LocalDate date);
 
     // 내 예약 목록
     List<FacilityReserveListDTO> getMyReservations(String memId);

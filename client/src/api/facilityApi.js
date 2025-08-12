@@ -62,3 +62,11 @@ export const createReservation = async ({ facRevNum, facDate, startTime, endTime
   });
   return res.data;
 };
+
+// 특정 날짜의 예약 불가 시간대 조회 (ReservedBlockDTO[])
+export const getReservedBlocks = async (facRevNum, date) => {
+  const res = await axios.get(`${facility}/facility/reserved`, {
+    params: { facRevNum, date }
+  });
+  return res.data;
+};
