@@ -52,3 +52,13 @@ export const deleteHoliday = async (date) => {
     params: { date } 
   })).data;
 };
+
+export const createReservation = async ({ facRevNum, facDate, startTime, endTime }) => {
+  const res = await jwtAxios.post(`${facility}/reserve`, {
+    facRevNum,
+    facDate,
+    startTime,
+    endTime,
+  });
+  return res.data;
+};
