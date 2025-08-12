@@ -71,12 +71,6 @@ public class DemonstrationReserveSpecs {
 
           Path<?> sortPath;
           switch (sortBy.toLowerCase()) {
-              case "companyname":
-                  sortPath = compJoin.get("companyName");
-                  break;
-              case "demname":
-                  sortPath = demJoin.get("demName");
-                  break;
               case "startdate":
                   sortPath = root.get("startDate");
                   break;

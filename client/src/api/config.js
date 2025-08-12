@@ -13,5 +13,6 @@ export const API_MAPPING = {
     notice: '/notice',
     question: '/question',
     answer: '/answer',
-    admin: '/admin'
+    admin: '/admin',
+    qna:'/question'
 };
