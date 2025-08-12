@@ -1,9 +1,14 @@
 package com.EduTech.scheduler;
 
+import java.util.List;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.EduTech.entity.demonstration.DemonstrationState;
+import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
+import com.EduTech.repository.demonstration.DemonstrationRepository;
+import com.EduTech.repository.demonstration.DemonstrationRequestRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.member.MemberRepository;
@@ -23,6 +28,12 @@ public class Scheduler {
 	private final EventInfoRepository infoRepository;
 
 	private final DemonstrationReserveRepository resRepository;
+	
+	private final DemonstrationRepository demRepository;
+	
+	private final DemonstrationRegistrationRepository regRepository;
+	
+	private final DemonstrationRequestRepository reqRepository;
 	
 	private final HolidaySyncService holidaySyncService;
 	
@@ -53,8 +64,24 @@ public class Scheduler {
         log.info("정기 공휴일 동기화 완료: {}건 추가됨", count);
     }
     
-    @Scheduled(cron = "0 0 0 * * 0", zone = "Asia/Seoul")
+    
+    // 매주 일요일 마다
+    @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul") // 10분 마다 실행
     public void deleteResCancelState() {
     	resRepository.deleteResCancel(DemonstrationState.CANCEL);
     }
+    
+    @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul") // 10분 마다 실행
+    public void deleteDemCancelState() {
+    	List<Long> demNums=regRepository.selectRegDemNums(DemonstrationState.CANCEL);
+    	demRepository.deleteDems(demNums);
+    }
+    
+    @Scheduled(cron = "0 */10 * * * *", zone = "Asia/Seoul") // 10분 마다 실행
+    public void deleteReqCancelState() {
+    	reqRepository.deleteReq(DemonstrationState.ACCEPT);
+    	reqRepository.deleteReq(DemonstrationState.REJECT);
+    }
+    
+    // @Scheduled(cron = "0 0 0 * * 0", zone = "Asia/Seoul")
 }
