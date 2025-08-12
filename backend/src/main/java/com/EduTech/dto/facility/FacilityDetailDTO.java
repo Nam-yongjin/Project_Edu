@@ -1,6 +1,9 @@
 package com.EduTech.dto.facility;
 
+import java.time.LocalTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +17,13 @@ public class FacilityDetailDTO {
     private int capacity;
     private String facItem;
     private String etc;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime reserveStart;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime reserveEnd;
+    
     private String availableTime;
     private String facInfo;
     private List<FacilityImageDTO> images;

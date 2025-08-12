@@ -12,12 +12,11 @@ const initialForm = {
   etc: "",
 };
 
-// 10분 단위 선택지
+// 시간(시)만 선택
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")); // 00~23
-const MINUTES = ["00", "10", "20", "30", "40", "50"];
 
-// HH:mm 조립
-const toTimeString = ({ h, m }) => (h && m ? `${h}:${m}` : "");
+// HH:mm 조립 (분은 고정 00)
+const toTimeString = (h) => (h ? `${h}:00` : "");
 
 const FacilityAddComponent = () => {
   const navigate = useNavigate();
@@ -26,16 +25,15 @@ const FacilityAddComponent = () => {
 
   const [form, setForm] = useState(initialForm);
 
-  // ✅ 시/분을 분리해 상태 보관 (리셋 문제 해결 포인트)
-  const [startHM, setStartHM] = useState({ h: "", m: "" });
-  const [endHM, setEndHM] = useState({ h: "", m: "" });
+  // ✅ 시만 보관
+  const [startH, setStartH] = useState("");
+  const [endH, setEndH] = useState("");
 
   const [mainImage, setMainImage] = useState(null);
   const [subImages, setSubImages] = useState([]);
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef(null);
 
-  // 권한 체크
   useEffect(() => {
     if (!isAdmin) {
       alert("권한이 없습니다.");
@@ -43,7 +41,6 @@ const FacilityAddComponent = () => {
     }
   }, [isAdmin, navigate]);
 
-  // 객체 URL 정리
   useEffect(
     () => () => {
       if (mainImage?.url) URL.revokeObjectURL(mainImage.url);
@@ -52,22 +49,17 @@ const FacilityAddComponent = () => {
     [mainImage, subImages]
   );
 
-  // 기본 정보 변경
   const onChange = useCallback((e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  // 시간 변경 (시/분 각각)
-  const onChangeTime = useCallback((which, part, value) => {
-    if (which === "start") {
-      setStartHM((prev) => ({ ...prev, [part]: value }));
-    } else {
-      setEndHM((prev) => ({ ...prev, [part]: value }));
-    }
+  // 시간 변경 (시만)
+  const onChangeTime = useCallback((which, value) => {
+    if (which === "start") setStartH(value);
+    else setEndH(value);
   }, []);
 
-  // 파일 선택
   const onFilePick = useCallback(
     (e) => {
       const files = Array.from(e.target.files || []);
@@ -126,18 +118,15 @@ const FacilityAddComponent = () => {
 
     if (!mainImage) next.images = "대표 이미지를 추가하세요.";
 
-    const startTime = toTimeString(startHM);
-    const endTime = toTimeString(endHM);
-
-    if (!startTime) next.startTime = "시작 시간을 선택하세요.";
-    if (!endTime) next.endTime = "종료 시간을 선택하세요.";
-    if (startTime && endTime && startTime >= endTime) {
+    if (!startH) next.startTime = "시작 시간을 선택하세요.";
+    if (!endH) next.endTime = "종료 시간을 선택하세요.";
+    if (startH && endH && Number(startH) >= Number(endH)) {
       next.timeRange = "시작 시간은 종료 시간보다 앞서야 합니다.";
     }
 
     setErrors(next);
     return Object.keys(next).length === 0;
-  }, [form, mainImage, startHM, endHM]);
+  }, [form, mainImage, startH, endH]);
 
   // FormData 구성 (dto + images)
   const buildFormData = useCallback(() => {
@@ -147,8 +136,8 @@ const FacilityAddComponent = () => {
       capacity: Number(form.capacity),
       facItem: form.facItem.trim(),
       etc: form.etc.trim(),
-      reserveStart: toTimeString(startHM),
-      reserveEnd: toTimeString(endHM),
+      reserveStart: toTimeString(startH),
+      reserveEnd: toTimeString(endH),
     };
 
     const fd = new FormData();
@@ -162,7 +151,7 @@ const FacilityAddComponent = () => {
     });
 
     return fd;
-  }, [form, mainImage, subImages, startHM, endHM]);
+  }, [form, mainImage, subImages, startH, endH]);
 
   const handleRegister = useCallback(async () => {
     if (!validate()) return;
@@ -184,10 +173,10 @@ const FacilityAddComponent = () => {
       !!form.facInfo.trim() &&
       !!String(form.capacity).trim() &&
       !!mainImage &&
-      !!startHM.h && !!startHM.m &&
-      !!endHM.h && !!endHM.m
+      !!startH &&
+      !!endH
     );
-  }, [form, mainImage, startHM, endHM]);
+  }, [form, mainImage, startH, endH]);
 
   return (
     <div className="flex mt-10 max-w-6xl mx-auto">
@@ -229,7 +218,7 @@ const FacilityAddComponent = () => {
           </div>
         ))}
 
-        {/* 예약 가능 시간 - 10분 단위 셀렉트 */}
+        {/* 예약 가능 시간 - 시만 선택 */}
         <div className="border rounded p-3">
           <h3 className="font-semibold mb-3">예약 가능 시간</h3>
 
@@ -237,55 +226,31 @@ const FacilityAddComponent = () => {
             {/* 시작 */}
             <div className="col-span-6">
               <label className="text-sm font-semibold block mb-1">시작 시간</label>
-              <div className="flex gap-2">
-                <select
-                  className={`border p-2 rounded w-1/2 ${errors.startTime || errors.timeRange ? "border-red-500" : ""}`}
-                  value={startHM.h}
-                  onChange={(e) => onChangeTime("start", "h", e.target.value)}
-                >
-                  <option value="">시</option>
-                  {HOURS.map((h) => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
-                </select>
-                <select
-                  className={`border p-2 rounded w-1/2 ${errors.startTime || errors.timeRange ? "border-red-500" : ""}`}
-                  value={startHM.m}
-                  onChange={(e) => onChangeTime("start", "m", e.target.value)}
-                >
-                  <option value="">분</option>
-                  {MINUTES.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
+              <select
+                className={`border p-2 rounded w-full ${errors.startTime || errors.timeRange ? "border-red-500" : ""}`}
+                value={startH}
+                onChange={(e) => onChangeTime("start", e.target.value)}
+              >
+                <option value="">시</option>
+                {HOURS.map((h) => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
             </div>
 
             {/* 종료 */}
             <div className="col-span-6">
               <label className="text-sm font-semibold block mb-1">종료 시간</label>
-              <div className="flex gap-2">
-                <select
-                  className={`border p-2 rounded w-1/2 ${errors.endTime || errors.timeRange ? "border-red-500" : ""}`}
-                  value={endHM.h}
-                  onChange={(e) => onChangeTime("end", "h", e.target.value)}
-                >
-                  <option value="">시</option>
-                  {HOURS.map((h) => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
-                </select>
-                <select
-                  className={`border p-2 rounded w-1/2 ${errors.endTime || errors.timeRange ? "border-red-500" : ""}`}
-                  value={endHM.m}
-                  onChange={(e) => onChangeTime("end", "m", e.target.value)}
-                >
-                  <option value="">분</option>
-                  {MINUTES.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
+              <select
+                className={`border p-2 rounded w-full ${errors.endTime || errors.timeRange ? "border-red-500" : ""}`}
+                value={endH}
+                onChange={(e) => onChangeTime("end", e.target.value)}
+              >
+                <option value="">시</option>
+                {HOURS.map((h) => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
             </div>
 
             {(errors.startTime || errors.endTime || errors.timeRange) && (
