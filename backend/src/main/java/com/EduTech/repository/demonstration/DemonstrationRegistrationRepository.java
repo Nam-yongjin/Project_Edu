@@ -29,7 +29,7 @@ public interface DemonstrationRegistrationRepository
 	@Query("SELECT reg.member.memId FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum=:demNum")
 	String selectRegMemId(@Param("demNum") Long demNum);
 
-	// 실증 기업 신청 페이지에서 회원 아이디를 불러오는 쿼리문
+	// 실증 기업 신청 페이지에서 물품 번호를 받아오는 쿼리문
 	@Query("SELECT reg.demonstration.demNum FROM DemonstrationRegistration reg WHERE reg.state=:state")
 	List<Long> selectRegDemNums(@Param("state") DemonstrationState state);
 
