@@ -126,7 +126,6 @@ const AdminMembersComponent = () => {
                     <option value="STUDENT">학생</option>
                     <option value="TEACHER">교사</option>
                     <option value="COMPANY">기업</option>
-                    <option value="ADMIN">관리자</option>
                 </select>
                 <select
                     name="state"
@@ -134,9 +133,9 @@ const AdminMembersComponent = () => {
                     className="input-focus"
                 >
                     <option value="">상태 선택</option>
-                    <option value="NORMAL">정상</option>
-                    <option value="BEN">정지</option>
-                    <option value="LEAVE">탈퇴</option>
+                    <option value="NORMAL">NORMAL</option>
+                    <option value="BEN">BEN</option>
+                    <option value="LEAVE">LEAVE</option>
                 </select>
 
                 {/* 정렬 기준 + 방향 버튼 */}
@@ -230,9 +229,9 @@ const AdminMembersComponent = () => {
                     className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">상태 선택</option>
-                    <option value="NORMAL">정상</option>
-                    <option value="BEN">정지</option>
-                    <option value="LEAVE">탈퇴</option>
+                    <option value="NORMAL">NORMAL</option>
+                    <option value="BEN">BEN</option>
+                    <option value="LEAVE">LEAVE</option>
                 </select>
                 <button
                     onClick={handleChangeState}

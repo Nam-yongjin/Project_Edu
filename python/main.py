@@ -6,9 +6,11 @@ from datetime import datetime
 from visit import visitors
 from member import member_role_stats
 from event import event_category_stats
+from facility import popular_facility_times
 
 app = FastAPI()
 
+# DB 접속
 def get_connection():
     return pymysql.connect(
         host="localhost",
@@ -64,3 +66,8 @@ async def memberRole_stats():
 @app.get("/api/admin/eventCategory")
 async def eventCategory_stats():
     return event_category_stats()
+
+# 공간 대여 인기 시간대
+@app.get("/api/admin/popular_facTimes")
+async def popular_facTimes():
+    return popular_facility_times()

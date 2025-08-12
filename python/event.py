@@ -14,7 +14,7 @@ def get_connection():
 def event_category_stats():
     conn = get_connection()
     df = pd.read_sql("""
-        SELECT category, COUNT(*) AS count
+        SELECT category, SUM(curr_capacity) AS curr_capacity, COUNT(*) AS count
         FROM event_info
         GROUP BY category
     """, conn)
@@ -22,4 +22,4 @@ def event_category_stats():
 
     total = df["count"].sum()
     df["ratio"] = round(df["count"] / total * 100, 2)
-    return df.to_dict(orient="records")
+    return df.to_dict(orient="records") # JSON 형태로 변환
