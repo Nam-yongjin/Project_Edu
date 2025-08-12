@@ -87,23 +87,23 @@ const MemberInfoModifyComponent = () => {
         const errs = {};
 
         if (!/^[A-Za-z0-9!@#$.]{6,16}$/.test(form.pw)) {
-            errs.pw = '비밀번호는 6~16자, 영문/숫자, 특수문자(!@#$.)만 사용 가능합니다.';
+            errs.pw = '🚫 비밀번호는 6~16자, 영문/숫자, 특수문자(!@#$.)만 사용 가능합니다.';
         };
 
         if (form.pw !== form.pwCheck) {
-            errs.pwCheck = '비밀번호가 일치하지 않습니다.';
+            errs.pwCheck = '🚫 비밀번호가 일치하지 않습니다.';
         };
 
         if (!/^[가-힣]{1,6}$/.test(form.name)) {
-            errs.name = '이름은 한글 6자 이하여야 합니다.';
+            errs.name = '🚫 이름은 한글 6자 이하여야 합니다.';
         };
 
         if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-            errs.email = '유효한 이메일을 입력해주세요.';
+            errs.email = '🚫 유효한 이메일을 입력해주세요.';
         };
 
         if (!verifiedPhone) {
-            errs.phone = '휴대폰 인증이 필요합니다.';
+            errs.phone = '🚫 휴대폰 인증이 필요합니다.';
         };
 
         return errs;
@@ -212,7 +212,7 @@ const MemberInfoModifyComponent = () => {
                             name="memId"
                             value={form.memId}
                             disabled={true}
-                            className="flex-1 input-focus cursor-not-allowed" />
+                            className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
                     </div>
                 </div>
                 {modifying ?
@@ -307,7 +307,7 @@ const MemberInfoModifyComponent = () => {
                             type="date"
                             value={form.birthDate}
                             disabled={true}
-                            className="flex-1 input-focus cursor-not-allowed" />
+                            className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
                     </div>
                 </div>
 
@@ -318,7 +318,7 @@ const MemberInfoModifyComponent = () => {
                             name="gender"
                             value={form.gender}
                             disabled={true}
-                            className="flex-1 input-focus cursor-not-allowed" />
+                            className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
                     </div>
                 </div>
 
