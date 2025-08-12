@@ -5,14 +5,14 @@ const SubDemonstrationHeader = () => {
     const location = useLocation();
     const loginState = useSelector((state) => state.loginState);
     return (
-        <div className="bg-blue-100 w-full pt-8 pb-8">
+        <div className="bg-purple-100 w-full pt-8 pb-8">
             <div className="max-w-screen-xl mx-auto ">
                 <div className="min-blank flex items-center justify-between">
                     <div className="newText-4xl font-bold text-gray-800">
                         실증
                     </div>
                     <div className="w-1/4">
-                        <img src={demonstration} className="w-[400px] p-4" />
+                        <img src={demonstration} className="w-[185px] p-4" />
                         {/* <a href="https://www.flaticon.com/free-icons/notebook" title="notebook icons">Notebook icons created by Freepik - Flaticon</a>*/}
                     </div>
                 </div>
