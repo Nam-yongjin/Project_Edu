@@ -17,8 +17,10 @@ import com.EduTech.dto.qna.QuestionDTO;
 import com.EduTech.dto.qna.QuestionUpdateDTO;
 import com.EduTech.dto.qna.QuestionWriteDTO;
 import com.EduTech.dto.qna.SearchDTO;
+import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.qna.Question;
+import com.EduTech.repository.demonstration.DemonstrationReserveSpecs;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.qna.AnswerRepository;
 import com.EduTech.repository.qna.QnASpecs;
@@ -35,36 +37,35 @@ public class QuestionServiceImpl implements QuestionService {
 	private final AnswerRepository answerRepository;
 	private final ModelMapper modelMapper;
 	private final MemberRepository memberRepository;
+	/*
 	public PageResponseDTO<QuestionDTO> QnAView(SearchDTO searchDTO,Integer pageCount) {
-		List<QuestionDTO> QPage=new ArrayList<>();
-		Specification<Question> spec = Specification.where(null);
-		
-		if(searchDTO.getMemId()!=null&&!searchDTO.getMemId().isBlank())
-		{
-			spec = spec.and(QnASpecs.memIdContains(searchDTO.getMemId()));
-		}
-		else if(searchDTO.getTitle()!=null&&!searchDTO.getTitle().isBlank())
-		{
-			spec=spec.and(QnASpecs.titleContains(searchDTO.getTitle()));
-		}
-		Pageable pageable = PageRequest.of(pageCount, 10, Sort.by("questionNum").descending());
+		Specification<Question> spec = QnASpecs.searchQnA(
+				searchDTO.getType(),
+		        searchDTO.getSearch(),
+		       searchDTO.getSortBy(),
+		       searchDTO.getSort()
+		    );
+		 Pageable pageable = PageRequest.of(pageCount, 10);
 		Page<Question> questionPage = questionRepository.findAll(spec, pageable);	
 		
-		for(Question question:questionPage)
-		{
-			QuestionDTO questionDTO=modelMapper.map(question,QuestionDTO.class);
-			questionDTO.setAnswerList(answerRepository.selectAnswer(question.getQuestionNum()));
-			QPage.add(questionDTO);
-		}
+		QuestionDTO QPage=new QuestionDTO();
 	
 		return new PageResponseDTO<QuestionDTO>(QPage,questionPage.getTotalPages(),questionPage.getNumber());
+	}  */
+	
+	public void QnAViewDetail(Long questionNum) {
+		System.out.println("Hello!");
+		
 	}
 	
 	// 회원이 질문 글 추가할때 사용하는 기능
-	public void addQuestion(QuestionWriteDTO questionWriteDTO) {
+	public void addQuestion(QuestionWriteDTO questionWriteDTO,String memId) {
 		Question question=modelMapper.map(questionWriteDTO, Question.class);
-		Member member = memberRepository.findById(questionWriteDTO.getMemId())
+		Member member = memberRepository.findById(memId)
 			    .orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
+		question.setContent(questionWriteDTO.getTitle());
+		question.setTitle(questionWriteDTO.getTitle());
+		question.setState(questionWriteDTO.getState());
 		question.setMember(member);
 		 question.setView(0L);
 		 question.setAnswer(new ArrayList<>());
