@@ -15,4 +15,6 @@ public interface PublicHolidayRepository extends JpaRepository<PublicHoliday, Lo
     
     boolean existsByDateBetween(LocalDate start, LocalDate end);
     
+    long deleteByDate(LocalDate date);
+    
 }
