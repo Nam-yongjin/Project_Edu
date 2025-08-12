@@ -162,7 +162,7 @@ const NewsListComponent = () => {
   return (
     <div className="w-full px-4 mt-10 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">언론보도</h1>
+        <h1 className="newText-2xl font-bold text-gray-900">언론보도</h1>
         <p className="text-gray-600 mt-1">
           전체 {totalElements}건의 뉴스가 있습니다.
         </p>
@@ -175,7 +175,7 @@ const NewsListComponent = () => {
       />
 
       {/* 언론보도 테이블 */}
-      <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white page-shadow overflow-hidden">
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -196,11 +196,11 @@ const NewsListComponent = () => {
                       />
                     </th>
                   )}
-                  <th className="w-16 px-2 py-3 text-center text-sm font-medium text-gray-900">번호</th>
-                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-900">제목</th>
-                  <th className="w-28 px-3 py-3 text-center text-sm font-medium text-gray-900">작성자</th>
-                  <th className="w-36 px-3 py-3 text-center text-sm font-medium text-gray-900">작성일</th>
-                  <th className="w-24 px-3 py-3 text-center text-sm font-medium text-gray-900">조회수</th>
+                  <th className="w-16 px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
+                  <th className="px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
+                  <th className="w-28 px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                  <th className="w-36 px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
+                  <th className="w-24 px-3 py-3 text-center newText-sm font-medium text-gray-900">조회수</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -230,26 +230,26 @@ const NewsListComponent = () => {
                         </td>
                       )}
                       {/* 역순 번호 */}
-                      <td className="px-4 py-3 text-center text-sm text-gray-900">
+                      <td className="px-4 py-3 text-center newText-sm text-gray-900">
                         {totalElements - (currentPage * searchParams.size) - index}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center">
                           <Link //제목 누르면 상세페이지로 넘어감
                             to={`/news/NewsDetail/${news.newsNum}`}
-                            className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                            className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
                           >
                             {news.title}
                           </Link>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-center text-sm text-gray-500">
+                      <td className="px-4 py-3 text-center newText-sm text-gray-500">
                         {news.name}
                       </td>
-                      <td className="px-4 py-3 text-center text-sm text-gray-500">
+                      <td className="px-4 py-3 text-center newText-sm text-gray-500">
                         {formatDate(news.createdAt)}
                       </td>
-                      <td className="px-4 py-3 text-center text-sm text-gray-500">
+                      <td className="px-4 py-3 text-center newText-sm text-gray-500">
                         {news.viewCount?.toLocaleString() || 0}
                       </td>
                     </tr>
