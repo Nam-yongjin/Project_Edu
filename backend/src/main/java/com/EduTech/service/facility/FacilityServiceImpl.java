@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
+import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.entity.facility.Facility;
 import com.EduTech.entity.facility.FacilityHoliday;
 import com.EduTech.entity.facility.FacilityImage;
@@ -313,15 +315,32 @@ public class FacilityServiceImpl implements FacilityService {
     // 휴무일 리스트 (전체)
     @Override
     @Transactional(readOnly = true)
-    public List<LocalDate> getHolidayDates(Long facRevNum) {
-        // 기존 로직 유지: 전체 조회 후 합치기
-        var nat = publicHolidayRepository.findAll().stream().map(PublicHoliday::getDate);
-        var fac = facilityHolidayRepository.findByFacility_FacRevNum(facRevNum)
-                .stream().map(FacilityHoliday::getHolidayDate);
+    public List<HolidayDayDTO> getHolidayDates(@org.springframework.lang.Nullable Long facRevNum) {
+        // 전국 공휴일 -> (date, name, "PUBLIC")
+        var nat = publicHolidayRepository.findAll()
+                .stream()
+                .map(ph -> HolidayDayDTO.builder()
+                        .date(ph.getDate())
+                        .label(ph.getName())   // PublicHoliday.name 그대로 사용
+                        .type("PUBLIC")
+                        .build());
 
+        // 시설 휴무일 -> (holidayDate, reason.label, "FACILITY")
+        var facStream = (facRevNum == null)
+                ? facilityHolidayRepository.findAll().stream()
+                : facilityHolidayRepository.findByFacility_FacRevNum(facRevNum).stream();
+
+        var fac = facStream
+                .map(fh -> HolidayDayDTO.builder()
+                        .date(fh.getHolidayDate())
+                        .label(fh.getReason().getLabel()) // <-- enum 라벨 바로 사용
+                        .type("FACILITY")
+                        .build());
+
+        // 같은 날짜에 공휴일 + 시설휴무가 함께 있을 수 있으니 그대로 합쳐서 반환
         return Stream.concat(nat, fac)
-                .distinct()
-                .sorted()
+                .sorted(Comparator.comparing(HolidayDayDTO::getDate)
+                        .thenComparing(HolidayDayDTO::getType))
                 .toList();
     }
 

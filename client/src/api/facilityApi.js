@@ -1,4 +1,4 @@
-//import axios from "axios";
+import axios from "axios";
 import jwtAxios from "../util/jwtUtil";
 import { API_SERVER_HOST } from "./config";
 import { API_MAPPING } from "./config";
@@ -21,6 +21,20 @@ export const FacilityList = async ({ page = 1, size = 12, keyword = "" }) => {
 
 export const getFacilityDetail = async (facRevNum) => {
   const res = await jwtAxios.get(`${facility}/facilityDetail`, {
+    params: { facRevNum }
+  });
+  return res.data;
+};
+
+// 전체 시설 기준 휴무일 (HolidayDayDTO[])
+export const getAllHolidays = async () => {
+  const res = await axios.get(`${facility}/holidays`);
+  return res.data; 
+};
+
+// 특정 시설 기준 휴무일(옵션) (HolidayDayDTO[])
+export const getFacilityHolidays = async (facRevNum) => {
+  const res = await axios.get(`${facility}/holidays`, {
     params: { facRevNum }
   });
   return res.data;

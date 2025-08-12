@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.facility.FacilityDetailDTO;
@@ -16,6 +17,7 @@ import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
+import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.entity.facility.FacilityState;
 
 public interface FacilityService {
@@ -48,8 +50,8 @@ public interface FacilityService {
     boolean cancelReservation(Long reserveId, String requesterId);
 
     // 휴무일
-    boolean isHoliday(Long facRevNum, LocalDate date);
-    List<LocalDate> getHolidayDates(Long facRevNum);
+    boolean isHoliday(@Nullable Long facRevNum, LocalDate date);
+    List<HolidayDayDTO> getHolidayDates(@Nullable Long facRevNum);
 
     // 휴무일 등록/삭제
     void registerHoliday(FacilityHolidayDTO dto);

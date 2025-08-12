@@ -24,4 +24,10 @@ public interface FacilityHolidayRepository extends JpaRepository<FacilityHoliday
     // 특정 기간 동안의 휴무일 조회
     List<FacilityHoliday> findByFacility_FacRevNumAndHolidayDateBetween(Long facRevNum, LocalDate start, LocalDate end);
     
+    // 전체 시설의 모든 휴무일
+    List<FacilityHoliday> findAllByOrderByHolidayDateAsc();
+
+    // 또는 특정 기간 전체 시설
+    List<FacilityHoliday> findByHolidayDateBetween(LocalDate start, LocalDate end);
+    
 }

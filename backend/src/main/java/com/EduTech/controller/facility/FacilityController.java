@@ -32,6 +32,7 @@ import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
+import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.service.facility.FacilityService;
 
@@ -150,16 +151,17 @@ public class FacilityController {
 
     // 휴무일 목록 조회 (시설 PK 기준)
     @GetMapping("/holidays")
-    public ResponseEntity<List<LocalDate>> getHolidayDates(@RequestParam("facRevNum") Long facRevNum) {
+    public ResponseEntity<List<HolidayDayDTO>> getHolidayDates(
+            @RequestParam(value = "facRevNum", required = false) Long facRevNum) {
         return ResponseEntity.ok(facilityService.getHolidayDates(facRevNum));
     }
 
+
     // 특정 날짜 휴무 여부 (시설 PK 기준)
-    @GetMapping("/holiday/check")
     public ResponseEntity<Boolean> isHoliday(
-            @RequestParam("facRevNum") Long facRevNum,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
+            @RequestParam(value = "facRevNum", required = false) Long facRevNum,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(facilityService.isHoliday(facRevNum, date));
     }
+    
 }
