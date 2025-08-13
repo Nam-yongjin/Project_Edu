@@ -32,7 +32,7 @@ public interface FacilityService {
     FacilityDetailDTO getFacilityDetail(Long facRevNum);
 
     // 예약 신청
-    void reserveFacility(FacilityReserveRequestDTO requestDTO);
+    void reserveFacility(FacilityReserveRequestDTO requestDTO, String memId);
 
     // 예약 가능 여부
     boolean isReservable(Long facRevNum, LocalDate date, LocalTime start, LocalTime end);

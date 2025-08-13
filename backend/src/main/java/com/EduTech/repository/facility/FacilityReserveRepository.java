@@ -3,6 +3,7 @@ package com.EduTech.repository.facility;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -75,6 +76,16 @@ public interface FacilityReserveRepository extends JpaRepository<FacilityReserve
     // 특정일시 현재 예약중인지 확인(사용)
     List<FacilityReserve> findByFacility_FacRevNumAndFacDateAndStateIn(
             Long facRevNum, LocalDate facDate, List<FacilityState> states);
+    
+    // 현재 memId값을 시준으로 예약을 했는지 확인(시설마다)(사용)
+    boolean existsByFacility_FacRevNumAndMember_MemIdAndFacDateAndStateIn(
+            Long facRevNum, String memId, LocalDate facDate,
+            Collection<FacilityState> states);
+    
+    // 시설 무관하여 전체 1회로 제한시
+    boolean existsByMember_MemIdAndFacDateAndStateIn(
+            String memId, LocalDate facDate, Collection<FacilityState> states);
+
 
     // 회원 탈퇴 제한 체크
     @Query("""

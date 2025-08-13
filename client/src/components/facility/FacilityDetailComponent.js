@@ -1,4 +1,3 @@
-// src/components/FacilityDetailContent.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   addDays, addMonths, startOfMonth, endOfMonth,
@@ -32,7 +31,7 @@ const toYmd = (d) => format(d, "yyyy-MM-dd");
 const todayYmd = () => format(new Date(), "yyyy-MM-dd");
 const nowHHmm = () => format(new Date(), "HH:mm");
 
-/** "HH:mm[:ss]" 등 → "HH:mm" */
+/* "HH:mm[:ss]" 등 → "HH:mm" */
 function normalizeHHmm(v) {
   if (v == null) return null;
   if (typeof v === "string") {
@@ -46,7 +45,7 @@ function normalizeHHmm(v) {
   return null;
 }
 
-/** 시작시간 라디오 목록(1시간 간격) */
+/* 시작시간 라디오 목록(1시간 간격) */
 function genStartSlots(openHHmm, closeHHmm) {
   const base = new Date();
   let s = parse(openHHmm, "HH:mm", base);
@@ -75,7 +74,7 @@ function calcEndHHmm(startHHmm, hours) {
 
 /* ---- 겹침 판정 유틸(문자열 HH:mm 비교 사용) ---- */
 const lt = (a, b) => a < b;
-/** 반개구간 [s, e) 기준(끝==시작은 겹치지 않음) */
+/* 반개구간 [s, e) 기준(끝==시작은 겹치지 않음) */
 function overlaps(s1, e1, s2, e2) {
   return lt(s1, e2) && lt(s2, e1);
 }
@@ -199,7 +198,7 @@ export default function FacilityDetailContent({ facRevNum }) {
   /* -------------------- 달력 -------------------- */
   const monthLabel = format(currentMonth, "yyyy. MM", { locale: ko });
 
-  // "이전 달 금지"
+  /* 이전 달 금지 */
   const minMonthStart = startOfMonth(new Date());
   const isPrevDisabled = startOfMonth(currentMonth) <= minMonthStart;
 
@@ -224,7 +223,7 @@ export default function FacilityDetailContent({ facRevNum }) {
   function handleDayClick(d) {
     const ymd = toYmd(d);
     if (!isSameMonth(d, currentMonth)) return;
-    if (ymd < todayYmd()) return; // 과거 날짜 비활성화
+    if (ymd < todayYmd()) return;
     setSelectedDate(ymd);
     setStartKey(null);
     setDurationHrs(null);
@@ -235,7 +234,7 @@ export default function FacilityDetailContent({ facRevNum }) {
   const open  = normalizeHHmm(data?.reserveStart) ?? "09:00";
   const close = normalizeHHmm(data?.reserveEnd)   ?? "18:00";
 
-  // 오늘이면 "시작 시간이 현재 이후"인 슬롯만 표시 (FIX)
+  /* 오늘이면 "시작 시간이 현재 이후"인 슬롯만 표시 */
   const baseStartSlots = useMemo(() => {
     const base = genStartSlots(open, close);
     if (selectedDate === todayYmd()) {
@@ -245,11 +244,11 @@ export default function FacilityDetailContent({ facRevNum }) {
     return base;
   }, [open, close, selectedDate]);
 
-  // 예약 블록을 고려해 시작 슬롯을 필터링
+  /* 예약 블록을 고려해 시작 슬롯을 필터링 */
   function buildFilteredStartSlots(slots, blocks) {
     const out = [];
     for (const s of slots) {
-      const tmpEnd = calcEndHHmm(s.key, 1); // 최소 1시간 가정
+      const tmpEnd = calcEndHHmm(s.key, 1);
       const blocked = blocks.some((b) => overlaps(s.key, tmpEnd, b.start, b.end));
       if (!blocked) out.push(s);
     }
@@ -265,7 +264,7 @@ export default function FacilityDetailContent({ facRevNum }) {
     ? `${startKey} ~ ${calcEndHHmm(startKey, durationHrs)}`
     : "-";
 
-  // 오늘이면 "시작 시간이 현재 이후"일 때만 허용 (FIX)
+  /* 오늘이면 "시작 시간이 현재 이후"일 때만 허용 */
   const notPastTimeOK =
     !startKey || !durationHrs || (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
 
@@ -305,7 +304,6 @@ export default function FacilityDetailContent({ facRevNum }) {
     const hours = [1, 2, 3, 4];
     return hours.map((h) => {
       const allowedByClose = startKey ? (h <= maxHrsFromStart) : false;
-      // 오늘은 시작 시간이 현재 이후면 OK (FIX)
       const allowedByNow = !startKey ? false : (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
       const allowedByBlocks = durationAllowedByBlocks(h);
       const allowed = allowedByClose && allowedByNow && allowedByBlocks;
@@ -334,12 +332,13 @@ export default function FacilityDetailContent({ facRevNum }) {
     setNotice("");
     createReservation({
       facRevNum,
-      facDate: selectedDate,                 // "YYYY-MM-DD"
-      startTime: startKey,                   // "HH:mm"
-      endTime: calcEndHHmm(startKey, durationHrs), // "HH:mm"
+      facDate: selectedDate,
+      startTime: startKey,
+      endTime: calcEndHHmm(startKey, durationHrs),
     })
-      .then(() => {
-        setNotice("예약 신청이 완료되었습니다. (승인 대기)");
+      .then((res) => {
+        const okMsg = res?.message || "예약 신청이 완료되었습니다. (승인 대기)";
+        setNotice(okMsg);
         return getReservedBlocks(facRevNum, selectedDate);
       })
       .then((blocks) => {
@@ -352,11 +351,24 @@ export default function FacilityDetailContent({ facRevNum }) {
         setReservedBlocks(list);
       })
       .catch((e) => {
-        const msg = e?.response?.data?.message || e?.message || "예약 신청 중 오류가 발생했습니다.";
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "예약 신청 중 오류가 발생했습니다.";
         setNotice(msg);
       })
       .finally(() => setSubmitting(false));
   }
+
+  /* -------------------- 렌더 전 안내문 색상 판단 -------------------- */
+  const isErrorNotice =
+    typeof notice === "string" &&
+    notice.length > 0 &&
+    (notice.includes("오류") ||
+     notice.includes("불가") ||
+     notice.includes("이미") ||
+     notice.includes("중복") ||
+     notice.includes("로그인"));
 
   /* -------------------- 로딩/에러 -------------------- */
   if (detailLoading) {
@@ -438,6 +450,13 @@ export default function FacilityDetailContent({ facRevNum }) {
             <Row label="구비품목" value={data?.facItem ?? "-"} />
             <Row label="유의사항" value={data?.etc ?? "-"} />
           </dl>
+
+          {/* 서버로부터 수신한 안내/오류 메시지 표시 */}
+          {notice && (
+            <div className={`mt-4 text-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
+              {notice}
+            </div>
+          )}
         </div>
       </div>
 
@@ -471,6 +490,8 @@ export default function FacilityDetailContent({ facRevNum }) {
         notice={notice}
         renderStartOptions={renderStartOptions}
         renderDurationButtons={renderDurationButtons}
+        /* 변경점: 하위 컴포넌트에 isErrorNotice 전달 */
+        isErrorNotice={isErrorNotice}
       />
     </div>
   );
@@ -483,7 +504,9 @@ function CalendarAndReserve(props) {
     selectedDateHasAnyHoliday, startSlots, startKey, setStartKey,
     durationHrs, setDurationHrs, maxHrsFromStart, endTimeText,
     canReserve, applyReserve, holLoading, holError, submitting, notice,
-    renderStartOptions, renderDurationButtons
+    renderStartOptions, renderDurationButtons,
+    /* 변경점: 전달받은 isErrorNotice를 구조 분해 */
+    isErrorNotice
   } = props;
 
   const onPrevMonth = () => { if (!isPrevDisabled) setCurrentMonth(addMonths(currentMonth, -1)); };
@@ -624,7 +647,12 @@ function CalendarAndReserve(props) {
             {submitting ? "전송 중..." : "예약 신청하기"}
           </button>
 
-          {notice && <div className="mt-3 text-sm text-gray-700">{notice}</div>}
+          {/* 패널 하단에도 알림 표시 */}
+          {notice && (
+            <div className={`mt-3 text-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
+              {notice}
+            </div>
+          )}
         </div>
       </aside>
     </div>
