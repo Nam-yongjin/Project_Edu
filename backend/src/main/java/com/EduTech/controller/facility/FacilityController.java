@@ -3,14 +3,17 @@ package com.EduTech.controller.facility;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,9 +79,21 @@ public class FacilityController {
 
     // 예약 신청(사용)
     @PostMapping("/reserve")
-    public ResponseEntity<Void> reserveFacility(@RequestBody @Valid FacilityReserveRequestDTO dto) {
-        facilityService.reserveFacility(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, String>> reserveFacility(
+            @RequestBody @Valid FacilityReserveRequestDTO dto,
+            @AuthenticationPrincipal(expression = "username") String memId
+    ) {
+        try {
+            facilityService.reserveFacility(dto, memId);
+            return ResponseEntity.ok(Map.of("message", "예약 신청이 완료되었습니다. (승인 대기)"));
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            // 예: "해당 시설에서 오늘은 이미 예약하셨습니다. (하루 1회 제한)"
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "예약 처리 중 오류가 발생했습니다."));
+        }
     }
     
     // 예약 가능 시간 설정(현재 예약중인거 제외처리)

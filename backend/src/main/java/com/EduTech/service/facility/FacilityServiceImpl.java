@@ -5,11 +5,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,6 +76,9 @@ public class FacilityServiceImpl implements FacilityService {
         int javaDow = date.getDayOfWeek().getValue(); // MON=1..SUN=7
         return (javaDow == DayOfWeek.SUNDAY.getValue()) ? 1 : javaDow + 1; // SUN->1, MON->2 .. SAT->7
     }
+    
+    private static final EnumSet<FacilityState> ACTIVE_STATES =
+            EnumSet.of(FacilityState.WAITING, FacilityState.APPROVED);
     // ----------------------------------------------------------------------
 
     // 공휴일 + 시설 휴무일 집합 (중복 제거, 정렬 유지)(사용x)
@@ -181,61 +186,77 @@ public class FacilityServiceImpl implements FacilityService {
         if (!end.isAfter(start)) return false;
         if (LocalDateTime.of(date, end).isBefore(LocalDateTime.now())) return false;
 
-        // 휴무일(공휴일) 체크
+        // 공휴일(시설 휴무 포함 정책이면 여기에서 함께 체크)
         if (publicHolidayRepository.existsByDate(date)) return false;
 
-        // 운영시간 범위 체크
-        Facility fac = facilityRepository.findById(facRevNum)
-                .orElse(null);
+        // 운영시간 범위
+        Facility fac = facilityRepository.findById(facRevNum).orElse(null);
         if (fac == null) return false;
-        LocalTime rs = fac.getReserveStart();
-        LocalTime re = fac.getReserveEnd();
-        if (rs != null && re != null) {
-            if (start.isBefore(rs) || end.isAfter(re)) return false;
-        }
+        LocalTime rs = fac.getReserveStart(), re = fac.getReserveEnd();
+        if (rs != null && re != null && (start.isBefore(rs) || end.isAfter(re))) return false;
 
         // 최대 4시간 연속
         if (java.time.Duration.between(start, end).toHours() > 4) return false;
 
-        // 예약 겹침(대기/승인만 충돌로 간주)
-        return !facilityReserveRepository
-                .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
-                        facRevNum, date, end, start,
-                        List.of(FacilityState.WAITING, FacilityState.APPROVED));
+        // ★ 활성 상태(대기/수락)만 충돌로 간주
+        boolean overlaps =
+                facilityReserveRepository
+                        .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
+                                facRevNum, date, end, start, ACTIVE_STATES);
+
+        return !overlaps;
     }
 
     // 예약 신청 처리
     @Override
     @Transactional
-    public void reserveFacility(FacilityReserveRequestDTO requestDTO) {
-        Facility facility = facilityRepository.findById(requestDTO.getFacRevNum())
-                .orElseThrow(() -> new RuntimeException("시설 정보가 존재하지 않습니다."));
+    public void reserveFacility(final FacilityReserveRequestDTO req, final String memId) {
+        requireLogin(memId);
 
-        if (!isReservable(facility.getFacRevNum(),
-                requestDTO.getFacDate(),
-                requestDTO.getStartTime(),
-                requestDTO.getEndTime())) {
+        final Facility facility = facilityRepository.findById(req.getFacRevNum())
+                .orElseThrow(() -> new IllegalArgumentException("시설 정보가 존재하지 않습니다."));
+
+        // 시간/운영/휴무/겹침 등 정책검사 (기존 로직 재사용)
+        if (!isReservable(facility.getFacRevNum(), req.getFacDate(), req.getStartTime(), req.getEndTime())) {
             throw new IllegalStateException("해당 시간은 이미 예약되었거나 예약할 수 없습니다.");
         }
 
-        FacilityReserve reserve = new FacilityReserve();
-        reserve.setFacility(facility);
-        reserve.setFacDate(requestDTO.getFacDate());
-        reserve.setStartTime(requestDTO.getStartTime());
-        reserve.setEndTime(requestDTO.getEndTime());
-        // ★ 권장: JWT에서 현재 사용자 ID 추출해 Member 주입
-        // String currentMemId = SecurityContextHolder.getContext().getAuthentication().getName();
-        // Member member = memberRepository.findById(currentMemId)
-        //         .orElseThrow(() -> new RuntimeException("회원 정보가 존재하지 않습니다."));
-        // reserve.setMember(member);
+        final Member member = memberRepository.findById(memId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
 
+        // 중복 예약 방지: 같은 시설 + 같은 날짜 + 같은 사용자 (대기/승인 상태만 충돌로 간주)
+        final boolean already = facilityReserveRepository
+                .existsByFacility_FacRevNumAndMember_MemIdAndFacDateAndStateIn(
+                        facility.getFacRevNum(), memId, req.getFacDate(), ACTIVE_STATES);
+        if (already) {
+            throw new IllegalStateException("해당 시설에서 오늘은 이미 예약하셨습니다. (하루 1회 제한)");
+        }
+
+        // 예약 생성
+        final FacilityReserve reserve = new FacilityReserve();
+        reserve.setFacility(facility);
+        reserve.setMember(member);
+        reserve.setFacDate(req.getFacDate());
+        reserve.setStartTime(req.getStartTime());
+        reserve.setEndTime(req.getEndTime());
         reserve.setReserveAt(LocalDateTime.now());
         reserve.setState(FacilityState.WAITING);
 
-        facilityReserveRepository.save(reserve);
+        // 동시성 대비(DB 유니크 제약을 둔 경우 메시지 변환)
+        try {
+            facilityReserveRepository.save(reserve);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException("이미 오늘 예약이 존재합니다. (중복 예약 불가)", e);
+        }
+    }
+
+    private static void requireLogin(String memId) {
+        if (memId == null || memId.isBlank()) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
     }
     
-    // 예약 가능 시간 확인(현재 예약중인 시간 제외)(ㅏ용)
+    // 예약 가능 시간 확인(현재 예약중인 시간 제외)(사용)
     @Override
     @Transactional(readOnly = true)
     public List<ReservedBlockDTO> getReservedBlocks(Long facRevNum, LocalDate date) {
