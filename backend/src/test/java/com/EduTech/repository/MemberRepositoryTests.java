@@ -22,7 +22,6 @@ import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
-import com.EduTech.repository.event.EventBannerRepository;
 import com.EduTech.repository.event.EventInfoRepository;
 import com.EduTech.repository.event.EventUseRepository;
 import com.EduTech.repository.member.CompanyRepository;
@@ -72,14 +71,12 @@ public class MemberRepositoryTests {
 	@MockBean
 	private NoticeFileRepository noticeFileRepository;
 	@MockBean
-	private EventBannerRepository eventBannerRepository;
-	@MockBean
 	private EventInfoRepository eventInfoRepository;
 	@MockBean
 	private EventUseRepository eventUseRepository;
 
 //	등록 테스트
-	@Test
+//	@Test
 	@Transactional
 	@Commit
 	public void testInsertMember() {
@@ -105,7 +102,7 @@ public class MemberRepositoryTests {
 	}
 	
 //	 관리자계정
-//	@Test
+	@Test
 	@Transactional
 	@Commit
 	public void testInsertAdmin() {
