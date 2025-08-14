@@ -41,7 +41,7 @@ public interface FacilityService {
     List<ReservedBlockDTO> getReservedBlocks(Long facRevNum, LocalDate date);
 
     // 내 예약 목록
-    List<FacilityReserveListDTO> getMyReservations(String memId);
+    Page<FacilityReserveListDTO> getMyReservations(String memId, Pageable pageable);
 
     // 관리자 목록
     List<FacilityReserveAdminDTO> getReservationsForAdmin(FacilityState state, LocalDate from, LocalDate to);

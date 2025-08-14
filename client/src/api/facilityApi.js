@@ -70,3 +70,11 @@ export const getReservedBlocks = async (facRevNum, date) => {
   });
   return res.data;
 };
+
+// 사용자 예약행사 조회
+export const getMyReservations = async ({ page = 0, size = 5, sort = "reserveAt,DESC" } = {}) => {
+  const res = await jwtAxios.get(`${facility}/reservations`, {
+    params: { page, size, sort },
+  });
+  return res.data; // Spring Page<EventUseDTO>와 동일한 구조 { content, totalPages, ... }
+};
