@@ -236,7 +236,7 @@ const AdminResComponent = () => {
                                                 <img
                                                     src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                     alt={member.demName}
-                                                    onClick={() => moveToPath(`../detail/${member.demNum}`)}
+                                                    onClick={() => moveToPath(`../../demonstration/detail/${member.demNum}`)}
                                                     className="w-16 h-16 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer mx-auto"
                                                 />
                                             ) : (

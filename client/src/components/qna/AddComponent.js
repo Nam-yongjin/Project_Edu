@@ -1,20 +1,33 @@
 import { useState } from "react";
-import {postAdd} from "../../api/qnaApi";
+import { questionAdd } from "../../api/qnaApi";
 import useMove from "../../hooks/useMove";
+import lock from '../../assets/lock.png';
+import lockNO from '../../assets/lockNo.png';
 const AddComponent = () => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-    const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
+  const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
 
-    const addQuestion=async()=> {
-         await postAdd(title,content,isPrivate);
-         alert("글 등록 완료");
-         moveToPath("/question/select");
-    };
 
-    return (
-    <div className="w-full mx-auto p-6 bg-white shadow rounded-lg">
+  const addQuestion = async () => {
+    if(title.trim()==="")
+    {
+      alert("글 제목을 입력해주세요");
+      return;
+    }
+    if(content.trim()==="")
+    {
+      alert("글 내용을 입력해주세요");
+      return;
+    }
+    await questionAdd(title, content, isPrivate);
+    alert("글 등록 완료");
+    moveToPath("/question/select");
+  };
+
+  return (
+     <div className="w-full max-w-screen-xl mx-auto px-4 mt-10 sm:px-6 md:px-8 lg:px-12">
       <h2 className="text-2xl my-4 font-bold">질문 등록</h2>
 
       <div className="flex justify-between items-center mb-4">
@@ -30,58 +43,15 @@ const AddComponent = () => {
           title={isPrivate ? "비밀글 해제" : "비밀글 설정"}
         >
           {isPrivate ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-7 h-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8 11V8a4 4 0 018 0v3"
-              />
-              <rect
-                x="5"
-                y="11"
-                width="14"
-                height="10"
-                rx="2"
-                ry="2"
-                stroke="currentColor"
-                fill="none"
-              />
-            </svg>
+            <img src={lock} className="w-6 h-6 mr-2 flex-shrink-0" alt="lock" />
+            // <a href="https://www.flaticon.com/kr/free-icons/" title="자물쇠 아이콘">자물쇠 아이콘 제작자: Freepik - Flaticon</a>
           ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-7 h-7"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 8a4 4 0 00-8 0v3"
-              />
-              <rect
-                x="5"
-                y="11"
-                width="14"
-                height="10"
-                rx="2"
-                ry="2"
-                stroke="currentColor"
-                fill="none"
-              />
-            </svg>
+           <img src={lockNO} className="w-6 h-6 mr-2 flex-shrink-0" alt="lockNO" />
+           //<a href="https://www.flaticon.com/kr/free-icons/" title="자물쇠 아이콘">자물쇠 아이콘 제작자: Freepik - Flaticon</a> 
           )}
         </button>
       </div>
+      
 
       <textarea
         value={content}
@@ -89,11 +59,11 @@ const AddComponent = () => {
         placeholder="글 내용을 입력하세요..."
         className="w-full min-h-[300px] border border-gray-300 p-2 rounded resize-y"
       />
-
+  
       <div className="mt-4 text-right">
         <button
           onClick={() => {
-          addQuestion();
+            addQuestion();
           }}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
         >
@@ -101,7 +71,7 @@ const AddComponent = () => {
         </button>
         <button
           onClick={() => {
-           moveToPath("/");
+            moveToPath("/");
           }}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition ml-2"
         >
