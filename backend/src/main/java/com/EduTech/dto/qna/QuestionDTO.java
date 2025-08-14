@@ -16,7 +16,9 @@ public class QuestionDTO {
 		private String content; // 내용
 		private Boolean state; // 공개여부
 		private LocalDateTime createdAt; // 작성일
+		private LocalDateTime updatedAt; // 수정일
 		private Long view; // 조회수
 		private String memId; // 회원 아이디
+		private Long questionNum;
 		private List<AnswerDTO> answerList; // 질문에 대한 답변들
 }

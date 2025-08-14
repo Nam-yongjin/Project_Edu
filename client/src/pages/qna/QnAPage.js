@@ -4,7 +4,7 @@ import SubBoardHeader from "../../layouts/SubBoardHeader"
 const QnAPage = () => {
     return (
         <div>
-            <BasicLayout>
+            <BasicLayout isFullWidth={true}>
                 <SubBoardHeader/>
                 <Outlet/>
             </BasicLayout>

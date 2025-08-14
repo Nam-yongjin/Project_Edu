@@ -1,10 +1,10 @@
 import DetailComponent from "../../components/qna/DetailComponent";
-
+import { useParams } from "react-router-dom";
 const QDetailPage = () => {
-
+ const {questionNum} = useParams();
   return (
    <>
-      <DetailComponent />
+      <DetailComponent questionNum={questionNum}/>
    </>
   );
 };
