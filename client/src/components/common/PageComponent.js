@@ -5,18 +5,20 @@ const PageComponent = ({ totalPages, current, setCurrent }) => {
     const endPage = Math.min(startPage + 10, totalPages); // 현재 그룹의 마지막 페이지
 
     return (
-        <div className="flex gap-x-2 items-center">
-            {startPage > 0 ? <div><button onClick={() => setCurrent(Math.floor(currentGroup - 1) * 10)}>&lt;</button></div> : <div></div>}
-            {startPage > 0 ? <div><button onClick={() => setCurrent(0)}>&lt;&lt;</button></div> : <div></div>}
+        <div className="flex sm:gap-x-2 gap-x-1 items-center">
+            {startPage > 0 ? <div><button onClick={() => setCurrent(0)}
+                className="normal-button newText-sm px-4 py-2 rounded-md font-semibold">&lt;&lt;</button></div> : <div></div>}
+            {startPage > 0 ? <div><button onClick={() => setCurrent(Math.floor(currentGroup - 1) * 10)}
+                className="normal-button newText-sm px-4 py-2 rounded-md font-semibold">&lt;</button></div> : <div></div>}
             {Array.from({ length: endPage - startPage }).map((_, i) => {
                 const pageIndex = startPage + i;
                 return (
                     <button
                         key={pageIndex}
                         onClick={() => setCurrent(pageIndex)}
-                        className={`newText-sm px-4 py-2 rounded-md font-semibold ${pageIndex === current
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-200 hover:bg-gray-300 active:bg-gray-400"
+                        className={`newText-sm px-4 py-2 rounded-md font-semibold lg:w-[38px] sm:w-[34px] w-[30px] ${pageIndex === current
+                            ? "positive-button"
+                            : "normal-button"
                             }`}
 
                     >
@@ -24,8 +26,10 @@ const PageComponent = ({ totalPages, current, setCurrent }) => {
                     </button>
                 );
             })}
-            {currentGroup !== Math.floor(totalPages / 10) ? <div><button onClick={() => setCurrent(Math.floor(currentGroup + 1) * 10)}>&gt;</button></div> : <div></div>}
-            {currentGroup !== Math.floor(totalPages / 10) ? <div><button onClick={() => setCurrent(Math.floor(totalPages / 10) * 10)}>&gt;&gt;</button></div> : <div></div>}
+            {currentGroup !== Math.floor(totalPages / 10) ? <div><button onClick={() => setCurrent(Math.floor(currentGroup + 1) * 10)}
+                className="normal-button newText-sm px-4 py-2 rounded-md font-semibold">&gt;</button></div> : <div></div>}
+            {currentGroup !== Math.floor(totalPages / 10) ? <div><button onClick={() => setCurrent(Math.floor(totalPages / 10) * 10)}
+                className="normal-button newText-sm px-4 py-2 rounded-md font-semibold">&gt;&gt;</button></div> : <div></div>}
         </div>
     );
 };
