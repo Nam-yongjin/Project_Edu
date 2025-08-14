@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -65,10 +66,8 @@ public class FacilityServiceImpl implements FacilityService {
     private FacilityImage toFacilityImage(MultipartFile file) {
         Map<String, String> saved = fileUtil.saveImage(file, "facility");
         String originalName = saved.get("originalName");
-        String imagePath   = saved.get("filePath");
-        // 엔티티에 @Builder 없으므로 생성자/세터 사용
-        FacilityImage entity = new FacilityImage(originalName, "/upload/" + imagePath, false);
-        return entity;
+        String imagePath    = saved.get("filePath");
+        return new FacilityImage(originalName, "/upload/" + imagePath, false);
     }
 
     // 요일 매핑: Java(MON=1..SUN=7) -> 시스템 규칙(SUN=1..SAT=7)
@@ -76,18 +75,41 @@ public class FacilityServiceImpl implements FacilityService {
         int javaDow = date.getDayOfWeek().getValue(); // MON=1..SUN=7
         return (javaDow == DayOfWeek.SUNDAY.getValue()) ? 1 : javaDow + 1; // SUN->1, MON->2 .. SAT->7
     }
-    
+
     private static final EnumSet<FacilityState> ACTIVE_STATES =
             EnumSet.of(FacilityState.WAITING, FacilityState.APPROVED);
+
+    /** FacilityReserve → FacilityReserveListDTO 매핑 (대표 이미지: 첫 번째 이미지) */
+    private FacilityReserveListDTO toDTO(FacilityReserve r) {
+        // 엔티티 이미지 목록
+        List<FacilityImage> imgEntities =
+                (r.getFacility() == null || r.getFacility().getImages() == null)
+                        ? List.of()
+                        : r.getFacility().getImages();
+
+        // 전체 URL 리스트
+        List<String> images = imgEntities.stream()
+                .map(FacilityImage::getImageUrl)
+                .filter(Objects::nonNull)
+                .toList();
+
+        // ✅ 대표 이미지: 첫 번째 이미지(플래그 의존 X)
+        String mainImageUrl = images.isEmpty() ? null : images.get(0);
+
+        return FacilityReserveListDTO.builder()
+                .reserveId(r.getReserveId())
+                .facRevNum(r.getFacility().getFacRevNum())
+                .facName(r.getFacility().getFacName())
+                .facDate(r.getFacDate())
+                .startTime(r.getStartTime())
+                .endTime(r.getEndTime())
+                .state(r.getState())
+                .mainImageUrl(mainImageUrl) // 대표 이미지 1장
+                .build();
+    }
+
     // ----------------------------------------------------------------------
 
-    // 공휴일 + 시설 휴무일 집합 (중복 제거, 정렬 유지)(사용x)
-//    private Set<LocalDate> getClosedDates(Long facRevNum, LocalDate start, LocalDate end) {
-//        List<PublicHoliday> ph = publicHolidayRepository.findByDateBetween(start, end);
-//        return ph.stream().map(PublicHoliday::getDate)
-//                 .collect(Collectors.toCollection(LinkedHashSet::new));
-//    }
-    
     // 시설 등록(사용중)
     @Override
     @Transactional
@@ -95,7 +117,7 @@ public class FacilityServiceImpl implements FacilityService {
         // 1) 기본 필드 매핑
         Facility facility = modelMapper.map(dto, Facility.class);
 
-        // 2) 예약 요약 시간(선택) 검증: 둘 다 있으면 start < end 확인
+        // 2) 예약 요약 시간(선택) 검증
         LocalTime start = facility.getReserveStart();
         LocalTime end   = facility.getReserveEnd();
         if (start != null || end != null) {
@@ -117,11 +139,11 @@ public class FacilityServiceImpl implements FacilityService {
             }
         }
 
-        // 4) 저장 (이미지만 cascade)
+        // 4) 저장
         facilityRepository.save(facility);
     }
-    
-    // 시설 조회(사용중)
+
+    // 시설 목록(사용중)
     @Override
     public Page<FacilityListDTO> getFacilityList(Pageable pageable, String keyword) {
         // 기본 정렬: facRevNum DESC (pageable에 정렬이 없을 때만)
@@ -141,7 +163,6 @@ public class FacilityServiceImpl implements FacilityService {
                 ? facilityRepository.findPageWithImages(pageReq)
                 : facilityRepository.searchPageWithImages(kw, pageReq);
 
-        // RootConfig의 typeMap/Converter가 Facility -> FacilityListDTO 매핑/정렬을 처리
         return result.map(f -> modelMapper.map(f, FacilityListDTO.class));
     }
 
@@ -164,7 +185,7 @@ public class FacilityServiceImpl implements FacilityService {
                 .collect(Collectors.toList());
 
         FacilityDetailDTO d = new FacilityDetailDTO();
-        d.setFacRevNum(facility.getFacRevNum()); // 프론트 라우팅에 유용
+        d.setFacRevNum(facility.getFacRevNum());
         d.setFacName(facility.getFacName());
         d.setFacInfo(facility.getFacInfo());
         d.setCapacity(facility.getCapacity());
@@ -177,7 +198,6 @@ public class FacilityServiceImpl implements FacilityService {
         return d;
     }
 
-
     // 예약 가능 여부
     @Override
     @Transactional(readOnly = true)
@@ -186,7 +206,7 @@ public class FacilityServiceImpl implements FacilityService {
         if (!end.isAfter(start)) return false;
         if (LocalDateTime.of(date, end).isBefore(LocalDateTime.now())) return false;
 
-        // 공휴일(시설 휴무 포함 정책이면 여기에서 함께 체크)
+        // 공휴일
         if (publicHolidayRepository.existsByDate(date)) return false;
 
         // 운영시간 범위
@@ -198,7 +218,7 @@ public class FacilityServiceImpl implements FacilityService {
         // 최대 4시간 연속
         if (java.time.Duration.between(start, end).toHours() > 4) return false;
 
-        // ★ 활성 상태(대기/수락)만 충돌로 간주
+        // 활성 상태(대기/수락)만 충돌로 간주
         boolean overlaps =
                 facilityReserveRepository
                         .existsByFacility_FacRevNumAndFacDateAndStartTimeLessThanAndEndTimeGreaterThanAndStateIn(
@@ -216,7 +236,6 @@ public class FacilityServiceImpl implements FacilityService {
         final Facility facility = facilityRepository.findById(req.getFacRevNum())
                 .orElseThrow(() -> new IllegalArgumentException("시설 정보가 존재하지 않습니다."));
 
-        // 시간/운영/휴무/겹침 등 정책검사 (기존 로직 재사용)
         if (!isReservable(facility.getFacRevNum(), req.getFacDate(), req.getStartTime(), req.getEndTime())) {
             throw new IllegalStateException("해당 시간은 이미 예약되었거나 예약할 수 없습니다.");
         }
@@ -224,7 +243,7 @@ public class FacilityServiceImpl implements FacilityService {
         final Member member = memberRepository.findById(memId)
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
 
-        // 중복 예약 방지: 같은 시설 + 같은 날짜 + 같은 사용자 (대기/승인 상태만 충돌로 간주)
+        // 같은 시설 + 같은 날짜 + 같은 사용자 (대기/승인 상태만 충돌로 간주)
         final boolean already = facilityReserveRepository
                 .existsByFacility_FacRevNumAndMember_MemIdAndFacDateAndStateIn(
                         facility.getFacRevNum(), memId, req.getFacDate(), ACTIVE_STATES);
@@ -232,7 +251,6 @@ public class FacilityServiceImpl implements FacilityService {
             throw new IllegalStateException("해당 시설에서 오늘은 이미 예약하셨습니다. (하루 1회 제한)");
         }
 
-        // 예약 생성
         final FacilityReserve reserve = new FacilityReserve();
         reserve.setFacility(facility);
         reserve.setMember(member);
@@ -242,7 +260,6 @@ public class FacilityServiceImpl implements FacilityService {
         reserve.setReserveAt(LocalDateTime.now());
         reserve.setState(FacilityState.WAITING);
 
-        // 동시성 대비(DB 유니크 제약을 둔 경우 메시지 변환)
         try {
             facilityReserveRepository.save(reserve);
         } catch (DataIntegrityViolationException e) {
@@ -255,13 +272,13 @@ public class FacilityServiceImpl implements FacilityService {
             throw new IllegalStateException("로그인이 필요합니다.");
         }
     }
-    
+
     // 예약 가능 시간 확인(현재 예약중인 시간 제외)(사용)
     @Override
     @Transactional(readOnly = true)
     public List<ReservedBlockDTO> getReservedBlocks(Long facRevNum, LocalDate date) {
         if (facRevNum == null || date == null) return List.of();
-        // 대기/승인 상태만 막음
+
         var blocks = facilityReserveRepository.findByFacility_FacRevNumAndFacDateAndStateIn(
                 facRevNum, date, List.of(FacilityState.WAITING, FacilityState.APPROVED));
 
@@ -294,20 +311,12 @@ public class FacilityServiceImpl implements FacilityService {
     // 내 예약 목록 (마이페이지)
     @Override
     @Transactional(readOnly = true)
-    public List<FacilityReserveListDTO> getMyReservations(String memId) {
-        return facilityReserveRepository.findByMember_MemIdOrderByReserveAtDesc(memId)
-                .stream()
-                .map(r -> {
-                    FacilityReserveListDTO d = new FacilityReserveListDTO();
-                    d.setReserveId(r.getReserveId());                    // 예약 PK
-                    d.setFacRevNum(r.getFacility().getFacRevNum());      // 시설 PK(옵션)
-                    d.setFacName(r.getFacility().getFacName());
-                    d.setFacDate(r.getFacDate());
-                    d.setStartTime(r.getStartTime());
-                    d.setEndTime(r.getEndTime());
-                    d.setState(r.getState());
-                    return d;
-                }).collect(Collectors.toList());
+    public Page<FacilityReserveListDTO> getMyReservations(String memId, Pageable pageable) {
+        if (memId == null || memId.isBlank()) {
+            throw new IllegalArgumentException("회원 ID는 null 또는 빈 값일 수 없습니다.");
+        }
+        // 리포지토리에 @EntityGraph(attributePaths={"facility","facility.images"}) 권장
+        return facilityReserveRepository.findByMember_MemId(memId, pageable).map(this::toDTO);
     }
 
     // 관리자 예약 목록
@@ -336,7 +345,7 @@ public class FacilityServiceImpl implements FacilityService {
     @Transactional
     public boolean updateReservationState(FacilityReserveApproveRequestDTO approveRequest) {
         int updated = facilityReserveRepository.updateStateIfCurrent(
-                approveRequest.getReserveId(),     // ← reserveId 로 변경
+                approveRequest.getReserveId(),
                 approveRequest.getState(),
                 FacilityState.WAITING
         );
@@ -365,17 +374,9 @@ public class FacilityServiceImpl implements FacilityService {
             throw new IllegalStateException("이미 시작된 예약은 취소할 수 없습니다.");
         }
 
-        // 쿼리 업데이트 방식 대신 엔티티 변경(더 안전, 캐시 일관성)
         reserve.setState(FacilityState.CANCELLED);
         return true;
     }
-
-    // 휴무일 여부 (단건)
-//    @Override
-//    @Transactional(readOnly = true)
-//    public boolean isHoliday(@org.springframework.lang.Nullable Long facRevNum, LocalDate date) {
-//        return publicHolidayRepository.existsByDate(date);
-//    }
 
     // 휴무일 리스트 (사용)
     @Override
@@ -391,15 +392,6 @@ public class FacilityServiceImpl implements FacilityService {
                 .sorted(Comparator.comparing(HolidayDayDTO::getDate))
                 .toList();
     }
-
-    // 휴무일 리스트 (기간)
-//    @Transactional(readOnly = true)
-//    public List<LocalDate> getHolidayDates(Long facRevNum, LocalDate start, LocalDate end) {
-//        return getClosedDates(facRevNum, start, end).stream()
-//                .filter(d -> !d.isBefore(start) && !d.isAfter(end))
-//                .sorted()
-//                .toList();
-//    }
 
     // 휴무일 등록
     @Override
@@ -435,5 +427,4 @@ public class FacilityServiceImpl implements FacilityService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 날짜의 공휴일이 없습니다.");
         }
     }
-    
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.dto.facility.ReservedBlockDTO;
+import com.EduTech.dto.member.MemberDTO;
 import com.EduTech.entity.facility.FacilityState;
 import com.EduTech.service.facility.FacilityService;
 
@@ -116,9 +118,14 @@ public class FacilityController {
     }
 
     // 사용자 예약 목록
-    @GetMapping("/my-reservations")
-    public ResponseEntity<List<FacilityReserveListDTO>> getMyReservations(@RequestParam String memId) {
-        return ResponseEntity.ok(facilityService.getMyReservations(memId));
+    @GetMapping("/reservations")
+    public ResponseEntity<Page<FacilityReserveListDTO>> getMyReservations(
+            @AuthenticationPrincipal MemberDTO memberDTO,
+            @PageableDefault(sort = "reserveAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+            facilityService.getMyReservations(memberDTO.getMemId(), pageable)
+        );
     }
 
     // 관리자 예약 목록 (상태/기간 필터)
