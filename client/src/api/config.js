@@ -14,5 +14,5 @@ export const API_MAPPING = {
     question: '/question',
     answer: '/answer',
     admin: '/admin',
-    qna:'/question'
+    question:'/question'
 };
