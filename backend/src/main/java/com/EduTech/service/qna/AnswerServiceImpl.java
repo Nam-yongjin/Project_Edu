@@ -1,6 +1,9 @@
 package com.EduTech.service.qna;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,30 +23,52 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class AnswerServiceImpl implements AnswerService {
-	private final ModelMapper modelMapper;
 	private final AnswerRepository answerRepository;
 	private final QuestionRepository questionRepository;
 	private final MemberRepository memberRepository;
 	// 관리자가 답변글 추가할때 사용하는 기능
-	public void addAnswer(AnswerWriteDTO answerWriteDTO) {
-		Answer answer=modelMapper.map(answerWriteDTO,Answer.class);
-		answer.setAnswerNum(null); // 기본키가 들어가므로 null 처리해준다
-		Member member = memberRepository.findById(answerWriteDTO.getMemId())
+	public void addAnswer(AnswerWriteDTO answerWriteDTO,String memId) {
+		
+		 if (!"admin".equals(memId)) { // 관리자일 경우에만 수정 가능
+		        throw new AccessDeniedException("관리자만 답변을 달수 있습니다.");
+		    }
+		 
+		Answer answer=new Answer();
+		answer.setContent(answerWriteDTO.getContent());
+		Question question= questionRepository.findById(answerWriteDTO.getQuestionNum())
+			    .orElseThrow(() -> new EntityNotFoundException("해당 질문이 존재하지 않습니다."));
+		answer.setQuestion(question);
+		Member member = memberRepository.findById(memId)
 			    .orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
 		answer.setMember(member);
-		Question question=questionRepository.getById(answerWriteDTO.getQuestionNum());
-		answer.setQuestion(question);
 		answerRepository.save(answer);
 	}
 	
-	// 관리자가 답변 글 수정할때 사용하는 기능
-	public void updateAnswer(AnswerUpdateDTO answerUpdateDTO) {
-		answerRepository.updateAnswer(answerUpdateDTO.getContent(), answerUpdateDTO.getAnswerNum());
+	// 관리자가 답변 글 수정
+	public void updateAnswer(AnswerUpdateDTO answerUpdateDTO, String memId) {
+		
+	    if (!"admin".equals(memId)) { // 관리자일 경우에만 수정 가능
+	        throw new AccessDeniedException("관리자만 수정할 수 있습니다.");
+	    }
+
+	    Answer answer = answerRepository.findById(answerUpdateDTO.getAnswerNum())
+	            .orElseThrow(() -> new EntityNotFoundException("답변이 존재하지 않습니다."));
+
+	    answerRepository.updateAnswer(answerUpdateDTO.getContent(), answer.getAnswerNum());
 	}
 
-	// 관리자가 답변 글 삭제할때 사용하는 기능
-	public void deleteAnswer(Long answerNum) {
-		answerRepository.deleteById(answerNum);
+	// 관리자가 답변 글 삭제
+	public void deleteAnswer(Long answerNum, String memId) {
+		
+	    if (!"admin".equals(memId)) { // 관리자일 경우에만 삭제 가능
+	        throw new AccessDeniedException("관리자만 삭제할 수 있습니다.");
+	    }
+
+	    Answer answer = answerRepository.findById(answerNum)
+	            .orElseThrow(() -> new EntityNotFoundException("답변이 존재하지 않습니다."));
+
+	    answerRepository.deleteById(answerNum);
 	}
+
 	
 }

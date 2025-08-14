@@ -5,11 +5,11 @@ import com.EduTech.dto.qna.AnswerWriteDTO;
 
 public interface AnswerService {
 	// 관리자가 답변글 추가할때 사용하는 기능
-		void addAnswer(AnswerWriteDTO answerWriteDTO);
+		void addAnswer(AnswerWriteDTO answerWriteDTO,String memId);
 
 		// 관리자가 답변 글 수정할때 사용하는 기능
-		void updateAnswer(AnswerUpdateDTO answerUpdateDTO);
+		void updateAnswer(AnswerUpdateDTO answerUpdateDTO,String memId);
 
 		// 관리자가 답변 글 삭제할때 사용하는 기능
-		void deleteAnswer(Long answerNum);
+		void deleteAnswer(Long answerNum,String memId);
 }

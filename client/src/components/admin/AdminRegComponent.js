@@ -197,7 +197,7 @@ const AdminRegComponent = () => {
                                                 <img
                                                     src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                     alt={data.demName}
-                                                    onClick={() => moveToPath(`../detail/${data.demNum}`)}
+                                                    onClick={() => moveToPath(`../../demonstration/detail/${data.demNum}`)}
                                                     className="w-16 h-16 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer mx-auto"
                                                 />
                                             ) : (
