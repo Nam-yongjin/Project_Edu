@@ -6,6 +6,7 @@ const FacilityAddPage = lazy(() => import("../pages/facility/FacilityAddPage"))
 const FacilityListPage = lazy(() => import("../pages/facility/FacilityListPage"))
 const FacilityDetailPage = lazy(() => import("../pages/facility/FacilityDetailPage"))
 const FacilityHolidayPage = lazy(() => import("../pages/facility/FacilityHolidayPage"))
+const FacilityReservationPage = lazy(() => import("../pages/facility/FacilityReservationPage"))
 
 const facilityRouter = () => {
 
@@ -25,6 +26,10 @@ const facilityRouter = () => {
         {
             path:"holiday",
             element: <Suspense fallback={<Loading />}><FacilityHolidayPage /></Suspense>,
+        },
+        {
+            path:"reservation",
+            element: <Suspense fallback={<Loading />}><FacilityReservationPage /></Suspense>,
         },
         {
             // 자동 리다이렉션

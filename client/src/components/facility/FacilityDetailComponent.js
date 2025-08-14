@@ -244,15 +244,13 @@ export default function FacilityDetailContent({ facRevNum }) {
     return base;
   }, [open, close, selectedDate]);
 
-  /* 예약 블록을 고려해 시작 슬롯을 필터링 */
+  /* ✅ 예약 블록을 고려하되 '제거' 대신 표시용 플래그를 부여 */
   function buildFilteredStartSlots(slots, blocks) {
-    const out = [];
-    for (const s of slots) {
+    return slots.map((s) => {
       const tmpEnd = calcEndHHmm(s.key, 1);
       const blocked = blocks.some((b) => overlaps(s.key, tmpEnd, b.start, b.end));
-      if (!blocked) out.push(s);
-    }
-    return out;
+      return { ...s, blocked }; // 예약 여부 표시
+    });
   }
   const startSlots = useMemo(
     () => buildFilteredStartSlots(baseStartSlots, reservedBlocks),
@@ -276,23 +274,38 @@ export default function FacilityDetailContent({ facRevNum }) {
     setStartKey(key);
     setDurationHrs(null);
   }
+
+  /* ✅ '이미 예약됨' 시각적 표시 + 라디오 비활성화 */
   function renderStartOptions() {
-    return startSlots.map((s) => (
-      <label
-        key={s.key}
-        className="flex items-center gap-2 rounded px-2 py-1 hover:bg-gray-50 cursor-pointer text-sm border"
-      >
-        <input
-          type="radio"
-          name="start"
-          value={s.key}
-          disabled={!selectedDate || selectedDateHasAnyHoliday}
-          checked={startKey === s.key}
-          onChange={() => onChangeStart(s.key)}
-        />
-        <span className="text-gray-800">{s.label}</span>
-      </label>
-    ));
+    return startSlots.map((s) => {
+      const disabled =
+        !selectedDate ||
+        selectedDateHasAnyHoliday ||
+        s.blocked;
+
+      return (
+        <label
+          key={s.key}
+          className={[
+            "flex items-center gap-2 rounded px-2 py-1 text-sm border",
+            disabled ? "opacity-60 cursor-not-allowed bg-gray-50" : "hover:bg-gray-50 cursor-pointer"
+          ].join(" ")}
+          title={s.blocked ? "이미 예약된 시간입니다" : undefined}
+        >
+          <input
+            type="radio"
+            name="start"
+            value={s.key}
+            disabled={disabled}
+            checked={startKey === s.key}
+            onChange={() => onChangeStart(s.key)}
+          />
+          <span className={s.blocked ? "line-through text-red-500" : "text-gray-800"}>
+            {s.label}{s.blocked && " (이미 예약됨)"}
+          </span>
+        </label>
+      );
+    });
   }
 
   function durationAllowedByBlocks(h) {
