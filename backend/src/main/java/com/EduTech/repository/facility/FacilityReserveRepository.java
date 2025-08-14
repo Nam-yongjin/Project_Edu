@@ -3,9 +3,11 @@ package com.EduTech.repository.facility;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +19,8 @@ import com.EduTech.entity.facility.FacilityState;
 public interface FacilityReserveRepository extends JpaRepository<FacilityReserve, Long> {
 
     // 내 예약 내역 (마이페이지)
-    List<FacilityReserve> findByMember_MemIdOrderByReserveAtDesc(String memId);
+	@EntityGraph(attributePaths = {"facility", "facility.images"})
+	Page<FacilityReserve> findByMember_MemId(String memId, Pageable pageable);
 
     // 상태 필터
     List<FacilityReserve> findByState(FacilityState state);
