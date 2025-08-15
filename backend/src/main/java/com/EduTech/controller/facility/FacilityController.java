@@ -13,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +44,9 @@ import com.EduTech.service.facility.FacilityService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/api/facility")
@@ -146,14 +149,35 @@ public class FacilityController {
     }
 
     // 사용자 예약 취소 (reserveId 기준)
-    @PatchMapping("/my/reservation/{reserveId}/cancel")
-    public ResponseEntity<String> userCancel(
-            @PathVariable Long reserveId,
-            @RequestParam String requesterId
+    @DeleteMapping("/cancel")
+    public ResponseEntity<String> cancelReservation(
+            @RequestParam("reserveId") Long reserveId,
+            @AuthenticationPrincipal(expression = "username") String memId
     ) {
-        boolean success = facilityService.cancelReservation(reserveId, requesterId);
-        return ResponseEntity.ok(success ? "취소 완료" : "취소 실패");
+        try {
+            log.info("시설 예약 취소 요청: reserveId={}, 요청자 memId={}", reserveId, memId);
+            facilityService.cancelReservation(reserveId, memId);
+            return ResponseEntity.ok("예약이 정상적으로 취소되었습니다.");
+
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("해당 예약에 대한 취소 권한이 없습니다.");
+
+        } catch (IllegalArgumentException e) { // 예약 없음 등
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("예약 내역이 존재하지 않습니다.");
+
+        } catch (IllegalStateException e) { // 이미 시작/취소/처리 등
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+
+        } catch (Exception e) {
+            log.error("시설 예약 취소 중 오류", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("예약 취소 중 오류가 발생했습니다.");
+        }
     }
+
 
     // 관리자 강제 취소 (reserveId 기준)
     @PatchMapping("/admin/reservation/{reserveId}/cancel")

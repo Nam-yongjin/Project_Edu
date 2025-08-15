@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -356,17 +357,21 @@ public class FacilityServiceImpl implements FacilityService {
     @Override
     @Transactional
     public boolean cancelReservation(Long reserveId, String requesterId) {
+        // 404 매핑용
         FacilityReserve reserve = facilityReserveRepository.findById(reserveId)
-                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
 
         Member requester = memberRepository.findById(requesterId)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
         boolean isAdmin = requester.getRole() == MemberRole.ADMIN;
 
+        // 403 매핑용
         if (!isAdmin && (reserve.getMember() == null || !reserve.getMember().getMemId().equals(requesterId))) {
-            throw new SecurityException("본인의 예약만 취소할 수 있습니다.");
+            throw new AccessDeniedException("본인의 예약만 취소할 수 있습니다.");
         }
+
+        // 400 매핑용
         if (reserve.getState() == FacilityState.CANCELLED || reserve.getState() == FacilityState.REJECTED) {
             throw new IllegalStateException("이미 취소/처리된 예약입니다.");
         }
