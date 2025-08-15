@@ -1,4 +1,4 @@
-import EvtTitleComponent from "../../components/event/EvtTitleComponent";
+import SubAdminHeader from "../../layouts/SubAdminHeader";
 import EvtAddComponent from "../../components/event/EvtAddComponent";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -6,7 +6,7 @@ const AddEvtPage = () => {
 
   return (
     <div className="w-full">
-      <EvtTitleComponent title="행사 등록" />
+      <SubAdminHeader />
       <EvtAddComponent />
       </div>
   );

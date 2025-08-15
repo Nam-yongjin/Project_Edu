@@ -88,3 +88,27 @@ export const cancelReservation = async (reserveId) => {
   });
   return res.data;
 };
+
+// 관리자 예약현황 확인
+export const getAdminReservations = async ({ state, from, to } = {}) => {
+  const stateParam = state === "CANCELLED" ? "CANCEL" : state;
+  const res = await jwtAxios.get(`${facility}/adminreservations`, {
+    params: {
+      state: stateParam || undefined,
+      from: from || undefined,
+      to: to || undefined,
+    },
+  });
+  return res.data;
+};
+
+// 관리자 예약 수락 및 거절
+export const updateReservationState = async ({ reserveId, state }) => {
+  if (!reserveId) throw new Error("reserveId는 필수입니다.");
+  const mapped = state === "CANCELLED" ? "CANCEL" : state;
+  const res = await jwtAxios.post(`${facility}/approve`, {
+    reserveId,
+    state: mapped,
+  });
+  return res.data;
+};

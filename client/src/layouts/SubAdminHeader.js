@@ -47,6 +47,24 @@ const SubAdminHeader = () => {
                         </li>
                         <li className="mr-6 pb-2">
                             <Link
+                                to="/event/add"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/stats") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                행사 추가
+                            </Link>
+                        </li>
+                        <li className="mr-6 pb-2">
+                            <Link
+                                to="/facility/adminreservations"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/stats") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                장소 대여 관리
+                            </Link>
+                        </li>
+                        <li className="mr-6 pb-2">
+                            <Link
                                 to="/admin/adminReg"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminReg") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
@@ -61,6 +79,15 @@ const SubAdminHeader = () => {
                                     }`}
                             >
                                 실증대여관리
+                            </Link>
+                        </li>
+                        <li className="mr-6 pb-2">
+                            <Link
+                                to="/facility/holiday"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/stats") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                휴무일 관리
                             </Link>
                         </li>
                     </ul>
