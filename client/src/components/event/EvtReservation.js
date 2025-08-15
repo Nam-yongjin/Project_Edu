@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getReservationList, cancelReservation } from "../../api/eventApi";
 
@@ -11,31 +11,34 @@ const ReservationListComponent = () => {
   const navigate = useNavigate();
   const host = "http://localhost:8090/view";
 
-  // 예약 리스트 조회
-  const fetchReservations = async (targetPage = page) => {
-    try {
-      const data = await getReservationList({
-        page: targetPage,
-        size: pageSize,
-        sort: "applyAt,DESC",
-      });
-      setReservations(data.content);
-      setTotalPages(data.totalPages);
-      setPage(targetPage);
-    } catch (error) {
-      console.error("예약 이력 불러오기 실패:", error);
-      if (error.response?.status === 401) {
-        alert("로그인이 필요합니다.");
-        navigate("/login");
-      } else {
-        alert("예약 정보를 불러오지 못했습니다.");
+  // 예약 리스트 조회 (useCallback으로 메모이즈)
+  const fetchReservations = useCallback(
+    async (targetPage = page) => {
+      try {
+        const data = await getReservationList({
+          page: targetPage,
+          size: pageSize,
+          sort: "applyAt,DESC",
+        });
+        setReservations(data.content);
+        setTotalPages(data.totalPages);
+        setPage(targetPage);
+      } catch (error) {
+        console.error("예약 이력 불러오기 실패:", error);
+        if (error.response?.status === 401) {
+          alert("로그인이 필요합니다.");
+          navigate("/login");
+        } else {
+          alert("예약 정보를 불러오지 못했습니다.");
+        }
       }
-    }
-  };
+    },
+    [page, pageSize, navigate]
+  );
 
   useEffect(() => {
-    fetchReservations();
-  }, [page]);
+    fetchReservations(page);
+  }, [page, fetchReservations]);
 
   // 예약 취소 처리
   const handleCancelReservation = async (evtRevNum) => {
@@ -91,17 +94,15 @@ const ReservationListComponent = () => {
   const isCancelable = (item) => {
     const now = new Date();
     const start = new Date(item.eventStartPeriod);
-    const end = new Date(item.eventEndPeriod);
+    // end는 사용하지 않으므로 제거하여 no-unused-vars 해결
+    // const end = new Date(item.eventEndPeriod);
 
-    return (
-      item.revState !== "CANCEL" &&
-      now < start // 시작 전만 취소 가능
-    );
+    return item.revState !== "CANCEL" && now < start; // 시작 전만 취소 가능
   };
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4">
-      <h2 className="text-2xl font-bold mb-6 text-center">예약 이력 조회</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">프로그램 신청 내역</h2>
 
       <div className="space-y-6">
         {reservations.length === 0 ? (
