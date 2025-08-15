@@ -132,19 +132,25 @@ public class FacilityController {
     }
 
     // 관리자 예약 목록 (상태/기간 필터)
-    @GetMapping("/admin/reservations")
+    @GetMapping("/adminreservations")
     public ResponseEntity<List<FacilityReserveAdminDTO>> getReservationsForAdmin(
-            @RequestParam(required = false) FacilityState state,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+        @RequestParam(value = "state", required = false) FacilityState state,
+        @RequestParam(value = "from",  required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+        @RequestParam(value = "to",    required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         return ResponseEntity.ok(facilityService.getReservationsForAdmin(state, from, to));
     }
 
     // 관리자: 예약 승인/거절 (reserveId 기준)
-    @PostMapping("/admin/approve")
-    public ResponseEntity<Void> updateReservationState(@RequestBody @Valid FacilityReserveApproveRequestDTO dto) {
-        facilityService.updateReservationState(dto);
+    @PostMapping("/approve")
+    public ResponseEntity<Void> updateReservationState(
+            @RequestBody @Valid FacilityReserveApproveRequestDTO dto) {
+
+        boolean updated = facilityService.updateReservationState(dto);
+        // 동시성으로 이미 다른 상태로 바뀐 경우
+        if (!updated) return ResponseEntity.status(HttpStatus.CONFLICT).build();
         return ResponseEntity.ok().build();
     }
 

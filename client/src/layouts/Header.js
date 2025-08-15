@@ -90,6 +90,7 @@ const Header = () => {
         { name: "배너 관리", link: "/admin/banner" },
         { name: "통계 확인", link: "/admin/stats" },
         { name: "행사 추가", link: "/event/add" },
+        { name: "장소대여 관리", link: "/facility/adminreservations" },
         { name: "휴일 관리", link: "/facility/holiday" },
         {name:"실증신청 관리",link:"/admin/adminReg"},
         {name:"실증대여 관리",link:"/admin/adminRes"}
