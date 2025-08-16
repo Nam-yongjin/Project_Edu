@@ -25,7 +25,7 @@ const AddComponent = () => {
             moveToPath("/");
         }
     
-    }, []);
+    }, [isCompany,isAdmin]);
 
     const addDem = () => {
 

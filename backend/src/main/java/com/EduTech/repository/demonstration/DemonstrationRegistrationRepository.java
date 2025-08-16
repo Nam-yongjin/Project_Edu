@@ -62,4 +62,9 @@ public interface DemonstrationRegistrationRepository
 
 	// demonstrationRegistrationRepository
 	List<DemonstrationRegistration> findByDemonstration_DemNumIn(List<Long> demNums);
+	
+    @Modifying
+    @Transactional
+    @Query("UPDATE DemonstrationRegistration r SET r.state = :expiredState WHERE r.expDate <= :today AND r.state =:state")
+    int changeRegExpiredState(@Param("toady") LocalDate today, @Param("state") DemonstrationState state);
 }

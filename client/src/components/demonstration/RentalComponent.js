@@ -9,13 +9,13 @@ import { useSelector } from "react-redux";
 const RentalComponent = () => {
     const isTeacher = useSelector((state) => state.loginState?.role === "TEACHER");
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
-     // 권한 체크 useEffect
+    // 권한 체크 useEffect
     useEffect(() => {
-        if (!isTeacher&&!isAdmin) {
+        if (!isTeacher && !isAdmin) {
             alert("권한이 없습니다.");
             moveToPath("/");
         }
-    
+
     }, []);
     const initState = {
         content: [],
@@ -293,224 +293,227 @@ const RentalComponent = () => {
                 searchOptions={searchOptions}
             />
             <div className="overflow-x-auto mt-6">
-                <table className="min-w-full bg-white rounded-lg shadow-md">
-                    <thead>
-                        <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
-                            {/* 전체선택 체크박스 th */}
-                            <th className="py-3 px-4 text-center">
-                                <input
-                                    type="checkbox"
-                                    onChange={handleSelectAll}
-                                    checked={
-                                        listData.content.filter(item => item.state !== "CANCEL").length > 0 &&
-                                        selectedItems.size === listData.content.filter(item => item.state !== "CANCEL").length
-                                    }
-                                />
-                            </th>
-                            <th className="py-3 px-4 text-left rounded-tl-lg">대표 이미지</th>
-                            <th className="py-3 px-4 text-left">상품명</th>
-                            <th className="py-3 px-4 text-left">기업명</th>
-                            <th className="py-3 px-4 text-left">대여개수</th>
+                <p className="text-gray-600 mt-1">
+                    전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
 
-                            {[
-                                { label: "시작일", value: "startDate" },
-                                { label: "마감일", value: "endDate" },
-                                { label: "등록일", value: "applyAt" },
-                            ].map(({ label, value }) => (
-                                <th
-                                    key={value}
-                                    onClick={() => handleSortChange(value)}
-                                    className="cursor-pointer text-center select-none py-3 px-4"
-                                >
-                                    <div className="flex items-center justify-center space-x-1">
-                                        <span>{label}</span>
-                                        <div className="flex flex-col">
-                                            <span
-                                                className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"
-                                                    }`}
-                                            >
-                                                ▲
-                                            </span>
-                                            <span
-                                                className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"
-                                                    }`}
-                                            >
-                                                ▼
-                                            </span>
-                                        </div>
-                                    </div>
+                <div className="overflow-x-auto mt-6">
+                    <table className="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+                                {/* 전체선택 체크박스 th */}
+                                <th className="py-3 px-4 text-center">
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleSelectAll}
+                                        checked={
+                                            listData.content.filter(item => item.state !== "CANCEL").length > 0 &&
+                                            selectedItems.size === listData.content.filter(item => item.state !== "CANCEL").length
+                                        }
+                                    />
                                 </th>
-                            ))}
+                                <th className="py-3 px-4 text-left rounded-tl-lg">대표 이미지</th>
+                                <th className="py-3 px-4 text-left">상품명</th>
+                                <th className="py-3 px-4 text-left">기업명</th>
+                                <th className="py-3 px-4 text-left">대여개수</th>
 
-                            <th className="py-3 px-2 border-b flex flex-col items-center space-y-1 whitespace-nowrap w-[90px]">
-                                <span>신청상태</span>
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => {
-                                        setStatusFilter(e.target.value);
-                                        setCurrent(0);
-                                    }}
-                                    className="border rounded px-1 text-xs w-full"
-                                >
-                                    <option value="">전체</option>
-                                    <option value="REJECT">거부</option>
-                                    <option value="ACCEPT">수락</option>
-                                    <option value="WAIT">대기</option>
-                                    <option value="CANCEL">취소</option>
-                                    <option value="EXPIRED">만료</option>
-                                </select>
-                            </th>
-                            {/* 버튼 3개 컬럼 */}
-                            <th className="py-3 px-4 text-center"></th>
-                            <th className="py-3 px-4 text-left"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-gray-600 text-sm">
-                        {listData.content.map((item) => {
-                            const mainImage = item.imageList?.find((img) => img.isMain === true);
-                            const isCancelled = item.state === "CANCEL";
-                            const isRejected = item.state === "REJECT";
-                            // 진행중 요청만 필터링 (WAIT 상태)
-                            const pendingRequests =
-                                item.requestType !== null && item.reqState !== null
-                                    ? [{ type: item.requestType, state: item.reqState }].filter(
-                                        (req) => req.state === "WAIT"
-                                    )
-                                    : [];
-
-                            return (
-                                <tr
-                                    key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`}
-                                    className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : ""
-                                        }`}
-                                >
-                                    {/* 체크박스 */}
-                                    <td className="py-3 px-4 text-center">
-                                        {item.state === "WAIT" ? (
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedItems.has(item.demNum)}
-                                                onChange={(e) => handleSelectOne(e, item.demNum)}
-                                            />
-                                        ) : (
-                                            <span></span>
-                                        )}
-                                    </td>
-
-                                    {/* 이미지 */}
-                                    <td className="py-3 px-4">
-                                        {mainImage ? (
-                                            <img
-                                                onClick={() => moveToPath(`../detail/${item.demNum}`)}
-                                                src={`http://localhost:8090/view/${mainImage.imageUrl}`}
-                                                alt={item.demName}
-                                                className="w-20 h-20 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer"
-                                            />
-                                        ) : (
-                                            <div className="w-20 h-20 flex items-center justify-center bg-gray-100 text-gray-400 rounded-md">
-                                                이미지 없음
+                                {[
+                                    { label: "시작일", value: "startDate" },
+                                    { label: "마감일", value: "endDate" },
+                                    { label: "등록일", value: "applyAt" },
+                                ].map(({ label, value }) => (
+                                    <th
+                                        key={value}
+                                        onClick={() => handleSortChange(value)}
+                                        className="cursor-pointer text-center select-none py-3 px-4"
+                                    >
+                                        <div className="flex items-center justify-center space-x-1">
+                                            <span>{label}</span>
+                                            <div className="flex flex-col">
+                                                <span
+                                                    className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"
+                                                        }`}
+                                                >
+                                                    ▲
+                                                </span>
+                                                <span
+                                                    className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"
+                                                        }`}
+                                                >
+                                                    ▼
+                                                </span>
                                             </div>
-                                        )}
+                                        </div>
+                                    </th>
+                                ))}
+
+                                <th className="py-3 px-2 border-b flex flex-col items-center space-y-1 whitespace-nowrap w-[90px]">
+                                    <span>신청상태</span>
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) => {
+                                            setStatusFilter(e.target.value);
+                                            setCurrent(0);
+                                        }}
+                                        className="border rounded px-1 text-xs w-full"
+                                    >
+                                        <option value="">전체</option>
+                                        <option value="REJECT">거부</option>
+                                        <option value="ACCEPT">수락</option>
+                                        <option value="WAIT">대기</option>
+                                        <option value="CANCEL">취소</option>
+                                        <option value="EXPIRED">만료</option>
+                                    </select>
+                                </th>
+                                {/* 버튼 3개 컬럼 */}
+                                <th className="py-3 px-4 text-center"></th>
+                                <th className="py-3 px-4 text-left"></th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-gray-600 text-sm">
+                            {listData.content.length === 0 ? (
+                                <tr>
+                                    <td colSpan={10} className="py-10 text-center text-gray-500">
+                                        등록된 상품이 없습니다.
                                     </td>
+                                </tr>
+                            ) : (
+                                listData.content.map((item) => {
+                                    const mainImage = item.imageList?.find((img) => img.isMain === true);
+                                    const isCancelled = item.state === "CANCEL";
+                                    const isRejected = item.state === "REJECT";
+                                    const pendingRequests =
+                                        item.requestType !== null && item.reqState !== null
+                                            ? [{ type: item.requestType, state: item.reqState }].filter(
+                                                (req) => req.state === "WAIT"
+                                            )
+                                            : [];
 
-                                    {/* 기본 정보 */}
-                                    <td className="py-3 px-4">{item.demName}</td>
-                                    <td className="py-3 px-4">{item.companyName}</td>
-                                    <td className="py-3 px-4">{item.bitemNum}</td>
-                                    <td className="py-3 px-4 text-center">{item.startDate}</td>
-                                    <td className="py-3 px-4 text-center">{item.endDate}</td>
-                                    <td className="py-3 px-4 text-center">{item.applyAt}</td>
+                                    return (
+                                        <tr
+                                            key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`}
+                                            className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : ""}`}
+                                        >
+                                            {/* 체크박스 */}
+                                            <td className="py-3 px-4 text-center">
+                                                {item.state === "WAIT" ? (
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedItems.has(item.demNum)}
+                                                        onChange={(e) => handleSelectOne(e, item.demNum)}
+                                                    />
+                                                ) : (
+                                                    <span></span>
+                                                )}
+                                            </td>
 
-                                    {/* 상태 표시 칸 (item.state만) */}
-                                    <td className="py-3 px-4 text-center align-center">
-                                        <div>{getStateLabel(item.state)}</div>
-                                    </td>
+                                            {/* 이미지 */}
+                                            <td className="py-3 px-4">
+                                                {mainImage ? (
+                                                    <img
+                                                        onClick={() => moveToPath(`../detail/${item.demNum}`)}
+                                                        src={`http://localhost:8090/view/${mainImage.imageUrl}`}
+                                                        alt={item.demName}
+                                                        className="w-20 h-20 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer"
+                                                    />
+                                                ) : (
+                                                    <div className="w-20 h-20 flex items-center justify-center bg-gray-100 text-gray-400 rounded-md">
+                                                        이미지 없음
+                                                    </div>
+                                                )}
+                                            </td>
 
-                                    {/* 진행중 요청 별도 칸 (반납신청, 연장신청 등) */}
-                                    <td className="py-3 px-4 text-center align-top text-xs text-blue-600">
-                                        {Array.isArray(item.reqState) && Array.isArray(item.requestType) ? (
-                                            // reqState 중 WAIT인 인덱스만 필터링해서 그에 맞는 requestType 출력
-                                            item.reqState
-                                                .map((state, idx) => ({ state, type: item.requestType[idx] }))
-                                                .filter(r => r.state === "WAIT")
-                                                .length > 0 ? (
-                                                <ul className="list-disc list-inside">
-                                                    {item.reqState
+                                            {/* 기본 정보 */}
+                                            <td className="py-3 px-4">{item.demName}</td>
+                                            <td className="py-3 px-4">{item.companyName}</td>
+                                            <td className="py-3 px-4">{item.bitemNum}</td>
+                                            <td className="py-3 px-4 text-center">{item.startDate}</td>
+                                            <td className="py-3 px-4 text-center">{item.endDate}</td>
+                                            <td className="py-3 px-4 text-center">{item.applyAt}</td>
+
+                                            {/* 상태 표시 칸 */}
+                                            <td className="py-3 px-4 text-center align-center">
+                                                <div>{getStateLabel(item.state)}</div>
+                                            </td>
+
+                                            {/* 진행중 요청 칸 */}
+                                            <td className="py-3 px-4 text-center align-top text-xs text-blue-600">
+                                                {Array.isArray(item.reqState) && Array.isArray(item.requestType) ? (
+                                                    item.reqState
                                                         .map((state, idx) => ({ state, type: item.requestType[idx] }))
                                                         .filter(r => r.state === "WAIT")
-                                                        .map((r, idx) => {
-                                                            if (r.type === "RENTAL") return <li key={idx}>반납신청 진행중</li>;
-                                                            if (r.type === "EXTEND") return <li key={idx}>기한연장 진행중</li>;
-                                                            return null;
-                                                        })}
-                                                </ul>
-                                            ) : (
-                                                <span>-</span>
-                                            )
-                                        ) : (
-                                            <span>-</span>
-                                        )}
-                                    </td>
+                                                        .length > 0 ? (
+                                                        <ul className="list-disc list-inside">
+                                                            {item.reqState
+                                                                .map((state, idx) => ({ state, type: item.requestType[idx] }))
+                                                                .filter(r => r.state === "WAIT")
+                                                                .map((r, idx) => {
+                                                                    if (r.type === "RENTAL") return <li key={idx}>반납신청 진행중</li>;
+                                                                    if (r.type === "EXTEND") return <li key={idx}>기한연장 진행중</li>;
+                                                                    return null;
+                                                                })}
+                                                        </ul>
+                                                    ) : (
+                                                        <span>-</span>
+                                                    )
+                                                ) : (
+                                                    <span>-</span>
+                                                )}
+                                            </td>
 
-                                    {/* 버튼 3개 칸 */}
-                                    <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
-                                        {(() => {
-                                            // 안전하게 배열 체크
-                                            const reqStates = Array.isArray(item.reqState) ? item.reqState : [];
-                                            // WAIT 상태가 하나라도 있는지 확인 (대소문자 무시)
-                                            const hasWaitState = reqStates.some(state => String(state).toUpperCase() === "WAIT");
-                                            const itemState = String(item.state).toUpperCase();
+                                            {/* 버튼 칸 */}
+                                            <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
+                                                {(() => {
+                                                    const reqStates = Array.isArray(item.reqState) ? item.reqState : [];
+                                                    const hasWaitState = reqStates.some(state => String(state).toUpperCase() === "WAIT");
+                                                    const itemState = String(item.state).toUpperCase();
 
-                                            return (
-                                                <>
-                                                    {/* 예약변경 버튼: WAIT 상태에서만 활성 */}
-                                                    <button
-                                                        disabled={itemState !== "WAIT"}
-                                                        onClick={() => handleActionClick(item.demNum, "예약변경")}
-                                                        className={`px-2 py-1 rounded text-xs w-full ${itemState === "WAIT"
-                                                                ? "bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
-                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                            }`}
-                                                    >
-                                                        예약변경
-                                                    </button>
+                                                    return (
+                                                        <>
+                                                            <button
+                                                                disabled={itemState !== "WAIT"}
+                                                                onClick={() => handleActionClick(item.demNum, "예약변경")}
+                                                                className={`px-2 py-1 rounded text-xs w-full ${itemState === "WAIT"
+                                                                    ? "bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
+                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                                    }`}
+                                                            >
+                                                                예약변경
+                                                            </button>
 
-                                                    {/* 대여연장 버튼: ACCEPT 상태에서만 활성, WAIT 상태 요청 없을 때만 */}
-                                                    <button
-                                                        disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                        onClick={() => handleExtendButtonClick(item.demNum)}
-                                                        className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                            }`}
-                                                    >
-                                                        대여연장
-                                                    </button>
+                                                            <button
+                                                                disabled={itemState !== "ACCEPT" || hasWaitState}
+                                                                onClick={() => handleExtendButtonClick(item.demNum)}
+                                                                className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                    ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                                    }`}
+                                                            >
+                                                                대여연장
+                                                            </button>
 
-                                                    {/* 반납 버튼: ACCEPT 상태에서만 활성, WAIT 상태 요청 없을 때만 */}
-                                                    <button
-                                                        disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                        onClick={() => handleActionClick(item.demNum, "반납")}
-                                                        className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                            }`}
-                                                    >
-                                                        반납
-                                                    </button>
-                                                </>
-                                            );
-                                        })()}
-                                    </td>
-
-                                </tr>
-
-                            );
-                        })}
-                    </tbody>
+                                                            <button
+                                                                disabled={itemState !== "ACCEPT" || hasWaitState}
+                                                                onClick={() => handleActionClick(item.demNum, "반납")}
+                                                                className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                    ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                                    }`}
+                                                            >
+                                                                반납
+                                                            </button>
+                                                        </>
+                                                    );
+                                                })()}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
 
 
-                </table>
+                    </table>
+                </div>
             </div>
 
             {isExtendModalOpen && (

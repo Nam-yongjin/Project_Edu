@@ -4,7 +4,6 @@ import { API_SERVER_HOST } from "./config";
 import { API_MAPPING } from "./config";
 const host = `${API_SERVER_HOST}/api`
 const demonstration = `${host}${API_MAPPING.demonstration}`;
-const admin = `${host}${API_MAPPING.admin}`;
 // 실증 상품 등록하는 요청 jwtAxios에서는 헤더를 직접 달아줘야 한다.
 export const postAdd = async (formData) => {
     const res = await jwtAxios.post(`${demonstration}/addDem`, formData, {
@@ -211,101 +210,4 @@ export const getBorrowResInfo  = async (demNum, pageCount, sort, sortBy, statusF
     }
     });
     return res.data;
-};
-
-// 관리자 물품 대여 관리 페이지에서 회원이 신청한 물품 항목들을 보여주는 요청
-export const getResAdminSearch  = async (pageCount, search, type, sortBy, sort,statusFilter) => {
-    const res = await jwtAxios.get(`${admin}/demRes`,{
-    params: {
-    search:search,
-    type:type,
-    statusFilter:statusFilter,
-    pageCount:pageCount,
-    sortBy:sortBy,
-    sort:sort
-    }
-    });
-    return res.data;
-};
-
-
-// 관리자 물품 대여 관리 페이지에서 회원이 신청한 물품 항목들을 보여주는 요청 (검색어 없음)
-export const getResAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
-    const res = await jwtAxios.get(`${admin}/demRes`,{
-    params: {
-    statusFilter:statusFilter,
-    pageCount:pageCount,
-    sortBy:sortBy,
-    sort:sort
-    }
-    });
-    return res.data;
-};
-
-// 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
-export const updateResState = async (demRevNum,state) => {
-  const res = await jwtAxios.put(`${admin}/ResState`, {
-      demRevNum:demRevNum ,
-        state: state,
-  });
-  return res.data;
-};
-
-// 관리자 물품 대여 페이지에서 반납 요청 / 반납 기한 연장에 대해 수락 / 거절을 업데이트 하는 요청
-export const updateReqState = async (demRevNum,state,type) => {
-  const res = await jwtAxios.put(`${admin}/ReqState`, {
-      demRevNum:demRevNum ,
-        state: state,
-        type:type,
-  });
-  return res.data;
-};
-
-
-// 관리자 물품 대여 페이지에서 물품 대여 신청에 대해 수락 / 거절을 업데이트 하는 요청
-export const updateRegState = async (startDate,endDate,demNum,itemNum) => {
-  const res = await jwtAxios.put(`${admin}/ChangeRes`, {
-      startDate: startDate,
-        endDate: endDate,
-        demNum: demNum,
-        itemNum:itemNum
-  });
-  return res.data;
-};
-
-// 관리자 물품 대여 관리 페이지에서 회원이 등록한 물품 항목들을 보여주는 요청
-export const getRegAdminSearch  = async (pageCount, search, type, sortBy, sort,statusFilter) => {
-    const res = await jwtAxios.get(`${admin}/demReg`,{
-    params: {
-    search:search,
-    type:type,
-    statusFilter:statusFilter,
-    pageCount:pageCount,
-    sortBy:sortBy,
-    sort:sort
-    }
-    });
-    return res.data;
-};
-
-// 관리자 물품 대여 관리 페이지에서 회원이 등록한 물품 항목들을 보여주는 요청 (검색어 없음)
-export const getRegAdmin  = async (pageCount, sort, sortBy, statusFilter) => {
-    const res = await jwtAxios.get(`${admin}/demReg`,{
-    params: {
-    statusFilter:statusFilter,
-    pageCount:pageCount,
-    sortBy:sortBy,
-    sort:sort
-    }
-    });
-    return res.data;
-};
-
-// 관리자 물품 대여 페이지에서 반납 요청 / 반납 기한 연장에 대해 수락 / 거절을 업데이트 하는 요청
-export const updateRegstate = async (demRegNum,state) => {
-  const res = await jwtAxios.put(`${admin}/RegState`, {
-      demRegNum:demRegNum ,
-        state: state
-  });
-  return res.data;
 };

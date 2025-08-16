@@ -69,8 +69,8 @@ public interface DemonstrationReserveRepository
 
 	@Modifying
 	@Transactional
-	@Query("UPDATE DemonstrationReserve SET endDate=:endDate WHERE demRevNum=:demRevNum")
-	int updateDemResEndDate(@Param("demRevNum") Long demRevNum,@Param("endDate") LocalDate endDate);
+	@Query("UPDATE DemonstrationReserve SET endDate=:endDate WHERE demRevNum=:demRevNum AND state=:state")
+	int updateDemResEndDate(@Param("demRevNum") Long demRevNum,@Param("endDate") LocalDate endDate,@Param("state") DemonstrationState state);
 	
 	@Modifying // demonstration reserve 테이블 상태값 변경 쿼리문 (실증 신청 번호를 받음)
 	@Transactional
@@ -137,5 +137,12 @@ public interface DemonstrationReserveRepository
 	                                     @Param("memIds") List<String> memIds,
 	                                     @Param("demNums") List<Long> demNums);
 		
+	    // 여러 상품번호를 받고 그 상품을 대여한 회원 목록 받아옴
 	    List<DemonstrationReserve> findByDemonstration_DemNumIn(List<Long> demNums);
+	    
+
+	    @Modifying
+	    @Transactional
+	    @Query("UPDATE DemonstrationReserve r SET r.state = :expiredState WHERE r.endDate <= :today AND r.state =:state")
+	    int changeResExpiredState(@Param("toady") LocalDate today, @Param("state") DemonstrationState state);
 }

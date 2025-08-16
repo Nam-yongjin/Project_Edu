@@ -4,6 +4,7 @@ import { getList } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import ImageSliderModal from "./ImageSliderModal";
 import useMove from "../../hooks/useMove";
+import SearchComponent from "../demonstration/SearchComponent"; 
 
 const ListComponent = () => {
   const initState = {
@@ -21,20 +22,25 @@ const ListComponent = () => {
   const [searchType, setSearchType] = useState("demName");
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    getList(current, searchType, search).then((data) => {
-      console.log(data);
-      setPageData(data);
-      setListData(data);
-    });
-  }, [current]);
+  const searchOptions = [
+    { value: "demName", label: "상품명" },
+    { value: "demMfr", label: "제조사명" },
+  ];
 
-  const handleSearch = (e) => {
- e.preventDefault(); 
-     getList(current, searchType, search).then((data) => {
+  const fetchData = () => {
+    getList(current, searchType, search).then((data) => {
       setPageData(data);
       setListData(data);
     });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [current, searchType, search]);
+
+  const onSearchClick = () => {
+    setCurrent(0);
+    fetchData();
   };
 
   const mainContent = listData?.content?.map((item) => {
@@ -43,8 +49,7 @@ const ListComponent = () => {
       ? `http://localhost:8090/view/${mainImageObj.imageUrl}`
       : defaultImg;
 
-    return (
-      item.state==="ACCEPT"?
+    return item.state === "ACCEPT" ? (
       <div
         key={item.demNum}
         className="w-[300px] h-[500px] bg-blue-200 p-4 flex flex-col items-center justify-center gap-4 text-center rounded-md shadow-md"
@@ -90,48 +95,32 @@ const ListComponent = () => {
           {item.itemNum !== 0 ? "대여 가능" : "대여 불가능"}
         </button>
       </div>
-      : <></>
+    ) : (
+      <></>
     );
   });
 
   return (
     <>
-      <div className="w-full px-4 mb-4 ml-[230px]">
-        <form
-      onSubmit={handleSearch}  
-      className="flex items-center border border-gray-300 rounded w-full max-w-md overflow-hidden"
-    >
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="검색어를 입력하세요"
-        className="flex-1 min-w-0 px-4 py-2 text-sm focus:outline-none"
-      />
-      <select
-        value={searchType}
-        onChange={(e) => setSearchType(e.target.value)}
-        className="px-3 py-2 text-sm bg-white focus:outline-none border-l border-gray-300"
-        aria-label="검색 옵션 선택"
-      >
-        <option value="demName">상품명</option>
-        <option value="demMfr">제조사명</option>
-      </select>
-      <button
-        type="submit"  
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center justify-center border-l border-gray-300"
-        aria-label="검색"
-      >검색
-      </button>
-    </form>
+      <div className="w-full px-4 mb-4 ml-[120px]">
+        <SearchComponent
+          search={search}
+          setSearch={setSearch}
+          type={searchType}
+          setType={setSearchType}
+          onSearchClick={onSearchClick}
+          searchOptions={searchOptions}
+        />
       </div>
-       <div className="flex flex-wrap justify-center gap-4">
-      {listData.content && listData.content.length === 0 ? (
-        <p className="text-gray-500 text-lg mt-20">등록된 상품이 없습니다.</p>
-      ) : (
-        mainContent
-      )}
-    </div>
+
+      <div className="flex flex-wrap justify-center gap-4">
+        {listData.content && listData.content.length === 0 ? (
+          <p className="text-gray-500 text-lg mt-20">등록된 상품이 없습니다.</p>
+        ) : (
+          mainContent
+        )}
+      </div>
+
       <div className="flex justify-center mt-[50px] mb-[50px]">
         <PageComponent
           totalPages={pageData.totalPages}
