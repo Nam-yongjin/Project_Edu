@@ -1,7 +1,9 @@
 package com.EduTech.service.mail;
 
+import java.io.File;
 import java.util.List;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -50,47 +52,56 @@ public class MailService {
 
 	// memeMessage를 사용하며 타임리프를 이용한 메시지 보내기
 	public void sendMimeMessage(AdminMessageDTO adminMessageDTO) {
+	    try {
+	        // 회원별로 메일 전송
+	        for (String memId : adminMessageDTO.getMemberList()) {
+	            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+	            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-		try {
+	            // 수신자 설정
+	            mimeMessageHelper.setTo(memId);
+	            // 제목 설정
+	            mimeMessageHelper.setSubject(adminMessageDTO.getTitle());
+	            File logoFile = new File("C:/Users/tee16/git/Project_Edu/backend/src/main/resources/static/images/logo.png");
 
-			// 매개 변수: (메시지, multipart 여부, 인코딩)
+	         // 로고를 메일에 inline으로 추가
+	         mimeMessageHelper.addInline("logo", logoFile);
+	            // 타임리프 Context
+	            Context context = new Context();
+	            context.setVariable("memId", memId); // 예시
+	            context.setVariable("content", adminMessageDTO.getContent().replaceAll("(\r\n|\n|\r)", "<br/>"));
+	            
+	            // HTML 렌더링
+	            String htmlContent = templateEngine.process("mailTemplate", context);
+	            mimeMessageHelper.setText(htmlContent, true); // HTML 형식
 
-			for (String memId : adminMessageDTO.getMemberList()) {
-				MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-				MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-				// 메일을 받을 수신자 설정
-				mimeMessageHelper.setTo(memId);
-				// 메일의 제목 설정
-				mimeMessageHelper.setSubject(adminMessageDTO.getTitle());
+	            // 1️⃣ 일반 첨부파일
+	            List<MultipartFile> files = adminMessageDTO.getAttachmentFile();
+	            if (files != null && !files.isEmpty()) {
+	                for (MultipartFile file : files) {
+	                    if (!file.isEmpty()) {
+	                        mimeMessageHelper.addAttachment(file.getOriginalFilename(), file);
+	                    }
+	                }
+	            }
 
-				Context context = new Context();
-				context.setVariable("memId", memId); // 예시
-				context.setVariable("content", adminMessageDTO.getContent().replaceAll("(\r\n|\n|\r)", "<br/>"));
+	            // 2️⃣ Quill 이미지 첨부 (imageList)
+	            List<MultipartFile> images = adminMessageDTO.getImageList();
+	            if (images != null && !images.isEmpty()) {
+	                for (MultipartFile image : images) {
+	                    if (!image.isEmpty()) {
+	                        mimeMessageHelper.addAttachment(image.getOriginalFilename(), image);
+	                    }
+	                }
+	            }
 
-				// HTML 렌더링
-				String htmlContent = templateEngine.process("mailTemplate", context);
-				// 메일의 내용 설정
-				// true: html형식으로 보여줌 false: 일반 텍스트로 보여줌
-				mimeMessageHelper.setText(htmlContent, true);
-				// 첫번째 매개변수값: 사용자가 볼 첨부파일 이름
-				// 두번째 매개변수값: 서버에서 첨부할 파일 경로
-				List<MultipartFile> files = adminMessageDTO.getAttachmentFile();
-				if (files != null && !files.isEmpty()) {
-					for (MultipartFile file : files) {
-						if (!file.isEmpty()) {
-							mimeMessageHelper.addAttachment(file.getOriginalFilename(), // 사용자에게 보여질 이름
-									file // MultipartFile 자체 전달 가능
-							);
-						}
-					}
-				}
-				javaMailSender.send(mimeMessage);
-
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
+	            // 메일 전송
+	            javaMailSender.send(mimeMessage);
+	        }
+	    } catch (Exception e) {
+	        throw new RuntimeException(e);
+	    }
 	}
+
 
 }
