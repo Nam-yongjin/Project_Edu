@@ -607,22 +607,6 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		List<String>rentalMemId=new ArrayList<>();
 		rentalMemId=demonstrationReserveRepository.getResMemId(demNum,DemonstrationState.CANCEL);
 		demonstrationReservationCancels(demNums, rentalMemId);
-		// 기존 상품 이미지 불러옴(폴더에서 이미지 삭제 위해)
-		List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository
-				.selectDemImage(demNum);
-		List<String> filePaths = new ArrayList<>();
-		for (DemonstrationImageDTO dto : deleteImageList) {
-			String path = dto.getImageUrl();
-			String s_path = "s_" + dto.getImageUrl();
-			filePaths.add(path);
-			filePaths.add(s_path);
-		}
-
-		// 폴더에서 이미지 삭제
-		fileUtil.deleteFiles(filePaths);
-
-		// 기존 상품 이미지 삭제 후,
-		demonstrationImageRepository.deleteDemNumImage(demNum);
 	}
 
 	// 실증 번호를 받아서 실증 상품의 정보를 받아오는 기능

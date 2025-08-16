@@ -35,6 +35,7 @@ import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
 import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
+import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.demonstration.RequestType;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
@@ -85,18 +86,19 @@ public class AdminServiceImpl implements AdminService {
 		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getState(),demonstrationApprovalRegDTO.getDemRegNum());
 	}
 
+	// 연장 반납 신청 처리하는 기능
 	@Override
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
 		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND))
 		{
-			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum());
-			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),request.getUpdateDate());
+			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum(),DemonstrationState.WAIT);
+			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),request.getUpdateDate(),DemonstrationState.WAIT);
 		}
 		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL))
 		{
-			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),LocalDate.now());
+			demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED,demonstrationApprovalReqDTO.getDemRevNum());
 		}
-		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType());
+		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType(),DemonstrationState.WAIT);
 	}
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
