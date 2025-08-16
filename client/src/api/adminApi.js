@@ -82,3 +82,10 @@ export const getFacTimesStats = async () => {
     const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/popular_facTimes`);
     return res.data;
 }
+
+// 이메일 전송
+export const sendEmail=async(formData)=> {
+ await jwtAxios.post(`${admin}/sendMessage`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+    }

@@ -15,11 +15,12 @@ public class PageResponseDTO <T>{
 	 private List<T> content;
 	    private int totalPages;
 	   private int currentPage;
-
+	   private Long totalElements;
 	    public PageResponseDTO(Page<T> page) {
 	        this.content = page.getContent(); // 페이지 요소
 	        this.totalPages = page.getTotalPages(); // 전체 페이지
-	        this.currentPage = page.getNumber(); // 현제 페이지 
+	        this.currentPage = page.getNumber(); // 현제 페이지
+	        this.totalElements=page.getTotalElements();
 	    }
 	    
 	 

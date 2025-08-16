@@ -101,7 +101,7 @@ public class AdminServiceImpl implements AdminService {
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
 	public void sendMessageForUser(AdminMessageDTO adminMessageDTO) {
-		mailService.sendSimpleMailMessage(adminMessageDTO);
+		mailService.sendMimeMessage(adminMessageDTO);
 	}
 
 	// 관리자 회원 목록 페이지 조회 기능 (+정렬기준, 정렬방향 추가)
@@ -165,7 +165,7 @@ public class AdminServiceImpl implements AdminService {
 			dtoList.add(adminMemberViewResDTO);
 		}
 
-		return new PageResponseDTO<AdminMemberViewResDTO>(dtoList, memberPage.getTotalPages(), memberPage.getNumber());
+		return new PageResponseDTO<AdminMemberViewResDTO>(dtoList, memberPage.getTotalPages(), memberPage.getNumber(),memberPage.getTotalElements());
 	}
 
 	// 관리자가 회원 상태 수정하는 기능

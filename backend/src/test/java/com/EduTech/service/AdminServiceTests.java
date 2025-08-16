@@ -1,5 +1,7 @@
 package com.EduTech.service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,14 +9,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
+import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
 import com.EduTech.entity.demonstration.DemonstrationState;
-import com.EduTech.entity.member.MemberRole;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.service.admin.AdminService;
 import com.EduTech.service.mail.MailService;
@@ -81,7 +85,7 @@ public class AdminServiceTests {
 	}
 	
 /*
-	// @Test
+	 @Test
 	@DisplayName("simple mail 테스트")
 	public void simpleMailTest() {
 		List<String> memberList = new ArrayList<>();
@@ -93,13 +97,13 @@ public class AdminServiceTests {
 		adminMessageDTO.setMemberList(memberList);
 		mailService.sendSimpleMailMessage(adminMessageDTO);
 	}
-
+*/
 	@Test
 	@DisplayName("타임리프를 이용한 memMail 테스트")
 	public void memMailTest() {
 		List<String> memberList = new ArrayList<>();
 		List<MultipartFile> fileList=new ArrayList<>();
-		Path imagePath = Path.of("C:\\바지이미지.jpg");
+		Path imagePath = Path.of("C:\\apple.jpg");
 		Path txtFilePath = Path.of("C:\\깃허브 순서REAL최종.txt");
 		
 		try {
@@ -107,14 +111,14 @@ public class AdminServiceTests {
 		byte[] fileBytes = Files.readAllBytes(txtFilePath);
 		
 		MockMultipartFile file1 = new MockMultipartFile("AttachmentFile", // form 필드명 (DTO에서 사용하는 필드명)
-				"testfile1.txt", // 업로드되는 파일명
+				"깃허브최종본.txt", // 업로드되는 파일명
 				"text/plain", // MIME 타입
 				fileBytes // 실제 파일 내용
 		);
 
 		MockMultipartFile file2 = new MockMultipartFile("file", // form field name
-				"duke.png", // 원래 파일명
-				"image/png", // content type
+				"apple.jpg", // 원래 파일명
+				"image/jpg", // content type
 				imageBytes // 실제 파일 내용 (byte 배열)
 		);
 		memberList.add("tee1694@naver.com");
@@ -143,5 +147,5 @@ public class AdminServiceTests {
 			
 		}
 	}
-*/
+
 }

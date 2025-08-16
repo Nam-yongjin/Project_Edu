@@ -32,10 +32,8 @@ const SelectComponent = () => {
     const [pageData, setPageData] = useState(initState);
     const [current, setCurrent] = useState(0);
     const [selectedQuestion, setSelectedQuestion] = useState([]);
-
     // 전체 글 개수 계산 (공지글 없는 경우 그대로 totalElements 이용)
     // 공지글 처리 부분은 삭제했습니다 (데이터 구조에 따라 공지글 분리 필요하면 알려주세요)
-    const totalElements = pageData.totalElements ?? Math.max(0, (pageData.totalPages - 1) * pageSize + pageData.content.length);
 
 
 
@@ -186,7 +184,7 @@ const SelectComponent = () => {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">문의사항</h1>
                 <p className="text-gray-600 mt-1">
-                    전체 {totalElements}건의 문의사항이 있습니다.
+                    전체 {pageData.totalElements}건의 문의사항이 있습니다.
                 </p>
             </div>
 
