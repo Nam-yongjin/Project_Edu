@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
+import com.EduTech.dto.admin.AdminEmailMembersDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
@@ -31,4 +32,6 @@ public interface AdminService {
 	void updateBannerSequence(List<Long> bannerNums);	// 배너 순서 수정
 	PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO); // 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.)
 	PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO); // 실증 기업 신청목록 조회 가능(검색도 같이 구현할 것임.)
+	 List<AdminEmailMembersDTO> getMembersByIds(List<String> selectedIds, String sortField, String sortDirection); // 이메일 보낼 회원들 받아오는 기능
+
 }
