@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
+import com.EduTech.dto.admin.AdminEmailMembersDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
@@ -413,6 +414,17 @@ public class AdminServiceImpl implements AdminService {
 		    });
 
 		    return new PageResponseDTO<>(dtoPage);
+		}
+		
+		public List<AdminEmailMembersDTO> getMembersByIds(List<String> selectedIds, String sortField, String sortDirection) {
+			        // JPA나 MyBatis에서 selectedIds로 IN 조회
+			        List<Member> entities = memberRepository.findByMemIdIn(selectedIds);
+
+			        // DTO로 변환
+			        return entities.stream()
+			                       .map(m -> new AdminEmailMembersDTO(m.getMemId(), m.getEmail(), m.getName()))
+			                       .collect(Collectors.toList());
+			    
 		}
 
 }

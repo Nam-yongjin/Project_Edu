@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { sendEmail } from "../../api/adminApi";
+import { sendEmail, getEmailMembers } from "../../api/adminApi";
 
-const AdminEmailComponent = () => {
+const AdminEmailComponent = ({ selectedIds }) => {
   const [memberList, setMemberList] = useState([]);
-  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState([]); // 이메일 배열
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageList, setImageList] = useState([]);
@@ -13,21 +13,28 @@ const AdminEmailComponent = () => {
 
   const quillRef = useRef(null);
 
+  // 선택된 ID 기반으로 회원 리스트 가져오기
   useEffect(() => {
-    setMemberList([
-      { id: "tee1694@naver.com", name: "김태근" },
-      { id: "tee169412@gmail.com", name: "김태근2" },
-      { id: "user3", name: "홍길동" },
-    ]);
+    if (selectedIds.length === 0) return;
 
+    const fetchMembers = async () => {
+      const members = await getEmailMembers(selectedIds);
+      console.log("회원 리스트:", members); // 확인용
+      setMemberList(members);
+    };
+
+    fetchMembers();
+
+    // Quill 에디터 스타일
     const style = document.createElement("style");
     style.innerHTML = `
       .ql-editor { min-height:600px; max-height:600px; overflow-y:auto; padding:12px; }
       .ql-editor img { display:inline-block; max-width:100%; height:auto; vertical-align:middle; }
     `;
     document.head.appendChild(style);
-  }, []);
+  }, [selectedIds]);
 
+  // 선택된 회원 이메일 처리
   const handleMemberSelect = (e) => {
     setSelectedMembers(Array.from(e.target.selectedOptions, (option) => option.value));
   };
@@ -103,12 +110,16 @@ const AdminEmailComponent = () => {
     },
   }), []);
 
-  const formats = ["header","bold","italic","underline","strike","color","background","list","bullet","link","image","align"];
+  const formats = [
+    "header","bold","italic","underline","strike","color","background",
+    "list","bullet","link","image","align"
+  ];
 
   const handleAttachFiles = (e) => {
     setAttachFiles((prev) => [...prev, ...Array.from(e.target.files)]);
   };
 
+  // 이메일 전송
   const handleSend = async () => {
     if (!title || !content || selectedMembers.length === 0) {
       alert("제목, 본문, 수신 회원을 모두 입력해주세요.");
@@ -118,9 +129,8 @@ const AdminEmailComponent = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    selectedMembers.forEach((m) => formData.append("memberList", m));
+    selectedMembers.forEach((email) => formData.append("memberList", email));
     attachFiles.forEach((file) => formData.append("attachmentFile", file));
-    // imageList는 inline 처리 용도라 서버에서 따로 관리
 
     try {
       await sendEmail(formData);
@@ -138,28 +148,59 @@ const AdminEmailComponent = () => {
 
       <div className="mb-4">
         <label className="font-semibold block mb-1">회원 선택:</label>
-        <select multiple value={selectedMembers} onChange={handleMemberSelect} className="w-full h-28 border p-2 rounded">
-          {memberList.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.id})</option>)}
+        <select
+          multiple
+          value={selectedMembers}
+          onChange={handleMemberSelect}
+          className="w-full h-28 border p-2 rounded"
+        >
+          {memberList.map((m) => (
+            <option key={m.memId} value={m.email}>
+              {m.name} ({m.memId})
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="mb-4">
         <label className="font-semibold block mb-1">제목:</label>
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full border p-2 rounded"/>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
       </div>
 
       <div className="mb-4">
         <label className="font-semibold block mb-1">본문:</label>
-        <ReactQuill ref={quillRef} theme="snow" value={content} onChange={setContent} modules={modules} formats={formats}/>
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={content}
+          onChange={setContent}
+          modules={modules}
+          formats={formats}
+        />
       </div>
 
       <div className="mb-4">
         <label className="font-semibold block mb-1">첨부파일 업로드:</label>
-        <input type="file" multiple onChange={handleAttachFiles} className="w-full border p-2 rounded"/>
+        <input
+          type="file"
+          multiple
+          onChange={handleAttachFiles}
+          className="w-full border p-2 rounded"
+        />
       </div>
 
       <div className="text-center">
-        <button onClick={handleSend} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">이메일 보내기</button>
+        <button
+          onClick={handleSend}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          이메일 보내기
+        </button>
       </div>
     </div>
   );

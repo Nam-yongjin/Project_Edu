@@ -1,10 +1,15 @@
+import { useLocation } from "react-router-dom";
 import AdminEmailComponent from "../../components/admin/AdminEmailComponent";
 
 const AdminEmailPage = () => {
-    return(
+    const location = useLocation();
+    const selectedIds = location.state?.selectedIds || []; // 선택된 ID 배열
+
+    return (
         <div>
-            <AdminEmailComponent />
+            <AdminEmailComponent selectedIds={selectedIds} />
         </div>
     );
 };
+
 export default AdminEmailPage;

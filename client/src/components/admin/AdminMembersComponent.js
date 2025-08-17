@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { viewMembers, memberStateChange } from "../../api/adminApi";
 import PageComponent from "../common/PageComponent";
-
+import { useNavigate } from "react-router-dom";
 const AdminMembersComponent = () => {
     const [members, setMembers] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [selectedState, setSelectedState] = useState("");
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useState({
         memId: "",
         name: "",
@@ -238,6 +239,18 @@ const AdminMembersComponent = () => {
                     className="nagative-button"
                 >
                     선택 회원 상태 변경
+                </button>
+                <button
+                    onClick={() => {
+                        if (selectedIds.length === 0) {
+                            alert("회원을 선택해 주세요");
+                            return;
+                        }
+                       navigate("/admin/adminEmail", { state: { selectedIds } });
+                    }}
+                    className="bg-yellow-300 hover:bg-yellow-200 text-white font-semibold py-2 px-4 rounded"
+                >
+                    선택 회원 메시지 보내기
                 </button>
             </div>
 
