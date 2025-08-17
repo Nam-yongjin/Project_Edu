@@ -5,9 +5,9 @@ import { Navigate } from "react-router-dom";
 const Members = lazy(() => import("../pages/admin/AdminMembersPage"));
 const Banner = lazy(() => import("../pages/admin/AdminBannerPage"));
 const Stats = lazy(() => import("../pages/admin/StatsPage"));
-const AdminRes = lazy(() => import("../pages/admin/AdminResPage"))
-const AdminReg = lazy(() => import("../pages/admin/AdminRegPage"))
-const AdminEmail=lazy(() => import("../pages/admin/AdminEmailPage"))
+const AdminRes = lazy(() => import("../pages/admin/AdminResPage"));
+const AdminReg = lazy(() => import("../pages/admin/AdminRegPage"));
+const AdminEmail=lazy(() => import("../pages/admin/AdminEmailPage"));
 const adminRouter = () => {
     return [
         {
@@ -38,7 +38,7 @@ const adminRouter = () => {
          {
             path:"adminEmail",
             element: <Suspense fallback={<Loading />}><AdminEmail /></Suspense>
-        },
+        }
     ];
 };
 export default adminRouter;
