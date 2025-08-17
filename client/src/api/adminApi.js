@@ -91,6 +91,7 @@ export const updateResState = async (demRevNum,state) => {
 
 // 관리자 물품 대여 페이지에서 반납 요청 / 반납 기한 연장에 대해 수락 / 거절을 업데이트 하는 요청
 export const updateReqState = async (demRevNum,state,type) => {
+    console.log(type);
   const res = await jwtAxios.put(`${admin}/ReqState`, {
       demRevNum:demRevNum ,
         state: state,

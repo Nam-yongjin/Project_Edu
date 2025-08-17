@@ -8,7 +8,6 @@ const DetailComponent = ({ questionNum }) => {
   const [loading, setLoading] = useState(true);
   const [answerContent, setAnswerContent] = useState("");
   const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
-  // 수정 상태
   const [editingAnswerNum, setEditingAnswerNum] = useState(null);
   const [editingAnswerContent, setEditingAnswerContent] = useState("");
 
@@ -20,6 +19,10 @@ const DetailComponent = ({ questionNum }) => {
   }, [questionNum]);
 
   const handleAnswerSubmit = () => {
+    if(loginState.role!=="ADMIN")
+    {
+      alert("관리자만 글 작성 가능합니다.");
+    }
     if (answerContent === "") {
       alert("답변을 입력해주세요.");
       return;

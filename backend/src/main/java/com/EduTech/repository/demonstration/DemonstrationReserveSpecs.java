@@ -94,7 +94,7 @@ public class DemonstrationReserveSpecs {
 
    }
    
-
+   // 관리자 실증 등록 페이지에서 조회를 위한 조건
    public static Specification<DemonstrationReserve> withResSearchAndSortAdmin(
 	        String type,
 	        String search,
@@ -165,6 +165,7 @@ public class DemonstrationReserveSpecs {
 	}
 
 
+// 실증 물품 등록 확인 페이지에서 해당 물품을 대여 신청한 사람들을 불러오는 조건
    public static Specification<DemonstrationReserve> withResSearchAndSort(
 	        String memId,
 	        String type,

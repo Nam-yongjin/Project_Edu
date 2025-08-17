@@ -89,12 +89,12 @@ public class AdminServiceImpl implements AdminService {
 	// 연장 반납 신청 처리하는 기능
 	@Override
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
-		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND))
+		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND)&&demonstrationApprovalReqDTO.getState().equals("ACCEPT"))
 		{
 			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum(),DemonstrationState.WAIT);
-			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),request.getUpdateDate(),DemonstrationState.WAIT);
+			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),request.getUpdateDate(),DemonstrationState.ACCEPT);
 		}
-		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL))
+		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL)&&demonstrationApprovalReqDTO.getState().equals("ACCEPT"))
 		{
 			demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED,demonstrationApprovalReqDTO.getDemRevNum());
 		}

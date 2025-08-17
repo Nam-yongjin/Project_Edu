@@ -9,7 +9,7 @@ import megaphone from '../../assets/megaphone.png';
 import calendar from '../../assets/calendar.png';
 import useMove from "../../hooks/useMove";
 import ItemModal from "./itemModal";
-
+import { useSelector } from "react-redux";
 const DetailComponent = ({ demNum }) => {
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [dem, setDem] = useState([]); // 서버에서 받아올 여러가지 값들
@@ -22,6 +22,7 @@ const DetailComponent = ({ demNum }) => {
     const [reservationQty, setReservationQty] = useState(1);
     const [reserveCheck, setReserveCheck] = useState(false);
     const [selectedDate, setSelectedDate] = useState([]); // 캘린더에서 선택한 날짜를 저장하는 state 변수
+    const loginState = useSelector((state) => state.loginState);
     const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
@@ -124,7 +125,12 @@ const DetailComponent = ({ demNum }) => {
     };
 
     const reservation = (updatedItemNum) => {
+        if (loginState.role !== "TEACHER") {
+                alert("교사만 예약 가능합니다.");
+                return;
+            }
         const loadData = async () => {
+
             if (!selectedDate || selectedDate.length === 0) {
                 alert('날짜를 선택해주세요!');
                 return;
@@ -261,7 +267,7 @@ const DetailComponent = ({ demNum }) => {
 
                                 <div className="flex items-center gap-3">
                                     <img src={calendar} className="w-6 h-6" alt="calendar" />
-                        {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
+                                    {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
                                     <label className="text-base font-semibold w-[100px]">예약 종료일:</label>
                                     <DatePicker
                                         className="border p-1 text-sm flex-1 min-w-0 box-border"
