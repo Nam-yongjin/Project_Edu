@@ -92,7 +92,7 @@ public class Scheduler {
 		for (Long demNum : demNums) {
 			demRepository.findById(demNum).ifPresent(demo -> {
 				demRepository.delete(demo); // 영속성 컨텍스트 거쳐서 cascade 삭제됨
-				List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository.selectDemImage(demNum);
+				List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository.selectDemImageIn(List.of(demNum));
 				List<String> filePaths = new ArrayList<>();
 				for (DemonstrationImageDTO dto : deleteImageList) {
 					String path = dto.getImageUrl();
@@ -105,7 +105,7 @@ public class Scheduler {
 				fileUtil.deleteFiles(filePaths);
 
 				// 기존 상품 이미지 삭제 후,
-				demonstrationImageRepository.deleteDemNumImage(demNum);
+				demonstrationImageRepository.deleteDemNumImage(List.of(demNum));
 			});
 		}
 	}

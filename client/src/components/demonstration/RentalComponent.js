@@ -46,7 +46,7 @@ const RentalComponent = () => {
     const [reservationQty, setReservationQty] = useState(1); // 수량 설정
     const [isExtendModalOpen, setIsExtendModalOpen] = useState(false); // 날짜 연장용 모달창 상태 변수
     const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
-
+     const [disabledExtendDate, setdisabledExtendDate] = useState([]);
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
@@ -255,7 +255,8 @@ const RentalComponent = () => {
         return `${y}-${m}-${d}`;
     }
 
-    const handleExtendButtonClick = (demNum) => {
+    const handleExtendButtonClick = (demNum,endDate) => {
+        setdisabledExtendDate(endDate);
         setSelectedDemNum(demNum);
         setIsExtendModalOpen(true);
     };
@@ -373,7 +374,7 @@ const RentalComponent = () => {
                             {listData.content.length === 0 ? (
                                 <tr>
                                     <td colSpan={10} className="py-10 text-center text-gray-500">
-                                        등록된 상품이 없습니다.
+                                        대여한 상품이 없습니다.
                                     </td>
                                 </tr>
                             ) : (
@@ -482,7 +483,7 @@ const RentalComponent = () => {
 
                                                             <button
                                                                 disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                                onClick={() => handleExtendButtonClick(item.demNum)}
+                                                                onClick={() => handleExtendButtonClick(item.demNum,item.endDate)}
                                                                 className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
                                                                     ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
                                                                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -510,8 +511,6 @@ const RentalComponent = () => {
                                 })
                             )}
                         </tbody>
-
-
                     </table>
                 </div>
             </div>
@@ -525,8 +524,10 @@ const RentalComponent = () => {
                             type="date"
                             className="border rounded p-2 w-full mb-4"
                             value={extendDate}
+                             min={disabledExtendDate}
                             onChange={(e) => setExtendDate(e.target.value)}
                         />
+           
                         <div className="flex justify-end gap-2">
                             <button
                                 className="px-4 py-2 bg-gray-300 rounded"
@@ -536,10 +537,17 @@ const RentalComponent = () => {
                             </button>
                             <button
                                 className="px-4 py-2 bg-green-500 text-white rounded"
-                                onClick={() => handleExtendConfirm(extendDate)}  // 날짜 매개변수 전달
+                                onClick={() => {
+                                    if (!extendDate) {
+                                        alert("날짜를 선택해주세요.");
+                                        return;
+                                    }
+                                    handleExtendConfirm(extendDate);
+                                }}
                             >
                                 확인
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -579,6 +587,10 @@ const RentalComponent = () => {
                             <button
                                 className="bg-blue-500 text-white px-4 py-2 rounded"
                                 onClick={() => {
+                                    if (!selectedDate) {
+                                        alert("날짜를 선택해주세요.");
+                                        return;
+                                    }
                                     setShowQtyModal(true);
                                 }}
                             >

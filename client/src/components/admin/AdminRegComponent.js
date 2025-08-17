@@ -214,7 +214,7 @@ const AdminRegComponent = () => {
                                         <td className="py-1 px-2 whitespace-nowrap text-center truncate max-w-[130px]" title={data.demName}>
                                             {data.demName || "-"}
                                         </td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center">{data.itemNum || "-"}</td>
+                                        <td className="py-1 px-2 whitespace-nowrap text-center">{data.itemNum ?? "-"}</td>
 
                                         <td className="py-1 px-2 font-semibold whitespace-nowrap text-center">
                                             <div>{getStateLabel(data.state)}</div>
