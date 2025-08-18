@@ -60,7 +60,7 @@ const Footer = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50" onClick={closeModal}>   {/*화면 밖 클릭시 모달 닫기*/}
                     <div className="min-blank bg-white max-w-2xl p-6 rounded-lg max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}> {/*화면 안 클릭시 모달 닫기 금지*/}
                         <h2 className="newText-lg font-semibold mb-4">{title}</h2>
-                        <pre className="whitespace-pre-wrap newText-sm">{content}</pre>
+                        <pre className="nanum-gothic whitespace-pre-wrap newText-sm">{content}</pre>
                         <div className="text-right mt-4">
                             <button
                                 onClick={() => setIsOpen(false)}

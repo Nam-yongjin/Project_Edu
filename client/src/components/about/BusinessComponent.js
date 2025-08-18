@@ -16,7 +16,7 @@ const BusinessComponent = () => {
         <div className="mx-auto max-w-screen-xl">
             <div className="min-blank my-10 border-b border-gray-300">
                 <div className="newText-2xl font-bold">사업소개</div>
-                <div className="newText-xl font-semibold py-8">에듀테크 소프트랩이란?</div>
+                <div className="newText-xl font-medium py-8">에듀테크 소프트랩이란?</div>
                 <div className="newText-lg pb-8" style={{ whiteSpace: 'pre-wrap' }}>{businessText}</div>
             </div>
             <div className="min-blank my-10">

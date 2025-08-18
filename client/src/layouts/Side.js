@@ -37,7 +37,7 @@ const Side = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div>
+        <div className=''>
             {/* 오버레이 */}
             <div className={`fixed inset-0 bg-gray-900 bg-opacity-50 z-40 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
