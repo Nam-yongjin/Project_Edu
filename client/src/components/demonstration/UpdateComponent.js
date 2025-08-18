@@ -12,14 +12,13 @@ const UpdateComponent = ({ demNum }) => {
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
   const { moveToPath, moveToReturn } = useMove();
 
-  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "" };
+  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", category: "" };
   const [dem, setDem] = useState({ ...initState });
   const [returnDate, setReturnDate] = useState(new Date());
   const [images, setImages] = useState([]);
   const [fileInputKey, setFileInputKey] = useState(Date.now());
   const [errors, setErrors] = useState({});
   const serverHost = "http://localhost:8090/";
-
   useEffect(() => {
     if (!isCompany && !isAdmin) {
       alert("권한이 없습니다.");
@@ -109,11 +108,13 @@ const UpdateComponent = ({ demNum }) => {
     if (!dem.demInfo.trim()) newErrors.demInfo = "물품 설명은 필수입니다.";
     if (images.length === 0) newErrors.images = "이미지는 최소 1장 등록해야 합니다.";
     if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 0) newErrors.itemNum = "수량은 0이상이어야 합니다.";
-
+    if (!dem.category) {
+      newErrors.category = "카테고리를 선택해주세요.";
+    }
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
     const selectedDate = new Date(dem.expDate);
-    selectedDate.setHours(0,0,0,0);
+    selectedDate.setHours(0, 0, 0, 0);
     if (selectedDate <= today) newErrors.expDate = "반납 날짜는 오늘 이후여야 합니다.";
 
     setErrors(newErrors);
@@ -149,28 +150,47 @@ const UpdateComponent = ({ demNum }) => {
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">물품명:</label>
           <input type="text" name="demName" value={dem.demName} onChange={handleChangeDem}
-            placeholder="제품 이름을 입력해주세요." className="border p-3 text-lg flex-1 min-w-0 box-border"/>
+            placeholder="제품 이름을 입력해주세요." className="border p-3 text-lg flex-1 min-w-0 box-border" />
         </div>
         {errors.demName && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.demName}</p>}
 
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">제조사:</label>
           <input type="text" name="demMfr" value={dem.demMfr} onChange={handleChangeDem}
-            placeholder="제조사를 입력해주세요." className="border p-3 text-lg flex-1 min-w-0 box-border"/>
+            placeholder="제조사를 입력해주세요." className="border p-3 text-lg flex-1 min-w-0 box-border" />
         </div>
         {errors.demMfr && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.demMfr}</p>}
 
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">개수:</label>
           <input type="text" name="itemNum" value={dem.itemNum} onChange={handleChangeDem}
-            placeholder="개수를 입력해주세요." className="border p-3 text-lg flex-1 min-w-0 box-border"/>
+            placeholder="개수를 입력해주세요." className="border p-3 text-lg flex-1 min-w-0 box-border" />
         </div>
         {errors.itemNum && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.itemNum}</p>}
+
+        <div className="flex items-center">
+          <label className="text-xl font-semibold w-[120px]">카테고리:</label>
+          <select
+          name="category"
+            className="border rounded p-2"
+            value={dem.category}
+            onChange={handleChangeDem}  
+          >
+            <option value="">카테고리 선택</option>
+            <option value="LAPTOP">노트북</option>
+            <option value="TABLET">태블릿</option>
+            <option value="PRINTER">프린터</option>
+            <option value="VR">학습용VR</option>
+            <option value="ROBOT">학습용AI로봇</option>
+          </select>
+        </div>
+
+        {errors.category && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.category}</p>}
 
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">소개:</label>
           <textarea rows={5} name="demInfo" value={dem.demInfo} onChange={handleChangeDem}
-            placeholder="제품 소개를 입력해주세요." className="border p-3 text-lg flex-1 resize-y min-w-0 box-border"/>
+            placeholder="제품 소개를 입력해주세요." className="border p-3 text-lg flex-1 resize-y min-w-0 box-border" />
         </div>
         {errors.demInfo && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.demInfo}</p>}
 
@@ -217,9 +237,9 @@ const UpdateComponent = ({ demNum }) => {
                   <label className="text-xs font-medium">대표 이미지</label>
                   <input type="checkbox" checked={Boolean(img.isMain)}
                     onChange={() => handleCheckboxChange(index)}
-                    className="w-4 h-4"/>
+                    className="w-4 h-4" />
                 </div>
-                <img src={img.url} alt="preview" className="w-full h-32 object-cover rounded"/>
+                <img src={img.url} alt="preview" className="w-full h-32 object-cover rounded" />
                 <p className="text-sm mt-1 break-words">{img.name}</p>
                 <button type="button" onClick={() => fileDelete(img)}
                   className="text-red-600 text-xs mt-1 self-end hover:text-red-800">

@@ -153,7 +153,6 @@ public class DemonstrationController {
 			@RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
 			@RequestPart("imageList") List<MultipartFile> imageList) {
 		String memId = JWTFilter.getMemId();
-
 		demonstrationService.addDemonstration(demonstrationFormDTO, imageList, memId);
 
 		return ResponseEntity.ok("실증 물품 등록 완료");
