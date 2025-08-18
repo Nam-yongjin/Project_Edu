@@ -11,15 +11,7 @@
   }
 }
 
-/* 구글폰트 마지막에 넣기 */
-@import url('https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300..800&display=swap');
-.Asta_Sans{
-  font-family: "Asta Sans", sans-serif;
-}
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
-.noto-sans-kr{
-  font-family: "Noto Sans KR", sans-serif;
-}
+/* 구글폰트 */
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
 .nanum-gothic {
   font-family: "Nanum Gothic", sans-serif;
@@ -27,14 +19,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap');
 .noto-serif-kr {
   font-family: "Noto Serif KR", serif;
-}
-@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-.jua {
-  font-family: "Jua", sans-serif;
-}
-@import url('https://fonts.googleapis.com/css2?family=Orbit&display=swap');
-.orbit {
-  font-family: "Orbit", sans-serif;
 }
 
 /* 페이지 최소 좌우 여백 */
