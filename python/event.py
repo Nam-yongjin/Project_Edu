@@ -11,6 +11,6 @@ def event_category_stats():
     """, conn)
     conn.close()
 
-    total = df["count"].sum()
+    total = int(df["count"].sum())
     df["ratio"] = round(df["count"] / total * 100, 2)
     return df.to_dict(orient="records") # JSON 형태로 변환

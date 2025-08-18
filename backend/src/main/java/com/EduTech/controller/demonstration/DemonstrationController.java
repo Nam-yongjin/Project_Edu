@@ -45,7 +45,7 @@ public class DemonstrationController {
 	private final DemonstrationService demonstrationService;
 
 	// 기업들이 등록한 물품들에 대여 중인 선생들의 정보 조회
-	@PreAuthorize("hasRole('COMPANY')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@GetMapping("/borrowRes")
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResBorrowPage(
 			@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
@@ -147,7 +147,7 @@ public class DemonstrationController {
 		demonstrationService.addRequest(resRequestDTO, memId);
 		return ResponseEntity.ok("요청 성공");
 	}
-	@PreAuthorize("hasRole('COMPANY')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@PostMapping("/addDem") // 이미지 파일 업로드 관련해서 8개까지 밖에 컨트롤러에 도달 못함(아마 톰켓 서버 관련 설정일듯, 톰켓 서버 설정 바꿔도 안먹음)
 	public ResponseEntity<String> DemAdd(
 			@RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
@@ -158,8 +158,8 @@ public class DemonstrationController {
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
 
-	// 실증 상품 수정하는 기능\
-	@PreAuthorize("hasRole('COMPANY')")
+	// 실증 상품 수정하는 기능
+	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@PutMapping("/UpdateDem")
 	public ResponseEntity<String> DemUpdate(
 			@RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
@@ -170,7 +170,7 @@ public class DemonstrationController {
 	}
 
 	// 실증 번호를 받아 실증 상품을 삭제하는 기능
-	@PreAuthorize("hasRole('COMPANY')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@DeleteMapping("/DeleteDem/{demNum}")
 	public ResponseEntity<String> demDelete(@PathVariable("demNum") Long demNum) {
 		String memId = JWTFilter.getMemId();
@@ -180,7 +180,7 @@ public class DemonstrationController {
 	}
 
 	// 실증 등록 수정 페이지에서 실증번호를 받아와 실증 상품의 정보를 받아오는 기능
-	@PreAuthorize("hasRole('COMPANY')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@GetMapping("/SelectOne")
 	public DemonstrationFormResDTO SelectOne(@RequestParam("demNum") Long demNum) {
 		DemonstrationFormResDTO dto = demonstrationService.selectOne(demNum);
@@ -198,7 +198,7 @@ public class DemonstrationController {
 	}
 	
 	// 실증 물품 현황 페이지에서 물품에 대한 정보를 받아오는 기능
-	@PreAuthorize("hasRole('COMPANY')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@GetMapping("/getBorrow") 
 	public PageResponseDTO<DemonstrationBorrowListDTO> getBorrow(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
 		String memId = JWTFilter.getMemId();

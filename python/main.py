@@ -6,6 +6,7 @@ from visit import visitors
 from member import member_role_stats
 from event import event_category_stats
 from facility import popular_facility_times
+from demonstration import demonstration_registration_stats, demonstration_reserve_stats
 
 app = FastAPI()
 
@@ -61,3 +62,13 @@ async def eventCategory_stats():
 @app.get("/api/admin/popular_facTimes")
 async def popular_facTimes():
     return popular_facility_times()
+
+# 실증 카테고리별 등록 수, 비율
+@app.get("/api/admin/demRegCategory")
+async def demonstrationRegistration_stats():
+    return demonstration_registration_stats()
+
+# 실증 카테고리별 대여 수, 비율
+@app.get("/api/admin/demRevCategory")
+async def demonstrationReserve_stats():
+    return demonstration_reserve_stats()
