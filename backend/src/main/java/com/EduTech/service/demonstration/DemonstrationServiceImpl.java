@@ -403,7 +403,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			String memId) {
 		Demonstration demonstration = Demonstration.builder().demName(demonstrationFormDTO.getDemName())
 				.demInfo(demonstrationFormDTO.getDemInfo()).demMfr(demonstrationFormDTO.getDemMfr())
-				.itemNum(demonstrationFormDTO.getItemNum()).build();
+				.itemNum(demonstrationFormDTO.getItemNum()).category(demonstrationFormDTO.getCategory()).build();
 
 		// 실증 물품 등록
 		demonstrationRepository.save(demonstration);
@@ -446,7 +446,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 			String memId) {
 		// 실증 상품 정보 업데이트
 		demonstrationRepository.updateDem(demonstrationFormDTO.getDemName(), demonstrationFormDTO.getDemMfr(),
-				demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum());
+				demonstrationFormDTO.getItemNum(), demonstrationFormDTO.getDemInfo(), demonstrationFormDTO.getDemNum(),demonstrationFormDTO.getCategory());
 
 		// 반납 예정일 수정
 		demonstrationRegistrationRepository.updateDemRegChangeExpDate(demonstrationFormDTO.getExpDate(),

@@ -6,6 +6,8 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,6 +46,10 @@ public class Demonstration { // 엔티티에 유효성 검사는 db에 데이터
 	@Column(nullable = false)
 	private Long itemNum; // 개수
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private DemonstrationCategory category; // 카테고리 종류
+	
 	// cascade.All: 저장하면 이미지도 저장, 삭제하면 이미도 삭제됨. orpahnRemoval: demonstrate에서 이미지 리스트
 	// 하나를 빼면 그 이미지를 db에서 제거함
 	@OneToMany(mappedBy = "demonstration", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -61,5 +67,7 @@ public class Demonstration { // 엔티티에 유효성 검사는 db에 데이터
 
 	@OneToMany(mappedBy = "demonstration", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DemonstrationTime> demonstrationTime = new ArrayList<>();
+	
+	
 
 }

@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 
 const AddComponent = () => {
-  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date() };
+  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(),category:"" };
   const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
   const [images, setImages] = useState([]);
@@ -16,7 +16,6 @@ const AddComponent = () => {
   const { moveToPath, moveToReturn } = useMove();
   const [errors, setErrors] = useState({});
   const [fileInputKey, setFileInputKey] = useState(Date.now());
-
   // 권한 체크
   useEffect(() => {
     if (!isCompany && !isAdmin) {
@@ -41,6 +40,9 @@ const AddComponent = () => {
     if (images.length === 0) newErrors.images = "이미지는 최소 1장 등록해야 합니다.";
     if (!Number.isInteger(Number(dem.itemNum)) || Number(dem.itemNum) < 0) {
       newErrors.itemNum = "수량은 0이상이여야 합니다.";
+    }
+    if (!dem.category) {
+      newErrors.category = "카테고리를 선택해주세요.";
     }
 
     // 날짜 체크
@@ -166,6 +168,25 @@ const AddComponent = () => {
           />
         </div>
         {errors.itemNum && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.itemNum}</p>}
+
+        <div className="flex items-center">
+          <label className="text-xl font-semibold w-[120px]">카테고리:</label>
+          <select
+          name="category"
+            className="border rounded p-2"
+            value={dem.category}
+            onChange={handleChangeDem}
+          >
+            <option value="">카테고리 선택</option>
+            <option value="LAPTOP">노트북</option>
+            <option value="TABLET">태블릿</option>
+            <option value="PRINTER">프린터</option>
+            <option value="VR">학습용VR</option>
+            <option value="ROBOT">학습용AI로봇</option>
+          </select>
+        </div>
+
+        {errors.category && <p className="text-red-600 text-sm mt-1 ml-[120px]">{errors.category}</p>}
 
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">소개:</label>
