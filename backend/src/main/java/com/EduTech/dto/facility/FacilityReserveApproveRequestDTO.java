@@ -9,5 +9,6 @@ import lombok.Setter;
 @Setter
 public class FacilityReserveApproveRequestDTO {
     private Long reserveId;          // 예약 번호 (PK)
+    
     private FacilityState state;     // ACCEPT / REJECT
 }
