@@ -87,8 +87,6 @@ const Header = () => {
         { name: "배너 관리", link: "/admin/banner" },
         { name: "통계 확인", link: "/admin/stats" },
         { name: "휴무일 관리", link: "/facility/holiday" },
-        { name: "실증 신청 관리", link: "/admin/adminReg" },
-        { name: "실증 대여 관리", link: "/admin/adminRes" },
       ],
     });
     const eventMenu = mainMenus.find(menu => menu.name === "프로그램");
@@ -110,7 +108,15 @@ const Header = () => {
     companyMenu.sub.push({ name: "실증 등록", link: "/demonstration/add" }, { name: "실증 신청 내역", link: "/demonstration/borrowList" });
   }
 
-
+if (loginState.role === "ADMIN") {
+  const adminMenu = mainMenus.find(menu => menu.name === "실증 지원"); // 메인 메뉴 이름에 맞춰 변경
+  if (adminMenu) {
+    adminMenu.sub.push(
+      { name: "실증신청 관리", link: "/demonstration/adminReg" },
+      { name: "실증대여 관리", link: "/demonstration/adminRes" }
+    );
+  }
+}
   return (
     <header className="fixed top-0 left-0 w-full bg-white shadow z-50 ">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between h-20">

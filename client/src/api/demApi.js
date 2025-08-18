@@ -211,3 +211,4 @@ export const getBorrowResInfo  = async (demNum, pageCount, sort, sortBy, statusF
     });
     return res.data;
 };
+

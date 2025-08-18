@@ -1,4 +1,4 @@
-import AdminResComponent from "../../components/admin/AdminResComponent";
+import AdminResComponent from "../../components/demonstration/AdminResComponent";
 const AdminResPage = () => {
 
     return (

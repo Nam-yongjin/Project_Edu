@@ -1,4 +1,4 @@
-import AdminRegComponent from "../../components/admin/AdminRegComponent";
+import AdminRegComponent from "../../components/demonstration/AdminRegComponent";
 
 const AdminRegPage = () => {
 
