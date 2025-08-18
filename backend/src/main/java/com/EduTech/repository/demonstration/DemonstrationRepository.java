@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
 import com.EduTech.entity.demonstration.Demonstration;
+import com.EduTech.entity.demonstration.DemonstrationCategory;
 import com.EduTech.entity.demonstration.DemonstrationState;
 
 public interface DemonstrationRepository extends JpaRepository<Demonstration, Long> { // 실증 상품 관련 레포지토리
@@ -34,9 +35,9 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 
 	@Modifying // JPQL에서 업데이트하는 방식 (기업의 실증 등록내용을 수정시켜주는 쿼리문)
 	@Transactional
-	@Query("UPDATE Demonstration d SET d.demName = :demName, d.demMfr = :demMfr, d.itemNum = :itemNum, d.demInfo = :demInfo WHERE d.demNum = :demNum")
+	@Query("UPDATE Demonstration d SET d.demName = :demName, d.demMfr = :demMfr, d.itemNum = :itemNum, d.demInfo = :demInfo, d.category=:category WHERE d.demNum = :demNum")
 	int updateDem(@Param("demName") String demName, @Param("demMfr") String demMfr, @Param("itemNum") Long itemNum,
-			@Param("demInfo") String demInfo, @Param("demNum") Long demNum);
+			@Param("demInfo") String demInfo, @Param("demNum") Long demNum,@Param("category") DemonstrationCategory category);
 
 	@Modifying // JPQL에서 업데이트하는 방식 (실증 물품 갯수 업데이트 하는 쿼리문)
 	@Transactional
