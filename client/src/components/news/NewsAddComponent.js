@@ -9,8 +9,8 @@ const NewsAddComponent = () => {
     const initState = {
         title: '',
         content: '',
-        imageUrl: '', // 썸네일 이미지 URL
-        linkUrl: ''   // 외부 기사 링크
+        imageUrl: '',
+        linkUrl: ''
     };
 
     const [news, setNews] = useState(initState);
@@ -35,7 +35,7 @@ const NewsAddComponent = () => {
         e.target.style.height = e.target.scrollHeight + 'px';
     };
 
-    // URL 유효성 검사 함수
+    // URL 유효성 검사
     const isValidUrl = (string) => {
         try {
             new URL(string);
@@ -45,7 +45,7 @@ const NewsAddComponent = () => {
         }
     };
 
-    // 이미지 URL 유효성 검사 함수
+    // 이미지 URL 유효성 검사
     const isValidImageUrl = (url) => {
         if (!isValidUrl(url)) return false;
         const imageExtensions = ['.jpg', '.jpeg', '.png'];
@@ -109,7 +109,7 @@ const NewsAddComponent = () => {
         setImageLoadError(true);
     };
 
-    // 등록 버튼 (JSON 방식)
+    // 등록 버튼
     const handleAdd = async () => {
         if (!validateForm()) {
             return;
@@ -142,9 +142,9 @@ const NewsAddComponent = () => {
     };
 
     return (
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
-            <div className="max-w-4xl mx-auto mt-4 px-10 p-6 bg-white rounded-xl shadow-md space-y-6">
-                <h2 className="text-2xl my-4 font-bold">뉴스 등록</h2>
+        <div className="max-w-screen-xl mx-auto my-10">
+            <div className="min-blank mt-4 px-10 p-6 bg-white page-shadow space-y-6">
+                <h2 className="newText-2xl my-4 font-bold">뉴스 등록</h2>
                 <hr className="border-gray-200 my-4" />
                 
                 {/* 제목 */}
@@ -155,10 +155,10 @@ const NewsAddComponent = () => {
                         value={news.title}
                         onChange={(e) => setNews({ ...news, title: e.target.value })}
                         placeholder="제목을 입력하세요"
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full input-focus"
                     />
                     {errors.title && (
-                        <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                        <p className="text-red-500 newText-sm mt-1">{errors.title}</p>
                     )}
                 </div>
 
@@ -170,10 +170,10 @@ const NewsAddComponent = () => {
                         value={news.imageUrl}
                         onChange={handleImageUrlChange}
                         placeholder="https://example.com/image.jpg"
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full input-focus"
                     />
                     {errors.imageUrl && (
-                        <p className="text-red-500 text-sm mt-1">{errors.imageUrl}</p>
+                        <p className="text-red-500 newText-sm mt-1">{errors.imageUrl}</p>
                     )}
                     <p className="text-gray-500 text-xs mt-1">
                         이미지 파일의 직접 링크를 입력하세요 (.jpg, .jpeg, .png 등)
@@ -188,10 +188,10 @@ const NewsAddComponent = () => {
                         value={news.linkUrl}
                         onChange={(e) => setNews({ ...news, linkUrl: e.target.value })}
                         placeholder="https://example.com/news/article"
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full input-focus"
                     />
                     {errors.linkUrl && (
-                        <p className="text-red-500 text-sm mt-1">{errors.linkUrl}</p>
+                        <p className="text-red-500 newText-sm mt-1">{errors.linkUrl}</p>
                     )}
                 </div>
 
@@ -199,7 +199,7 @@ const NewsAddComponent = () => {
                 <div>
                     <label className="block font-medium mb-1">내용</label>
                     <div className="border border-gray-300 rounded focus-within:ring-2 focus-within:ring-blue-400">
-                        {/* 이미지 미리보기 (내용 위에 표시) */}
+                        {/* 이미지 미리보기 */}
                         {news.imageUrl && (
                             <div className="p-4 border-b border-gray-200 bg-gray-50">
                                 {isImageLoading && (
@@ -222,16 +222,16 @@ const NewsAddComponent = () => {
                                 {imageLoadError && (
                                     <div className="flex items-center justify-center h-48 bg-gray-100 rounded border-2 border-dashed border-gray-300">
                                         <div className="text-center text-gray-500">
-                                            <div className="text-4xl mb-2">🖼️</div>
+                                            <div className="newText-4xl mb-2">🖼️</div>
                                             <div>이미지를 불러올 수 없습니다</div>
-                                            <div className="text-sm">URL을 확인해주세요</div>
+                                            <div className="newText-sm">URL을 확인해주세요</div>
                                         </div>
                                     </div>
                                 )}
                             </div>
                         )}
                         
-                        {/* 내용 입력 영역 */}
+                        {/* 내용 입력 */}
                         <textarea
                             value={news.content}
                             onChange={(e) => {
@@ -245,20 +245,20 @@ const NewsAddComponent = () => {
                         />
                     </div>
                     {errors.content && (
-                        <p className="text-red-500 text-sm mt-1">{errors.content}</p>
+                        <p className="text-red-500 newText-sm mt-1">{errors.content}</p>
                     )}
                 </div>
 
                 {/* 버튼 */}
                 <div className="flex justify-end space-x-4">
                     <button
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium inline-block"
+                        className="positive-button newText-sm"
                         onClick={handleAdd}
                     >
                         등록
                     </button>
                     <button
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm font-medium inline-block"
+                        className="nagative-button newText-sm"
                         onClick={handleCancel}
                     >
                         취소

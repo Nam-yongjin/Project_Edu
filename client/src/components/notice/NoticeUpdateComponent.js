@@ -210,9 +210,9 @@ const NoticeUpdateComponent = () => {
     }
 
     return (
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
-            <div className="max-w-3xl mx-auto my-4 px-10 p-6 bg-white rounded-xl shadow-md space-y-6">
-                <h2 className="text-2xl my-4 font-bold">공지사항 수정</h2>
+        <div className="max-w-screen-xl mx-auto my-10">
+            <div className="min-blank my-4 px-10 p-6 bg-white page-shadow space-y-6">
+                <h2 className="newText-2xl my-4 font-bold">공지사항 수정</h2>
                 <hr className="border-gray-200 my-4" />
 
                 {/* 제목 */}
@@ -223,10 +223,10 @@ const NoticeUpdateComponent = () => {
                         value={notice.title}
                         onChange={(e) => setNotice({ ...notice, title: e.target.value })}
                         placeholder="제목을 입력하세요"
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full input-focus"
                     />
                     {error.title && (
-                        <p className="text-red-500 text-sm mt-1">{error.title}</p>
+                        <p className="text-red-500 newText-sm mt-1">{error.title}</p>
                     )}    
                 </div>
 
@@ -245,7 +245,7 @@ const NoticeUpdateComponent = () => {
                         style={{ minHeight: '144px' }}
                     />
                     {error.content && (
-                        <p className="text-red-500 text-sm mt-1">{error.content}</p>
+                        <p className="text-red-500 newText-sm mt-1">{error.content}</p>
                     )}
                 </div>
 
@@ -258,7 +258,7 @@ const NoticeUpdateComponent = () => {
                             onChange={(e) => setNotice({ ...notice, isPinned: e.target.checked })}
                             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                         />
-                        <span className="ml-3 text-sm font-medium text-gray-700">
+                        <span className="ml-3 newText-sm font-medium text-gray-700">
                             📌고정 게시물로 설정
                         </span>
                     </label>
@@ -297,7 +297,7 @@ const NoticeUpdateComponent = () => {
                                             className="w-full h-full object-cover rounded"
                                         />    
                                     ) : (
-                                        <div className="flex items-center justify-center h-full text-center px-2 text-sm">
+                                        <div className="flex items-center justify-center h-full text-center px-2 newText-sm">
                                             <span>{file.fileName || file.originalName}</span>
                                         </div>
                                     )}
@@ -342,7 +342,7 @@ const NoticeUpdateComponent = () => {
                                             className="w-full h-full object-cover rounded"
                                         />
                                     ) : (
-                                        <div className="flex items-center justify-center h-full text-center px-2 text-sm">
+                                        <div className="flex items-center justify-center h-full text-center px-2 newText-sm">
                                             <span>{file.name}</span>
                                         </div>
                                     )}
@@ -353,10 +353,10 @@ const NoticeUpdateComponent = () => {
                 )}
                 <div className="flex justify-end space-x-4">
                     <button
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium inline-block"
+                        className="green-button newText-sm"
                         onClick={handleUpdate}>수정</button>
                     <button
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm font-medium inline-block"
+                        className="nagative-button newText-sm"
                         onClick={handleCancel}>취소</button>
                 </div> 
             </div>

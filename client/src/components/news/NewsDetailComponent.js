@@ -141,17 +141,17 @@ const NewsDetailComponent = () => {
     }
 
     return (
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
+        <div className="max-w-screen-xl mx-auto my-10">
             {/* 뉴스 상세 페이지 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="min-blank bg-white page-shadow border border-gray-200 overflow-hidden">
                 {/* 제목 */}
                 <div className="px-6 py-8 border-b border-gray-200">
                     <div className="flex items-center gap-3 mb-2">
-                        <h1 className="text-2xl font-bold text-gray-900">{news.title || '제목없음'}</h1>
+                        <h1 className="newText-2xl font-bold text-gray-900">{news.title || '제목없음'}</h1>
                     </div>
 
                     {/* 정보 */}
-                    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mt-4">
+                    <div className="flex flex-wrap items-center gap-6 newText-sm text-gray-600 mt-4">
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
@@ -189,7 +189,7 @@ const NewsDetailComponent = () => {
                             <img
                                 src={news.imageUrl}
                                 alt={news.title || '뉴스 썸네일'}
-                                className="w-full h-auto max-w-full rounded-lg shadow-md"
+                                className="w-full h-auto max-w-full page-shadow"
                                 style={{
                                     maxHeight: '400px',
                                     objectFit: 'contain',
@@ -226,11 +226,11 @@ const NewsDetailComponent = () => {
                                 <svg className="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
-                                <span className="text-sm font-medium text-blue-700">원본 기사 보기</span>
+                                <span className="newText-sm font-medium text-blue-700">원본 기사 보기</span>
                             </div>
                             <button
                                 onClick={handleLinkClick}
-                                className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                                className="px-4 py-2 bg-blue-500 text-white newText-sm rounded hover:bg-blue-600 transition-colors"
                             >
                                 외부 링크로 이동
                             </button>
@@ -243,6 +243,7 @@ const NewsDetailComponent = () => {
                     <div className="flex justify-between">
                         <button 
                             onClick={handleList}
+                            // 검정버튼 만들면 수정
                             className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
                         >
                             목록
@@ -252,13 +253,13 @@ const NewsDetailComponent = () => {
                             <div className="flex gap-2">
                                 <button 
                                     onClick={handleUpdate}
-                                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                    className="green-button newText-sm"
                                 >
                                     수정하기
                                 </button>
                                 <button 
                                     onClick={handleDelete}
-                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                    className="nagative-button newText-sm"
                                 >
                                     삭제하기
                                 </button>

@@ -335,7 +335,12 @@ public class NoticeServiceImpl implements NoticeService {
         listDTO.setName(notice.getMember().getName());
         listDTO.setViewCount(notice.getViewCount());
         listDTO.setCreatedAt(notice.getCreatedAt());
-        
+
+        // 파일 개수 세팅
+        listDTO.setFileCount(
+            notice.getNoticeFiles() != null ? notice.getNoticeFiles().size() : 0
+        );
+
         return listDTO;
     }
     // 파일 DTO 변환
