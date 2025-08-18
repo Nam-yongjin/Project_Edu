@@ -81,9 +81,10 @@ public class AdminController {
    @PostMapping("/sendMessage")
    public ResponseEntity<String> sendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO) {
        // 첨부파일 리스트
-       List<MultipartFile> files = adminMessageDTO.getAttachmentFile();
-       String htmlContent = adminMessageDTO.getContent(); // Quill HTML 전체
-       adminService.sendMessageForUser(adminMessageDTO);
+	   System.out.println(adminMessageDTO);
+      List<MultipartFile> files = adminMessageDTO.getAttachmentFile();
+      String htmlContent = adminMessageDTO.getContent(); // Quill HTML 전체
+     adminService.sendMessageForUser(adminMessageDTO);
 
        return ResponseEntity.ok("메시지 전송 성공!");
    }

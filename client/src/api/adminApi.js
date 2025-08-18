@@ -202,7 +202,6 @@ export const sendEmail = async (formData) => {
 
 // 선택된 회원 ID 배열로 회원 정보 조회
 export const getEmailMembers = async (params) => {
-    console.log(params)
   const res = await jwtAxios.get(`${admin}/emailMembers`, 
  {params});
   return res.data;

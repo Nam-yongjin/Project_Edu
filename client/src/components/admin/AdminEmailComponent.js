@@ -3,9 +3,8 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { sendEmail } from "../../api/adminApi";
 
-const AdminEmailComponent = ({members }) => {
+const AdminEmailComponent = ({ members }) => {
   const [memberList, setMemberList] = useState([]);
-  const [selectedMembers, setSelectedMembers] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageList, setImageList] = useState([]);
@@ -30,10 +29,6 @@ const AdminEmailComponent = ({members }) => {
     `;
     document.head.appendChild(style);
   }, [members]);
-
-  const handleMemberSelect = (e) => {
-    setSelectedMembers(Array.from(e.target.selectedOptions, (option) => option.value));
-  };
 
   const resizeImageFile = (file, maxWidth = 600, maxHeight = 600) =>
     new Promise((resolve) => {
@@ -107,8 +102,8 @@ const AdminEmailComponent = ({members }) => {
   }), []);
 
   const formats = [
-    "header","bold","italic","underline","strike","color","background",
-    "list","bullet","link","image","align"
+    "header", "bold", "italic", "underline", "strike", "color", "background",
+    "list", "bullet", "link", "image", "align"
   ];
 
   const handleAttachFiles = (e) => {
@@ -116,25 +111,24 @@ const AdminEmailComponent = ({members }) => {
   };
 
   const handleSend = async () => {
-    if (!title || !content || selectedMembers.length === 0) {
-      alert("제목, 본문, 수신 회원을 모두 입력해주세요.");
+    if (!title || !content) {
+      alert("제목, 본문을 모두 입력해주세요.");
       return;
     }
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    selectedMembers.forEach((email) => formData.append("memberList", email));
+    memberList.forEach((email) => formData.append("memberList", email));
     attachFiles.forEach((file) => formData.append("attachmentFile", file));
 
     try {
       await sendEmail(formData);
       alert("메일 전송 성공!");
       // 모든 상태 초기화
-      setTitle(""); 
-      setContent(""); 
-      setSelectedMembers([]); 
-      setImageList([]); 
+      setTitle("");
+      setContent("");
+      setImageList([]);
       setAttachFiles([]);
       if (attachInputRef.current) attachInputRef.current.value = null; // input 초기화
     } catch (err) {
@@ -148,20 +142,20 @@ const AdminEmailComponent = ({members }) => {
       <h2 className="text-xl font-bold mb-4 text-center">이메일 발송 페이지</h2>
 
       <div className="mb-4">
-        <label className="font-semibold block mb-1">회원 선택:</label>
-        <select
-          multiple
-          value={selectedMembers}
-          onChange={handleMemberSelect}
-          className="w-full h-28 border p-2 rounded"
-        >
-          {memberList.map((m) => (
-            <option key={m.memId} value={m.email}>
-              {m.name} ({m.memId})
-            </option>
-          ))}
-        </select>
+        <label className="font-semibold block mb-2">선택된 회원</label>
+        <div className="border rounded p-2 max-h-[100px] overflow-y-auto">
+          <ul className="space-y-1">
+            {memberList.map((m) => (
+              <li key={m.memId} className="grid grid-cols-3 gap-4 border-b pb-1">
+                <span className="font-medium">{m.memId}</span>
+                <span>{m.name}</span>
+                <span className="text-gray-600">{m.email}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
+
 
       <div className="mb-4">
         <label className="font-semibold block mb-1">제목:</label>

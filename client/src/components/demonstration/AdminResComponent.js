@@ -98,8 +98,7 @@ const AdminResComponent = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto my-10">
-      <div className="newText-2xl min-blank font-bold mb-4">실증 대여 관리</div>
-
+      <div className="newText-2xl min-blank font-bold mb-4">물품 대여 관리</div>
       <div className="mb-4 flex justify-start w-full max-w-md">
         <SearchComponent
           search={search} setSearch={setSearch}
