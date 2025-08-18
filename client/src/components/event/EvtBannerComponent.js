@@ -10,7 +10,7 @@ import 'swiper/css/pagination';
 
 const HOST = "http://localhost:8090/view"; // 이미지 경로
 
-const EvtBannerList = () => {
+const EvtBannerComponent = () => {
   const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
 
@@ -25,8 +25,8 @@ const EvtBannerList = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-semibold mb-4 text-gray-700">신청가능한 프로그램</h2>
+    <div className="px-4 py-6 page-shadow">
+      <h2 className="newText-xl font-semibold mb-4">신청가능한 프로그램</h2>
 
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
@@ -53,14 +53,14 @@ const EvtBannerList = () => {
                   e.currentTarget.src = '/default/image.png';
                 }}
               />
-              <p className="text-lg font-bold text-green-700 mb-1">[{event.eventName}]</p>
-              <p className="text-sm text-gray-600">
+              <p className="newText-lg font-bold text-green-700 mb-1">[{event.eventName}]</p>
+              <p className="newText-sm text-gray-600">
                 {event.eventStartPeriod?.slice(0, 10)} ~ {event.eventEndPeriod?.slice(0, 10)}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="newText-sm text-gray-500">
                 {event.eventStartPeriod?.slice(11, 16)} ~ {event.eventEndPeriod?.slice(11, 16)}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="newText-sm text-gray-500">
                 {event.category === 'STUDENT' ? '학생 대상'
                   : event.category === 'TEACHER' ? '교직원 대상'
                   : '일반 대상'}
@@ -73,4 +73,4 @@ const EvtBannerList = () => {
   );
 };
 
-export default EvtBannerList;
+export default EvtBannerComponent;
