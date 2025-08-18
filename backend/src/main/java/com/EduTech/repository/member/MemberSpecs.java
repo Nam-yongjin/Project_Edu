@@ -37,4 +37,8 @@ public class MemberSpecs {
 	public static Specification<Member> hasState(MemberState state) {
 		return (root, query, builder) -> state == null ? null : builder.equal(root.get("state"), state);
 	}
+	
+	public static Specification<Member> emailAgree() {
+	    return (root, query, builder) -> builder.isTrue(root.get("checkEmail"));
+	}
 }
