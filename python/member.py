@@ -1,14 +1,5 @@
-import pymysql
+from database import get_connection
 import pandas as pd
-
-def get_connection():
-    return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="12345",
-        database="edudb",
-        charset="utf8mb4"
-    )
 
 def member_role_stats():
     conn = get_connection()

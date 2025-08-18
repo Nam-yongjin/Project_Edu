@@ -1,8 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import pymysql
 from datetime import datetime
-
+from database import get_connection
 from visit import visitors
 from member import member_role_stats
 from event import event_category_stats
@@ -10,15 +9,6 @@ from facility import popular_facility_times
 
 app = FastAPI()
 
-# DB 접속
-def get_connection():
-    return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="12345",
-        database="edudb",
-        charset="utf8mb4"
-    )
 
 app.add_middleware(
     CORSMiddleware,
