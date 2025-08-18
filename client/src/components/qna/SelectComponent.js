@@ -39,8 +39,8 @@ const SelectComponent = () => {
 
     // 데이터 가져오기
     const fetchData = (params = searchParams) => {
+        console.log(params);
         setLoading(true);
-
         if (params.keyword && params.keyword.trim() !== "") {
             getSelectSearch(
                 params.keyword,
