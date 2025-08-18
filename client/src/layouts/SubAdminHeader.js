@@ -60,7 +60,7 @@ const SubAdminHeader = () => {
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminSelectEmail") || location.pathname.includes("/admin/adminEmail") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
-                                메일 보내기
+                                메일보내기
                             </Link>
                         </li>
                     </ul>
