@@ -176,6 +176,8 @@ public class NewsServiceImpl implements NewsService {
    
     
     // DTO 매핑 메서드들
+    
+    //상세용 DTO 변환
     private NewsDetailDTO mapToDetailDTO(News news) {
         
         NewsDetailDTO detailDTO = new NewsDetailDTO();
@@ -192,7 +194,7 @@ public class NewsServiceImpl implements NewsService {
         
         return detailDTO;
     }
-    
+    //목록용 DTO 변환
     private NewsListDTO mapToListDTO(News news) {
         NewsListDTO listDTO = new NewsListDTO();
         listDTO.setNewsNum(news.getNewsNum());

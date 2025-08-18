@@ -9,6 +9,9 @@ import '../swiperCss/main.css'
 import { useState, useEffect } from "react";
 import { getAllBanners, getBannerImage, recordVisitor } from "../api/adminApi";
 
+import NoticeMainComponent from "../components/notice/NoticeMainComponent";
+import NewsMainComponent from "../components/news/NewsMainComponent";
+
 const MainPage = () => {
     const [banners, setBanners] = useState([]);
 
@@ -77,7 +80,12 @@ const MainPage = () => {
                     <div className="min-blank my-10">프로그램소개 칸</div>
                     <div className="min-blank my-10">지원사업 소개 칸</div>
                     <div className="min-blank my-10">기업 소개 칸</div>
-                    <div className="min-blank my-10">공지사항 칸</div>
+                    <div className="min-blank my-10">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <NoticeMainComponent />
+                            <NewsMainComponent />
+                        </div>
+                    </div>
                 </div>
             </BasicLayout>
         </div>
