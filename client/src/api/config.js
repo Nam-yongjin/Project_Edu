@@ -5,7 +5,6 @@ export const API_MAPPING = {
     student: '/student',
     teacher: '/teacher',
     company: '/company',
-    admin: '/admin',
     event: '/event',
     facility: '/facility',
     demonstration: '/demonstration',
@@ -14,5 +13,4 @@ export const API_MAPPING = {
     question: '/question',
     answer: '/answer',
     admin: '/admin',
-    question:'/question'
 };
