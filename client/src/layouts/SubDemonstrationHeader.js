@@ -76,6 +76,28 @@ const SubDemonstrationHeader = () => {
                                 </Link>
                             </li>
                         ) : <></>}
+                        {loginState.role === "ADMIN" ? (
+                            <>
+                         <li className="mr-6 pb-2">
+                            <Link
+                                to="/demonstration/adminReg"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/adminReg") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                실증신청관리
+                            </Link>
+                        </li>
+                        <li className="mr-6 pb-2">
+                            <Link
+                                to="/demonstration/adminRes"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/adminRes") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                실증대여관리
+                            </Link>
+                        </li>
+                        </>
+                        ) : <></>}
                     </ul>
                 </div>
             </div>

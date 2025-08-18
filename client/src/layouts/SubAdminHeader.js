@@ -54,24 +54,6 @@ const SubAdminHeader = () => {
                                 휴무일관리
                             </Link>
                         </li>
-                        <li className="mr-6 pb-2">
-                            <Link
-                                to="/admin/adminReg"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminReg") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
-                                    }`}
-                            >
-                                실증신청관리
-                            </Link>
-                        </li>
-                        <li className="mr-6 pb-2">
-                            <Link
-                                to="/admin/adminRes"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminRes") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
-                                    }`}
-                            >
-                                실증대여관리
-                            </Link>
-                        </li>
                     </ul>
                 </div>
             </div>

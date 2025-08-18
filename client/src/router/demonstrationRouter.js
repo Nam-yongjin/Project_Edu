@@ -9,6 +9,8 @@ const DemList = lazy(() => import("../pages/demonstration/DemListPage"))
 const RentalList = lazy(() => import("../pages/demonstration/DemRentalPage"))
 const BorrowList = lazy(() => import("../pages/demonstration/DemBorrowPage"))
 const Info=lazy(() => import("../pages/demonstration/InfoPage"))
+const AdminRes = lazy(() => import("../pages/demonstration/AdminResPage"));
+const AdminReg = lazy(() => import("../pages/demonstration/AdminRegPage"));
 const demonstrationRouter = () => {
 
     return [
@@ -39,6 +41,14 @@ const demonstrationRouter = () => {
         {
             path: "demInfo",
             element: <Suspense fallback={<Loading />}><Info /></Suspense>
+        },
+        {
+            path:"adminRes",
+            element: <Suspense fallback={<Loading />}><AdminRes /></Suspense>
+        },
+        {
+            path:"adminReg",
+            element: <Suspense fallback={<Loading />}><AdminReg /></Suspense>
         },
         {
             // 자동 리다이렉션

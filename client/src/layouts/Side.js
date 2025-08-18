@@ -159,20 +159,30 @@ const Side = ({ isOpen, onClose }) => {
                                     <Link to="/demonstration/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 물품</Link>
                                 </li>
                                 {loginState.role === "TEACHER" ?
-                                <li>
-                                    <Link to="/demonstration/rentalList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 대여 조회</Link>
-                                </li>
-                                : <></> }
+                                    <li>
+                                        <Link to="/demonstration/rentalList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 대여 조회</Link>
+                                    </li>
+                                    : <></>}
                                 {loginState.role === "COMPANY" ?
-                                <>
+                                    <>
+                                        <li>
+                                            <Link to="/demonstration/add" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/demonstration/borrowList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 조회</Link>
+                                        </li>
+                                    </>
+                                    : <></>}
+                                 {loginState.role === "ADMIN" ?
+                                 <>
                                 <li>
-                                    <Link to="/demonstration/add" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청</Link>
+                                    <Link to="/demonstration/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 관리</Link>
                                 </li>
                                 <li>
-                                    <Link to="/demonstration/borrowList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 조회</Link>
+                                    <Link to="/demonstration/adminRes" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 대여 관리</Link>
                                 </li>
                                 </>
-                                : <></> }
+                                : <></>}
                             </ul>
                         </li>
                         <li>
@@ -223,12 +233,6 @@ const Side = ({ isOpen, onClose }) => {
                                         </li>
                                         <li>
                                             <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>휴일 관리</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="/admin/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 신청 관리</Link>
-                                        </li>
-                                        <li>
-                                            <Link to="/admin/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 대여 관리</Link>
                                         </li>
                                     </ul>
                                 </li>
