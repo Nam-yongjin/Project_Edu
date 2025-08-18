@@ -32,6 +32,7 @@ export const getSelect = async (pageCount, sortBy, sort, startDate, endDate) => 
 
 // 문의 사항 글 목록 불러오기 (검색어 있음)
 export const getSelectSearch = async (search, type, pageCount, sortBy, sort, startDate, endDate) => {
+    console.log(search,type,pageCount,sortBy,sort,startDate,endDate);
     const res = await axios.get(`${question}/QnAView`, {
         params: {
             search: search,
