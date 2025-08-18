@@ -76,10 +76,8 @@ const MainPage = () => {
                     </div>
                 </div>
                 <div className="my-10 max-w-screen-xl mx-auto">
-                    <div className="min-blank my-10">소개 요약 칸</div>
-                    <div className="min-blank my-10">프로그램소개 칸</div>
-                    <div className="min-blank my-10">지원사업 소개 칸</div>
-                    <div className="min-blank my-10">기업 소개 칸</div>
+                    <div className="min-blank my-10">프로그램 배너 칸</div>
+                    <div className="min-blank my-10">공간예약, 실증대여 링크 칸</div>
                     <div className="min-blank my-10">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <NoticeMainComponent />
