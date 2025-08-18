@@ -111,7 +111,7 @@ public class MailService {
                 helper.setText(htmlContent, true);
 
                 // 로고 첨부 (선택 사항)
-                File logoFile = new File("C:/Users/tee16/git/Project_Edu/backend/src/main/resources/static/images/logo.png");
+                File logoFile = new File("C:\\Users\\JA309\\git\\Project_Edu\\backend\\src\\main\\resources\\static\\images\\logo.png");
                 if (logoFile.exists()) {
                     FileSystemResource res = new FileSystemResource(logoFile);
                     helper.addInline("logo", res);

@@ -19,7 +19,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
-import com.EduTech.dto.admin.AdminEmailMembersDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
@@ -416,15 +415,57 @@ public class AdminServiceImpl implements AdminService {
 		    return new PageResponseDTO<>(dtoPage);
 		}
 		
-		public List<AdminEmailMembersDTO> getMembersByIds(List<String> selectedIds, String sortField, String sortDirection) {
-			        // JPA나 MyBatis에서 selectedIds로 IN 조회
-			        List<Member> entities = memberRepository.findByMemIdIn(selectedIds);
+		public List<AdminMemberViewResDTO> getMembersByIds( AdminMemberViewReqDTO adminMemberViewReqDTO) {
+			String sortField = adminMemberViewReqDTO.getSortField() != null ? adminMemberViewReqDTO.getSortField()
+			        : "createdAt";
+			Direction direction = adminMemberViewReqDTO.getSortDirection() != null
+			        && adminMemberViewReqDTO.getSortDirection().equalsIgnoreCase("ASC") ? Direction.ASC : Direction.DESC;
 
-			        // DTO로 변환
-			        return entities.stream()
-			                       .map(m -> new AdminEmailMembersDTO(m.getMemId(), m.getEmail(), m.getName()))
-			                       .collect(Collectors.toList());
-			    
+			// 정렬 정보
+			Sort sort = Sort.by(direction, sortField);
+
+			// DTO 리스트
+			List<AdminMemberViewResDTO> dtoList = new ArrayList<>();
+
+			// 조건
+			Specification<Member> spec = Specification.where(null);
+
+			if (adminMemberViewReqDTO.getMemId() != null && !adminMemberViewReqDTO.getMemId().isBlank()) {
+			    spec = spec.and(MemberSpecs.memIdContains(adminMemberViewReqDTO.getMemId()));
+			} else if (adminMemberViewReqDTO.getName() != null && !adminMemberViewReqDTO.getName().isBlank()) {
+			    spec = spec.and(MemberSpecs.nameContains(adminMemberViewReqDTO.getName()));
+			} else if (adminMemberViewReqDTO.getEmail() != null && !adminMemberViewReqDTO.getEmail().isBlank()) {
+			    spec = spec.and(MemberSpecs.emailContains(adminMemberViewReqDTO.getEmail()));
+			} else if (adminMemberViewReqDTO.getPhone() != null && !adminMemberViewReqDTO.getPhone().isBlank()) {
+			    spec = spec.and(MemberSpecs.phoneContains(adminMemberViewReqDTO.getPhone()));
+			}
+
+			if (adminMemberViewReqDTO.getRole() != null) {
+			    spec = spec.and(MemberSpecs.hasRole(adminMemberViewReqDTO.getRole()));
+			}
+			if (adminMemberViewReqDTO.getState() != null) {
+			    spec = spec.and(MemberSpecs.hasState(adminMemberViewReqDTO.getState()));
+			}
+
+			// Pageable 없이 최대 50개만 가져오기
+			List<Member> members = memberRepository.findAll(spec, sort)
+			        .stream()
+			        .limit(50) // 최대 50개
+			        .toList();
+
+			for (Member member : members) {
+			    AdminMemberViewResDTO dto = new AdminMemberViewResDTO();
+			    dto.setMemId(member.getMemId());
+			    dto.setName(member.getName());
+			    dto.setPhone(member.getPhone());
+			    dto.setEmail(member.getEmail());
+			    dto.setCreatedAt(member.getCreatedAt());
+			    dto.setRole(member.getRole());
+			    dto.setState(member.getState());
+			    dtoList.add(dto);
+			}		
+
+			return dtoList; 
 		}
 
 }
