@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { NewsList } from "../../api/newsApi";
 import NewsSearchComponent from "./NewsSearchComponent";
 import NewsButtonComponent from "./NewsButtonsComponent";
+import PageComponent from "../common/PageComponent";
 
 const NewsListComponent = () => {
   const loginState = useSelector((state) => state.loginState); //로그인 상태 확인
@@ -54,7 +55,7 @@ const NewsListComponent = () => {
   const handleSearch = (newSearchParams) => {
     const updatedParams = {
       ...newSearchParams,
-      page: 0 //검색 시 첫 페이지로
+      page: 0, //검색 시 첫 페이지로
     };
     setSearchParams(updatedParams);
     fetchArticles(updatedParams);
@@ -65,7 +66,7 @@ const NewsListComponent = () => {
   const handlePageChange = (page) => {
     const updatedParams = {
       ...searchParams,
-      page: page
+      page: page,
     };
     setSearchParams(updatedParams);
     fetchArticles(updatedParams);
@@ -100,60 +101,6 @@ const NewsListComponent = () => {
       month: '2-digit',
       day: '2-digit'
     });
-  };
-
-  //페이지네이션
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-
-    const pages = [];
-    const startPage = Math.max(0, currentPage - 2); //첫 페이지
-    const endPage = Math.min(totalPages - 1, currentPage + 2); //마지막 페이지
-
-    //이전 버튼
-    if (currentPage > 0) {
-      pages.push(
-        <button
-          key="prev"
-          onClick={() => handlePageChange(currentPage - 1)}
-          className="px-3 py-1 mx-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-        > 이전 </button>
-      );
-    }
-
-    //페이지 번호
-    for (let i = startPage; i  <= endPage; i++)  {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-3 py-1 mx-1 rounded ${
-            currentPage === i
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
-          >
-            {i + 1}
-          </button>
-      );
-    }
-
-    //다음 버튼
-    if (currentPage < totalPages - 1) {
-      pages.push(
-        <button
-          key="next"
-          onClick={() => handlePageChange(currentPage + 1)}
-          className="px-3 py-1 mx-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-        > 다음 </button>
-      );
-    }
-
-    return (
-      <div className="flex justify-center items-center mt-6">
-        {pages}
-      </div>
-    );
   };
 
   // 뉴스 정렬
@@ -263,7 +210,13 @@ const NewsListComponent = () => {
         </div>
 
         {/* 페이지네이션 */}
-        {renderPagination()}
+        <div className="flex justify-center mt-[50px]">
+          <PageComponent
+            totalPages={totalPages}
+            current={currentPage}
+            setCurrent={handlePageChange}
+          />
+        </div>
 
         {/* 하단 버튼 */}
         <div className="mb-8">
