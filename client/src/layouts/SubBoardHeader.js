@@ -23,7 +23,7 @@ const SubAboutHeader = () => {
                             <Link 
                                 to="/notice/NoticeList" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600 border-b-2 ${
-                                    location.pathname.includes("/notice/NoticeList")
+                                    location.pathname.includes("/notice")
                                     ? "text-blue-600 border-blue-600"
                                     : "text-gray-500 border-transparent"
                                 }`}
@@ -35,7 +35,7 @@ const SubAboutHeader = () => {
                             <Link 
                                 to="/question/select" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600 border-b-2 ${
-                                    location.pathname.includes("/question/select")
+                                    location.pathname.includes("/question")
                                     ? "text-blue-600 border-blue-600"
                                     : "text-gray-500 border-transparent"
                                 }`}
@@ -47,7 +47,7 @@ const SubAboutHeader = () => {
                             <Link 
                                 to="/news/NewsList" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600 border-b-2 ${
-                                    location.pathname.includes("/news/NewsList")
+                                    location.pathname.includes("/news")
                                     ? "text-blue-600 border-blue-600"
                                     : "text-gray-500 border-transparent"
                                 }`}
