@@ -45,7 +45,7 @@ const SubAboutHeader = () => {
                                     location.pathname.includes("/about/direction") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                 }`}
                             >
-                                오시는 길
+                                오시는길
                             </Link>
                         </li>
                     </ul>
