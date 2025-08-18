@@ -8,6 +8,7 @@ const Stats = lazy(() => import("../pages/admin/StatsPage"));
 const AdminRes = lazy(() => import("../pages/admin/AdminResPage"));
 const AdminReg = lazy(() => import("../pages/admin/AdminRegPage"));
 const AdminEmail=lazy(() => import("../pages/admin/AdminEmailPage"));
+const AdminSelectEmail=lazy(() => import("../pages/admin/AdminEmailSelectMembersPage"));
 const adminRouter = () => {
     return [
         {
@@ -38,6 +39,10 @@ const adminRouter = () => {
          {
             path:"adminEmail",
             element: <Suspense fallback={<Loading />}><AdminEmail /></Suspense>
+        },
+        {
+            path:"adminSelectEmail",
+            element: <Suspense fallback={<Loading />}><AdminSelectEmail /></Suspense>
         }
     ];
 };
