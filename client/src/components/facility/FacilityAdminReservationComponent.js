@@ -24,16 +24,15 @@ const hhmm = (v) => {
   const m = String(v).match(/(\d{1,2}):(\d{2})/);
   return m ? `${pad2(m[1])}:${m[2]}` : String(v);
 };
+
+// ✅ 서버 Enum과 1:1 매핑, "CANCEL" 제거
 const chipOf = (state) => {
   switch (state) {
-    case "APPROVED":
-      return { label: "승인 완료", cls: "bg-green-500" };
-    case "CANCEL":
-    case "CANCELLED":
-      return { label: "취소", cls: "bg-red-500" };
+    case "APPROVED":   return { label: "승인 완료", cls: "bg-green-500" };
+    case "REJECTED":   return { label: "거절",     cls: "bg-red-500"   };
+    case "CANCELLED":  return { label: "취소",     cls: "bg-red-500"   }; // (나중에 취소 기능 추가 시 사용)
     case "WAITING":
-    default:
-      return { label: "승인 대기", cls: "bg-gray-500" };
+    default:           return { label: "승인 대기", cls: "bg-gray-500"  };
   }
 };
 
@@ -65,7 +64,7 @@ export default function AdminFacilityReservations() {
   const navigate = useNavigate();
 
   // 필터 상태
-  const [state, setState] = useState(""); // "", "WAITING", "APPROVED", "CANCEL"
+  const [state, setState] = useState(""); // "", "WAITING", "APPROVED", "REJECTED" (취소는 나중에 추가)
   const [from, setFrom] = useState(thisMonthRange().from);
   const [to, setTo] = useState(thisMonthRange().to);
 
@@ -120,6 +119,7 @@ export default function AdminFacilityReservations() {
     setLoading(true);
     setError("");
     try {
+      // ⚠️ 백엔드 파라미터명이 startDate/endDate 라면 아래 키도 맞춰주세요.
       const data = await getAdminReservations({
         state: state || undefined,
         from: from || undefined,
@@ -177,10 +177,11 @@ export default function AdminFacilityReservations() {
     doUpdate({ reserveId: r.reserveId, nextState: "APPROVED" });
   };
 
+  // ✅ 거절은 항상 REJECTED 로 전송
   const handleReject = (r) => {
     if (!r?.reserveId) return;
-    if (!window.confirm(`예약 ${r.reserveId}을(를) 거절(취소)하시겠습니까?`)) return;
-    doUpdate({ reserveId: r.reserveId, nextState: "CANCEL" });
+    if (!window.confirm(`예약 ${r.reserveId}을(를) 거절하시겠습니까?`)) return;
+    doUpdate({ reserveId: r.reserveId, nextState: "REJECTED" });
   };
 
   const renderActions = (r) => {
@@ -220,7 +221,9 @@ export default function AdminFacilityReservations() {
               <option value="">전체</option>
               <option value="WAITING">승인 대기</option>
               <option value="APPROVED">승인 완료</option>
-              <option value="CANCEL">취소</option>
+              {/* ❌ "CANCEL" 제거 */}
+              <option value="REJECTED">거절</option>
+              {/* 취소 기능 도입 시: <option value="CANCELLED">취소</option> */}
             </select>
           </div>
           <div className="flex flex-col">

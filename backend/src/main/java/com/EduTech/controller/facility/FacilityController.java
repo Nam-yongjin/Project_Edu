@@ -186,9 +186,9 @@ public class FacilityController {
 
 
     // 관리자 강제 취소 (reserveId 기준)
-    @PatchMapping("/admin/reservation/{reserveId}/cancel")
+    @PatchMapping("/admincancel")
     public ResponseEntity<String> adminCancel(
-            @PathVariable Long reserveId,
+            @RequestParam Long reserveId,
             @RequestParam String requesterId
     ) {
         boolean success = facilityService.cancelReservation(reserveId, requesterId);
