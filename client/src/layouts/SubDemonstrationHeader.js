@@ -25,24 +25,9 @@ const SubDemonstrationHeader = () => {
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/demInfo") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
-                                실증 소개
+                                실증소개
                             </Link>
                         </li>
-
-
-                        {loginState.role === "COMPANY" ? (
-                            <li className="mr-6 pb-2">
-                                <Link
-                                    to="/demonstration/add"
-                                    className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/add")
-                                            ? " text-blue-600 border-b-2 border-blue-600 active:text-blue-600"
-                                            : ""
-                                        }`}
-                                >
-                                    실증 등록
-                                </Link>
-                            </li>
-                        ) : <></>}
 
                         <li className="mr-6 pb-2">
                             <Link
@@ -50,32 +35,46 @@ const SubDemonstrationHeader = () => {
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/list") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
-                                실증 물품
+                                실증물품
                             </Link>
                         </li>
 
-                    {loginState.role === "TEACHER" ? (    
-                        <li className="mr-6 pb-2">
-                            <Link
-                                to="/demonstration/rentalList"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/rentalList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
-                                    }`}
-                            >
-                                물품 대여 조회
-                            </Link>
-                        </li>
+                        {loginState.role === "COMPANY" ? (
+                            <li className="mr-6 pb-2">
+                                <Link
+                                    to="/demonstration/add"
+                                    className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/add")
+                                        ? " text-blue-600 border-b-2 border-blue-600 active:text-blue-600"
+                                        : ""
+                                        }`}
+                                >
+                                    실증등록
+                                </Link>
+                            </li>
+                        ) : <></>}
+
+                        {loginState.role === "TEACHER" ? (
+                            <li className="mr-6 pb-2">
+                                <Link
+                                    to="/demonstration/rentalList"
+                                    className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/rentalList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                        }`}
+                                >
+                                    실증대여내역
+                                </Link>
+                            </li>
                         ) : <></>}
 
                         {loginState.role === "COMPANY" ? (
-                        <li className="mr-6 pb-2">
-                            <Link
-                                to="/demonstration/borrowList"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/borrowList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
-                                    }`}
-                            >
-                                실증 신청 조회
-                            </Link>
-                        </li>
+                            <li className="mr-6 pb-2">
+                                <Link
+                                    to="/demonstration/borrowList"
+                                    className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/borrowList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                        }`}
+                                >
+                                    실증신청내역
+                                </Link>
+                            </li>
                         ) : <></>}
                     </ul>
                 </div>

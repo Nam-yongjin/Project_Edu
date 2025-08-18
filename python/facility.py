@@ -13,7 +13,6 @@ def get_connection():
         charset="utf8mb4"
     )
 
-@app.get("/api/admin/facility/popular-times")
 def popular_facility_times():
     conn = get_connection()
     
