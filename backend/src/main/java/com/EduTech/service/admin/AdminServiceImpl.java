@@ -89,12 +89,13 @@ public class AdminServiceImpl implements AdminService {
 	// 연장 반납 신청 처리하는 기능
 	@Override
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
-		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND)&&demonstrationApprovalReqDTO.getState().equals("ACCEPT"))
+		System.out.println(demonstrationApprovalReqDTO);
+		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND)&&demonstrationApprovalReqDTO.getState().equals(DemonstrationState.ACCEPT))
 		{
 			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum(),DemonstrationState.WAIT);
-			demonstrationReserveRepository.updateDemResEndDate(demonstrationApprovalReqDTO.getDemRevNum(),request.getUpdateDate(),DemonstrationState.ACCEPT);
+			demonstrationReserveRepository.updateDemResEndDate(request.getReserve().getDemRevNum(),request.getUpdateDate(),DemonstrationState.ACCEPT);
 		}
-		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL)&&demonstrationApprovalReqDTO.getState().equals("ACCEPT"))
+		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL)&&demonstrationApprovalReqDTO.getState().equals(DemonstrationState.ACCEPT))
 		{
 			demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED,demonstrationApprovalReqDTO.getDemRevNum());
 		}
