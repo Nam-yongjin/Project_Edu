@@ -60,15 +60,29 @@ const SubMyInfoHeader = () => {
                                 공간예약내역
                             </Link>
                         </li>
+                        {loginState.role === "TEACHER" ? (    
                         <li className="mr-6 pb-2">
                             <Link
-                                to="/demonstration"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                to="/demonstration/rentalList"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/rentalList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                실증대여내역
+                            </Link>
+                        </li>
+                        ) : <></>}
+
+                        {loginState.role === "COMPANY" ? (
+                        <li className="mr-6 pb-2">
+                            <Link
+                                to="/demonstration/borrowList"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/borrowList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 실증신청내역
                             </Link>
                         </li>
+                        ) : <></>}
                     </ul>
                 </div>
             </div>
