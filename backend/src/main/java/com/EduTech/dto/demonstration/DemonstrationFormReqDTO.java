@@ -1,11 +1,10 @@
 package com.EduTech.dto.demonstration;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
+
+import com.EduTech.entity.demonstration.DemonstrationCategory;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -36,6 +35,9 @@ public class DemonstrationFormReqDTO { // 기업이 실증 물품 dto (프론트
 	@NotNull(message="반납 예정일은 필수입니다.")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate expDate; // 반납 예정일
+	
+	@NotNull(message="카테고리 입력은 필수입니다.")
+	private DemonstrationCategory category; // 카테고리
 	
 	private Long demNum; // 실증 번호
 	private String memId; // 회원 아이디
