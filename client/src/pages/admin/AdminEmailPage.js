@@ -3,11 +3,11 @@ import AdminEmailComponent from "../../components/admin/AdminEmailComponent";
 
 const AdminEmailPage = () => {
     const location = useLocation();
-    const selectedIds = location.state?.selectedIds || []; // 선택된 ID 배열
+    const members = location.state?.selectedMembers || []; // 선택된 ID 배열
 
     return (
         <div>
-            <AdminEmailComponent selectedIds={selectedIds} />
+            <AdminEmailComponent members={members} />
         </div>
     );
 };

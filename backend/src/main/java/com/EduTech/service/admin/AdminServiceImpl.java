@@ -447,11 +447,9 @@ public class AdminServiceImpl implements AdminService {
 			if (adminMemberViewReqDTO.getState() != null) {
 			    spec = spec.and(MemberSpecs.hasState(adminMemberViewReqDTO.getState()));
 			}
-
-			// Pageable 없이 최대 50개만 가져오기
+			
 			List<Member> members = memberRepository.findAll(spec, sort)
 			        .stream()
-			        .limit(50) // 최대 50개
 			        .toList();
 
 			for (Member member : members) {
