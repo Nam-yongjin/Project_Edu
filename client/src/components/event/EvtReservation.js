@@ -86,8 +86,8 @@ const ReservationListComponent = () => {
     const end = new Date(item.eventEndPeriod);
 
     if (item.revState === "CANCEL") return "취소완료";
-    if (now >= start && now <= end) return "행사 진행 중";
-    if (now > end) return "행사 완료";
+    if (now >= start && now <= end) return "프로그램 진행 중";
+    if (now > end) return "프로그램 완료";
     return "취소하기";
   };
 
@@ -113,13 +113,13 @@ const ReservationListComponent = () => {
               key={item.evtRevNum}
               className="flex items-start border-b pb-4 gap-4"
             >
-              {/* 행사 이미지 */}
+              {/* 프로그램 이미지 */}
               <div className="w-24 h-24 bg-gray-200 flex items-center justify-center text-sm text-gray-500 flex-shrink-0">
                 {item.mainImagePath &&
                 /\.(jpg|jpeg|png|gif)$/i.test(item.mainImagePath) ? (
                   <img
                     src={`${host}/${item.mainImagePath}`}
-                    alt="행사 이미지"
+                    alt="프로그램 이미지"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -127,13 +127,13 @@ const ReservationListComponent = () => {
                 )}
               </div>
 
-              {/* 행사 정보 */}
+              {/* 프로그램 정보 */}
               <div className="flex-1 text-sm">
                 <p className="mb-1">
-                  <strong>행사이름:</strong> {item.eventName}
+                  <strong>프로그램이름:</strong> {item.eventName}
                 </p>
                 <p className="mb-1">
-                  <strong>행사 일정:</strong>{" "}
+                  <strong>프로그램 일정:</strong>{" "}
                   {formatDate(item.eventStartPeriod)} ~{" "}
                   {formatDate(item.eventEndPeriod)}
                 </p>

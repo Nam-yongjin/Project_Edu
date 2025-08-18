@@ -107,7 +107,7 @@ const FacilityAddComponent = () => {
   // 검증
   const validate = useCallback(() => {
     const next = {};
-    if (!form.facName.trim()) next.facName = "시설명을 입력하세요.";
+    if (!form.facName.trim()) next.facName = "공간명을 입력하세요.";
     if (!form.facInfo.trim()) next.facInfo = "소개를 입력하세요.";
     if (!String(form.capacity).trim()) next.capacity = "수용인원을 입력하세요.";
 
@@ -158,7 +158,7 @@ const FacilityAddComponent = () => {
     try {
       const formData = buildFormData();
       await registerFacility(formData);
-      alert("시설이 등록되었습니다.");
+      alert("공간이 등록되었습니다.");
       navigate("/facility/list");
     } catch (err) {
       console.error(err);
@@ -181,11 +181,11 @@ const FacilityAddComponent = () => {
   return (
     <div className="flex mt-10 max-w-6xl mx-auto">
       <div className="space-y-6 w-2/3">
-        <h2 className="text-2xl font-bold mb-4">시설 등록</h2>
+        <h2 className="text-2xl font-bold mb-4">공간 등록</h2>
 
         {/* 기본 정보 */}
         {[
-          { label: "시설명", name: "facName", type: "text" },
+          { label: "공간명", name: "facName", type: "text" },
           { label: "수용인원", name: "capacity", type: "number" },
         ].map(({ label, name, type }) => (
           <div className="flex items-center" key={name}>
@@ -285,7 +285,7 @@ const FacilityAddComponent = () => {
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
             type="button"
           >
-            시설 등록
+            공간 등록
           </button>
           <button
             onClick={moveToReturn}

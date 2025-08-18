@@ -8,7 +8,7 @@ const FacilityDetailPage = () => {
 
   return (
     <div className="w-full">
-      <FacilityTitleComponent title="시설 상세" />
+      <FacilityTitleComponent title="공간 상세" />
       <FacilityDetailComponent facRevNum={facRevNum} />
     </div>
   );

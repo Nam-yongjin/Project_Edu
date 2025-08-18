@@ -50,16 +50,15 @@ const Header = () => {
       link: "/event",
       sub: [
         { name: "프로그램 안내", link: "/event/list" },
-        { name: "프로그램", link: "/" },
-        { name: "프로그램", link: "/" },
+        { name: "프로그램 신청 내역", link: "/event/Reservation" },
       ],
     },
     {
       name: "공간 운영",
       link: "/facility",
       sub: [
-        { name: "공간 추가", link: "/facility/add" },
-        { name: "공간 목록", link: "/facility/list" },
+        { name: "공간 안내", link: "/facility/list" },
+        { name: "공간 예약 내역", link: "/facility/reservation" },
       ],
     },
     {
@@ -89,24 +88,32 @@ const Header = () => {
         { name: "회원 관리", link: "/admin/members" },
         { name: "배너 관리", link: "/admin/banner" },
         { name: "통계 확인", link: "/admin/stats" },
-        { name: "행사 추가", link: "/event/add" },
-        { name: "장소대여 관리", link: "/facility/adminreservations" },
-        { name: "휴일 관리", link: "/facility/holiday" },
-        {name:"실증신청 관리",link:"/admin/adminReg"},
-        {name:"실증대여 관리",link:"/admin/adminRes"}
+        { name: "휴무일 관리", link: "/facility/holiday" },
       ],
     });
+    const eventMenu = mainMenus.find(menu => menu.name === "프로그램");
+    eventMenu.sub.push({ name: "프로그램 추가", link: "/event/add" });
+    const facilityMenu = mainMenus.find(menu => menu.name === "공간 운영");
+    facilityMenu.sub.push(
+      { name: "공간 추가", link: "/facility/add" },
+      { name: "공간 대여 관리", link: "/facility/adminreservations" },
+    );
+    const demonstrationMenu = mainMenus.find(menu => menu.name === "실증 지원");
+    demonstrationMenu.sub.push(
+      { name: "실증 신청 관리", link: "/admin/adminReg" },
+        { name: "실증 대여 관리", link: "/admin/adminRes" },
+    );
   }
 
   if (loginState.role === "TEACHER") {
-  const teacherMenu = mainMenus.find(menu => menu.name === "실증 지원");
+    const teacherMenu = mainMenus.find(menu => menu.name === "실증 지원");
     teacherMenu.sub.push({ name: "실증 대여 조회", link: "/demonstration/rentalList" });
-}
+  }
 
-if (loginState.role === "COMPANY") {
-  const companyMenu = mainMenus.find(menu => menu.name === "실증 지원");
-    companyMenu.sub.push({ name: "실증 신청", link: "/demonstration/add" },{ name: "실증 신청 조회", link: "/demonstration/borrowList" });
-}
+  if (loginState.role === "COMPANY") {
+    const companyMenu = mainMenus.find(menu => menu.name === "실증 지원");
+    companyMenu.sub.push({ name: "실증 신청", link: "/demonstration/add" }, { name: "실증 신청 조회", link: "/demonstration/borrowList" });
+  }
 
 
   return (

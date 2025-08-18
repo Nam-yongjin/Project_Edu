@@ -6,7 +6,7 @@ const FacilityListPage = () => {
 
   return(
     <div className="w-full">
-      <FacilityTitleComponent title="시설 목록" />
+      <FacilityTitleComponent title="공간 목록" />
       <FacilityListComponent />
     </div>
   )

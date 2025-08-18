@@ -65,7 +65,7 @@ const FacilityReservationComponent = () => {
         setTotalPages(data?.totalPages || 1);
         setPage(targetPage);
       } catch (error) {
-        console.error("시설 예약 이력 불러오기 실패:", error);
+        console.error("공간 예약 이력 불러오기 실패:", error);
         if (error.response?.status === 401) {
           alert("로그인이 필요합니다.");
           navigate("/login");
@@ -136,7 +136,7 @@ const FacilityReservationComponent = () => {
                 <div className="w-24 h-24 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                   <img
                     src={thumb}
-                    alt="시설 이미지"
+                    alt="공간 이미지"
                     className="w-full h-full object-cover"
                     onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
                   />
@@ -144,7 +144,7 @@ const FacilityReservationComponent = () => {
 
                 {/* 정보 */}
                 <div className="flex-1 text-sm">
-                  <p className="mb-1"><strong>시설명:</strong> {item.facName}</p>
+                  <p className="mb-1"><strong>공간명:</strong> {item.facName}</p>
                   <p className="mb-1"><strong>이용일:</strong> {formatDateYmd(item.facDate)}</p>
                   <p className="mb-1"><strong>이용 시간:</strong> {hhmm(item.startTime)} ~ {hhmm(item.endTime)}</p>
                   <p className="mb-1">

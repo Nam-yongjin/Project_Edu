@@ -5,7 +5,7 @@ import EvtListComponent from "../../components/event/EvtListComponent";
 const EventListPage = () => {
     return (
         <div>
-            <EvtTitleComponent title="행사 신청" />
+            <EvtTitleComponent title="프로그램 신청" />
             <EvtListComponent />
         </div>
     );

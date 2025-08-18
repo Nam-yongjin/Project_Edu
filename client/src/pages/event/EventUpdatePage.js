@@ -9,7 +9,7 @@ const UpdatEvtPage = () => {
 
   return (
     <div className="w-full">
-      <EvtTitleComponent title="행사 수정" />
+      <EvtTitleComponent title="프로그램 수정" />
       <EvtUpdateComponent eventNum={parsedEventNum} />
     </div>
   );

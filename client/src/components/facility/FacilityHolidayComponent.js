@@ -28,7 +28,7 @@ export default function FacilityDetailComponent() {
   const [selectedDate, setSelectedDate] = useState(null); // "yyyy-MM-dd"
   const [selectedReason, setSelectedReason] = useState(HOLIDAY_REASON_OPTIONS[0].code);
 
-  // 전체(공통) 공휴일 + 시설휴무(있다면) 로드
+  // 전체(공통) 공휴일 + 공간휴무(있다면) 로드
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -224,9 +224,9 @@ export default function FacilityDetailComponent() {
                         "inline-block w-fit text-[11px] px-2 py-0.5 rounded-full",
                         it.type === "PUBLIC"
                           ? "bg-red-100 text-red-700"      // 공휴일
-                          : "bg-amber-100 text-amber-700"  // 시설 휴무
+                          : "bg-amber-100 text-amber-700"  // 공간 휴무
                       ].join(" ")}
-                      title={it.type === "PUBLIC" ? "공휴일" : "시설 휴무"}
+                      title={it.type === "PUBLIC" ? "공휴일" : "공간 휴무"}
                     >
                       {it.label}
                     </span>
