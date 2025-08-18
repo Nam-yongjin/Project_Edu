@@ -11,6 +11,7 @@ import { getAllBanners, getBannerImage, recordVisitor } from "../api/adminApi";
 
 import NoticeMainComponent from "../components/notice/NoticeMainComponent";
 import NewsMainComponent from "../components/news/NewsMainComponent";
+import EvtBannerComponent from "../components/event/EvtBannerComponent";
 
 const MainPage = () => {
     const [banners, setBanners] = useState([]);
@@ -76,8 +77,12 @@ const MainPage = () => {
                     </div>
                 </div>
                 <div className="my-10 max-w-screen-xl mx-auto">
-                    <div className="min-blank my-10">프로그램 배너 칸</div>
-                    <div className="min-blank my-10">공간예약, 실증대여 링크 칸</div>
+                    <div className="min-blank my-10">
+                        <EvtBannerComponent />
+                    </div>
+                    <div className="min-blank my-10">
+                        공간예약, 실증대여 링크 칸
+                    </div>
                     <div className="min-blank my-10">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <NoticeMainComponent />
