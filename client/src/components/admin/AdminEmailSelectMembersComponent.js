@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { viewMembers, memberStateChange } from "../../api/adminApi";
-import PageComponent from "../common/PageComponent";
+import {getEmailMembers} from "../../api/adminApi";
 import { useNavigate } from "react-router-dom";
-const AdminMembersComponent = () => {
+const AdminEmailSelectMembersComponent = () => {
     const [members, setMembers] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
-    const [selectedState, setSelectedState] = useState("");
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useState({
         memId: "",
@@ -15,27 +13,26 @@ const AdminMembersComponent = () => {
         role: "",
         state: "",
     });
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
     const [sortField, setSortField] = useState("createdAt");
     const [sortDirection, setSortDirection] = useState("DESC");
 
     // 회원 목록 불러오기
     const loadMembers = () => {
-        viewMembers({ ...searchParams, pageCount: page, sortField: sortField, sortDirection: sortDirection })
+        if(selectedIds.length===0) {
+        getEmailMembers({ ...searchParams, sortField: sortField, sortDirection: sortDirection })
             .then(data => {
-                setMembers(Array.isArray(data?.content) ? data.content : []);
-                setTotalPages(data?.totalPages ?? 0);
+               setMembers(Array.isArray(data) ? data : []);
             })
             .catch(error => {
                 alert("회원 목록 불러오기 실패:", error);
                 setMembers([]);
             });
+        }
     };
 
     useEffect(() => {
         loadMembers();
-    }, [page]); // 페이지가 변경될 때 재호출
+    }, []);
 
     // 체크박스 토글
     const handleCheckboxChange = (id) => {
@@ -58,24 +55,6 @@ const AdminMembersComponent = () => {
     // 모든 회원이 선택되었는지 확인
     const isAllSelected = members.length > 0 && selectedIds.length === members.length;
 
-    // 상태 변경 처리
-    const handleChangeState = async () => {
-        if (!selectedState || selectedIds.length === 0) {
-            alert("변경할 상태와 회원을 선택하세요.");
-            return;
-        }
-
-        memberStateChange({ memId: selectedIds, state: selectedState })
-            .then(() => {
-                alert("상태 변경 완료");
-                setSelectedIds([]);
-                loadMembers();
-            })
-            .catch((error) => {
-                alert("상태 변경 실패:", error);
-            });
-    };
-
     // 검색 입력 처리
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -84,7 +63,6 @@ const AdminMembersComponent = () => {
 
     // 검색 버튼 클릭 시
     const handleSearch = () => {
-        setPage(0); // 검색 시 첫 페이지로 이동
         loadMembers();
     };
 
@@ -221,33 +199,21 @@ const AdminMembersComponent = () => {
                     </tbody>
                 </table>
             </div>
-
-            {/* 상태 변경 드롭다운 */}
-            <div className="min-blank newText-base flex items-center gap-4 mt-10 mb-6">
-                <select
-                    value={selectedState}
-                    onChange={(e) => setSelectedState(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">상태 선택</option>
-                    <option value="NORMAL">일반</option>
-                    <option value="BEN">블랙리스트</option>
-                    <option value="LEAVE">탈퇴</option>
-                </select>
-                <button
-                    onClick={handleChangeState}
-                    className="nagative-button"
-                >
-                    선택 회원 상태 변경
-                </button>
+             <div className="min-blank newText-base flex items-center gap-4 mt-10 mb-6"></div>
+            <button
+                onClick={() => {
+                    if (selectedIds.length === 0) {
+                        alert("회원을 선택해 주세요");
+                        return;
+                    }
+                    navigate("/admin/adminEmail", { state: { selectedIds } });
+                }}
+                className="bg-yellow-300 hover:bg-yellow-200 text-white font-semibold py-2 px-4 rounded"
+            >
+                선택 회원 메시지 보내기
+            </button>
             </div>
-
-            {/* 페이지네이션 */}
-            <div className="flex justify-center mt-10">
-                <PageComponent totalPages={totalPages} current={page} setCurrent={setPage} />
-            </div>
-        </div>
     );
 };
 
-export default AdminMembersComponent;
+export default AdminEmailSelectMembersComponent;

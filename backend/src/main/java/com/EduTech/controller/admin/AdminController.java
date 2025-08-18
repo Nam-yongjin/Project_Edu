@@ -1,6 +1,6 @@
+
 package com.EduTech.controller.admin;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
-import com.EduTech.dto.admin.AdminEmailMembersDTO;
 import com.EduTech.dto.admin.AdminMemberViewReqDTO;
 import com.EduTech.dto.admin.AdminMemberViewResDTO;
 import com.EduTech.dto.admin.AdminMessageDTO;
@@ -31,6 +30,7 @@ import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.entity.admin.BannerImage;
+import com.EduTech.entity.member.Member;
 import com.EduTech.service.admin.AdminService;
 import com.EduTech.util.FileUtil;
 
@@ -169,13 +169,10 @@ public class AdminController {
    // 이메일 보낼 회원 정보 받아오는 기능
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/emailMembers")
-   public List<AdminEmailMembersDTO> adminViewMembers(
-           @RequestParam("selectedIds") String selectedIds,  // get 요청으론 배열을 받기 힘들어 string으로 받고 list로 변화해서 사용
-           @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
-           @RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection) {
-	   List<String> idList = Arrays.asList(selectedIds.split(","));
+   public List<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewReqDTO) {
+	   System.out.println(adminMemberViewReqDTO);
        // selectedIds를 이용해 DB에서 회원 정보 조회
-       List<AdminEmailMembersDTO> members = adminService.getMembersByIds(idList, sortField, sortDirection);
+       List<AdminMemberViewResDTO> members = adminService.getMembersByIds(adminMemberViewReqDTO);
 
        return members;
    }
