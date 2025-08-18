@@ -1,31 +1,32 @@
-from fastapi import FastAPI
-import pymysql
 import pandas as pd
+from database import get_connection
 
-app = FastAPI()
-
-def get_connection():
-    return pymysql.connect(
-        host="localhost",
-        user="root", 
-        password="12345",
-        database="mydb",
-        charset="utf8mb4"
-    )
 
 def popular_facility_times():
     conn = get_connection()
-    
-    # 시간대별 예약 건수 집계
     df = pd.read_sql("""
         SELECT 
             start_time, 
-            end_time, 
-            COUNT(*) AS count
+            end_time
         FROM facility_reserve
-        GROUP BY start_time, end_time
-        ORDER BY count DESC
     """, conn)
     conn.close()
 
-    return df.to_dict(orient="records") # JSON 형태로 변환
+    # 시간대별 카운트 초기화 (0~23)
+    hours_count = {h: 0 for h in range(0, 24)}
+
+    for _, row in df.iterrows():
+        start_hour = int(row["start_time"].total_seconds() // 3600)
+        end_hour = int(row["end_time"].total_seconds() // 3600)
+
+        for h in range(start_hour, end_hour):
+            if 0 <= h < 24:
+                hours_count[h] += 1
+
+    result_list = []
+    for h in range(0, 24):
+        count = hours_count[h]
+        label = f"{h:02d}:00 ~ {h+1:02d}:00"
+        result_list.append({"hour": h, "count": count, "label": label})
+
+    return result_list
