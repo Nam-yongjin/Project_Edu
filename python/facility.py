@@ -19,12 +19,10 @@ def popular_facility_times():
         start_hour = int(row["start_time"].total_seconds() // 3600)
         end_hour = int(row["end_time"].total_seconds() // 3600)
 
-        # 예약 시간대는 "start ~ end" → [start, end) (end 제외)
         for h in range(start_hour, end_hour):
             if 0 <= h < 24:
                 hours_count[h] += 1
 
-    # ✅ 겹치는 부분만 남기려면: count > 1인 시간대만 유지
     result_list = []
     for h in range(0, 24):
         count = hours_count[h]
