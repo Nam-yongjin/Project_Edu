@@ -1,15 +1,6 @@
-import pymysql
 import pandas as pd
 from datetime import date
-
-def get_connection():
-    return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="12345",
-        database="edudb",
-        charset="utf8mb4"
-    )
+from database import get_connection
 
 def event_category_stats():
     conn = get_connection()

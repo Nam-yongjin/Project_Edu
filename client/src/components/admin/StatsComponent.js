@@ -141,14 +141,14 @@ const StatsComponent = () => {
                         <Plot
                             data={[
                                 {
-                                    x: popularFacTimes.map(item => `${item.start_time} ~ ${item.end_time}`),
+                                    x: popularFacTimes.map(item => item.label),
                                     y: popularFacTimes.map(item => item.count),
                                     type: "bar",
                                     marker: { color: "orange" }
                                 }
                             ]}
                             layout={{
-                                title: "시설 인기 예약 시간대",
+                                title: "공간 인기 예약 시간대",
                                 xaxis: {
                                     title: "시간대",
                                 },
