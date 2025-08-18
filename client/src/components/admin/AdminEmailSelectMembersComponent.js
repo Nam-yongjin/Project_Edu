@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminEmailSelectMembersComponent = () => {
     const [members, setMembers] = useState([]);
-    const [selectedMembers, setSelectedMembers] = useState([]); // ✅ 선택된 멤버 객체들 저장
+    const [selectedMembers, setSelectedMembers] = useState([]);
     const navigate = useNavigate();
 
     const [searchParams, setSearchParams] = useState({

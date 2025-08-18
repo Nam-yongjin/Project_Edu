@@ -127,9 +127,9 @@ const AddComponent = () => {
   };
 
   return (
-    <div className="flex mt-10 max-w-6xl mx-auto">
-      <div className="space-y-6 w-full">
-        {/* 이름/제조사/개수/소개 */}
+     <div className='max-w-screen-md mx-auto'>
+            <div className="page-shadow min-blank my-10 p-10 space-y-6 text-center">
+                <div className="newText-3xl font-bold">물품등록</div>
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">물품명:</label>
           <input

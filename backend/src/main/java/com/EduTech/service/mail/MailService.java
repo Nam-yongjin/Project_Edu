@@ -1,9 +1,10 @@
 package com.EduTech.service.mail;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.ArrayList;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
@@ -18,7 +19,6 @@ import org.thymeleaf.context.Context;
 import com.EduTech.dto.admin.AdminMessageDTO;
 
 import jakarta.mail.internet.MimeMessage;
-import java.io.File;
 
 @Service
 public class MailService {
@@ -84,7 +84,6 @@ public class MailService {
                 // HTML 본문 + Quill 이미지 CID 처리
                 Context context = new Context();
                 context.setVariable("memId", memId);
-
                 String contentHtml = adminMessageDTO.getContent().replaceAll("(\r\n|\n|\r)", "<br/>");
 
                 // Quill 이미지 처리
