@@ -187,6 +187,21 @@ const AdminResComponent = () => {
                     <td className="py-1 px-2 whitespace-nowrap text-center">{member.bitemNum ?? "-"}</td>
                     <td className="py-1 px-2 font-semibold whitespace-nowrap text-center">
                       <div>{getStateLabel(member.state)}</div>
+                      {member.state==="WAIT"?
+                        <div className="flex space-x-1">
+                                  <button
+                                    className="inline-block min-w-[50px] px-2 py-0.5 bg-green-500 text-white rounded text-[10px]"
+                                    onClick={() => handleRental(member.demRevNum, "ACCEPT")}
+                                  >
+                                    수락
+                                  </button>
+                                  <button
+                                    className="inline-block min-w-[50px] px-2 py-0.5 bg-red-500 text-white rounded text-[10px]"
+                                    onClick={() => handleRental(member.demRevNum, "REJECT")}
+                                  >
+                                    거절
+                                  </button>
+                          </div>:<></>}
                     </td>
                     <td className="py-1 px-2 whitespace-nowrap text-center">{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
                     <td className="py-1 px-2 whitespace-nowrap text-center">{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
