@@ -137,22 +137,22 @@ const NoticeDetailComponent = () => {
     ) || [];
 
     return (
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
+        <div className="max-w-screen-xl mx-auto my-10">
             {/* 공지사항 상세 페이지 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="min-blank bg-white page-shadow border border-gray-200 overflow-hidden">
                 {/* 제목 */}
                 <div className="px-6 py-8 border-b border-gray-200">
                     <div className="flex items-center gap-3 mb-2">
                         {notice.isPinned && (
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs fint-medium bg-red-100 text-red-800">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                 공지
                             </span>
                         )}
-                        <h1 className="text-2xl font-bold text-gray-900">{notice.title || '제목없음'}</h1>
+                        <h1 className="newText-2xl font-bold text-gray-900">{notice.title || '제목없음'}</h1>
                     </div>
 
                     {/* 정보 */}
-                    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mt-4">
+                    <div className="flex flex-wrap items-center gap-6 newText-sm text-gray-600 mt-4">
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
@@ -190,7 +190,7 @@ const NoticeDetailComponent = () => {
                                     <img
                                         src={`http://localhost:8090/api/notice/view/${file.savedName}`}
                                         alt={file.originalName}
-                                        className="max-w-full h-auto mx-auto block border rounded shadow-md"
+                                        className="max-w-full h-auto mx-auto block border page-shadow"
                                         style={{
                                             width: 'auto',
                                             height: 'auto',
@@ -222,7 +222,7 @@ const NoticeDetailComponent = () => {
                 {attachmentFiles.length > 0 && (
                     <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                         <div className="flex items-start">
-                            <span className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">첨부파일:</span>
+                            <span className="newText-sm font-medium text-gray-700 w-20 flex-shrink-0">첨부파일:</span>
                             <div className="flex-1">
                                 {attachmentFiles.map((file, index) => (
                                     <div key={index} className="flex items-center mb-2 last:mb-0">
@@ -234,7 +234,7 @@ const NoticeDetailComponent = () => {
                                             download
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                            className="newText-sm text-blue-600 hover:text-blue-800 hover:underline"
                                         >
                                             {file.originalName}
                                         </a>
@@ -259,13 +259,13 @@ const NoticeDetailComponent = () => {
                         <div className="flex gap-2">
                             <button 
                                 onClick={handleUpdate}
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                className="green-button newText-sm"
                             >
                                 수정하기
                             </button>
                             <button 
                                 onClick={handleDelete}
-                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                className="nagative-button newText-sm"
                             >
                                 삭제하기
                             </button>
