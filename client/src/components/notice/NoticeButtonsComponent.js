@@ -42,7 +42,7 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
           {selectedNotices.length > 0 && (
             <button
               onClick={handleDelete}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm font-medium"
+              className="nagative-button newText-sm"
             >
               선택 삭제 ({selectedNotices.length})
             </button>
@@ -50,7 +50,7 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
           
           <button
               onClick={handleWrite}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium inline-block"
+            className="positive-button newText-sm"
           >
             글쓰기
           </button>
@@ -58,7 +58,7 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
           {selectedNotices.length === 1 && (
              <button
               onClick={() => moveToPath(`/notice/UpdateNotice/${selectedNotices[0]}`)}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm font-medium inline-block"
+              className="green-button newText-sm"
             >
               수정하기
             </button>

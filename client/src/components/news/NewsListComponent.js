@@ -160,123 +160,125 @@ const NewsListComponent = () => {
     const allArticles = articles;
 
   return (
-    <div className="w-full px-4 mt-10 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">언론보도</h1>
-        <p className="text-gray-600 mt-1">
-          전체 {totalElements}건의 뉴스가 있습니다.
-        </p>
-      </div>
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank">
+        <div className="mb-6">
+          <h1 className="newText-2xl font-bold text-gray-900">언론보도</h1>
+          <p className="text-gray-600 mt-1">
+            전체 {totalElements}건의 뉴스가 있습니다.
+          </p>
+        </div>
 
-      {/* 검색 컴포넌트 */}
-      <NewsSearchComponent
-        onSearch={handleSearch}
-        initialValues={searchParams}
-      />
+        {/* 검색 컴포넌트 */}
+        <NewsSearchComponent
+          onSearch={handleSearch}
+          initialValues={searchParams}
+        />
 
-      {/* 언론보도 테이블 */}
-      <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span className="ml-2 text-gray-600">로딩중...</span>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full table-fixed">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  {loginState.role === 'ADMIN' && ( //관리자만 선택 가능
-                    <th className="w-12 px-2 py-3 text-center align-middle">
-                      <input
-                        type="checkbox"
-                        checked={selectedArticles.length === articles.length && articles.length > 0}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                    </th>
-                  )}
-                  <th className="w-16 px-2 py-3 text-center text-sm font-medium text-gray-900">번호</th>
-                  <th className="px-3 py-3 text-left text-sm font-medium text-gray-900">제목</th>
-                  <th className="w-28 px-3 py-3 text-center text-sm font-medium text-gray-900">작성자</th>
-                  <th className="w-36 px-3 py-3 text-center text-sm font-medium text-gray-900">작성일</th>
-                  <th className="w-24 px-3 py-3 text-center text-sm font-medium text-gray-900">조회수</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {allArticles.length === 0 ? ( //뉴스가 없을 때
+        {/* 언론보도 테이블 */}
+        <div className="bg-white page-shadow border border-gray-200 overflow-hidden">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <span className="ml-2 text-gray-600">로딩중...</span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full table-fixed">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <td 
-                      colSpan={loginState.role === 'ADMIN' ? 6 : 5}
-                      className="px-4 py-12 text-center text-gray-500"
-                    >
-                      등록된 뉴스가 없습니다.
-                    </td>
+                    {loginState.role === 'ADMIN' && ( //관리자만 선택 가능
+                      <th className="w-12 px-2 py-3 text-center align-middle">
+                        <input
+                          type="checkbox"
+                          checked={selectedArticles.length === articles.length && articles.length > 0}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </th>
+                    )}
+                    <th className="w-16 px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
+                    <th className="px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
+                    <th className="w-28 px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                    <th className="w-36 px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
+                    <th className="w-24 px-3 py-3 text-center newText-sm font-medium text-gray-900">조회수</th>
                   </tr>
-                ) : (
-                  allArticles.map((news, index) => (
-                    <tr 
-                      key={news.newsNum}
-                      className={`hover:bg-gray-50`}
-                    >
-                      {loginState.role === 'ADMIN' && (
-                        <td className="px-4 py-3">
-                          <input
-                            type="checkbox"
-                            checked={selectedArticles.includes(news.newsNum)}
-                            onChange={(e) => handleCheckboxChange(news.newsNum, e.target.checked)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                          />
-                        </td>
-                      )}
-                      {/* 역순 번호 */}
-                      <td className="px-4 py-3 text-center text-sm text-gray-900">
-                        {totalElements - (currentPage * searchParams.size) - index}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center">
-                          <Link //제목 누르면 상세페이지로 넘어감
-                            to={`/news/NewsDetail/${news.newsNum}`}
-                            className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
-                          >
-                            {news.title}
-                          </Link>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm text-gray-500">
-                        {news.name}
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm text-gray-500">
-                        {formatDate(news.createdAt)}
-                      </td>
-                      <td className="px-4 py-3 text-center text-sm text-gray-500">
-                        {news.viewCount?.toLocaleString() || 0}
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {allArticles.length === 0 ? ( //뉴스가 없을 때
+                    <tr>
+                      <td 
+                        colSpan={loginState.role === 'ADMIN' ? 6 : 5}
+                        className="px-4 py-12 text-center text-gray-500"
+                      >
+                        등록된 뉴스가 없습니다.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                  ) : (
+                    allArticles.map((news, index) => (
+                      <tr 
+                        key={news.newsNum}
+                        className={`hover:bg-gray-50`}
+                      >
+                        {loginState.role === 'ADMIN' && (
+                          <td className="px-4 py-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedArticles.includes(news.newsNum)}
+                              onChange={(e) => handleCheckboxChange(news.newsNum, e.target.checked)}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                          </td>
+                        )}
+                        {/* 역순 번호 */}
+                        <td className="px-4 py-3 text-center newText-sm text-gray-900">
+                          {totalElements - (currentPage * searchParams.size) - index}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center">
+                            <Link //제목 누르면 상세페이지로 넘어감
+                              to={`/news/NewsDetail/${news.newsNum}`}
+                              className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                            >
+                              {news.title}
+                            </Link>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500">
+                          {news.name}
+                        </td>
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500">
+                          {formatDate(news.createdAt)}
+                        </td>
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500">
+                          {news.viewCount?.toLocaleString() || 0}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
-      {/* 페이지네이션 */}
-      {renderPagination()}
+        {/* 페이지네이션 */}
+        {renderPagination()}
 
-      {/* 하단 버튼 */}
-      <div className="mb-8">
-        <NewsButtonComponent
-          isAdmin={loginState.role === 'ADMIN'}
-          selectedArticles={selectedArticles}
-          onDelete={() => {
-            // 삭제 후 목록 새로고침
-            fetchArticles();
-            setSelectedArticles([]);
-          }}
-        />
+        {/* 하단 버튼 */}
+        <div className="mb-8">
+          <NewsButtonComponent
+            isAdmin={loginState.role === 'ADMIN'}
+            selectedArticles={selectedArticles}
+            onDelete={() => {
+              // 삭제 후 목록 새로고침
+              fetchArticles();
+              setSelectedArticles([]);
+            }}
+          />
+        </div>
       </div>
-  </div>
+    </div>
   );
 };
 
