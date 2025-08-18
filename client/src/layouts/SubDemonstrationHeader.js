@@ -19,7 +19,7 @@ const SubDemonstrationHeader = () => {
 
                 <div className="newText-lg min-blank border-b-2 border-blue-500 pb-4">
                     <ul className="flex">
-                        <li className="mr-6 pb-2">
+                        <li className="mr-4 pb-2">
                             <Link
                                 to="/demonstration/demInfo"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/demInfo") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
@@ -29,7 +29,7 @@ const SubDemonstrationHeader = () => {
                             </Link>
                         </li>
 
-                        <li className="mr-6 pb-2">
+                        <li className="mr-4 pb-2">
                             <Link
                                 to="/demonstration/list"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/list") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
@@ -40,7 +40,7 @@ const SubDemonstrationHeader = () => {
                         </li>
 
                         {loginState.role === "COMPANY" || "ADMIN"? (
-                            <li className="mr-6 pb-2">
+                            <li className="mr-4 pb-2">
                                 <Link
                                     to="/demonstration/add"
                                     className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/add")
@@ -54,7 +54,7 @@ const SubDemonstrationHeader = () => {
                         ) : <></>}
 
                         {loginState.role === "TEACHER" ? (
-                            <li className="mr-6 pb-2">
+                            <li className="mr-4 pb-2">
                                 <Link
                                     to="/demonstration/rentalList"
                                     className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/rentalList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
@@ -66,7 +66,7 @@ const SubDemonstrationHeader = () => {
                         ) : <></>}
 
                         {loginState.role === "COMPANY" ? (
-                            <li className="mr-6 pb-2">
+                            <li className="mr-4 pb-2">
                                 <Link
                                     to="/demonstration/borrowList"
                                     className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/borrowList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
@@ -78,7 +78,7 @@ const SubDemonstrationHeader = () => {
                         ) : <></>}
                         {loginState.role === "ADMIN" ? (
                             <>
-                         <li className="mr-6 pb-2">
+                         <li className="mr-4 pb-2">
                             <Link
                                 to="/demonstration/adminReg"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/adminReg") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
@@ -87,7 +87,7 @@ const SubDemonstrationHeader = () => {
                                 실증등록관리
                             </Link>
                         </li>
-                        <li className="mr-6 pb-2">
+                        <li className="mr-4 pb-2">
                             <Link
                                 to="/demonstration/adminRes"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/adminRes") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""

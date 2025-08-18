@@ -18,7 +18,7 @@ const SubAboutHeader = () => {
                 
                 <div className="newText-lg min-blank border-b-2 border-blue-500 pb-4">
                     <ul className="flex">
-                        <li className="mr-6 pb-2">
+                        <li className="mr-4 pb-2">
                             <Link 
                                 to="/about/greeting" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
@@ -28,7 +28,7 @@ const SubAboutHeader = () => {
                                 인사말
                             </Link>
                         </li>
-                        <li className="mr-6 pb-2">
+                        <li className="mr-4 pb-2">
                             <Link 
                                 to="/about/business" 
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
@@ -38,7 +38,7 @@ const SubAboutHeader = () => {
                                 사업소개
                             </Link>
                         </li>
-                        <li className="mr-6 pb-2">
+                        <li className="mr-4 pb-2">
                             <Link 
                                 to="/about/direction"
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${
