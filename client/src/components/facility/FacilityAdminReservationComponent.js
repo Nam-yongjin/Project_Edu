@@ -205,7 +205,7 @@ export default function AdminFacilityReservations() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">시설 예약 현황 (관리자)</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">공간 예약 현황 (관리자)</h2>
 
       {/* 필터 박스 */}
       <div className="rounded-2xl border p-4 mb-4 bg-white shadow-sm">
@@ -266,8 +266,8 @@ export default function AdminFacilityReservations() {
             <option value="reserveAt:ASC">신청일 ↑</option>
             <option value="facDate:DESC">이용일 ↓</option>
             <option value="facDate:ASC">이용일 ↑</option>
-            <option value="facName:ASC">시설명 A→Z</option>
-            <option value="facName:DESC">시설명 Z→A</option>
+            <option value="facName:ASC">공간명 A→Z</option>
+            <option value="facName:DESC">공간명 Z→A</option>
           </select>
           <label className="text-sm text-gray-600 ml-3">페이지 크기</label>
           <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }} className="border rounded px-2 py-1 text-sm">
@@ -284,8 +284,8 @@ export default function AdminFacilityReservations() {
           <thead>
             <tr className="bg-gray-50 text-left">
               <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("reserveId")}>예약ID</th>
-              <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("facName")}>시설명</th>
-              <th className="px-2 py-3">시설번호</th>
+              <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("facName")}>공간명</th>
+              <th className="px-2 py-3">공간번호</th>
               <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("facDate")}>이용일</th>
               <th className="px-4 py-3">이용 시간</th>
               <th className="px-4 py-3">신청자</th>

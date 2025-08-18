@@ -74,7 +74,7 @@ const FacilityListComponent = () => {
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
         <input
           type="text"
-          placeholder="시설명/소개로 검색"
+          placeholder="공간명/소개로 검색"
           className="border p-2 rounded w-60"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
@@ -91,7 +91,7 @@ const FacilityListComponent = () => {
       {loading ? (
         <div className="text-center py-16">불러오는 중…</div>
       ) : list.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">등록된 시설이 없습니다.</div>
+        <div className="text-center py-16 text-gray-500">등록된 공간이 없습니다.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {list.map((item) => (

@@ -22,7 +22,7 @@ function EvtDetailComponent({ eventNum }) {
       const data = await getEventById(eventNum);
       setEvent(data);
     } catch (err) {
-      console.error("행사 정보 조회 실패:", err);
+      console.error("프로그램 정보 조회 실패:", err);
     } finally {
       setLoading(false);
     }
@@ -71,9 +71,9 @@ function EvtDetailComponent({ eventNum }) {
   const isDisabled = isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
 
   const getApplyButtonText = () => {
-    if (isCanceled) return "취소된 행사";
-    if (isEventEnded) return "행사 완료";
-    if (isEventStarted) return "행사 진행 중";
+    if (isCanceled) return "취소된 프로그램";
+    if (isEventEnded) return "프로그램 완료";
+    if (isEventStarted) return "프로그램 진행 중";
     if (alreadyApplied) return "신청 완료";
     if (!isApplyPeriod()) return "신청 기간 아님";
     if (isFull()) return "모집 마감";
@@ -101,7 +101,7 @@ function EvtDetailComponent({ eventNum }) {
   };
 
   const handleCancel = async () => {
-    if (!window.confirm("정말 이 행사를 취소하시겠습니까?")) return;
+    if (!window.confirm("정말 이 프로그램를 취소하시겠습니까?")) return;
 
     if ((event.currCapacity ?? 0) > 0) {
       const confirmCancel = window.confirm(
@@ -112,10 +112,10 @@ function EvtDetailComponent({ eventNum }) {
 
     try {
       await deleteEvent(event.eventNum);
-      alert("행사가 취소되었습니다.");
+      alert("프로그램가 취소되었습니다.");
       navigate("/event/list");
     } catch (err) {
-      alert("행사 취소 실패: " + (err.response?.data?.message || err.message));
+      alert("프로그램 취소 실패: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -139,7 +139,7 @@ function EvtDetailComponent({ eventNum }) {
   }[event?.category] || "미지정";
 
   if (loading) return <div className="text-center p-10">로딩 중...</div>;
-  if (!event) return <div className="text-center p-10">행사 정보를 불러올 수 없습니다.</div>;
+  if (!event) return <div className="text-center p-10">프로그램 정보를 불러올 수 없습니다.</div>;
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow mt-8 space-y-10">
@@ -148,7 +148,7 @@ function EvtDetailComponent({ eventNum }) {
           {event.mainImagePath ? (
             <img
               src={getFullUrl(event.mainImagePath)}
-              alt="행사 이미지"
+              alt="프로그램 이미지"
               className="rounded-xl w-full h-auto object-cover"
             />
           ) : (
@@ -203,7 +203,7 @@ function EvtDetailComponent({ eventNum }) {
                     className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
                     onClick={handleCancel}
                   >
-                    행사 취소
+                    프로그램 취소
                   </button>
                 )}
               </div>

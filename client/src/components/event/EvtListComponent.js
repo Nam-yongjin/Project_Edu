@@ -22,7 +22,7 @@ const EventListComponent = () => {
   // 검색 API 호출
   useEffect(() => {
     const fetchData = async () => {
-      // CLOSED(신청마감) 선택 시 COMPLETE(행사완료)도 함께 포함
+      // CLOSED(신청마감) 선택 시 COMPLETE(프로그램완료)도 함께 포함
       const apiState = state;
 
       const data = await getSearchList({
@@ -109,7 +109,7 @@ const EventListComponent = () => {
       {/* 검색 필터 + 정렬 */}
       <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
         <select className="border p-2 rounded" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-          <option value="eventName">행사명</option>
+          <option value="eventName">프로그램명</option>
           <option value="eventInfo">내용</option>
           <option value="all">전체</option>
         </select>
@@ -154,7 +154,7 @@ const EventListComponent = () => {
         </button>
       </div>
 
-      {/* 행사 카드 목록 */}
+      {/* 프로그램 카드 목록 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {events.map((event) => {
           const status = getApplyStatus(event);

@@ -6,7 +6,7 @@ const EventDetailPage = () => {
     const {eventNum} = useParams();
     return (
         <div>
-            <EvtTitleComponent title="행사 상세 보기" />
+            <EvtTitleComponent title="프로그램 상세 보기" />
             <EvtDetailComponent eventNum={eventNum}/>
         </div>
     );

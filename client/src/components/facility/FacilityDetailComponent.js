@@ -113,7 +113,7 @@ export default function FacilityDetailContent({ facRevNum }) {
     setErr("");
     getFacilityDetail(facRevNum)
       .then((d) => mounted && (setData(d), setIdx(0)))
-      .catch((e) => mounted && setErr(e?.response?.data?.message || e.message || "시설 정보를 불러오지 못했습니다."))
+      .catch((e) => mounted && setErr(e?.response?.data?.message || e.message || "공간 정보를 불러오지 못했습니다."))
       .finally(() => mounted && setDetailLoading(false));
     return () => { mounted = false; };
   }, [facRevNum]);
@@ -455,7 +455,7 @@ export default function FacilityDetailContent({ facRevNum }) {
 
         {/* 상세 정보 */}
         <div className="p-2">
-          <h2 className="text-lg font-semibold">{data?.facName ?? "시설명"}</h2>
+          <h2 className="text-lg font-semibold">{data?.facName ?? "공간명"}</h2>
           <p className="mt-1 text-gray-500">{data?.facInfo ?? "-"}</p>
           <dl className="mt-6 space-y-3">
             <Row label="예약가능시간" value={`${open} ~ ${close}`} />
@@ -595,7 +595,7 @@ function CalendarAndReserve(props) {
                           "inline-block w-fit text-[11px] px-2 py-0.5 rounded-full",
                           (it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700")
                         ].join(" ")}
-                        title={it.type === "PUBLIC" ? "공휴일" : "시설 휴무"}
+                        title={it.type === "PUBLIC" ? "공휴일" : "공간 휴무"}
                       >
                         {it.label}
                       </span>

@@ -110,7 +110,7 @@ const EvtAddComponent = () => {
 
     postAddEvent(formData)
       .then(() => {
-        alert("행사 등록 완료");
+        alert("프로그램 등록 완료");
         moveToPath("/event/list");
       })
       .catch((error) => {
@@ -126,18 +126,18 @@ const EvtAddComponent = () => {
     <div className="flex mt-10 max-w-6xl mx-auto">
       <div className="space-y-6 w-2/3">
         <div className="flex items-center">
-          <label className="text-xl font-semibold w-[120px]">행사명:</label>
-          <input type="text" name="eventName" value={evt.eventName} onChange={handleChangeEvt} placeholder="행사명을 입력하세요" className="border p-3 text-lg flex-1" />
+          <label className="text-xl font-semibold w-[120px]">프로그램명:</label>
+          <input type="text" name="eventName" value={evt.eventName} onChange={handleChangeEvt} placeholder="프로그램명을 입력하세요" className="border p-3 text-lg flex-1" />
         </div>
 
         <div className="flex items-start">
           <label className="text-xl font-semibold w-[120px] pt-3">소개:</label>
-          <textarea name="eventInfo" value={evt.eventInfo} onChange={handleChangeEvt} rows={5} className="border p-3 text-lg flex-1 resize-y" placeholder="행사 소개 입력" />
+          <textarea name="eventInfo" value={evt.eventInfo} onChange={handleChangeEvt} rows={5} className="border p-3 text-lg flex-1 resize-y" placeholder="프로그램 소개 입력" />
         </div>
 
         <div className="flex items-center">
           <label className="text-xl font-semibold w-[120px]">장소:</label>
-          <input type="text" name="place" value={evt.place} onChange={handleChangeEvt} placeholder="행사 장소" className="border p-3 text-lg flex-1" />
+          <input type="text" name="place" value={evt.place} onChange={handleChangeEvt} placeholder="프로그램 장소" className="border p-3 text-lg flex-1" />
         </div>
 
         <div className="flex items-center">
@@ -151,7 +151,7 @@ const EvtAddComponent = () => {
 
         {["applyStartPeriod", "applyEndPeriod", "eventStartPeriod", "eventEndPeriod"].map((key, idx) => (
           <div key={key} className="flex items-center">
-            <label className="text-xl font-semibold w-[120px]">{["모집 시작", "모집 종료", "행사 시작", "행사 종료"][idx]}:</label>
+            <label className="text-xl font-semibold w-[120px]">{["모집 시작", "모집 종료", "프로그램 시작", "프로그램 종료"][idx]}:</label>
             <DatePicker
               selected={evt[key]}
               onChange={(date) => handleDateChange(key, date)}
@@ -207,7 +207,7 @@ const EvtAddComponent = () => {
         </div>
 
         <div className="mt-4 flex justify-end gap-4">
-          <button onClick={register} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">행사 등록</button>
+          <button onClick={register} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">프로그램 등록</button>
           <button onClick={moveToReturn} className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500">뒤로가기</button>
         </div>
       </div>

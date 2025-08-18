@@ -29,8 +29,8 @@ const EvtUpdateComponent = ({ eventNum }) => {
         daysOfWeek: data.daysOfWeek || [],
       });
     } catch (err) {
-      console.error("❌ 행사 조회 실패", err);
-      alert("행사 정보를 불러오는 데 실패했습니다.");
+      console.error("❌ 프로그램 조회 실패", err);
+      alert("프로그램 정보를 불러오는 데 실패했습니다.");
       moveToReturn();
     }
   };
@@ -109,7 +109,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
     updateEvent(eventNum, formData)
       .then(() => {
-        alert("행사 수정이 완료되었습니다.");
+        alert("프로그램 수정이 완료되었습니다.");
         moveToPath("/event/list");
       })
       .catch((err) => {
@@ -118,12 +118,12 @@ const EvtUpdateComponent = ({ eventNum }) => {
       });
   };
 
-  if (!evt) return <div className="text-center mt-20">행사 정보를 불러오는 중...</div>;
+  if (!evt) return <div className="text-center mt-20">프로그램 정보를 불러오는 중...</div>;
 
   return (
     <div className="flex mt-10 max-w-6xl mx-auto">
       <div className="space-y-6 w-2/3">
-        {[{ label: "행사명", name: "eventName" }, { label: "장소", name: "place" }].map(({ label, name }) => (
+        {[{ label: "프로그램명", name: "eventName" }, { label: "장소", name: "place" }].map(({ label, name }) => (
           <div key={name} className="flex items-center">
             <label className="text-xl font-semibold w-[120px]">{label}:</label>
             <input
@@ -164,7 +164,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
         {["applyStartPeriod", "applyEndPeriod", "eventStartPeriod", "eventEndPeriod"].map((name) => (
           <div key={name} className="flex items-center">
             <label className="text-xl font-semibold w-[120px]">
-              {name.includes("apply") ? "모집" : "행사"} {name.includes("Start") ? "시작" : "종료"}:
+              {name.includes("apply") ? "모집" : "프로그램"} {name.includes("Start") ? "시작" : "종료"}:
             </label>
             <DatePicker
               selected={evt[name]}
@@ -240,7 +240,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
             onClick={handleUpdate}
             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           >
-            행사 수정
+            프로그램 수정
           </button>
           <button
             onClick={moveToReturn}
