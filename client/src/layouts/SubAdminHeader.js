@@ -57,7 +57,7 @@ const SubAdminHeader = () => {
                          <li className="mr-6 pb-2">
                             <Link
                                 to="/admin/adminSelectEmail"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminSelectEmail") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminSelectEmail") || location.pathname.includes("/admin/adminEmail") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 메일 보내기
