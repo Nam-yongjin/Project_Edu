@@ -79,7 +79,7 @@ const SubMyInfoHeader = () => {
                                 className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/demonstration/borrowList") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
-                                실증신청내역
+                                실증등록내역
                             </Link>
                         </li>
                         ) : <></>}

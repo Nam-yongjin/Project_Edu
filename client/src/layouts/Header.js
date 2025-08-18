@@ -105,14 +105,9 @@ const Header = () => {
     );
   }
 
-  if (loginState.role === "TEACHER") {
-    const teacherMenu = mainMenus.find(menu => menu.name === "실증 지원");
-    teacherMenu.sub.push({ name: "실증 대여 내역", link: "/demonstration/rentalList" });
-  }
-
   if (loginState.role === "COMPANY") {
     const companyMenu = mainMenus.find(menu => menu.name === "실증 지원");
-    companyMenu.sub.push({ name: "실증 등록", link: "/demonstration/add" }, { name: "실증 등록 내역", link: "/demonstration/borrowList" });
+    companyMenu.sub.push({ name: "실증 등록", link: "/demonstration/add" },);
   }
 
   return (

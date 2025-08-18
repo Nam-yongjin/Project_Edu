@@ -67,9 +67,41 @@ const Side = ({ isOpen, onClose }) => {
                                     </div>
                                 </li>
                                 <li>
-                                    <Link to={getMyPageLink(loginState.role)} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>
-                                        🙍🏻‍♂️ 내정보
-                                    </Link>
+                                    <div
+                                        className="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer"
+                                        onClick={() => handleMenuToggle('myInfo')}
+                                    >
+                                        <span>🙍🏻‍♂️ 내정보</span>
+                                        <span className={`w-2 h-2 border-r-2 border-b-2 border-gray-500 transform transition-transform duration-300 ease-in-out  ${openMenus['myInfo'] ? '-rotate-[135deg]' : 'rotate-45'}`}></span>
+                                    </div>
+                                    <ul
+                                        className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['myInfo'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                                            }`}
+                                    >
+                                        <li>
+                                            <Link to={getMyPageLink(loginState.role)} className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>내정보</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/event/Reservation" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>프로그램신청내역</Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/facility/reservation" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간예약내역</Link>
+                                        </li>
+                                        {loginState.role === "TEACHER" ?
+                                            <>
+                                                <li>
+                                                    <Link to="/demonstration/rentalList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증대여내역</Link>
+                                                </li>
+                                            </>
+                                            : <></>}
+                                        {loginState.role === "COMPANY" ?
+                                            <>
+                                                <li>
+                                                    <Link to="/demonstration/borrowList" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증등록내역</Link>
+                                                </li>
+                                            </>
+                                            : <></>}
+                                    </ul>
                                 </li>
                             </>
                             :
