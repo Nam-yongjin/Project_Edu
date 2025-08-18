@@ -54,6 +54,15 @@ const SubAdminHeader = () => {
                                 휴무일관리
                             </Link>
                         </li>
+                         <li className="mr-6 pb-2">
+                            <Link
+                                to="/admin/adminSelectEmail"
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/admin/adminSelectEmail") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                    }`}
+                            >
+                                메일 보내기
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>

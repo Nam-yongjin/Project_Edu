@@ -5,27 +5,26 @@ import { sendEmail, getEmailMembers } from "../../api/adminApi";
 
 const AdminEmailComponent = ({ selectedIds }) => {
   const [memberList, setMemberList] = useState([]);
-  const [selectedMembers, setSelectedMembers] = useState([]); // 이메일 배열
+  const [selectedMembers, setSelectedMembers] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageList, setImageList] = useState([]);
   const [attachFiles, setAttachFiles] = useState([]);
 
   const quillRef = useRef(null);
+  const attachInputRef = useRef(null); // 첨부파일 input ref
 
-  // 선택된 ID 기반으로 회원 리스트 가져오기
   useEffect(() => {
     if (selectedIds.length === 0) return;
 
     const fetchMembers = async () => {
       const members = await getEmailMembers(selectedIds);
-      console.log("회원 리스트:", members); // 확인용
+      console.log("회원 리스트:", members);
       setMemberList(members);
     };
 
     fetchMembers();
 
-    // Quill 에디터 스타일
     const style = document.createElement("style");
     style.innerHTML = `
       .ql-editor { min-height:600px; max-height:600px; overflow-y:auto; padding:12px; }
@@ -34,7 +33,6 @@ const AdminEmailComponent = ({ selectedIds }) => {
     document.head.appendChild(style);
   }, [selectedIds]);
 
-  // 선택된 회원 이메일 처리
   const handleMemberSelect = (e) => {
     setSelectedMembers(Array.from(e.target.selectedOptions, (option) => option.value));
   };
@@ -119,7 +117,6 @@ const AdminEmailComponent = ({ selectedIds }) => {
     setAttachFiles((prev) => [...prev, ...Array.from(e.target.files)]);
   };
 
-  // 이메일 전송
   const handleSend = async () => {
     if (!title || !content || selectedMembers.length === 0) {
       alert("제목, 본문, 수신 회원을 모두 입력해주세요.");
@@ -135,7 +132,13 @@ const AdminEmailComponent = ({ selectedIds }) => {
     try {
       await sendEmail(formData);
       alert("메일 전송 성공!");
-      setTitle(""); setContent(""); setSelectedMembers([]); setImageList([]); setAttachFiles([]);
+      // 모든 상태 초기화
+      setTitle(""); 
+      setContent(""); 
+      setSelectedMembers([]); 
+      setImageList([]); 
+      setAttachFiles([]);
+      if (attachInputRef.current) attachInputRef.current.value = null; // input 초기화
     } catch (err) {
       console.error(err);
       alert("메일 전송 실패");
@@ -190,6 +193,7 @@ const AdminEmailComponent = ({ selectedIds }) => {
           type="file"
           multiple
           onChange={handleAttachFiles}
+          ref={attachInputRef} // ref 추가
           className="w-full border p-2 rounded"
         />
       </div>
