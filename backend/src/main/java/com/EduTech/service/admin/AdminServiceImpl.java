@@ -447,6 +447,7 @@ public class AdminServiceImpl implements AdminService {
 			if (adminMemberViewReqDTO.getState() != null) {
 			    spec = spec.and(MemberSpecs.hasState(adminMemberViewReqDTO.getState()));
 			}
+			spec=spec.and(MemberSpecs.emailAgree());
 			
 			List<Member> members = memberRepository.findAll(spec, sort)
 			        .stream()
