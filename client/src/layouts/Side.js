@@ -154,7 +154,7 @@ const Side = ({ isOpen, onClose }) => {
                                     }`}
                             >
                                 <li>
-                                    <Link to="/event/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>프로그램 안내</Link>
+                                    <Link to="/event/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>프로그램 신청</Link>
                                 </li>
                                 {loginState.role === "ADMIN" ?
                                     <>
@@ -178,7 +178,7 @@ const Side = ({ isOpen, onClose }) => {
                                     }`}
                             >
                                 <li>
-                                    <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 안내</Link>
+                                    <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 예약</Link>
                                 </li>
                                 {loginState.role === "ADMIN" ?
                                     <>
