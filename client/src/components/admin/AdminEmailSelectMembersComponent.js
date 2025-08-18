@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import {getEmailMembers} from "../../api/adminApi";
+import { getEmailMembers } from "../../api/adminApi";
 import { useNavigate } from "react-router-dom";
+
 const AdminEmailSelectMembersComponent = () => {
     const [members, setMembers] = useState([]);
-    const [selectedIds, setSelectedIds] = useState([]);
+    const [selectedMembers, setSelectedMembers] = useState([]); // ✅ 선택된 멤버 객체들 저장
     const navigate = useNavigate();
+
     const [searchParams, setSearchParams] = useState({
         memId: "",
         name: "",
@@ -18,15 +20,15 @@ const AdminEmailSelectMembersComponent = () => {
 
     // 회원 목록 불러오기
     const loadMembers = () => {
-        if(selectedIds.length===0) {
-        getEmailMembers({ ...searchParams, sortField: sortField, sortDirection: sortDirection })
-            .then(data => {
-               setMembers(Array.isArray(data) ? data : []);
-            })
-            .catch(error => {
-                alert("회원 목록 불러오기 실패:", error);
-                setMembers([]);
-            });
+        if (selectedMembers.length === 0) {
+            getEmailMembers({ ...searchParams, sortField, sortDirection })
+                .then(data => {
+                    setMembers(Array.isArray(data) ? data : []);
+                })
+                .catch(error => {
+                    alert("회원 목록 불러오기 실패:", error);
+                    setMembers([]);
+                });
         }
     };
 
@@ -35,25 +37,28 @@ const AdminEmailSelectMembersComponent = () => {
     }, []);
 
     // 체크박스 토글
-    const handleCheckboxChange = (id) => {
-        setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-        );
+    const handleCheckboxChange = (member) => {
+        setSelectedMembers((prev) => {
+            const exists = prev.some((m) => m.memId === member.memId);
+            return exists
+                ? prev.filter((m) => m.memId !== member.memId)
+                : [...prev, member];
+        });
     };
 
     // 전체 선택/해제
     const handleSelectAll = (e) => {
         const isChecked = e.target.checked;
         if (isChecked) {
-            const allMemberIds = members.map(m => m.memId);
-            setSelectedIds(allMemberIds);
+            setSelectedMembers(members);
         } else {
-            setSelectedIds([]);
+            setSelectedMembers([]);
         }
     };
 
     // 모든 회원이 선택되었는지 확인
-    const isAllSelected = members.length > 0 && selectedIds.length === members.length;
+    const isAllSelected =
+        members.length > 0 && selectedMembers.length === members.length;
 
     // 검색 입력 처리
     const handleSearchChange = (e) => {
@@ -68,7 +73,7 @@ const AdminEmailSelectMembersComponent = () => {
 
     return (
         <div className="max-w-screen-xl mx-auto my-10 ">
-            <div className="newText-2xl min-blank font-bold mb-4">회원 관리</div>
+            <div className="newText-2xl min-blank font-bold mb-4">발송자 선택</div>
 
             {/* 검색 및 정렬 필터 */}
             <div className="min-blank newText-base grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 bg-gray-100 rounded-lg shadow-sm">
@@ -129,17 +134,18 @@ const AdminEmailSelectMembersComponent = () => {
                         <option value="memId">아이디</option>
                     </select>
                     <button
-                        onClick={() => setSortDirection(sortDirection === "ASC" ? "DESC" : "ASC")}
+                        onClick={() =>
+                            setSortDirection(
+                                sortDirection === "ASC" ? "DESC" : "ASC"
+                            )
+                        }
                         className="normal-button"
                     >
                         {sortDirection === "ASC" ? "▲ 오름차순" : "▼ 내림차순"}
                     </button>
                 </div>
 
-                <button
-                    onClick={handleSearch}
-                    className="positive-button"
-                >
+                <button onClick={handleSearch} className="positive-button">
                     검색
                 </button>
             </div>
@@ -157,36 +163,71 @@ const AdminEmailSelectMembersComponent = () => {
                                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                                 />
                             </th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">ID</th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">이름</th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">이메일</th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">휴대폰번호</th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">가입일</th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">역할</th>
-                            <th scope="col" className="lg:px-6 px-2 py-3">상태</th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                ID
+                            </th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                이름
+                            </th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                이메일
+                            </th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                휴대폰번호
+                            </th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                가입일
+                            </th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                역할
+                            </th>
+                            <th scope="col" className="lg:px-6 px-2 py-3">
+                                상태
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {members.length > 0 ? (
                             members.map((m) => (
-                                <tr key={m.memId} className="bg-white border-b hover:bg-gray-50">
+                                <tr
+                                    key={m.memId}
+                                    className="bg-white border-b hover:bg-gray-50"
+                                >
                                     <td className="w-4 p-4">
                                         <input
                                             type="checkbox"
-                                            checked={selectedIds.includes(m.memId)}
-                                            onChange={() => handleCheckboxChange(m.memId)}
+                                            checked={selectedMembers.some(
+                                                (sm) => sm.memId === m.memId
+                                            )}
+                                            onChange={() =>
+                                                handleCheckboxChange(m)
+                                            }
                                             className="w-4 h-4"
                                         />
                                     </td>
-                                    <td className="lg:px-6 px-2 py-4">{m.memId}</td>
-                                    <td className="lg:px-6 px-2 py-4">{m.name}</td>
-                                    <td className="lg:px-6 px-2 py-4">{m.email}</td>
-                                    <td className="lg:px-6 px-2 py-4">{m.phone}</td>
                                     <td className="lg:px-6 px-2 py-4">
-                                        {new Date(m.createdAt).toLocaleDateString()}
+                                        {m.memId}
                                     </td>
-                                    <td className="lg:px-6 px-2 py-4">{m.role}</td>
-                                    <td className="lg:px-6 px-2 py-4">{m.state}</td>
+                                    <td className="lg:px-6 px-2 py-4">
+                                        {m.name}
+                                    </td>
+                                    <td className="lg:px-6 px-2 py-4">
+                                        {m.email}
+                                    </td>
+                                    <td className="lg:px-6 px-2 py-4">
+                                        {m.phone}
+                                    </td>
+                                    <td className="lg:px-6 px-2 py-4">
+                                        {new Date(
+                                            m.createdAt
+                                        ).toLocaleDateString()}
+                                    </td>
+                                    <td className="lg:px-6 px-2 py-4">
+                                        {m.role}
+                                    </td>
+                                    <td className="lg:px-6 px-2 py-4">
+                                        {m.state}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
@@ -199,20 +240,23 @@ const AdminEmailSelectMembersComponent = () => {
                     </tbody>
                 </table>
             </div>
-             <div className="min-blank newText-base flex items-center gap-4 mt-10 mb-6"></div>
+            <div className="min-blank newText-base flex items-center gap-4 mt-10 mb-6"></div>
             <button
                 onClick={() => {
-                    if (selectedIds.length === 0) {
+                    if (selectedMembers.length === 0) {
                         alert("회원을 선택해 주세요");
                         return;
                     }
-                    navigate("/admin/adminEmail", { state: { selectedIds } });
+                    // ✅ 아이디, 이름, 이메일까지 같이 넘김
+                    navigate("/admin/adminEmail", {
+                        state: { selectedMembers },
+                    });
                 }}
                 className="bg-yellow-300 hover:bg-yellow-200 text-white font-semibold py-2 px-4 rounded"
             >
                 선택 회원 메시지 보내기
             </button>
-            </div>
+        </div>
     );
 };
 

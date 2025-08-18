@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { sendEmail, getEmailMembers } from "../../api/adminApi";
+import { sendEmail } from "../../api/adminApi";
 
-const AdminEmailComponent = ({ selectedIds }) => {
+const AdminEmailComponent = ({members }) => {
   const [memberList, setMemberList] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [title, setTitle] = useState("");
@@ -15,11 +15,9 @@ const AdminEmailComponent = ({ selectedIds }) => {
   const attachInputRef = useRef(null); // 첨부파일 input ref
 
   useEffect(() => {
-    if (selectedIds.length === 0) return;
+    if (members.length === 0) return;
 
     const fetchMembers = async () => {
-      const members = await getEmailMembers(selectedIds);
-      console.log("회원 리스트:", members);
       setMemberList(members);
     };
 
@@ -31,7 +29,7 @@ const AdminEmailComponent = ({ selectedIds }) => {
       .ql-editor img { display:inline-block; max-width:100%; height:auto; vertical-align:middle; }
     `;
     document.head.appendChild(style);
-  }, [selectedIds]);
+  }, [members]);
 
   const handleMemberSelect = (e) => {
     setSelectedMembers(Array.from(e.target.selectedOptions, (option) => option.value));
