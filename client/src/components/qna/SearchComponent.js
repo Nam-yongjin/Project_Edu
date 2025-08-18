@@ -58,6 +58,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                             onChange={handleInputChange}
                             className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
+                            <option value="ALL">전체</option>
                             <option value="TITLE">제목</option>
                             <option value="memId">작성자</option>
                         </select>
