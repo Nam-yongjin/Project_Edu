@@ -39,7 +39,7 @@ const SubDemonstrationHeader = () => {
                             </Link>
                         </li>
 
-                        {loginState.role === "COMPANY" ? (
+                        {loginState.role === "COMPANY" || "ADMIN"? (
                             <li className="mr-6 pb-2">
                                 <Link
                                     to="/demonstration/add"

@@ -181,6 +181,18 @@ export const getFacTimesStats = async () => {
     return res.data;
 }
 
+// 실증 카테고리별 등록 수, 비율
+export const getDemRegStats = async () => {
+    const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/demRegCategory`);
+    return res.data;
+}
+
+// 실증 카테고리별 대여 수, 비율
+export const getDemRevStats = async () => {
+    const res = await jwtAxios.get(`http://127.0.0.1:8000/api/admin/demRevCategory`);
+    return res.data;
+}
+
 // 이메일 전송
 export const sendEmail = async (formData) => {
     await jwtAxios.post(`${admin}/sendMessage`, formData, {

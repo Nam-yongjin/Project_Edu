@@ -196,6 +196,9 @@ const Side = ({ isOpen, onClose }) => {
                                 {loginState.role === "ADMIN" ?
                                     <>
                                         <li>
+                                            <Link to="/demonstration/add" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 등록</Link>
+                                        </li>
+                                        <li>
                                             <Link to="/demonstration/adminReg" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>실증 등록 관리</Link>
                                         </li>
                                         <li>
