@@ -21,12 +21,19 @@ const EvtBannerComponent = () => {
   }, []);
 
   if (banners.length === 0) {
-    return <div className="text-center p-6 text-gray-500">신청가능한 프로그램이 없습니다.</div>;
+    return (
+      <div className="px-4 py-6 page-shadow">
+        <h2 className="newText-xl font-semibold mb-4">프로그램</h2>
+        <div className="text-center p-6 text-gray-500">
+          신청가능한 프로그램이 없습니다.
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="px-4 py-6 page-shadow">
-      <h2 className="newText-xl font-semibold mb-4">신청가능한 프로그램</h2>
+      <h2 className="newText-xl font-semibold mb-4">프로그램</h2>
 
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
@@ -63,7 +70,7 @@ const EvtBannerComponent = () => {
               <p className="newText-sm text-gray-500">
                 {event.category === 'STUDENT' ? '학생 대상'
                   : event.category === 'TEACHER' ? '교직원 대상'
-                  : '일반 대상'}
+                    : '일반 대상'}
               </p>
             </div>
           </SwiperSlide>
