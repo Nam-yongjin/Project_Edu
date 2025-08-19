@@ -56,9 +56,29 @@
   box-shadow: 0 0 0 2px #3b82f6; /* focus:ring-2, focus:ring-blue-500 */
 }
 
+/* text-xs */
+.newText-xs {
+  font-size: 0.5rem;
+}
+@media (min-width: 640px) {
+  .newText-xs {
+    font-size: 0.625rem;
+  }
+}
+@media (min-width: 1024px) {
+  .newText-xs {
+    font-size: 0.75rem;
+  }
+}
+
 /* text-sm */
 .newText-sm {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
+}
+@media (min-width: 640px) {
+  .newText-sm {
+    font-size: 0.75rem;
+  }
 }
 @media (min-width: 1024px) {
   .newText-sm {
