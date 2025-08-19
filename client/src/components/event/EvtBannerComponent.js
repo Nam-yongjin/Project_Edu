@@ -30,7 +30,7 @@ const EvtBannerComponent = () => {
       <div className="px-6 py-4 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
         <h2 className="newText-xl font-semibold mb-4">프로그램</h2>
         <div className="text-center p-6 text-gray-500">
-          신청가능한 프로그램이 없습니다.
+          이달의 신청가능한 프로그램이 없습니다.
         </div>
       </div>
     )

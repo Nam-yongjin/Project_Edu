@@ -7,11 +7,12 @@ const FacilityPage = () => {
     const location = useLocation();
 
     const isReservationPage = location.pathname.includes("facility/reservation");
+    const isHolidayPage = location.pathname.includes("facility/holiday");
 
     return (
         <div>
             <BasicLayout  isFullWidth={true}>
-                {!isReservationPage && <SubFacilityHeader />}
+                {!isReservationPage && !isHolidayPage && <SubFacilityHeader />}
                 <Outlet />
             </BasicLayout>
         </div>
