@@ -101,11 +101,9 @@ const NewsMainComponent = () => {
                         className="block group-hover:text-green-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-
                           <h3 className="newText-sm font-medium text-gray-900 group-hover:text-green-600 truncate max-w-[200px] lg:max-w-[400px]">
-
-                              {truncateTitle(news.title)}
-                            </h3>
+                            {truncateTitle(news.title)}
+                          </h3>
 
                             {/* New 표시 (최근 3일 이내) */}
                             {(() => {
