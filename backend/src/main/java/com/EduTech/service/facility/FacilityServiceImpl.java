@@ -97,7 +97,7 @@ public class FacilityServiceImpl implements FacilityService {
                 .filter(Objects::nonNull)
                 .toList();
 
-        // ✅ 대표 이미지: 첫 번째 이미지(플래그 의존 X)
+        // 대표 이미지: 첫 번째 이미지(플래그 의존 X)
         String mainImageUrl = images.isEmpty() ? null : images.get(0);
 
         return FacilityReserveListDTO.builder()

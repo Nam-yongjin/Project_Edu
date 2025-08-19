@@ -1,17 +1,18 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getReservationList, cancelReservation } from "../../api/eventApi";
+import PageComponent from "../common/PageComponent";
 
 const ReservationListComponent = () => {
   const [reservations, setReservations] = useState([]);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(0);            // 0-based (PageComponent와 호환)
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 5;
 
   const navigate = useNavigate();
   const host = "http://localhost:8090/view";
 
-  // 예약 리스트 조회 (useCallback으로 메모이즈)
+  // 예약 리스트 조회
   const fetchReservations = useCallback(
     async (targetPage = page) => {
       try {
@@ -20,8 +21,8 @@ const ReservationListComponent = () => {
           size: pageSize,
           sort: "applyAt,DESC",
         });
-        setReservations(data.content);
-        setTotalPages(data.totalPages);
+        setReservations(data.content || []);
+        setTotalPages(data.totalPages || 1);
         setPage(targetPage);
       } catch (error) {
         console.error("예약 이력 불러오기 실패:", error);
@@ -40,10 +41,9 @@ const ReservationListComponent = () => {
     fetchReservations(page);
   }, [page, fetchReservations]);
 
-  // 예약 취소 처리
+  // 예약 취소
   const handleCancelReservation = async (evtRevNum) => {
     if (!window.confirm("예약을 취소하시겠습니까?")) return;
-
     try {
       await cancelReservation(evtRevNum);
       alert("예약이 취소되었습니다.");
@@ -61,12 +61,12 @@ const ReservationListComponent = () => {
   const formatDate = (dateStr) => {
     if (!dateStr) return "없음";
     const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    const hh = String(date.getHours()).padStart(2, "0");
+    const mm = String(date.getMinutes()).padStart(2, "0");
+    return `${y}.${m}.${d} ${hh}:${mm}`;
   };
 
   const getStatusLabel = (state) => {
@@ -94,117 +94,113 @@ const ReservationListComponent = () => {
   const isCancelable = (item) => {
     const now = new Date();
     const start = new Date(item.eventStartPeriod);
-    // end는 사용하지 않으므로 제거하여 no-unused-vars 해결
-    // const end = new Date(item.eventEndPeriod);
-
     return item.revState !== "CANCEL" && now < start; // 시작 전만 취소 가능
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 px-4">
-      <h2 className="text-2xl font-bold mb-6 text-center">프로그램 신청 내역</h2>
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank page-shadow bg-white rounded-lg p-8">
+        {/* 헤더 */}
+        <h2 className="newText-3xl font-bold text-center mb-8">프로그램 신청 내역</h2>
 
-      <div className="space-y-6">
-        {reservations.length === 0 ? (
-          <p className="text-center text-gray-500">예약 이력이 없습니다.</p>
-        ) : (
-          reservations.map((item) => (
-            <div
-              key={item.evtRevNum}
-              className="flex items-start border-b pb-4 gap-4"
-            >
-              {/* 프로그램 이미지 */}
-              <div className="w-24 h-24 bg-gray-200 flex items-center justify-center text-sm text-gray-500 flex-shrink-0">
-                {item.mainImagePath &&
-                /\.(jpg|jpeg|png|gif)$/i.test(item.mainImagePath) ? (
-                  <img
-                    src={`${host}/${item.mainImagePath}`}
-                    alt="프로그램 이미지"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span>이미지 없음</span>
-                )}
-              </div>
-
-              {/* 프로그램 정보 */}
-              <div className="flex-1 text-sm">
-                <p className="mb-1">
-                  <strong>프로그램이름:</strong> {item.eventName}
-                </p>
-                <p className="mb-1">
-                  <strong>프로그램 일정:</strong>{" "}
-                  {formatDate(item.eventStartPeriod)} ~{" "}
-                  {formatDate(item.eventEndPeriod)}
-                </p>
-                <p className="mb-1">
-                  <strong>예약 일시:</strong> {formatDate(item.applyAt)}
-                </p>
-                <p className="mb-1">
-                  <strong>상태:</strong>{" "}
-                  <span
-                    className={`inline-block px-2 py-0.5 rounded text-white text-xs ${
-                      item.revState === "APPROVED"
-                        ? "bg-green-500"
-                        : item.revState === "CANCEL"
-                        ? "bg-red-500"
-                        : "bg-gray-400"
-                    }`}
-                  >
-                    {getStatusLabel(item.revState)}
-                  </span>
-                </p>
-              </div>
-
-              {/* 버튼 영역 */}
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => handleCancelReservation(item.evtRevNum)}
-                  disabled={!isCancelable(item)}
-                  className={`px-3 py-1 rounded text-sm ${
-                    !isCancelable(item)
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-red-500 text-white hover:bg-red-600"
-                  }`}
+        {/* 리스트 */}
+        <div className="space-y-5">
+          {reservations.length === 0 ? (
+            <p className="newText-base text-center text-gray-500 py-10">
+              예약 이력이 없습니다.
+            </p>
+          ) : (
+            reservations.map((item) => {
+              const cancelable = isCancelable(item);
+              return (
+                <div
+                  key={item.evtRevNum}
+                  className="page-shadow rounded-md border border-gray-100 p-4 flex items-start gap-4"
                 >
-                  {getCancelButtonLabel(item)}
-                </button>
+                  {/* 썸네일 */}
+                  <div className="w-24 h-24 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                    {item.mainImagePath && /\.(jpg|jpeg|png|gif|webp)$/i.test(item.mainImagePath) ? (
+                      <img
+                        src={`${host}/${item.mainImagePath}`}
+                        alt="프로그램 이미지"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center newText-sm text-gray-500">
+                        이미지 없음
+                      </div>
+                    )}
+                  </div>
 
-                <button
-                  onClick={() => navigate(`/event/detail/${item.eventNum}`)}
-                  className="border border-gray-400 text-sm px-3 py-1 rounded hover:bg-gray-100"
-                >
-                  상세보기
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+                  {/* 내용 */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div className="newText-base">
+                        <p className="newText-lg font-semibold mb-1">
+                          {item.eventName}
+                        </p>
+                        <p className="text-gray-600 mb-0.5">
+                          <span className="font-semibold">프로그램 일정:</span>{" "}
+                          {formatDate(item.eventStartPeriod)} ~ {formatDate(item.eventEndPeriod)}
+                        </p>
+                        <p className="text-gray-600 mb-0.5">
+                          <span className="font-semibold">예약 일시:</span>{" "}
+                          {formatDate(item.applyAt)}
+                        </p>
+                        <p className="text-gray-600">
+                          <span className="font-semibold">상태:</span>{" "}
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded newText-sm text-white ${
+                              item.revState === "APPROVED"
+                                ? "bg-green-500"
+                                : item.revState === "CANCEL"
+                                ? "bg-red-500"
+                                : "bg-gray-400"
+                            }`}
+                          >
+                            {getStatusLabel(item.revState)}
+                          </span>
+                        </p>
+                      </div>
 
-      {/* 페이지네이션 */}
-      <div className="mt-6 flex justify-center gap-2 text-blue-600 font-semibold">
-        {page > 0 && (
-          <button onClick={() => setPage(page - 1)} className="hover:text-blue-800">
-            {"<"}
-          </button>
-        )}
-        {Array.from({ length: totalPages }, (_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setPage(idx)}
-            className={`${
-              page === idx ? "underline text-blue-800" : "hover:text-blue-800"
-            }`}
-          >
-            {idx + 1}
-          </button>
-        ))}
-        {page < totalPages - 1 && (
-          <button onClick={() => setPage(page + 1)} className="hover:text-blue-800">
-            {">"}
-          </button>
-        )}
+                      {/* 우측 버튼 */}
+                      <div className="flex flex-col gap-2 items-end">
+                        <button
+                          onClick={() => handleCancelReservation(item.evtRevNum)}
+                          disabled={!cancelable}
+                          className={`newText-sm rounded ${
+                            cancelable
+                              ? "nagative-button"
+                              : "normal-button cursor-not-allowed !bg-gray-300 !text-gray-700 !border !border-gray-400"
+                          }`}
+                          title={getCancelButtonLabel(item)}
+                        >
+                          {getCancelButtonLabel(item)}
+                        </button>
+
+                        <button
+                          onClick={() => navigate(`/event/detail/${item.eventNum}`)}
+                          className="normal-button newText-sm"
+                        >
+                          상세보기
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* 페이지네이션 (공용 컴포넌트 / 0-based 인덱스) */}
+        <div className="mt-8 flex justify-center">
+          <PageComponent
+            totalPages={totalPages}
+            current={page}
+            setCurrent={setPage}
+          />
+        </div>
       </div>
     </div>
   );

@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { FacilityList } from "../../api/facilityApi";
 import useMove from "../../hooks/useMove";
 import { useSelector } from "react-redux";
+import PageComponent from "../common/PageComponent";
 
 const PLACEHOLDER = "/placeholder.svg";
 const host = "http://localhost:8090/view";
 
-// ✅ 이미지 경로 안전 조립 헬퍼 (문자열/객체 모두 지원)
+/** 이미지 경로 안전 조립 (문자열/객체 모두 지원) */
 const buildImageUrl = (p) => {
   const val = typeof p === "string" ? p : p?.imageUrl;
   if (!val) return PLACEHOLDER;
@@ -23,10 +24,13 @@ const buildImageUrl = (p) => {
 
 const FacilityListComponent = () => {
   const navigate = useNavigate();
+  const { moveToLogin } = useMove();
+  const loginState = useSelector((s) => s.loginState);
 
+  // 1-based 로컬 페이지 (PageComponent는 0-based이므로 변환해서 전달)
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const size = 12;
+  const size = 8; // ✅ 한 페이지 8개 고정
 
   const [list, setList] = useState([]);
   const [keyword, setKeyword] = useState("");
@@ -34,25 +38,32 @@ const FacilityListComponent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const { moveToLogin } = useMove();
-  const loginState = useSelector((state) => state.loginState);
-
+  // 목록 가져오기
   useEffect(() => {
     const fetchList = async () => {
       setLoading(true);
       setError("");
       try {
         const res = await FacilityList({
-          page: Math.max(page - 1, 0),
+          page: Math.max(page - 1, 0), // API 0-based
           size,
           keyword: keyword.trim(),
         });
-        const content = Array.isArray(res) ? res : res?.content ?? [];
+
+        // axios 래퍼 차이 대응
+        const data = res?.data ?? res;
+        const content = Array.isArray(data) ? data : data?.content ?? [];
+        const tp = Math.max(1, data?.totalPages ?? 1);
+
         setList(content);
-        setTotalPages(res?.totalPages ?? 1);
+        setTotalPages(tp);
+
+        // 현재 페이지가 총 페이지보다 크면 마지막 페이지로 보정
+        if (page > tp) setPage(tp);
       } catch (e) {
-        setError(e?.response?.data?.message || e.message || "목록 조회 실패");
-        console.error(e);
+        setError(e?.response?.data?.message || e.message || "목록 조회에 실패했습니다.");
+        setList([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
@@ -66,83 +77,73 @@ const FacilityListComponent = () => {
     setSearchTrigger((v) => !v);
   };
 
-  const pageBlockSize = 10;
-  const currentBlock = Math.floor((page - 1) / pageBlockSize);
-  const blockStart = currentBlock * pageBlockSize + 1;
-  const blockEnd = Math.min(blockStart + pageBlockSize - 1, totalPages);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold text-center mb-10">공간/체험 신청</h1>
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank">
+        {/* 타이틀 */}
+        <h1 className="newText-3xl font-bold text-center mb-8">공간/체험 신청</h1>
 
-      {/* 검색 */}
-      <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
-        <input
-          type="text"
-          placeholder="공간명/소개로 검색"
-          className="border p-2 rounded w-60"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
-          검색
-        </button>
-      </div>
+        {/* 검색 */}
+        <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
+          <input
+            type="text"
+            placeholder="공간명/소개로 검색"
+            className="input-focus newText-base p-2 rounded w-60"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <button onClick={handleSearch} className="positive-button newText-base px-4 py-2 rounded">
+            검색
+          </button>
+        </div>
 
-      {error && <div className="text-center text-red-600 mb-4">{error}</div>}
+        {/* 오류 */}
+        {error && <div className="text-center newText-base text-red-600 mb-4">{error}</div>}
 
-      {/* 카드 목록 */}
-      {loading ? (
-        <div className="text-center py-16">불러오는 중…</div>
-      ) : list.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">등록된 공간이 없습니다.</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {list.map((item) => (
-            <FacilityCard
-              key={item.facRevNum}
-              item={item}
-              onCardClick={() => {
-                if (loginState && loginState.memId) {
-                  navigate(`/facility/detail/${item.facRevNum}`)
-                } else {
-                  alert("로그인이 필요합니다.");
-                  moveToLogin();
-                }
-              }}
-              onApplyClick={() => {
-                if (loginState && loginState.memId) {
-                  navigate(`/facility/detail/${item.facRevNum}`)
-                } else {
-                  alert("로그인이 필요합니다.");
-                  moveToLogin();
-                }
-              }}
+        {/* 카드 목록 */}
+        {loading ? (
+          <div className="text-center py-16 newText-base text-gray-600">불러오는 중…</div>
+        ) : list.length === 0 ? (
+          <div className="text-center py-16 newText-base text-gray-500">등록된 공간이 없습니다.</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {list.map((item) => (
+              <FacilityCard
+                key={item.facRevNum}
+                item={item}
+                onCardClick={() => {
+                  if (loginState && loginState.memId) {
+                    navigate(`/facility/detail/${item.facRevNum}`);
+                  } else {
+                    alert("로그인이 필요합니다.");
+                    moveToLogin();
+                  }
+                }}
+                onApplyClick={() => {
+                  if (loginState && loginState.memId) {
+                    navigate(`/facility/detail/${item.facRevNum}`);
+                  } else {
+                    alert("로그인이 필요합니다.");
+                    moveToLogin();
+                  }
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 페이지네이션 (공용 0-based 컴포넌트 사용) */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <PageComponent
+              totalPages={totalPages}
+              current={page - 1}                 // 0-based로 전달
+              setCurrent={(idx) => setPage(idx + 1)} // 콜백은 1-based로 환산
             />
-          ))}
-        </div>
-      )}
-
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex justify-center gap-2 text-blue-600 font-semibold">
-          {blockStart > 1 && <button onClick={() => setPage(blockStart - 1)}>{"<"}</button>}
-          {Array.from({ length: blockEnd - blockStart + 1 }, (_, i) => {
-            const p = blockStart + i;
-            return (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={page === p ? "underline text-blue-800" : "hover:text-blue-800"}
-              >
-                {p}
-              </button>
-            );
-          })}
-          {blockEnd < totalPages && <button onClick={() => setPage(blockEnd + 1)}>{">"}</button>}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -154,23 +155,24 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
 
   return (
     <div
-      className="border rounded-lg shadow hover:shadow-lg transition bg-white overflow-hidden cursor-pointer"
+      className="page-shadow rounded-xl bg-white overflow-hidden hover:shadow-lg transition cursor-pointer"
       onClick={onCardClick}
     >
       <ImageSlider images={srcs} alt={facName} />
       <div className="p-4 flex flex-col gap-2">
-        <h3 className="text-lg font-semibold leading-snug">{facName}</h3>
-        <p className="text-sm text-gray-600 min-h-[42px]">
+        <h3 className="newText-lg font-semibold leading-snug line-clamp-2">{facName}</h3>
+        <p className="newText-sm text-gray-600 min-h-[42px]">
           {facInfo?.length > 90 ? `${facInfo.slice(0, 90)}…` : facInfo || ""}
         </p>
-        <p className="text-sm text-gray-700">(수용인원 : {Number(capacity) || 0}명)</p>
+        <p className="newText-sm text-gray-700">(수용인원 : {Number(capacity) || 0}명)</p>
+
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onApplyClick();
           }}
-          className="mt-2 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+          className="positive-button mt-2 w-full newText-base"
         >
           신청하기
         </button>
@@ -179,12 +181,7 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
   );
 };
 
-/**
- * 🔧 리스트 썸네일 슬라이더
- * - 컨테이너: 4:3 고정 비율 → pb-[75%]
- * - 내부 트랙: absolute + translateX
- * - 각 슬라이드: absolute fill + object-cover (비율 유지하며 꽉 채움)
- */
+/** 리스트 썸네일 슬라이더 (4:3 비율) */
 const ImageSlider = ({ images = [], alt = "facility" }) => {
   const [idx, setIdx] = useState(0);
   const [startX, setStartX] = useState(null);
@@ -210,7 +207,6 @@ const ImageSlider = ({ images = [], alt = "facility" }) => {
     setDragging(false); setStartX(null);
   };
 
-  // 비율 컨테이너 (4:3)
   return (
     <div
       className="relative w-full pb-[75%] bg-gray-100 select-none overflow-hidden"
@@ -219,14 +215,13 @@ const ImageSlider = ({ images = [], alt = "facility" }) => {
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
     >
-      {/* 트랙 */}
+      {/* 슬라이드 트랙 */}
       <div
         className="absolute inset-0 h-full flex transition-transform duration-500"
         style={{ transform: `translateX(-${idx * 100}%)`, width: `${images.length * 100}%` }}
       >
         {images.map((src, i) => (
           <div key={`${src}-${i}`} className="relative w-full h-full shrink-0">
-            {/* 슬라이드 영역 채우기 */}
             <img
               src={src}
               alt={`${alt}-${i + 1}`}
@@ -243,7 +238,7 @@ const ImageSlider = ({ images = [], alt = "facility" }) => {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center shadow"
+            className="normal-button !px-2 !py-0.5 rounded-full absolute left-2 top-1/2 -translate-y-1/2"
             aria-label="이전 이미지"
           >
             ‹
@@ -251,7 +246,7 @@ const ImageSlider = ({ images = [], alt = "facility" }) => {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center shadow"
+            className="normal-button !px-2 !py-0.5 rounded-full absolute right-2 top-1/2 -translate-y-1/2"
             aria-label="다음 이미지"
           >
             ›
@@ -263,7 +258,7 @@ const ImageSlider = ({ images = [], alt = "facility" }) => {
                 key={i}
                 type="button"
                 onClick={(e) => { e.stopPropagation(); setIdx(i); }}
-                className={`w-2.5 h-2.5 rounded-full ${i === idx ? "bg-white" : "bg-white/50"} ring-1 ring-black/10`}
+                className={`w-2.5 h-2.5 rounded-full ${i === idx ? "bg-white" : "bg-white/60"} ring-1 ring-black/10`}
                 aria-label={`이미지 ${i + 1}`}
               />
             ))}

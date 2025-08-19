@@ -12,10 +12,8 @@ const initialForm = {
   etc: "",
 };
 
-// 시간(시)만 선택
-const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")); // 00~23
-
-// HH:mm 조립 (분은 고정 00)
+// 00~23 시
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const toTimeString = (h) => (h ? `${h}:00` : "");
 
 const FacilityAddComponent = () => {
@@ -24,15 +22,15 @@ const FacilityAddComponent = () => {
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
 
   const [form, setForm] = useState(initialForm);
-
   const [startH, setStartH] = useState("");
   const [endH, setEndH] = useState("");
 
-  const [mainImage, setMainImage] = useState(null);
-  const [subImages, setSubImages] = useState([]);
+  const [mainImage, setMainImage] = useState(null); // {file,url,name}
+  const [subImages, setSubImages] = useState([]);   // [{file,url,name}]
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef(null);
 
+  // 권한 체크
   useEffect(() => {
     if (!isAdmin) {
       alert("권한이 없습니다.");
@@ -40,6 +38,7 @@ const FacilityAddComponent = () => {
     }
   }, [isAdmin, navigate]);
 
+  // 미리보기 URL 해제
   useEffect(
     () => () => {
       if (mainImage?.url) URL.revokeObjectURL(mainImage.url);
@@ -53,12 +52,12 @@ const FacilityAddComponent = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  // 시간 변경 (시만)
   const onChangeTime = useCallback((which, value) => {
     if (which === "start") setStartH(value);
     else setEndH(value);
   }, []);
 
+  // 이미지 선택(첫 파일은 대표로, 나머지는 서브)
   const onFilePick = useCallback(
     (e) => {
       const files = Array.from(e.target.files || []);
@@ -127,7 +126,7 @@ const FacilityAddComponent = () => {
     return Object.keys(next).length === 0;
   }, [form, mainImage, startH, endH]);
 
-  // FormData 구성 (dto + images)
+  // FormData 구성
   const buildFormData = useCallback(() => {
     const payload = {
       facName: form.facName.trim(),
@@ -145,9 +144,9 @@ const FacilityAddComponent = () => {
     if (mainImage) {
       fd.append("images", mainImage.file, mainImage.name || mainImage.file.name);
     }
-    subImages.forEach((img) => {
-      fd.append("images", img.file, img.name || img.file.name);
-    });
+    subImages.forEach((img) =>
+      fd.append("images", img.file, img.name || img.file.name)
+    );
 
     return fd;
   }, [form, mainImage, subImages, startH, endH]);
@@ -166,164 +165,194 @@ const FacilityAddComponent = () => {
     }
   }, [buildFormData, navigate, validate]);
 
-  const canSubmit = useMemo(() => {
-    return (
+  const canSubmit = useMemo(
+    () =>
       !!form.facName.trim() &&
       !!form.facInfo.trim() &&
       !!String(form.capacity).trim() &&
       !!mainImage &&
       !!startH &&
-      !!endH
-    );
-  }, [form, mainImage, startH, endH]);
+      !!endH,
+    [form, mainImage, startH, endH]
+  );
 
   return (
-    <div className="flex mt-10 max-w-6xl mx-auto">
-      <div className="space-y-6 w-2/3">
-        <h2 className="text-2xl font-bold mb-4">공간 등록</h2>
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank bg-white rounded-lg shadow page-shadow p-10">
+        <h2 className="text-center newText-3xl font-bold mb-10">공간 등록</h2>
 
-        {/* 기본 정보 */}
-        {[
-          { label: "공간명", name: "facName", type: "text" },
-          { label: "수용인원", name: "capacity", type: "number" },
-        ].map(({ label, name, type }) => (
-          <div className="flex items-center" key={name}>
-            <label className="w-[120px] font-semibold">{label}</label>
-            <input
-              type={type}
-              name={name}
-              value={form[name]}
-              onChange={onChange}
-              className={`border p-3 flex-1 ${errors[name] ? "border-red-500" : ""}`}
-              min={name === "capacity" ? 1 : undefined}
-            />
-          </div>
-        ))}
-
-        {[
-          { label: "소개", name: "facInfo", rows: 4 },
-          { label: "구비품목", name: "facItem", rows: 3 },
-          { label: "유의사항", name: "etc", rows: 2 },
-        ].map(({ label, name, rows }) => (
-          <div className="flex items-start" key={name}>
-            <label className="w-[120px] font-semibold pt-3">{label}</label>
-            <textarea
-              name={name}
-              value={form[name]}
-              onChange={onChange}
-              rows={rows}
-              className={`border p-3 flex-1 resize-y ${errors[name] ? "border-red-500" : ""}`}
-            />
-          </div>
-        ))}
-
-        {/* 예약 가능 시간 - 시만 선택 */}
-        <div className="border rounded p-3">
-          <h3 className="font-semibold mb-3">예약 가능 시간</h3>
-
-          <div className="grid grid-cols-12 gap-3 items-end p-2 rounded bg-gray-50">
-            {/* 시작 */}
-            <div className="col-span-6">
-              <label className="text-sm font-semibold block mb-1">시작 시간</label>
-              <select
-                className={`border p-2 rounded w-full ${errors.startTime || errors.timeRange ? "border-red-500" : ""}`}
-                value={startH}
-                onChange={(e) => onChangeTime("start", e.target.value)}
-              >
-                <option value="">시</option>
-                {HOURS.map((h) => (
-                  <option key={h} value={h}>{h}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* 종료 */}
-            <div className="col-span-6">
-              <label className="text-sm font-semibold block mb-1">종료 시간</label>
-              <select
-                className={`border p-2 rounded w-full ${errors.endTime || errors.timeRange ? "border-red-500" : ""}`}
-                value={endH}
-                onChange={(e) => onChangeTime("end", e.target.value)}
-              >
-                <option value="">시</option>
-                {HOURS.map((h) => (
-                  <option key={h} value={h}>{h}</option>
-                ))}
-              </select>
-            </div>
-
-            {(errors.startTime || errors.endTime || errors.timeRange) && (
-              <div className="col-span-12 text-xs text-red-600 mt-2">
-                {errors.startTime && <div>{errors.startTime}</div>}
-                {errors.endTime && <div>{errors.endTime}</div>}
-                {errors.timeRange && <div>{errors.timeRange}</div>}
+        {/* 폼 본문 */}
+        <div className="grid grid-cols-1 gap-4">
+          {/* 기본 정보 */}
+          {[
+            { label: "공간명", name: "facName", type: "text", required: true, placeholder: "공간명을 입력하세요" },
+            { label: "수용인원", name: "capacity", type: "number", required: true, placeholder: "최대 수용 인원(숫자)" },
+          ].map(({ label, name, type, required, placeholder }) => (
+            <div className="flex items-start gap-4" key={name}>
+              <label className="w-32 newText-base font-semibold pt-2">
+                {label} {required && <span className="text-red-500">*</span>}
+              </label>
+              <div className="flex-1">
+                <input
+                  type={type}
+                  name={name}
+                  value={form[name]}
+                  onChange={onChange}
+                  min={name === "capacity" ? 1 : undefined}
+                  placeholder={placeholder}
+                  className={`input-focus newText-base w-full placeholder-gray-400 ${
+                    errors[name] ? "border-red-500" : ""
+                  }`}
+                />
+                {errors[name] && <p className="newText-sm text-red-600 mt-1">{errors[name]}</p>}
               </div>
-            )}
+            </div>
+          ))}
+
+          {/* 텍스트 영역 */}
+          {[
+            { label: "소개", name: "facInfo", rows: 4, required: true, placeholder: "공간 소개를 입력하세요" },
+            { label: "구비품목", name: "facItem", rows: 3, placeholder: "예: 빔프로젝터, 화이트보드" },
+            { label: "유의사항", name: "etc", rows: 2, placeholder: "예약 전 참고할 점" },
+          ].map(({ label, name, rows, required, placeholder }) => (
+            <div className="flex items-start gap-4" key={name}>
+              <label className="w-32 newText-base font-semibold pt-2">
+                {label} {required && <span className="text-red-500">*</span>}
+              </label>
+              <div className="flex-1">
+                <textarea
+                  name={name}
+                  value={form[name]}
+                  onChange={onChange}
+                  rows={rows}
+                  placeholder={placeholder}
+                  className={`input-focus newText-base w-full resize-y placeholder-gray-400 ${
+                    errors[name] ? "border-red-500" : ""
+                  }`}
+                />
+                {errors[name] && <p className="newText-sm text-red-600 mt-1">{errors[name]}</p>}
+              </div>
+            </div>
+          ))}
+
+          {/* 예약 가능 시간 (시 단위) */}
+          <div className="flex items-start gap-4">
+            <label className="w-32 newText-base font-semibold pt-2">예약 가능 시간</label>
+            <div className="flex-1 border rounded p-4 bg-gray-50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <span className="newText-sm font-semibold block mb-1">시작 시간</span>
+                  <select
+                    className={`input-focus newText-base w-full ${errors.startTime || errors.timeRange ? "border-red-500" : ""}`}
+                    value={startH}
+                    onChange={(e) => onChangeTime("start", e.target.value)}
+                  >
+                    <option value="">시 선택</option>
+                    {HOURS.map((h) => (
+                      <option key={h} value={h}>{h}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <span className="newText-sm font-semibold block mb-1">종료 시간</span>
+                  <select
+                    className={`input-focus newText-base w-full ${errors.endTime || errors.timeRange ? "border-red-500" : ""}`}
+                    value={endH}
+                    onChange={(e) => onChangeTime("end", e.target.value)}
+                  >
+                    <option value="">시 선택</option>
+                    {HOURS.map((h) => (
+                      <option key={h} value={h}>{h}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {(errors.startTime || errors.endTime || errors.timeRange) && (
+                <div className="newText-sm text-red-600 mt-3 space-y-1">
+                  {errors.startTime && <div>{errors.startTime}</div>}
+                  {errors.endTime && <div>{errors.endTime}</div>}
+                  {errors.timeRange && <div>{errors.timeRange}</div>}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 이미지 업로드 */}
+          <div className="flex items-center gap-4">
+            <label className="w-32 newText-base font-semibold">이미지</label>
+            <div className="flex-1">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={onFilePick}
+                className={`input-focus newText-base w-full ${errors.images ? "border-red-500" : ""}`}
+              />
+              <p className="newText-sm text-gray-500 mt-1">첫 번째 선택한 이미지가 대표 이미지로 사용됩니다.</p>
+              {errors.images && <p className="newText-sm text-red-600 mt-1">{errors.images}</p>}
+            </div>
+          </div>
+
+          {/* 대표/서브 이미지 미리보기 */}
+          {(mainImage || subImages.length > 0) && (
+            <>
+              {mainImage && (
+                <div className="ml-32">
+                  <PreviewImageCard title="대표 이미지" image={mainImage} onDelete={deleteMainImage} />
+                </div>
+              )}
+              {subImages.length > 0 && (
+                <div className="ml-32 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {subImages.map((img, idx) => (
+                    <PreviewImageCard
+                      key={idx}
+                      title={`서브 이미지 ${idx + 1}`}
+                      image={img}
+                      onDelete={() => deleteSubImage(idx)}
+                      compact
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* 버튼 영역 */}
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              onClick={handleRegister}
+              disabled={!canSubmit}
+              className={`positive-button ${!canSubmit ? "opacity-60 cursor-not-allowed" : ""}`}
+              type="button"
+            >
+              공간 등록
+            </button>
+            <button onClick={moveToReturn} className="normal-button" type="button">
+              뒤로가기
+            </button>
           </div>
         </div>
-
-        {/* 이미지 업로드 */}
-        <div className="flex items-center">
-          <label className="w-[120px] font-semibold">이미지</label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={onFilePick}
-            className={`border p-2 flex-1 ${errors.images ? "border-red-500" : ""}`}
-          />
-        </div>
-        {errors.images && <p className="text-sm text-red-600">{errors.images}</p>}
-
-        {/* 버튼 */}
-        <div className="mt-4 flex justify-end gap-4">
-          <button
-            onClick={handleRegister}
-            disabled={!canSubmit}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
-            type="button"
-          >
-            공간 등록
-          </button>
-          <button
-            onClick={moveToReturn}
-            className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-            type="button"
-          >
-            뒤로가기
-          </button>
-        </div>
-      </div>
-
-      {/* 우측 미리보기 */}
-      <div className="w-1/3 pl-10 flex flex-col gap-4">
-        {mainImage && (
-          <ImagePreview title="대표 이미지" image={mainImage} onDelete={deleteMainImage} />
-        )}
-        {subImages.map((img, idx) => (
-          <ImagePreview
-            key={idx}
-            title={`서브 이미지 ${idx + 1}`}
-            image={img}
-            onDelete={() => deleteSubImage(idx)}
-          />
-        ))}
       </div>
     </div>
   );
 };
 
-const ImagePreview = React.memo(({ title, image, onDelete }) => (
-  <div className="border rounded p-2 shadow">
-    <div className="flex justify-between items-center">
-      <p className="text-sm font-semibold text-blue-600">{title}</p>
-      <button className="text-red-500 text-sm" onClick={onDelete} type="button">
+const PreviewImageCard = React.memo(({ title, image, onDelete, compact }) => (
+  <div className="page-shadow border rounded p-2 bg-white w-fit">
+    <div className="flex justify-between items-center mb-1">
+      <p className="newText-sm font-semibold text-blue-600">{title}</p>
+      <button className="nagative-button newText-sm px-2 py-0.5" onClick={onDelete} type="button">
         삭제
       </button>
     </div>
-    <img src={image.url} alt={title} className="w-32 h-32 object-cover rounded" />
-    <p className="text-sm break-words">{image.name}</p>
+    <img
+      src={image.url}
+      alt={title}
+      className={`${compact ? "w-28 h-28" : "w-32 h-32"} object-cover rounded`}
+    />
+    <p className="newText-sm break-words mt-1 max-w-[10rem]">{image.name}</p>
   </div>
 ));
 
