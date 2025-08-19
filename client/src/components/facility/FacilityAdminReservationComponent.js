@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAdminReservations, updateReservationState } from "../../api/facilityApi";
+import { getAdminReservations, updateReservationState, adminCancelReservation } from "../../api/facilityApi";
 
 // ==================== 날짜/시간 유틸 ====================
+// 2자리 패딩
 const pad2 = (n) => String(n).padStart(2, "0");
+
+// Date -> 'YYYY-MM-DD'
 const toYmd = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+
+// 'YYYY-MM-DD' or Date/DateTime string -> 'YYYY.MM.DD'
 const formatYmdDots = (v) => {
   if (!v) return "-";
   const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -13,24 +18,39 @@ const formatYmdDots = (v) => {
   if (Number.isNaN(d.getTime())) return String(v);
   return `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`;
 };
+
+// Date/DateTime string -> 'YYYY.MM.DD HH:mm'
 const formatDateTime = (v) => {
   if (!v) return "-";
   const d = new Date(String(v).replace(" ", "T"));
   if (Number.isNaN(d.getTime())) return String(v);
   return `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 };
+
+// 'H:mm' or 'HH:mm' -> 'HH:mm'
 const hhmm = (v) => {
   if (!v) return "-";
   const m = String(v).match(/(\d{1,2}):(\d{2})/);
   return m ? `${pad2(m[1])}:${m[2]}` : String(v);
 };
 
-// ✅ 서버 Enum과 1:1 매핑, "CANCEL" 제거
-const chipOf = (state) => {
+// 이용일이 오늘 이전인가
+const isPastUseDate = (ymd) => {
+  if (!ymd) return false;
+  const today = toYmd(new Date()); // 'YYYY-MM-DD'
+  return String(ymd) < today;
+};
+
+// 상태 칩 계산
+// - APPROVED 이면서 이용일이 지났으면 "완료" 라벨로 보여준다
+const chipOf = (state, facDate) => {
+  if (state === "APPROVED" && isPastUseDate(facDate)) {
+    return { label: "완료", cls: "bg-slate-500" };
+  }
   switch (state) {
     case "APPROVED":   return { label: "승인 완료", cls: "bg-green-500" };
     case "REJECTED":   return { label: "거절",     cls: "bg-red-500"   };
-    case "CANCELLED":  return { label: "취소",     cls: "bg-red-500"   }; // (나중에 취소 기능 추가 시 사용)
+    case "CANCELLED":  return { label: "취소",     cls: "bg-red-500"   };
     case "WAITING":
     default:           return { label: "승인 대기", cls: "bg-gray-500"  };
   }
@@ -44,8 +64,8 @@ const todayRange = () => {
 };
 const thisWeekRange = () => {
   const t = new Date();
-  const day = t.getDay(); // 0(일)~6(토)
-  const diffToMon = (day + 6) % 7; // 월=1 -> 0
+  const day = t.getDay();                 // 0(일)~6(토)
+  const diffToMon = (day + 6) % 7;        // 월요일까지 뒤로 이동
   const mon = new Date(t);
   mon.setDate(t.getDate() - diffToMon);
   const sun = new Date(mon);
@@ -64,7 +84,7 @@ export default function AdminFacilityReservations() {
   const navigate = useNavigate();
 
   // 필터 상태
-  const [state, setState] = useState(""); // "", "WAITING", "APPROVED", "REJECTED" (취소는 나중에 추가)
+  const [state, setState] = useState(""); // "", "WAITING", "APPROVED", "REJECTED"
   const [from, setFrom] = useState(thisMonthRange().from);
   const [to, setTo] = useState(thisMonthRange().to);
 
@@ -82,6 +102,7 @@ export default function AdminFacilityReservations() {
   const [sortKey, setSortKey] = useState("reserveAt");
   const [sortDir, setSortDir] = useState("DESC");
 
+  // 정렬
   const sorted = useMemo(() => {
     const arr = [...rows];
     const key = sortKey;
@@ -104,6 +125,7 @@ export default function AdminFacilityReservations() {
     return sortDir === "DESC" ? arr.reverse() : arr;
   }, [rows, sortKey, sortDir]);
 
+  // 페이징
   const paged = useMemo(() => {
     const start = page * pageSize;
     return sorted.slice(start, start + pageSize);
@@ -111,6 +133,7 @@ export default function AdminFacilityReservations() {
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
 
+  // 데이터 로드
   const fetchData = async () => {
     if (from && to && new Date(`${from}T00:00:00`) > new Date(`${to}T00:00:00`)) {
       setError("시작일이 종료일보다 클 수 없습니다.");
@@ -119,7 +142,6 @@ export default function AdminFacilityReservations() {
     setLoading(true);
     setError("");
     try {
-      // ⚠️ 백엔드 파라미터명이 startDate/endDate 라면 아래 키도 맞춰주세요.
       const data = await getAdminReservations({
         state: state || undefined,
         from: from || undefined,
@@ -128,7 +150,6 @@ export default function AdminFacilityReservations() {
       setRows(Array.isArray(data) ? data : []);
       setPage(0);
     } catch (e) {
-      console.error(e);
       const msg = e?.response?.data?.message || e?.message || "목록을 불러오지 못했습니다.";
       setError(msg);
       if (e?.response?.status === 401) {
@@ -142,9 +163,11 @@ export default function AdminFacilityReservations() {
 
   useEffect(() => {
     fetchData();
+    // 의도적으로 초기 1회만 로드
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 빠른 범위 선택
   const quick = {
     today: () => { const r = todayRange(); setFrom(r.from); setTo(r.to); fetchData(); },
     week: () => { const r = thisWeekRange(); setFrom(r.from); setTo(r.to); fetchData(); },
@@ -152,58 +175,95 @@ export default function AdminFacilityReservations() {
     all: () => { setFrom(""); setTo(""); fetchData(); },
   };
 
+  // 정렬 변경
   const onChangeSort = (k) => {
     if (sortKey === k) setSortDir((d) => (d === "ASC" ? "DESC" : "ASC"));
     else { setSortKey(k); setSortDir("DESC"); }
   };
 
-  // ====== 액션: 승인 / 거절 ======
+  // ====== 액션 공통: 서버 상태 변경 후 재조회 ======
   const doUpdate = async ({ reserveId, nextState }) => {
     try {
       setSavingId(reserveId);
       await updateReservationState({ reserveId, state: nextState });
       await fetchData();
     } catch (e) {
-      console.error(e);
       alert(e?.response?.data?.message || e?.message || "상태 변경에 실패했습니다.");
     } finally {
       setSavingId(null);
     }
   };
 
+  // 승인
   const handleApprove = (r) => {
     if (!r?.reserveId) return;
     if (!window.confirm(`예약 ${r.reserveId}을(를) 승인하시겠습니까?`)) return;
     doUpdate({ reserveId: r.reserveId, nextState: "APPROVED" });
   };
 
-  // ✅ 거절은 항상 REJECTED 로 전송
+  // 거절
   const handleReject = (r) => {
     if (!r?.reserveId) return;
     if (!window.confirm(`예약 ${r.reserveId}을(를) 거절하시겠습니까?`)) return;
     doUpdate({ reserveId: r.reserveId, nextState: "REJECTED" });
   };
 
-  const renderActions = (r) => {
-    const waiting = r.state === "WAITING";
-    if (!waiting) return <span className="text-gray-400">-</span>;
-    const disabled = savingId === r.reserveId;
-    return (
-      <div className="flex gap-2">
-        <button
-          disabled={disabled}
-          onClick={() => handleApprove(r)}
-          className={`px-3 py-1 rounded text-white ${disabled ? "bg-green-300 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
-        >승인</button>
-        <button
-          disabled={disabled}
-          onClick={() => handleReject(r)}
-          className={`px-3 py-1 rounded text-white ${disabled ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
-        >거절</button>
-      </div>
-    );
+  // 관리자 강제취소
+  const handleAdminCancel = (r) => {
+    if (!r?.reserveId) return;
+    if (!window.confirm(`예약 ${r.reserveId}을(를) 강제 취소하시겠습니까?`)) return;
+    setSavingId(r.reserveId);
+    adminCancelReservation({ reserveId: r.reserveId, requesterId: r.memId })
+      .then(() => fetchData())
+      .catch((e) => {
+        alert(e?.response?.data?.message || e?.message || "취소에 실패했습니다.");
+      })
+      .finally(() => setSavingId(null));
   };
 
+  // 액션 렌더링
+  // - WAITING: 승인/거절
+  // - APPROVED: 이용일이 지나지 않은 경우에만 강제취소
+  const renderActions = (r) => {
+    const disabled = savingId === r.reserveId;
+
+    if (r.state === "WAITING") {
+      return (
+        <div className="flex gap-2">
+          <button
+            disabled={disabled}
+            onClick={() => handleApprove(r)}
+            className={`px-3 py-1 rounded text-white ${disabled ? "bg-green-300 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+          >승인</button>
+          <button
+            disabled={disabled}
+            onClick={() => handleReject(r)}
+            className={`px-3 py-1 rounded text-white ${disabled ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+          >거절</button>
+        </div>
+      );
+    }
+
+    if (r.state === "APPROVED") {
+      // 이용일이 오늘 이전이면 강제취소 버튼 숨김
+      if (isPastUseDate(r.facDate)) {
+        return <span className="text-gray-400">-</span>;
+      }
+      return (
+        <div className="flex gap-2">
+          <button
+            disabled={disabled}
+            onClick={() => handleAdminCancel(r)}
+            className={`px-3 py-1 rounded text-white ${disabled ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
+          >강제취소</button>
+        </div>
+      );
+    }
+
+    return <span className="text-gray-400">-</span>;
+  };
+
+  // ==================== 렌더 ====================
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6 text-center">공간 예약 현황 (관리자)</h2>
@@ -221,9 +281,8 @@ export default function AdminFacilityReservations() {
               <option value="">전체</option>
               <option value="WAITING">승인 대기</option>
               <option value="APPROVED">승인 완료</option>
-              {/* ❌ "CANCEL" 제거 */}
               <option value="REJECTED">거절</option>
-              {/* 취소 기능 도입 시: <option value="CANCELLED">취소</option> */}
+              {/* 필요 시 <option value="CANCELLED">취소</option> 추가 */}
             </select>
           </div>
           <div className="flex flex-col">
@@ -261,10 +320,14 @@ export default function AdminFacilityReservations() {
         <div className="text-sm text-gray-600">총 <b>{rows.length}</b>건</div>
         <div className="flex items-center gap-2">
           <label className="text-sm text-gray-600">정렬</label>
-          <select value={`${sortKey}:${sortDir}`} onChange={(e) => {
-            const [k, d] = e.target.value.split(":");
-            setSortKey(k); setSortDir(d);
-          }} className="border rounded px-2 py-1 text-sm">
+          <select
+            value={`${sortKey}:${sortDir}`}
+            onChange={(e) => {
+              const [k, d] = e.target.value.split(":");
+              setSortKey(k); setSortDir(d);
+            }}
+            className="border rounded px-2 py-1 text-sm"
+          >
             <option value="reserveAt:DESC">신청일 ↓</option>
             <option value="reserveAt:ASC">신청일 ↑</option>
             <option value="facDate:DESC">이용일 ↓</option>
@@ -273,7 +336,11 @@ export default function AdminFacilityReservations() {
             <option value="facName:DESC">공간명 Z→A</option>
           </select>
           <label className="text-sm text-gray-600 ml-3">페이지 크기</label>
-          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }} className="border rounded px-2 py-1 text-sm">
+          <select
+            value={pageSize}
+            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
+            className="border rounded px-2 py-1 text-sm"
+          >
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
@@ -306,7 +373,7 @@ export default function AdminFacilityReservations() {
               <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-500">데이터가 없습니다.</td></tr>
             ) : (
               paged.map((r) => {
-                const chip = chipOf(r.state);
+                const chip = chipOf(r.state, r.facDate); // 이용일 반영
                 const mem = r.memId || "-";
                 return (
                   <tr key={r.reserveId} className="border-t">

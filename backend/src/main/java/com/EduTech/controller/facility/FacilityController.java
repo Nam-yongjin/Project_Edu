@@ -17,10 +17,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -187,14 +187,19 @@ public class FacilityController {
 
     // 관리자 강제 취소 (reserveId 기준)
     @PatchMapping("/admincancel")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> adminCancel(
-            @RequestParam Long reserveId,
-            @RequestParam String requesterId
+            @RequestParam("reserveId") Long reserveId,
+            @RequestParam(value = "requesterId", required = false) String requesterId
     ) {
+        // 프론트에서 requesterId 안 보내면 토큰에서 가져오기
+        if (requesterId == null || requesterId.isBlank()) {
+            requesterId = com.EduTech.security.jwt.JWTFilter.getMemId();
+        }
+
         boolean success = facilityService.cancelReservation(reserveId, requesterId);
         return ResponseEntity.ok(success ? "강제 취소 완료" : "취소 실패");
     }
-
     // 휴무일 등록
     @PostMapping("/addholiday")
     @PreAuthorize("hasRole('ADMIN')")
