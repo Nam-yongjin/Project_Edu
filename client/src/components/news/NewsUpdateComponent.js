@@ -200,7 +200,7 @@ const NewsUpdateComponent = () => {
         return (
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="max-w-4xl mx-auto mt-4 px-10 p-6 bg-white rounded-xl shadow-md">
-                    <div className="text-center py-8">로딩 중...</div>
+                    <div className="text-center py-8 newText-base">로딩 중...</div>
                 </div>
             </div>
         );
@@ -214,13 +214,13 @@ const NewsUpdateComponent = () => {
 
                 {/* 제목 */}
                 <div>
-                    <label className="block font-medium mb-1">제목</label>
+                    <label className="block font-medium mb-1 newText-base">제목</label>
                     <input
                         type="text"
                         value={news.title}
                         onChange={(e) => setNews({ ...news, title: e.target.value })}
                         placeholder="제목을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                     />
                     {errors.title && (
                         <p className="text-red-500 newText-sm mt-1">{errors.title}</p>
@@ -229,31 +229,31 @@ const NewsUpdateComponent = () => {
 
                 {/* 이미지 URL */}
                 <div>
-                    <label className="block font-medium mb-1">썸네일 이미지 URL</label>
+                    <label className="block font-medium mb-1 newText-base">썸네일 이미지 URL</label>
                     <input
                         type="url"
                         value={news.imageUrl}
                         onChange={handleImageUrlChange}
                         placeholder="https://example.com/image.jpg"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                     />
                     {errors.imageUrl && (
                         <p className="text-red-500 newText-sm mt-1">{errors.imageUrl}</p>
                     )}
-                    <p className="text-gray-500 text-xs mt-1">
+                    <p className="text-gray-500 newText-xs mt-1">
                         이미지 파일의 직접 링크를 입력하세요(.jpg, .jpeg, .png 등)
                     </p>
                 </div>
 
                 {/* 외부 링크 URL */}
                 <div>
-                    <label className="block font-medium mb-1">외부 기사 링크</label>
+                    <label className="block font-medium mb-1 newText-base">외부 기사 링크</label>
                     <input
                         type="url"
                         value={news.linkUrl}
                         onChange={(e) => setNews({ ...news, linkUrl: e.target.value })}
                         placeholder="https://example.com/news/article"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                     />
                     {errors.linkUrl && (
                         <p className="text-red-500 newText-sm mt-1">{errors.linkUrl}</p>
@@ -262,13 +262,13 @@ const NewsUpdateComponent = () => {
 
                 {/* 내용 + 이미지 미리보기 */}
                 <div>
-                    <label className="block font-medium mb-1">내용</label>
+                    <label className="block font-medium mb-1 newText-base">내용</label>
                         {/* 이미지 미리보기 */}
                         {news.imageUrl && (
                             <div className="p-4 border border-gray-300 rounded bg-gray-50 mb-2">
                                 {isImageLoading && (
                                     <div className="flex items-center justify-center h-48 bg-gray-100 rounded">
-                                        <div className="text-gray-500">이미지 로딩 중...</div>
+                                        <div className="text-gray-500 newText-base">이미지 로딩 중...</div>
                                     </div>
                                 )}
                                 {!imageLoadError && !isImageLoading && (
@@ -278,7 +278,7 @@ const NewsUpdateComponent = () => {
                                             alt="뉴스 썸네일"
                                             onLoad={handleImageLoad}
                                             onError={handleImageError}
-                                            className="page-shadow"
+                                            className="page-shadow newText-base"
                                             style={{ maxHeight: '300px' }}
                                         />
                                     </div>
@@ -300,7 +300,7 @@ const NewsUpdateComponent = () => {
                             value={news.content}
                             onChange={(e) => setNews({ ...news, content: e.target.value })}
                             placeholder="뉴스 내용을 입력하세요"
-                            className="w-full input-focus"
+                            className="w-full input-focus newText-base"
                             style={{ minHeight: "300px", resize: "none", overflowY: "auto" }} 
                         />
                     {errors.content && (

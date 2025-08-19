@@ -123,13 +123,13 @@ const NoticeAddComponent = () => {
                 <hr className="border-gray-200 my-4" />
                 {/* 제목 */}
                 <div>
-                    <label className="block font-medium mb-1">제목</label>
+                    <label className="block font-medium mb-1 newText-base">제목</label>
                     <input
                         type="text"
                         value={notice.title}
                         onChange={(e) => setNotice({ ...notice, title: e.target.value })}
                         placeholder="제목을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                     />
                     {errors.title && (
                         <p className="text-red-500 newText-sm mt-1">{errors.title}</p>
@@ -137,14 +137,14 @@ const NoticeAddComponent = () => {
                 </div>
                 {/* 내용 */}
                 <div>
-                    <label className="block font-medium mb-1">내용</label>
+                    <label className="block font-medium mb-1 newText-base">내용</label>
                     <textarea
                         value={notice.content}
                         onChange={(e) => {
                             setNotice({ ...notice, content:e.target.value });
                         }}
                         placeholder="내용을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                         style={{ height: "300px", resize: "none", overflowY: "auto" }}
                     />
                     {errors.content && (
@@ -167,20 +167,20 @@ const NoticeAddComponent = () => {
                 </div>
                 {/* 첨부파일 */}
                 <div>
-                    <label className="block font-medium mb-1">첨부파일</label>
+                    <label className="block font-medium mb-1 newText-base">첨부파일</label>
                     <input
                         type="file"
                         multiple //여러 개의 파일을 한 번에 선택
                         accept=".jpg, .jpeg, .png, .pdf, .hwp, .doc, .docx" //업로드 파일 유형 제한
                         onChange={handleFileChange}
-                        className="w-full"
+                        className="w-full newText-base"
                     />
                 </div>
 
                 {/* 파일 미리 보기 */}
                 {notice.files.length > 0 && (
                     <div>
-                        <strong className="block mb-2">첨부 파일:</strong>
+                        <strong className="block mb-2 newText-base">첨부 파일:</strong>
                         <ul className="flex overflow-x-auto space-x-4">
                             {notice.files.map((file, index) => (
                                 <li key={index}
@@ -189,7 +189,7 @@ const NoticeAddComponent = () => {
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveFile(index)}
-                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 newText-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                                         title="삭제"
                                     >✕</button>
 
