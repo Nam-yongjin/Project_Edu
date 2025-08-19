@@ -63,7 +63,7 @@ const NewsMainComponent = () => {
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h2 className="newText-xl font-bold text-gray-900">언론보도</h2>
-          <Link 
+          <Link
             to="/news/NewsList"
             className="text-gray-600 hover:text-gray-800 text-sm transition-colors duration-200 flex items-center font-medium"
           >
@@ -87,7 +87,7 @@ const NewsMainComponent = () => {
         ) : (
           <ul className="space-y-3">
             {news.map((news, index) => (
-              <li 
+              <li
                 key={news.newsNum}
                 className="group hover:bg-gray-50 rounded-lg p-3 transition-all duration-200 border-l-4 border-transparent hover:border-green-500"
               >
@@ -96,31 +96,29 @@ const NewsMainComponent = () => {
 
                     {/* 제목과 메타 정보 */}
                     <div className="flex-1 min-w-0">
-                      <Link 
+                      <Link
                         to={`/news/NewsDetail/${news.newsNum}`}
                         className="block group-hover:text-green-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-<<<<<<< HEAD
-                          <h3 className="newText-sm font-medium text-gray-900 truncate group-hover:text-green-600">
-=======
-                          <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-600 truncate max-w-[200px] lg:max-w-[400px]">
->>>>>>> refs/heads/Notice
-                            {truncateTitle(news.title)}
-                          </h3>
-                          
-                          {/* New 표시 (최근 3일 이내) */}
-                          {(() => {
-                            const createdDate = new Date(news.createdAt);
-                            const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
-                            return daysDiff <= 3 && (
-                              <span className="ml-2 text-xs font-bold text-red-500 whitespace-nowrap">
-                                New !
-                              </span>
-                            );
-                          })()}
+
+                          <h3 className="newText-sm font-medium text-gray-900 group-hover:text-green-600 truncate max-w-[200px] lg:max-w-[400px]">
+
+                              {truncateTitle(news.title)}
+                            </h3>
+
+                            {/* New 표시 (최근 3일 이내) */}
+                            {(() => {
+                              const createdDate = new Date(news.createdAt);
+                              const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+                              return daysDiff <= 3 && (
+                                <span className="ml-2 text-xs font-bold text-red-500 whitespace-nowrap">
+                                  New !
+                                </span>
+                              );
+                            })()}
                         </div>
-                        
+
                         {/* 작성자 및 조회수 */}
                         <div className="flex items-center mt-1 text-xs text-gray-500">
                           <span>{news.name}</span>

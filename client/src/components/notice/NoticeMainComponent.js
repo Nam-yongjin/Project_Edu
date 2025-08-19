@@ -115,11 +115,10 @@ const NoticeMainComponent = () => {
                         className="block group-hover:text-blue-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-<<<<<<< HEAD
-                          <h3 className="newText-sm font-medium text-gray-900 truncate group-hover:text-blue-600">
-=======
-                          <h3 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
->>>>>>> refs/heads/Notice
+
+                          <h3 className="newText-sm font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
+
+
                             {truncateTitle(notice.title)}
                           </h3>
                           
