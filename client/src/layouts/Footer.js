@@ -25,12 +25,12 @@ const Footer = () => {
 
     return (
         <div>
-            <footer className="bg-gray-600 px-8 py-6 text-[14px]">
+            <footer className="bg-gray-600 py-6">
                 <div className="max-w-screen-xl mx-auto flex justify-between items-start flex-wrap">
                     {/* 왼쪽: 정책 + 주소 */}
-                    <div className='space-y-4 max-w-xl'>
+                    <div className='min-blank space-y-4 '>
                         {/* 정책 */}
-                        <nav className='space-x-2 text-m text-white font-medium'>
+                        <nav className='space-x-2 newText-sm text-white font-medium'>
                             <span className='hover:underline cursor-pointer ' onClick={() => openModal("register.txt", "이용약관")}><Link to="">이용약관</Link></span>
                             <span>|</span>
                             <span className='hover:underline cursor-pointer' onClick={() => openModal("process.txt", "개인정보처리방침")}><Link to="">개인정보처리방침</Link></span>
@@ -38,7 +38,7 @@ const Footer = () => {
                             <span className='hover:underline cursor-pointer '><Link to="/about/direction">오시는길</Link></span>
                         </nav>
                         {/* 주소 */}
-                        <address className="not-italic space-y-1 text-gray-400">
+                        <address className="newText-base not-italic space-y-1 text-gray-400">
                             <p className='text-gray-300 font-semibold'>서울에듀테크소프트랩</p>
                             <p>주소 : 서울특별시 광진구 능동로 120 신공학관 1F</p>
                             <p>Tel : 02-450-0698 / 02-450-0699</p>
@@ -46,7 +46,7 @@ const Footer = () => {
                         </address>
                     </div>
                     {/* 오른쪽 */}
-                    <div className='text-right mt-6 md:mt-0'>
+                    <div className='min-blank text-right mt-6 md:mt-0'>
                         <img src={logo} alt="로고" className="ml-8 w-[240px] h-[100px] flex-shrink-0" />
                         {/* https://www.keris.or.kr/main/cm/cntnts/cntntsViewPop.do?cntntsId=1681 */}
                         <p className='pt-5 text-xs font-light text-gray-300'>
