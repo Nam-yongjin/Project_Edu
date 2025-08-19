@@ -144,7 +144,7 @@ const NoticeDetailComponent = () => {
                 <div className="px-6 py-8 border-b border-gray-200">
                     <div className="flex items-center gap-3 mb-2">
                         {notice.isPinned && (
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
                                 공지
                             </span>
                         )}
@@ -165,6 +165,14 @@ const NoticeDetailComponent = () => {
                             </svg>
                             <span>작성일: {formatDate(notice.createdAt)}</span>
                         </div>
+                         {notice.updatedAt && notice.updatedAt !== notice.createdAt && (
+                            <div className="flex items-center gap-1">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                <span>수정일: {formatDate(notice.updatedAt)}</span>
+                            </div>
+                        )}
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -177,7 +185,7 @@ const NoticeDetailComponent = () => {
 
                 {/* 내용 */}
                 <div className="px-6 py-6">
-                    <div className="prose max-w-none text-gray-800 leanding-relaxed whitespace-pre-wrap">
+                    <div className="prose max-w-none text-gray-800 leanding-relaxed whitespace-pre-wrap newText-base">
                         {notice.content || '내용이 없습니다.'}
                     </div>
 
@@ -186,11 +194,11 @@ const NoticeDetailComponent = () => {
                     <div className="mt-8">
                         <div className="grid gap-4">
                             {imageFiles.map((file, index) => (
-                                <div key={index} className="border border-gray-200 rounded-lg">
+                                <div key={index} className="rounded-lg">
                                     <img
                                         src={`http://localhost:8090/api/notice/view/${file.savedName}`}
                                         alt={file.originalName}
-                                        className="max-w-full h-auto mx-auto block border page-shadow"
+                                        className="max-w-full h-auto mx-auto block page-shadow"
                                         style={{
                                             width: 'auto',
                                             height: 'auto',
