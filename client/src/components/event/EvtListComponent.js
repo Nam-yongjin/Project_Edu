@@ -74,7 +74,7 @@ const EventListComponent = () => {
   const handleCardClick = (eventNum) => {
     if (loginState && loginState.memId) {
       navigate(`/event/detail/${eventNum}`);
-    } else {
+    } else {  // 로그인창 이동
       alert("로그인이 필요합니다.");
       moveToLogin();
     }
