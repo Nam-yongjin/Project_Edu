@@ -9,7 +9,7 @@ import defaultImage from "../../assets/default.jpg";
 import { postAddEvent } from "../../api/eventApi";
 import useMove from "../../hooks/useMove";
 
-const ProgramAddComponent = () => {
+const EvtAddComponent = () => {
   const navigate = useNavigate();
   const { moveToPath } = useMove();
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
@@ -268,4 +268,4 @@ const ProgramAddComponent = () => {
   );
 };
 
-export default ProgramAddComponent;
+export default EvtAddComponent;
