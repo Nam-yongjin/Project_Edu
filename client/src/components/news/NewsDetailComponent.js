@@ -100,7 +100,7 @@ const NewsDetailComponent = () => {
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <span className="ml-2 text-gray-600">로딩 중...</span>
+                    <span className="ml-2 text-gray-600 newText-base">로딩 중...</span>
                 </div>
             </div>
         );
@@ -128,7 +128,7 @@ const NewsDetailComponent = () => {
         return (
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="text-center py-12">
-                    <p className="text-gray-600 mb-4">뉴스를 찾을 수 없습니다.</p>
+                    <p className="text-gray-600 mb-4 newText-base">뉴스를 찾을 수 없습니다.</p>
                     <button
                         onClick={handleList}
                         className="dark-button newText-sm"
@@ -203,7 +203,7 @@ const NewsDetailComponent = () => {
                                 }}
                             />
                             <div
-                                className="hidden p-4 text-center text-gray-500 bg-gray-50 rounded-lg"
+                                className="hidden p-4 text-center text-gray-500 bg-gray-50 rounded-lg newText-base"
                             >
                                 이미지를 불러올 수 없습니다.
                             </div>
@@ -213,7 +213,7 @@ const NewsDetailComponent = () => {
 
                 {/* 내용 */}
                 <div className="px-6 py-6">
-                    <div className="prose max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap">
+                    <div className="prose max-w-none newText-base text-gray-800 leading-relaxed whitespace-pre-wrap">
                         {news.content || '내용이 없습니다.'}
                     </div>
                 </div>
