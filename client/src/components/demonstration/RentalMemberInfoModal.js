@@ -63,21 +63,10 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
     : memberInfo.content;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl p-6 max-h-[80vh] overflow-y-auto relative flex flex-col">
-        <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
-          onClick={onClose}
-          aria-label="Close modal"
-        >
-          ×
-        </button>
-
-        <h2 className="text-2xl font-semibold mb-4 text-center border-b pb-3">
-          회원 정보
-        </h2>
-
-        <div className="mb-4 flex justify-start w-full max-w-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg p-6 max-w-[1000px] w-full">
+       <h2 className="newText-3xl font-bold mb-1">회원 정보</h2>
+        <div className="mb-4 flex w-full max-w-md">
           <SearchComponent
             search={search}
             setSearch={setSearch}
@@ -112,22 +101,22 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
                   </select>
                 </th>
                 {[{ label: "시작일", value: "startDate" },
-                  { label: "마감일", value: "endDate" },
-                  { label: "등록일", value: "applyAt" }].map(({ label, value }) => (
-                    <th
-                      key={value}
-                      onClick={() => handleSortChange(value)}
-                      className="cursor-pointer text-center select-none py-3 px-4"
-                    >
-                      <div className="flex items-center justify-center space-x-1">
-                        <span>{label}</span>
-                        <div className="flex flex-col">
-                          <span className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>▲</span>
-                          <span className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>▼</span>
-                        </div>
+                { label: "마감일", value: "endDate" },
+                { label: "등록일", value: "applyAt" }].map(({ label, value }) => (
+                  <th
+                    key={value}
+                    onClick={() => handleSortChange(value)}
+                    className="cursor-pointer text-center select-none py-3 px-4"
+                  >
+                    <div className="flex items-center justify-center space-x-1">
+                      <span>{label}</span>
+                      <div className="flex flex-col">
+                        <span className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>▲</span>
+                        <span className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>▼</span>
                       </div>
-                    </th>
-                  ))}
+                    </div>
+                  </th>
+                ))}
               </tr>
             </thead>
 
@@ -166,6 +155,9 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
             />
           </div>
         )}
+        <div className="mt-4 flex justify-end">
+          <button className="normal-button rounded" onClick={onClose}>닫기</button>
+        </div>
       </div>
     </div>
   );
