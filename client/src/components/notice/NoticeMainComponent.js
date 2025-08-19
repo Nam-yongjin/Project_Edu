@@ -62,7 +62,7 @@ const NoticeMainComponent = () => {
       {/* 헤더 */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">공지사항</h2>
+          <h2 className="newText-xl font-bold text-gray-900">공지사항</h2>
           <Link 
             to="/notice/NoticeList"
             className="text-gray-600 hover:text-gray-800 text-sm transition-colors duration-200 flex items-center font-medium"
@@ -114,7 +114,7 @@ const NoticeMainComponent = () => {
                         className="block group-hover:text-blue-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-                          <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600">
+                          <h3 className="newText-sm font-medium text-gray-900 truncate group-hover:text-blue-600">
                             {truncateTitle(notice.title)}
                           </h3>
                           

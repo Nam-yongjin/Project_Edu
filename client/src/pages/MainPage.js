@@ -33,7 +33,7 @@ const MainPage = () => {
     return (
         <div className="">
             <BasicLayout isFullWidth={true}>
-                <div className="mx-auto relative">
+                <div className="mx-auto relative overflow-x-hidden">
                     {banners.length > 0 && (
                         <Swiper
                             centeredSlides={true}
@@ -51,7 +51,7 @@ const MainPage = () => {
                             }}
                             speed={1200}
                             modules={[Autoplay, Pagination]}
-                            className="mySwiper max-h-[80vh] aspect-video"
+                            className="mySwiper max-h-[70vh] aspect-video"
                         >
                             {banners.map((banner) => (
                                 <SwiperSlide key={banner.bannerNum}>
@@ -66,7 +66,7 @@ const MainPage = () => {
                         </Swiper>
                     )}
 
-                    <div className="min-blank absolute top-1/4 left-0 w-full z-20 pointer-events-none select-none">
+                    <div className="min-blank absolute top-[30%] left-0 w-full z-20 pointer-events-none select-none">
                         <div className="max-w-screen-xl mx-auto">
                             <div className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold drop-shadow-[2px_2px_0px_rgba(0,0,0,0.8)]">
                                 서울<br />
@@ -76,15 +76,18 @@ const MainPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="my-10 max-w-screen-xl mx-auto">
-                    <div className="min-blank my-10">
+                <div className="my-10 max-w-screen-xl mx-auto ">
+                    <div className="min-blank my-10 grid grid-cols-1 md:grid-cols-2 gap-6 ">
                         <EvtBannerComponent />
+                        <div className="px-6 py-4 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                            <div className="newText-xl font-semibold mb-4">지원사업</div>
+                            <div>
+                                공간바로가기, 실증바로가기
+                            </div>
+                        </div>
                     </div>
                     <div className="min-blank my-10">
-                        공간예약, 실증대여 링크 칸
-                    </div>
-                    <div className="min-blank my-10">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <NoticeMainComponent />
                             <NewsMainComponent />
                         </div>
