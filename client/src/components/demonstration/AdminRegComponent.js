@@ -21,7 +21,7 @@ const AdminRegComponent = () => {
     };
     const searchOptions = [ // search compnent에게 전달할 option의 select 객체
         { value: "memId", label: "아이디" },
-        { value: "demName", label: "상품명" },
+        { value: "demName", label: "물품명" },
         { value: "companyName", label: "기업명" },
     ];
     const [search, setSearch] = useState(""); // 검색 state 변수
@@ -101,7 +101,7 @@ const AdminRegComponent = () => {
 
     return (
         <>
-            <div className="max-w-screen-xl mx-auto my-10 overflow-x-auto">
+            <div className="max-w-screen-xl mx-auto my-10">
                 <div className="min-blank">
                     <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
                     <div className="py-2">
@@ -114,17 +114,17 @@ const AdminRegComponent = () => {
                             searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
                         />
                     </div>
-
-                    <table className="min-w-full">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
                         <thead className="bg-gray-100 text-gray-700 newText-base">
-                            <tr className="newText-base">
+                            <tr className="newText-base whitespace-nowrap">
                                 <th className="w-[8%]">이미지</th>
                                 <th className="w-[8%]">아이디</th>
                                 <th className="w-[14%]">전화번호</th>
                                 <th className="w-[14%]">주소</th>
                                 <th className="w-[10%]">기업명</th>
-                                <th className="w-[10%]">상품명</th>
-                                <th className="w-[10%]">상품 갯수</th>
+                                <th className="w-[10%]">물품명</th>
+                                <th className="w-[10%]">물품 갯수</th>
 
                                 <th className="w-[10%]">
                                     <div className="mb-1">신청상태</div>
@@ -178,9 +178,9 @@ const AdminRegComponent = () => {
                             ) : (
                                 regInfo.content.map((data) => {
                                     const mainImage = data.imageList?.find((img) => img.isMain);
-
+                                    const dataState = data.state;
                                     return (
-                                        <tr key={data.demRegNum} className="hover:bg-gray-50 newText-sm text-center whitespace-nowrap">
+                                        <tr key={data.demRegNum} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${dataState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
                                             <td>
                                                 {mainImage ? (
                                                     <img
@@ -243,6 +243,7 @@ const AdminRegComponent = () => {
                             )}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
             <div className="flex justify-center my-6">

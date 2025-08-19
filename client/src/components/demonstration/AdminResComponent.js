@@ -23,7 +23,7 @@ const AdminResComponent = () => {
 
   const searchOptions = [
     { value: "memId", label: "아이디" },
-    { value: "demName", label: "상품명" },
+    { value: "demName", label: "물품명" },
     { value: "schoolName", label: "학교명" },
   ];
 
@@ -98,7 +98,7 @@ const AdminResComponent = () => {
 
   return (
     <>
-    <div className="max-w-screen-xl mx-auto my-10 overflow-x-auto">
+    <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
         <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
         <div className="py-2">
@@ -110,15 +110,16 @@ const AdminResComponent = () => {
           />
         </div>
 
-        <table className="min-w-full">
+       <div className="overflow-x-auto">
+        <table className="w-full">
           <thead className="bg-gray-100 text-gray-700 newText-base">
-            <tr className="newText-base">
+            <tr className="newText-base whitespace-nowrap">
               <th className="w-[10%]">이미지</th>
               <th className="w-[5%]">아이디</th>
               <th className="w-[10%]">전화번호</th>
               <th className="w-[14%]">주소</th>
               <th className="w-[10%]">학교명</th>
-              <th className="w-[10%]">상품명</th>
+              <th className="w-[10%]">물품명</th>
               <th className="w-[10%]">신청 갯수</th>
               <th className="w-[10%]">
                 <div className="mb-1">신청 상태</div>
@@ -168,9 +169,9 @@ const AdminResComponent = () => {
             ) : (
               resInfo.content.map((member) => {
                 const mainImage = member.imageList?.find((img) => img.isMain === true);
-
+                const memberState = member.state;
                 return (
-                  <tr key={member.demRevNum} className="hover:bg-gray-50 newText-sm text-center whitespace-nowrap">
+                  <tr key={`${member.demRevNum}_${member.startDate}_${member.endDate}_${member.applyAt}_${member.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
                     <td className="py-2 px-2 whitespace-nowrap text-center">
                       {mainImage ? (
                         <img
@@ -259,6 +260,7 @@ const AdminResComponent = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
     <div className="flex justify-center my-6">
