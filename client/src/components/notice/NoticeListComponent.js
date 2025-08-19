@@ -115,7 +115,7 @@ const NoticeListComponent = () => {
       <div className="min-blank">
         <div className="mb-6">
           <h1 className="newText-2xl font-bold text-gray-900">공지사항</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 newText-base">
             전체 {totalElements}건의 공지사항이 있습니다.
           </p>
         </div>
@@ -131,7 +131,7 @@ const NoticeListComponent = () => {
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              <span className="ml-2 text-gray-600">로딩중...</span>
+              <span className="ml-2 text-gray-600 newText-base">로딩중...</span>
             </div>
           ) : (
               <table className="w-full table-auto">
@@ -147,11 +147,11 @@ const NoticeListComponent = () => {
                         />
                       </th>
                     )}
-                    <th className="w-16 px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
-                    <th className="px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
-                    <th className="min-w-[70px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
-                    <th className="min-w-[90px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
-                    <th className="min-w-[70px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
+                    <th className="min-w-[50px] px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
+                    <th className="w-full px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
+                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
+                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -159,7 +159,7 @@ const NoticeListComponent = () => {
                     <tr>
                       <td 
                         colSpan={loginState.role === 'ADMIN' ? 6 : 5} 
-                        className="px-4 py-12 text-center text-gray-500"
+                        className="px-4 py-12 text-center text-gray-500 newText-base"
                       >
                         등록된 공지사항이 없습니다.
                       </td>
@@ -182,7 +182,7 @@ const NoticeListComponent = () => {
                         )}
                         <td className="px-2 py-3 text-center newText-sm text-gray-900">
                           {notice.isPinned ? (
-                            <span className="inline-block min-w-[40px] px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
+                            <span className="inline-block min-w-[40px] px-3 py-1 rounded-full newText-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
                               공지
                             </span>
                           ) : (
@@ -193,7 +193,7 @@ const NoticeListComponent = () => {
                         </td>
                         {/* 제목 */}
                         <td className="px-2 py-3">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 w-full">
                             <Link //제목 누르면 상세페이지로 넘어감
                               to={`/notice/NoticeDetail/${notice.noticeNum}`}
                               className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate max-w-[100px] lg:max-w-[400px]"
@@ -238,13 +238,13 @@ const NoticeListComponent = () => {
                           </div>
                         </td>
                         {/* overflow 방지 whitespace-nowrap*/}
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[70px]">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
                           {notice.name}
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[90px]">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
                           {formatDate(notice.createdAt)}
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[70px] hidden sm:table-cell">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px] hidden sm:table-cell">
                           {notice.viewCount?.toLocaleString() || 0}
                         </td>
                       </tr>

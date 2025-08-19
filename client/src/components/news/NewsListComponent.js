@@ -111,7 +111,7 @@ const NewsListComponent = () => {
       <div className="min-blank">
         <div className="mb-6">
           <h1 className="newText-2xl font-bold text-gray-900">언론보도</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 newText-base">
             전체 {totalElements}건의 뉴스가 있습니다.
           </p>
         </div>
@@ -127,7 +127,7 @@ const NewsListComponent = () => {
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              <span className="ml-2 text-gray-600">로딩중...</span>
+              <span className="ml-2 text-gray-600 newText-base">로딩중...</span>
             </div>
           ) : (
               <table className="w-full table-auto">
@@ -143,11 +143,11 @@ const NewsListComponent = () => {
                         />
                       </th>
                     )}
-                    <th className="w-16 px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
-                    <th className="px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
-                    <th className="min-w-[70px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
-                    <th className="min-w-[90px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
-                    <th className="min-w-[70px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
+                    <th className="min-w-[50px] px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
+                    <th className="w-full px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
+                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
+                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -155,7 +155,7 @@ const NewsListComponent = () => {
                     <tr>
                       <td 
                         colSpan={loginState.role === 'ADMIN' ? 6 : 5}
-                        className="px-4 py-12 text-center text-gray-500"
+                        className="px-4 py-12 text-center text-gray-500 newText-base"
                       >
                         등록된 뉴스가 없습니다.
                       </td>
@@ -185,20 +185,20 @@ const NewsListComponent = () => {
                           <div className="flex items-center space-x-2">
                             <Link //제목 누르면 상세페이지로 넘어감
                               to={`/news/NewsDetail/${news.newsNum}`}
-                              className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate max-w-[150px] lg:max-w-[700px]"
+                              className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate min-w-[120px] max-w-[150px] lg:max-w-[700px]"
                               title={news.title}
                             >
                               {news.title}
                             </Link>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[70px]">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
                           {news.name}
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[90px]">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
                           {formatDate(news.createdAt)}
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[70px] hidden sm:table-cell">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px] hidden sm:table-cell">
                           {news.viewCount?.toLocaleString() || 0}
                         </td>
                       </tr>

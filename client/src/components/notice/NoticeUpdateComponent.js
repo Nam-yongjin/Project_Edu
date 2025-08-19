@@ -197,7 +197,7 @@ const NoticeUpdateComponent = () => {
         return (
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="max-w-3xl mx-auto mt-4 px-10 p-6 bg-white rounded-xl shadow-md">
-                    <div className="text-center py-8">로딩 중...</div>
+                    <div className="text-center py-8 newText-base">로딩 중...</div>
                 </div>
             </div>
         );
@@ -211,13 +211,13 @@ const NoticeUpdateComponent = () => {
 
                 {/* 제목 */}
                 <div>
-                    <label className="block font-medium mb-1">제목</label>
+                    <label className="block font-medium mb-1 newText-base">제목</label>
                     <input
                         type="text"
                         value={notice.title}
                         onChange={(e) => setNotice({ ...notice, title: e.target.value })}
                         placeholder="제목을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                     />
                     {error.title && (
                         <p className="text-red-500 newText-sm mt-1">{error.title}</p>
@@ -226,14 +226,14 @@ const NoticeUpdateComponent = () => {
 
                 {/* 내용 */}
                 <div>
-                    <label className="block font-medium mb-1">내용</label>
+                    <label className="block font-medium mb-1 newText-base">내용</label>
                     <textarea
                         value={notice.content}
                         onChange={(e) => {
                             setNotice({ ...notice, content: e.target.value });
                         }}
                         placeholder="내용을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                         style={{ height: "300px", resize: "none", overflowY: "auto" }}
                     />
                     {error.content && (
@@ -259,7 +259,7 @@ const NoticeUpdateComponent = () => {
                 {/* 기존 첨부파일 */}
                 {notice.existingFiles.length > 0 && (
                     <div>
-                        <strong className="block mb-2">기존 첨부 파일:</strong>
+                        <strong className="block mb-2 newText-base">기존 첨부 파일:</strong>
                         <ul className="flex overflow-x-auto space-x-4">
                             {notice.existingFiles.map((file, index) => (
                                 <li key={file.noticeNum || index}
@@ -272,16 +272,9 @@ const NoticeUpdateComponent = () => {
                                             handleRemoveExistingFile(file.notFileNum);
                                         }}
     
-                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 newText-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                                         title="삭제"
                                     >✕</button>
-                                    {/* 기존에 있는 파일 불러오는 거라 실제 서버 경로가 필요함 */}
-                                    {/* {file.fileType && file.fileType.startsWith("image/") ? (
-                                        <img
-                                            src={file.filePath || `/files/${file.fileName}`}
-                                            alt={file.fileName}
-                                            className="w-full h-full object-cover rounded"
-                                        /> */}
                                     {isImage(file.fileType) ? (
                                         <img
                                             src={file.downloadUrl}
@@ -301,20 +294,20 @@ const NoticeUpdateComponent = () => {
 
                 {/* 새 첨부파일 */}
                 <div>
-                    <label className="block font-medium mb-1">새 첨부파일 추가</label>
+                    <label className="block font-medium mb-1 newText-base">새 첨부파일 추가</label>
                     <input
                         type="file"
                         multiple
                         accept=".jpg, .jpeg, .png, .pdf, .hwp, .doc, .docx"
                         onChange={handleNewFileChange}
-                        className="w-full"
+                        className="w-full newText-base"
                     />
                 </div>
 
                 {/* 새 파일 미리보기 */}
                 {notice.newFiles.length > 0 && (
                     <div>
-                        <strong className="block mb-2">새로 추가할 파일:</strong>
+                        <strong className="block mb-2 newText-base">새로 추가할 파일:</strong>
                         <ul className="flex overflow-x-auto space-x-4">
                             {notice.newFiles.map((file, index) => (
                                 <li key={index}
@@ -323,7 +316,7 @@ const NoticeUpdateComponent = () => {
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveNewFile(index)}
-                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 newText-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                                         title="삭제"
                                     >✕</button>
 
