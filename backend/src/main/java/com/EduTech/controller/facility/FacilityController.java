@@ -86,8 +86,8 @@ public class FacilityController {
     
     // 시설 조회(사용)
     @GetMapping("/list")
-    public ResponseEntity<Page<FacilityListDTO>> list(
-            @PageableDefault(page = 0, size = 12) Pageable pageable,
+    public ResponseEntity<Page<FacilityListDTO>> getFacilityList(
+            @PageableDefault(page = 0, size = 8) Pageable pageable,
             @RequestParam(name = "keyword", defaultValue = "") String keyword) {
 
         Page<FacilityListDTO> res = facilityService.getFacilityList(pageable, keyword);

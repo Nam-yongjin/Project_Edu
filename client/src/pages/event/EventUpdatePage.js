@@ -1,4 +1,3 @@
-import EvtTitleComponent from "../../components/event/EvtTitleComponent";
 import "react-datepicker/dist/react-datepicker.css";
 import EvtUpdateComponent from "../../components/event/EvtUpdateComponent";
 import { useParams } from "react-router-dom";
@@ -9,7 +8,6 @@ const UpdatEvtPage = () => {
 
   return (
     <div className="w-full">
-      <EvtTitleComponent title="프로그램 수정" />
       <EvtUpdateComponent eventNum={parsedEventNum} />
     </div>
   );

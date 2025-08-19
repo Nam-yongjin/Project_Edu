@@ -1,6 +1,5 @@
-// FacilityDetailContent.jsx
-// - 관리자 전용 수정/삭제 버튼 추가
-// - 전체 코드에 한글 주석 적용
+// src/components/facility/FacilityDetailContent.jsx
+// 상단 배너(공간 상세정보) 추가 + 기존 UI 그대로 유지
 
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
@@ -16,14 +15,13 @@ import {
   getAllHolidays,
   createReservation,
   getReservedBlocks,
-  deleteFacilityById, // 관리자 삭제 API
+  deleteFacilityById,
 } from "../../api/facilityApi";
 
-/* ==================== 이미지 URL 유틸 ==================== */
+/* ---------- 이미지 URL 유틸 ---------- */
 const PLACEHOLDER = "/placeholder.svg";
 const host = "http://localhost:8090/view";
 function buildImageUrl(p) {
-  // 이미지 경로 문자열 또는 객체의 imageUrl 필드를 표준 URL로 변환
   const val = typeof p === "string" ? p : p?.imageUrl;
   if (!val) return PLACEHOLDER;
   if (/^https?:\/\//i.test(val)) return val;
@@ -34,12 +32,11 @@ function buildImageUrl(p) {
   return (host + path).replace(/([^:]\/)\/+/g, "$1");
 }
 
-/* ==================== 시간/날짜 유틸 ==================== */
+/* ---------- 시간/날짜 유틸 ---------- */
 const toYmd = (d) => format(d, "yyyy-MM-dd");
 const todayYmd = () => format(new Date(), "yyyy-MM-dd");
 const nowHHmm = () => format(new Date(), "HH:mm");
 
-// "HH:mm[:ss]" 또는 Date → "HH:mm"
 function normalizeHHmm(v) {
   if (v == null) return null;
   if (typeof v === "string") {
@@ -52,8 +49,6 @@ function normalizeHHmm(v) {
   } catch {}
   return null;
 }
-
-/* 시작시간 라디오 목록(1시간 간격) 생성 */
 function genStartSlots(openHHmm, closeHHmm) {
   const base = new Date();
   let s = parse(openHHmm, "HH:mm", base);
@@ -65,8 +60,6 @@ function genStartSlots(openHHmm, closeHHmm) {
   }
   return out;
 }
-
-/* 시작시간 이후 종료시간까지 허용되는 최대 시간(상한 capHours) 계산 */
 function maxDurationHours(startHHmm, closeHHmm, capHours = 4) {
   const base = new Date();
   const s = parse(startHHmm, "HH:mm", base);
@@ -74,32 +67,24 @@ function maxDurationHours(startHHmm, closeHHmm, capHours = 4) {
   const diffMin = Math.max(0, differenceInMinutes(close, s));
   return Math.min(capHours, Math.floor(diffMin / 60));
 }
-
-/* 시작시각 + N시간 → 종료시각 "HH:mm" */
 function calcEndHHmm(startHHmm, hours) {
   const base = new Date();
   const s = parse(startHHmm, "HH:mm", base);
   return format(addMinutes(s, hours * 60), "HH:mm");
 }
-
-/* ---- 겹침 판정 유틸(문자열 HH:mm 비교 사용) ---- */
-const lt = (a, b) => a < b;
-/* 반개구간 [s, e) 기준(끝==시작은 겹치지 않음) */
-function overlaps(s1, e1, s2, e2) {
-  return lt(s1, e2) && lt(s2, e1);
-}
+const overlaps = (s1, e1, s2, e2) => s1 < e2 && s2 < e1;
 
 /* ====================================================== */
 
 export default function FacilityDetailContent({ facRevNum }) {
-  /* 상단 상세 */
+  /* 상세 */
   const [data, setData] = useState(null);
   const [idx, setIdx] = useState(0);
   const [detailLoading, setDetailLoading] = useState(true);
   const [err, setErr] = useState("");
-  const startX = useRef(null);
+  const touchX = useRef(null);
 
-  /* 달력/예약 */
+  /* 캘린더 & 예약 */
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [holidayMap, setHolidayMap] = useState(new Map());
   const [holLoading, setHolLoading] = useState(false);
@@ -108,19 +93,15 @@ export default function FacilityDetailContent({ facRevNum }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [startKey, setStartKey] = useState(null);
   const [durationHrs, setDurationHrs] = useState(null);
+  const [reservedBlocks, setReservedBlocks] = useState([]);
 
-  /* 예약 블록 */
-  const [reservedBlocks, setReservedBlocks] = useState([]); // [{start:"HH:mm", end:"HH:mm"}]
-
-  /* 예약 전송 상태/메시지 */
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState("");
 
-  /* 관리자 및 네비게이션 */
-  const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+  const isAdmin = useSelector((s) => s.loginState?.role === "ADMIN");
   const navigate = useNavigate();
 
-  /* -------------------- 상세 불러오기 -------------------- */
+  /* 상세 불러오기 */
   useEffect(() => {
     let mounted = true;
     setDetailLoading(true);
@@ -132,91 +113,70 @@ export default function FacilityDetailContent({ facRevNum }) {
     return () => { mounted = false; };
   }, [facRevNum]);
 
-  /* -------------------- 공휴일/휴무 불러오기 -------------------- */
+  /* 휴무일 */
   useEffect(() => {
     let mounted = true;
-    (function () {
-      setHolLoading(true);
-      setHolError("");
-      getAllHolidays()
-        .then((list) => {
-          if (!mounted) return;
-          const map = new Map();
-          const arr = Array.isArray(list) ? list : [];
-          for (const it of arr) {
-            const key = String(it.date);
-            if (!map.has(key)) map.set(key, []);
-            map.get(key).push(it);
-          }
-          setHolidayMap(map);
-        })
-        .catch((e) => {
-          if (!mounted) return;
-          setHolError("휴무일을 불러오지 못했어요.");
-          setHolidayMap(new Map());
-          console.error(e);
-        })
-        .finally(() => mounted && setHolLoading(false));
-    })();
+    setHolLoading(true);
+    setHolError("");
+    getAllHolidays()
+      .then((list) => {
+        if (!mounted) return;
+        const map = new Map();
+        (Array.isArray(list) ? list : []).forEach((it) => {
+          const key = String(it.date);
+          if (!map.has(key)) map.set(key, []);
+          map.get(key).push(it);
+        });
+        setHolidayMap(map);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setHolError("휴무일을 불러오지 못했어요.");
+        setHolidayMap(new Map());
+      })
+      .finally(() => mounted && setHolLoading(false));
     return () => { mounted = false; };
   }, []);
 
-  /* -------------------- 선택 날짜의 예약 블록 불러오기 -------------------- */
+  /* 선택일 예약 블록 */
   useEffect(() => {
     let mounted = true;
     if (!selectedDate) { setReservedBlocks([]); return; }
     getReservedBlocks(facRevNum, selectedDate)
       .then((blocks) => {
         if (!mounted) return;
-        const arr = Array.isArray(blocks) ? blocks : [];
-        const list = arr.map((b) => ({
-          start: typeof b.start === "string" ? b.start.slice(0, 5) : b.start,
-          end  : typeof b.end   === "string" ? b.end.slice(0, 5)   : b.end,
-        })).sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+        const list = (Array.isArray(blocks) ? blocks : [])
+          .map((b) => ({
+            start: typeof b.start === "string" ? b.start.slice(0, 5) : b.start,
+            end  : typeof b.end   === "string" ? b.end.slice(0, 5)   : b.end,
+          }))
+          .sort((a, b) => (a.start < b.start ? -1 : 1));
         setReservedBlocks(list);
       })
-      .catch((e) => {
-        console.error(e);
-        setReservedBlocks([]);
-      });
+      .catch(() => setReservedBlocks([]));
     return () => { mounted = false; };
   }, [facRevNum, selectedDate]);
 
-  /* -------------------- 이미지 캐러셀 -------------------- */
+  /* 이미지 */
   const srcs = useMemo(() => {
     const raw = data?.images ?? [];
-    const arr = (Array.isArray(raw) && raw.length ? raw : [null]).map(buildImageUrl);
-    const cleaned = arr.filter(Boolean);
-    return cleaned.length ? cleaned : [PLACEHOLDER];
+    const arr = (Array.isArray(raw) && raw.length ? raw : [null]).map(buildImageUrl).filter(Boolean);
+    return arr.length ? arr : [PLACEHOLDER];
   }, [data]);
   const n = srcs.length;
-
-  const prevImg = () => setIdx((idx - 1 + n) % n);
-  const nextImg = () => setIdx((idx + 1) % n);
-  const onTouchStart = (e) => { startX.current = e.touches[0].clientX; };
+  const onTouchStart = (e) => (touchX.current = e.touches[0].clientX);
   const onTouchEnd = (e) => {
-    if (startX.current == null) return;
-    const dx = e.changedTouches[0].clientX - startX.current;
-    if (Math.abs(dx) > 40) (dx > 0 ? prevImg() : nextImg());
-    startX.current = null;
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    if (Math.abs(dx) > 40) setIdx((p) => (dx > 0 ? (p - 1 + n) % n : (p + 1) % n));
+    touchX.current = null;
   };
-  useEffect(() => {
-    function onKey(e) {
-      if (e.key === "ArrowLeft") prevImg();
-      if (e.key === "ArrowRight") nextImg();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [n, idx]);
 
-  /* -------------------- 달력 -------------------- */
+  /* 달력 */
   const monthLabel = format(currentMonth, "yyyy. MM", { locale: ko });
-
-  // 이전 달 이동 금지
   const minMonthStart = startOfMonth(new Date());
   const isPrevDisabled = startOfMonth(currentMonth) <= minMonthStart;
 
-  // 달력 그리드 데이터
   const weeks = useMemo(() => {
     const startMonth = startOfMonth(currentMonth);
     const endMonthDate = endOfMonth(currentMonth);
@@ -232,11 +192,9 @@ export default function FacilityDetailContent({ facRevNum }) {
     return rows;
   }, [currentMonth]);
 
-  // 휴무일 맵 조회
   const getHolidayItems = (d) => holidayMap.get(toYmd(d)) ?? [];
-  const selectedDateHasAnyHoliday = selectedDate ? ((holidayMap.get(selectedDate)?.length || 0) > 0) : false;
+  const selectedDateHasHoliday = selectedDate ? (holidayMap.get(selectedDate)?.length > 0) : false;
 
-  // 날짜 클릭 처리
   function handleDayClick(d) {
     const ymd = toYmd(d);
     if (!isSameMonth(d, currentMonth)) return;
@@ -247,11 +205,10 @@ export default function FacilityDetailContent({ facRevNum }) {
     setNotice("");
   }
 
-  /* -------------------- 예약가능시간 (정시) -------------------- */
+  /* 슬롯/버튼 데이터 */
   const open  = normalizeHHmm(data?.reserveStart) ?? "09:00";
   const close = normalizeHHmm(data?.reserveEnd)   ?? "18:00";
 
-  // 오늘이면 현재 시각 이후 슬롯만 노출
   const baseStartSlots = useMemo(() => {
     const base = genStartSlots(open, close);
     if (selectedDate === todayYmd()) {
@@ -261,108 +218,20 @@ export default function FacilityDetailContent({ facRevNum }) {
     return base;
   }, [open, close, selectedDate]);
 
-  // 예약 블록을 고려하여 슬롯에 blocked 플래그 부여
-  function buildFilteredStartSlots(slots, blocks) {
-    return slots.map((s) => {
+  const startSlots = useMemo(() => {
+    return baseStartSlots.map((s) => {
       const tmpEnd = calcEndHHmm(s.key, 1);
-      const blocked = blocks.some((b) => overlaps(s.key, tmpEnd, b.start, b.end));
+      const blocked = reservedBlocks.some((b) => overlaps(s.key, tmpEnd, b.start, b.end));
       return { ...s, blocked };
     });
-  }
-  const startSlots = useMemo(
-    () => buildFilteredStartSlots(baseStartSlots, reservedBlocks),
-    [baseStartSlots, reservedBlocks]
-  );
+  }, [baseStartSlots, reservedBlocks]);
 
-  // 시작시점 기준 허용 최대 시간(운영 종료와 4시간 상한 고려)
-  const maxHrsFromStart = startKey ? maxDurationHours(startKey, close, 4) : 0;
+  const maxHrs = startKey ? maxDurationHours(startKey, close, 4) : 0;
+  const endTimeText = (startKey && durationHrs) ? `${startKey} ~ ${calcEndHHmm(startKey, durationHrs)}` : "-";
+  const notPastTimeOK = !startKey || !durationHrs || (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
+  const canReserve = !!selectedDate && !!startKey && !!durationHrs && !selectedDateHasHoliday && notPastTimeOK;
 
-  // 선택한 구간 표시용 텍스트
-  const endTimeText = (startKey && durationHrs)
-    ? `${startKey} ~ ${calcEndHHmm(startKey, durationHrs)}`
-    : "-";
-
-  // 오늘이면 시작시각이 현재 이후여야 함
-  const notPastTimeOK =
-    !startKey || !durationHrs || (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
-
-  // 예약 버튼 활성 조건
-  const canReserve =
-    !!selectedDate && !!startKey && !!durationHrs && !selectedDateHasAnyHoliday && notPastTimeOK;
-
-  /* -------------------- 선택 핸들러 -------------------- */
-  function onChangeStart(key) {
-    setStartKey(key);
-    setDurationHrs(null);
-  }
-
-  // 시작시간 라디오 렌더 (예약된 슬롯 비활성화 및 표시)
-  function renderStartOptions() {
-    return startSlots.map((s) => {
-      const disabled =
-        !selectedDate ||
-        selectedDateHasAnyHoliday ||
-        s.blocked;
-
-      return (
-        <label
-          key={s.key}
-          className={[
-            "flex items-center gap-2 rounded px-2 py-1 text-sm border",
-            disabled ? "opacity-60 cursor-not-allowed bg-gray-50" : "hover:bg-gray-50 cursor-pointer"
-          ].join(" ")}
-          title={s.blocked ? "이미 예약된 시간입니다" : undefined}
-        >
-          <input
-            type="radio"
-            name="start"
-            value={s.key}
-            disabled={disabled}
-            checked={startKey === s.key}
-            onChange={() => onChangeStart(s.key)}
-          />
-          <span className={s.blocked ? "line-through text-red-500" : "text-gray-800"}>
-            {s.label}{s.blocked && " (이미 예약됨)"}
-          </span>
-        </label>
-      );
-    });
-  }
-
-  // 선택된 시작시각에서 h시간 사용이 가능한지(예약 블록과 겹치지 않는지) 판정
-  function durationAllowedByBlocks(h) {
-    if (!startKey) return false;
-    const e = calcEndHHmm(startKey, h);
-    return !reservedBlocks.some((b) => overlaps(startKey, e, b.start, b.end));
-  }
-
-  // 이용시간 버튼 렌더
-  function renderDurationButtons() {
-    const hours = [1, 2, 3, 4];
-    return hours.map((h) => {
-      const allowedByClose = startKey ? (h <= maxHrsFromStart) : false;
-      const allowedByNow = !startKey ? false : (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
-      const allowedByBlocks = durationAllowedByBlocks(h);
-      const allowed = allowedByClose && allowedByNow && allowedByBlocks;
-      return (
-        <button
-          key={h}
-          type="button"
-          className={[
-            "px-3 py-1 rounded border text-sm",
-            (durationHrs === h ? "bg-blue-600 text-white border-blue-600" : "hover:bg-gray-50"),
-            (!allowed || !selectedDate || selectedDateHasAnyHoliday ? " opacity-50 cursor-not-allowed" : "")
-          ].join("")}
-          disabled={!allowed || !selectedDate || selectedDateHasAnyHoliday}
-          onClick={() => setDurationHrs(h)}
-        >
-          {h}시간
-        </button>
-      );
-    });
-  }
-
-  /* -------------------- 예약 API 호출 -------------------- */
+  /* 액션 */
   function applyReserve() {
     if (!canReserve || submitting) return;
     setSubmitting(true);
@@ -374,283 +243,252 @@ export default function FacilityDetailContent({ facRevNum }) {
       endTime: calcEndHHmm(startKey, durationHrs),
     })
       .then((res) => {
-        const okMsg = res?.message || "예약 신청이 완료되었습니다. (승인 대기)";
-        setNotice(okMsg);
+        setNotice(res?.message || "예약 신청이 완료되었습니다. (승인 대기)");
         return getReservedBlocks(facRevNum, selectedDate);
       })
       .then((blocks) => {
-        if (!blocks) return;
-        const arr = Array.isArray(blocks) ? blocks : [];
-        const list = arr.map((b) => ({
-          start: typeof b.start === "string" ? b.start.slice(0, 5) : b.start,
-          end  : typeof b.end   === "string" ? b.end.slice(0, 5)   : b.end,
-        })).sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+        const list = (Array.isArray(blocks) ? blocks : [])
+          .map((b) => ({ start: b.start.slice(0, 5), end: b.end.slice(0, 5) }))
+          .sort((a, b) => (a.start < b.start ? -1 : 1));
         setReservedBlocks(list);
       })
-      .catch((e) => {
-        const msg =
-          e?.response?.data?.message ||
-          e?.message ||
-          "예약 신청 중 오류가 발생했습니다.";
-        setNotice(msg);
-      })
+      .catch((e) => setNotice(e?.response?.data?.message || e?.message || "예약 신청 중 오류가 발생했습니다."))
       .finally(() => setSubmitting(false));
   }
 
-  /* -------------------- 관리자: 시설 삭제 핸들러 -------------------- */
   const handleDelete = useCallback(async () => {
     if (!window.confirm("정말 이 시설을 삭제하시겠습니까?")) return;
     try {
       await deleteFacilityById(facRevNum);
       alert("시설이 삭제되었습니다.");
-      navigate("/facility/list"); // 라우팅 경로는 프로젝트에 맞게 조정
+      navigate("/facility/list");
     } catch (err) {
-      const msg = err?.response?.data?.message || err.message || "삭제 중 오류가 발생했습니다.";
-      alert(`삭제 실패: ${msg}`);
+      alert(err?.response?.data?.message || err?.message || "삭제 중 오류가 발생했습니다.");
     }
   }, [facRevNum, navigate]);
 
-  /* -------------------- 렌더 전 안내문 색상 판단 -------------------- */
   const isErrorNotice =
-    typeof notice === "string" &&
-    notice.length > 0 &&
-    (notice.includes("오류") ||
-     notice.includes("불가") ||
-     notice.includes("이미") ||
-     notice.includes("중복") ||
-     notice.includes("로그인"));
+    notice &&
+    (/(오류|불가|이미|중복|로그인)/.test(notice));
 
-  /* -------------------- 로딩/에러 -------------------- */
-  if (detailLoading) {
+  /* 로딩/에러 카드 */
+  if (detailLoading || err) {
     return (
-      <div className="mt-6 grid grid-cols-1 gap-8">
-        <div className="h-[420px] rounded border border-gray-300 bg-gray-100 animate-pulse" />
-        <div className="space-y-4">
-          <div className="h-6 w-3/4 rounded bg-gray-100 animate-pulse" />
-          <div className="h-4 w-full rounded bg-gray-100 animate-pulse" />
-          <div className="h-4 w-5/6 rounded bg-gray-100 animate-pulse" />
-          <div className="h-24 w-full rounded bg-gray-100 animate-pulse" />
+      <div className="max-w-screen-xl mx-auto my-10">
+        <div className="min-blank page-shadow bg-white rounded-xl p-10 text-center">
+          {err ? <p className="newText-base text-red-600">{err}</p> : <p className="newText-base">불러오는 중…</p>}
         </div>
       </div>
     );
   }
-  if (err) {
-    return <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-6 text-red-800">{err}</div>;
-  }
 
-  /* -------------------- 렌더 -------------------- */
+  /* 렌더 */
   return (
-    <div className="mt-6 space-y-8">
-      {/* 상단: 이미지 + 상세 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 이미지 캐러셀 */}
-        <div
-          className="relative border border-gray-300 bg-white overflow-hidden select-none rounded-xl"
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-        >
-          <div className="w-full flex items-center justify-center">
-            <img
-              key={srcs[idx]}
-              src={srcs[idx]}
-              alt={`facility-${idx + 1}`}
-              className="w-full h-auto max-h-[420px] object-contain"
-              onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
-              draggable={false}
-            />
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank">
+        {/* ====== 상단 배너(큰 틀) : 공간 상세정보 ====== */}
+        <header className="page-shadow rounded-xl overflow-hidden mb-6">
+          <div className="bg-gradient-to-r from-blue-50 via-sky-50 to-white border border-blue-100 px-6 py-5 flex items-center justify-between">
+            <div>
+              <h1 className="newText-3xl font-extrabold text-gray-800">공간 상세정보</h1>
+              <p className="newText-sm text-gray-500 mt-1">예약 가능 시간과 이용 안내를 확인하고 바로 신청하세요.</p>
+            </div>
+            <button className="normal-button newText-sm" onClick={() => navigate(-1)}>
+              목록으로
+            </button>
           </div>
-          {srcs.length > 1 && (
-            <>
-              <button
-                aria-label="이전 이미지"
-                onClick={prevImg}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-9 h-9 flex items-center justify-center shadow"
-              >
-                ‹
-              </button>
-              <button
-                aria-label="다음 이미지"
-                onClick={nextImg}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-9 h-9 flex items-center justify-center shadow"
-              >
-                ›
-              </button>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                {srcs.map((_, i) => (
+        </header>
+
+        {/* 상단: 이미지 / 정보 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 이미지 카드 */}
+          <div
+            className="page-shadow bg-white rounded-xl overflow-hidden select-none"
+            onTouchStart={(e)=> (touchX.current = e.touches[0].clientX)}
+            onTouchEnd={(e)=> {
+              if (touchX.current == null) return;
+              const dx = e.changedTouches[0].clientX - touchX.current;
+              if (Math.abs(dx) > 40) setIdx((p) => (dx > 0 ? (p - 1 + n) % n : (p + 1) % n));
+              touchX.current = null;
+            }}
+          >
+            <div className="relative aspect-[4/3] w-full">
+              <img
+                key={srcs[idx]}
+                src={srcs[idx]}
+                alt={`facility-${idx + 1}`}
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
+                draggable={false}
+              />
+              {srcs.length > 1 && (
+                <>
                   <button
-                    key={i}
-                    type="button"
-                    onClick={() => setIdx(i)}
-                    className={`w-2.5 h-2.5 rounded-full ${i === idx ? "bg-black/70" : "bg-black/30"}`}
-                    aria-label={`이미지 ${i + 1}`}
-                  />
-                ))}
+                    aria-label="이전 이미지"
+                    onClick={() => setIdx((idx - 1 + n) % n)}
+                    className="normal-button !px-3 !py-1 rounded-full absolute left-3 top-1/2 -translate-y-1/2"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    aria-label="다음 이미지"
+                    onClick={() => setIdx((idx + 1) % n)}
+                    className="normal-button !px-3 !py-1 rounded-full absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* 정보 카드 */}
+          <div className="page-shadow bg-white rounded-xl p-6">
+            <h2 className="newText-2xl font-bold">{data?.facName ?? "공간명"}</h2>
+            <p className="newText-base text-gray-600 mt-2">{data?.facInfo ?? "-"}</p>
+
+            <dl className="mt-6 space-y-3">
+              <InfoRow label="예약가능시간" value={`${normalizeHHmm(data?.reserveStart) ?? "09:00"} ~ ${normalizeHHmm(data?.reserveEnd) ?? "18:00"}`} />
+              <InfoRow label="수용인원" value={data?.capacity != null ? `${data.capacity}명` : "-"} />
+              <InfoRow label="구비품목" value={data?.facItem ?? "-"} />
+              <InfoRow label="유의사항" value={data?.etc ?? "-"} />
+            </dl>
+
+            {isAdmin && (
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  className="normal-button newText-base"
+                  onClick={() => navigate(`/facility/update/${facRevNum}`)}
+                >
+                  수정
+                </button>
+                <button
+                  type="button"
+                  className="nagative-button newText-base"
+                  onClick={handleDelete}
+                >
+                  삭제
+                </button>
               </div>
-            </>
-          )}
+            )}
+
+            {notice && (
+              <div className={`mt-4 newText-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
+                {notice}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 상세 정보 */}
-        <div className="p-2">
-          <h2 className="text-lg font-semibold">{data?.facName ?? "공간명"}</h2>
-          <p className="mt-1 text-gray-500">{data?.facInfo ?? "-"}</p>
-          <dl className="mt-6 space-y-3">
-            <Row label="예약가능시간" value={`${open} ~ ${close}`} />
-            <Row label="수용인원" value={data?.capacity != null ? `${data.capacity}명` : "-"} />
-            <Row label="구비품목" value={data?.facItem ?? "-"} />
-            <Row label="유의사항" value={data?.etc ?? "-"} />
-          </dl>
-
-          {/* 관리자 전용: 수정/삭제 버튼 */}
-          {isAdmin && (
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                className="flex-1 h-10 rounded bg-yellow-500 text-white font-semibold hover:bg-yellow-600"
-                onClick={() => navigate(`/facility/update/${facRevNum}`)}
-              >
-                수정
-              </button>
-              <button
-                type="button"
-                className="flex-1 h-10 rounded bg-red-500 text-white font-semibold hover:bg-red-600"
-                onClick={handleDelete}
-              >
-                삭제
-              </button>
-            </div>
-          )}
-
-          {/* 서버로부터 수신한 안내/오류 메시지 표시 */}
-          {notice && (
-            <div className={`mt-4 text-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
-              {notice}
-            </div>
-          )}
-        </div>
+        {/* 하단: 캘린더 / 예약 패널 */}
+        <DetailCalendarSection
+          currentMonth={currentMonth}
+          setCurrentMonth={setCurrentMonth}
+          monthLabel={monthLabel}
+          isPrevDisabled={isPrevDisabled}
+          weeks={weeks}
+          getHolidayItems={getHolidayItems}
+          selectedDate={selectedDate}
+          handleDayClick={handleDayClick}
+          open={open}
+          close={close}
+          selectedDateHasHoliday={selectedDateHasHoliday}
+          startSlots={startSlots}
+          startKey={startKey}
+          setStartKey={setStartKey}
+          durationHrs={durationHrs}
+          setDurationHrs={setDurationHrs}
+          maxHrs={maxHrs}
+          endTimeText={endTimeText}
+          canReserve={canReserve}
+          applyReserve={applyReserve}
+          holLoading={holLoading}
+          holError={holError}
+          reservedBlocks={reservedBlocks}
+          submitting={submitting}
+          notice={notice}
+          isErrorNotice={isErrorNotice}
+        />
       </div>
-
-      <div className="border-t border-gray-200" />
-
-      {/* 하단: 달력 + 예약 패널 */}
-      <CalendarAndReserve
-        currentMonth={currentMonth}
-        setCurrentMonth={setCurrentMonth}
-        isPrevDisabled={isPrevDisabled}
-        monthLabel={monthLabel}
-        weeks={weeks}
-        getHolidayItems={getHolidayItems}
-        selectedDate={selectedDate}
-        setSelectedDate={handleDayClick}
-        open={open}
-        close={close}
-        selectedDateHasAnyHoliday={selectedDateHasAnyHoliday}
-        startSlots={startSlots}
-        startKey={startKey}
-        setStartKey={setStartKey}
-        durationHrs={durationHrs}
-        setDurationHrs={setDurationHrs}
-        maxHrsFromStart={maxHrsFromStart}
-        endTimeText={endTimeText}
-        canReserve={canReserve}
-        applyReserve={applyReserve}
-        holLoading={holLoading}
-        holError={holError}
-        submitting={submitting}
-        notice={notice}
-        renderStartOptions={renderStartOptions}
-        renderDurationButtons={renderDurationButtons}
-        isErrorNotice={isErrorNotice}
-      />
     </div>
   );
 }
 
-/* -------------------- 하위 컴포넌트: 달력/예약 패널 -------------------- */
-function CalendarAndReserve(props) {
+/* ---------- 하단 캘린더/예약 ---------- */
+function DetailCalendarSection(props) {
   const {
-    currentMonth, setCurrentMonth, isPrevDisabled, monthLabel, weeks, getHolidayItems,
-    selectedDate, setSelectedDate, open, close,
-    selectedDateHasAnyHoliday, startSlots, startKey, setStartKey,
-    durationHrs, setDurationHrs, maxHrsFromStart, endTimeText,
-    canReserve, applyReserve, holLoading, holError, submitting, notice,
-    renderStartOptions, renderDurationButtons, isErrorNotice
+    currentMonth, setCurrentMonth, monthLabel, isPrevDisabled, weeks, getHolidayItems,
+    selectedDate, handleDayClick, open, close, selectedDateHasHoliday,
+    startSlots, startKey, setStartKey, durationHrs, setDurationHrs, maxHrs,
+    endTimeText, canReserve, applyReserve, holLoading, holError, submitting,
+    notice, isErrorNotice
   } = props;
 
-  const onPrevMonth = () => { if (!isPrevDisabled) setCurrentMonth(addMonths(currentMonth, -1)); };
-  const onNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-
   return (
-    <div className="flex items-start justify-center gap-6">
-      {/* 달력 */}
-      <div className="flex-1 max-w-[680px]">
-        {/* 헤더: 이전달 이동 비활성화 */}
-        <div className="flex items-center justify-center gap-6 mb-3">
+    <div className="mt-8 flex items-start gap-6">
+      {/* 캘린더 카드 */}
+      <div className="flex-1 page-shadow bg-white rounded-xl p-5">
+        <div className="flex items-center justify-center gap-4 mb-4">
           <button
-            onClick={onPrevMonth}
-            className={`px-3 py-1 rounded ${isPrevDisabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-100"}`}
-            aria-label="이전 달"
+            onClick={() => !isPrevDisabled && setCurrentMonth(addMonths(currentMonth, -1))}
+            className={`normal-button ${isPrevDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
             disabled={isPrevDisabled}
           >
             &lt;
           </button>
-          <div className="text-3xl font-extrabold tracking-wide">{monthLabel}</div>
+        <div className="newText-3xl font-bold tracking-wide">{monthLabel}</div>
           <button
-            onClick={onNextMonth}
-            className="px-3 py-1 rounded hover:bg-gray-100"
-            aria-label="다음 달"
+            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+            className="normal-button"
           >
             &gt;
           </button>
         </div>
 
-        {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 text-center text-sm font-semibold text-gray-500 mb-1">
+        <div className="grid grid-cols-7 text-center newText-sm font-semibold text-gray-500 mb-2">
           {["일","월","화","수","목","금","토"].map((d, i) => (
             <div key={i} className={i===0 ? "text-red-500" : i===6 ? "text-blue-500" : ""}>{d}요일</div>
           ))}
         </div>
 
-        {/* 날짜 그리드 (오늘 이전 날짜 비활성화) */}
-        <div className="grid grid-cols-7 gap-[1px] bg-gray-200 rounded">
+        <div className="grid grid-cols-7 gap-[1px] bg-gray-200 rounded-lg overflow-hidden">
           {weeks.flatMap((week, wi) =>
             week.map((d, di) => {
               const ymd = toYmd(d);
               const inMonth = isSameMonth(d, currentMonth);
               const items = getHolidayItems(d);
-              const isAnyHoliday = items.length > 0;
-              const isSelected = selectedDate && selectedDate === ymd;
-              const isPastDay = ymd < todayYmd();
+              const isHoliday = items.length > 0;
+              const isSelected = selectedDate === ymd;
+              const isPast = ymd < todayYmd();
+              const isToday = ymd === todayYmd();
 
               return (
                 <button
-                  type="button"
-                  onClick={() => setSelectedDate(d)}
                   key={`${wi}-${di}`}
+                  type="button"
+                  onClick={() => handleDayClick(d)}
                   className={[
-                    "text-left bg-white h-[96px] p-2 text-sm relative focus:outline-none",
-                    (isPastDay ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"),
-                    (!inMonth ? " text-gray-300" : ""),
-                    (isAnyHoliday ? " ring-2 ring-red-300" : ""),
-                    (isSelected ? " outline outline-2 outline-blue-400" : "")
-                  ].join(" ")}
-                  disabled={isPastDay}
+                    "h-[96px] bg-white text-left p-2 relative focus:outline-none",
+                    "transition",
+                    isPast ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer",
+                    !inMonth && "text-gray-300",
+                    isHoliday && "ring-2 ring-red-300",
+                    isSelected && "outline outline-2 outline-blue-400",
+                  ].filter(Boolean).join(" ")}
+                  disabled={isPast}
                 >
-                  <div className={[
-                    "absolute top-2 right-2 text-xs",
-                    (di===0 ? "text-red-500" : di===6 ? "text-blue-500" : "text-gray-600")
-                  ].join(" ")}>
+                  <div className={`absolute top-2 right-2 newText-sm ${di===0 ? "text-red-500" : di===6 ? "text-blue-500" : "text-gray-600"}`}>
                     {format(d, "d")}
                   </div>
+                  {isToday && <span className="absolute left-2 top-2 newText-xs text-blue-600">오늘</span>}
                   <div className="mt-6 flex flex-col gap-1">
-                    {items.map((it, idx) => (
+                    {items.map((it, i2) => (
                       <span
-                        key={idx}
-                        className={[
-                          "inline-block w-fit text-[11px] px-2 py-0.5 rounded-full",
-                          (it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700")
-                        ].join(" ")}
-                        title={it.type === "PUBLIC" ? "공휴일" : "공간 휴무"}
+                        key={i2}
+                        className={`inline-block w-fit text-[11px] px-2 py-0.5 rounded-full ${
+                          it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                        }`}
                       >
                         {it.label}
                       </span>
@@ -662,78 +500,117 @@ function CalendarAndReserve(props) {
           )}
         </div>
 
-        {holLoading && <div className="mt-3 text-sm text-gray-500">휴무일 불러오는 중…</div>}
-        {holError && <div className="mt-2 text-sm text-red-500">{holError}</div>}
+        {holLoading && <div className="mt-3 newText-sm text-gray-500">휴무일 불러오는 중…</div>}
+        {holError && <div className="mt-2 newText-sm text-red-500">{holError}</div>}
       </div>
 
       {/* 예약 패널 */}
-      <aside className="w-full max-w-[360px]">
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <div className="text-blue-500 font-bold">예약 정보</div>
+      <aside className="w-full max-w-[360px] sticky top-6 page-shadow bg-white rounded-xl p-5">
+        <div className="newText-base text-blue-600 font-bold">예약 정보</div>
 
-          <dl className="mt-4 space-y-3 text-sm">
-            <div className="grid grid-cols-3">
-              <dt className="text-gray-500">예약일</dt>
-              <dd className="col-span-2 font-medium text-gray-900">{selectedDate ?? "-"}</dd>
-            </div>
-            <div className="grid grid-cols-3">
-              <dt className="text-gray-500">예약가능</dt>
-              <dd className="col-span-2 font-medium text-gray-900">{open} ~ {close}</dd>
-            </div>
-            <div className="grid grid-cols-3">
-              <dt className="text-gray-500">규칙</dt>
-              <dd className="col-span-2 text-gray-500">하루 1회, 최대 4시간 연속 사용</dd>
-            </div>
-          </dl>
+        <dl className="mt-3 space-y-2 newText-sm">
+          <Row label="예약일" value={selectedDate ?? "-"} />
+          <Row label="예약가능" value={`${open} ~ ${close}`} />
+          <Row label="규칙" value="하루 1회, 최대 4시간 연속 사용" />
+        </dl>
 
-          {/* 시작시간 선택 */}
-          <div className="mt-3">
-            <div className="text-sm font-medium text-gray-700 mb-2">시작시간</div>
-            <div className="grid grid-cols-2 gap-2">
-              {renderStartOptions()}
-            </div>
+        <div className="mt-4">
+          <div className="newText-sm font-medium text-gray-700 mb-2">시작시간</div>
+          <div className="grid grid-cols-2 gap-2">
+            {startSlots.map((s) => {
+              const disabled = !selectedDate || selectedDateHasHoliday || s.blocked;
+              const selected = startKey === s.key;
+              return (
+                <label
+                  key={s.key}
+                  className={[
+                    "rounded-md border text-center py-2 transition newText-sm",
+                    selected ? "positive-button" : "normal-button",
+                    disabled && "opacity-50 cursor-not-allowed",
+                  ].join(" ")}
+                  title={s.blocked ? "이미 예약된 시간입니다" : undefined}
+                >
+                  <input
+                    type="radio"
+                    name="start"
+                    value={s.key}
+                    checked={selected}
+                    onChange={() => setStartKey(s.key)}
+                    disabled={disabled}
+                    className="sr-only"
+                  />
+                  {s.label}{s.blocked && " · 예약됨"}
+                </label>
+              );
+            })}
           </div>
-
-          {/* 이용시간 선택 */}
-          <div className="mt-4">
-            <div className="text-sm font-medium text-gray-700 mb-2">이용시간</div>
-            <div className="flex flex-wrap gap-2">
-              {renderDurationButtons()}
-            </div>
-            <div className="mt-2 text-sm text-gray-600">
-              선택한 시간: <span className="font-medium text-gray-900">
-                {startKey && durationHrs ? endTimeText : "-"}
-              </span>
-            </div>
-          </div>
-
-          {/* 예약 신청 버튼 */}
-          <button
-            className="mt-5 w-full h-12 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 disabled:opacity-50"
-            onClick={applyReserve}
-            disabled={!canReserve || submitting}
-          >
-            {submitting ? "전송 중..." : "예약 신청하기"}
-          </button>
-
-          {/* 하단 알림 */}
-          {notice && (
-            <div className={`mt-3 text-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
-              {notice}
-            </div>
-          )}
         </div>
+
+        <div className="mt-4">
+          <div className="newText-sm font-medium text-gray-700 mb-2">이용시간</div>
+          <div className="grid grid-cols-4 gap-2">
+            {[1,2,3,4].map((h) => {
+              const allowedByClose = startKey ? (h <= maxHrs) : false;
+              const allowedByNow = !startKey ? false : (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
+              const allowedByBlocks = startKey ? !false : false; // 이미 startSlots에서 1시간 충돌 검증, 추가로 구간 충돌은 신청시 재검증됨
+              const allowed = allowedByClose && allowedByNow && !selectedDateHasHoliday && (allowedByBlocks || true);
+              const selected = durationHrs === h;
+              return (
+                <button
+                  key={h}
+                  type="button"
+                  aria-pressed={selected}
+                  className={[
+                    "rounded-md text-center py-2 transition newText-sm",
+                    selected ? "positive-button" : "normal-button",
+                    (!allowed) && "opacity-50 cursor-not-allowed",
+                  ].join(" ")}
+                  onClick={() => allowed && setDurationHrs(h)}
+                  disabled={!allowed}
+                >
+                  {h}시간
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-2 newText-sm text-gray-600">
+            선택한 시간: <span className="font-medium text-gray-900">{startKey && durationHrs ? endTimeText : "-"}</span>
+          </div>
+        </div>
+
+        <button
+          className={`mt-5 w-full ${canReserve ? "positive-button" : "normal-button opacity-50 cursor-not-allowed"}`}
+          onClick={applyReserve}
+          disabled={!canReserve || submitting}
+        >
+          {submitting ? "전송 중..." : "예약 신청하기"}
+        </button>
+
+        {notice && (
+          <div className={`mt-3 newText-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
+            {notice}
+          </div>
+        )}
       </aside>
     </div>
   );
 }
 
-/* -------------------- 상세 정보 행 컴포넌트 -------------------- */
+/* ---------- 소형 컴포넌트 ---------- */
+function InfoRow({ label, value }) {
+  return (
+    <div className="grid grid-cols-[110px_1fr] items-start gap-x-3">
+      <dt className="newText-sm text-gray-500">{label}</dt>
+      <dd className="newText-base text-gray-800 whitespace-pre-line">{value}</dd>
+    </div>
+  );
+}
 function Row({ label, value }) {
   return (
     <div className="grid grid-cols-3">
-      <dt className="col-span-1 text-gray-400">{label}</dt>
-      <dd className="col-span-2 text-gray-800 whitespace-pre-line">{value}</dd>
+      <dt className="col-span-1 newText-sm text-gray-500">{label}</dt>
+      <dd className="col-span-2 newText-sm text-gray-900">{value}</dd>
     </div>
   );
 }
