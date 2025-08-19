@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { getRegAdminSearch, getRegAdmin, updateRegstate } from "../../api/adminApi";
 import useMove from "../../hooks/useMove";
 import { useSelector } from "react-redux";
+import defaultImage from '../../assets/default.jpg';
 const AdminRegComponent = () => {
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN"); // 권한이 admin인지 확인
-
 
     useEffect(() => { // 권한 체크 useEffect
         if (!isAdmin) {
@@ -33,7 +33,6 @@ const AdminRegComponent = () => {
     const [current, setCurrent] = useState(initState.currentPage); // 현재 페이지 정보를 담는 state 변수
     const [pageData, setPageData] = useState(initState); // 페이지 정보를 담는 state 변수
     const [statusFilter, setStatusFilter] = useState(""); // status값으로 필터링 위한 state 변수
-
     useEffect(() => { // 현재 페이지, 정렬 칼럼, 정렬 방식, 상태값이 변하면 리랜더링
         fetchData();
     }, [current, sortBy, sort, statusFilter]);
@@ -101,158 +100,155 @@ const AdminRegComponent = () => {
     };
 
     return (
+        <>
+            <div className="max-w-screen-xl mx-auto my-10 overflow-x-auto">
+                <div className="min-blank">
+                    <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
+                    <div className="py-2">
+                        <SearchComponent
+                            search={search} // 검색어
+                            setSearch={setSearch} // 검색어 set
+                            type={type} // 검색어 칼럼
+                            setType={setType} // 검색어 칼럼 set
+                            onSearchClick={onSearchClick} // 검색어 클릭 함수
+                            searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
+                        />
+                    </div>
 
-        <div className="max-w-screen-xl mx-auto my-10 ">
-            <div className="newText-2xl min-blank font-bold mb-4 ">물품 등록 관리</div>
-            <div className="mb-4 flex justify-start w-full max-w-md">
-                <SearchComponent
-                    search={search} // 검색어
-                    setSearch={setSearch} // 검색어 set
-                    type={type} // 검색어 칼럼
-                    setType={setType} // 검색어 칼럼 set
-                    onSearchClick={onSearchClick} // 검색어 클릭 함수
-                    searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
-                />
-            </div>
+                    <table className="min-w-full">
+                        <thead className="bg-gray-100 text-gray-700 newText-base">
+                            <tr className="newText-base">
+                                <th className="w-[8%]">이미지</th>
+                                <th className="w-[8%]">아이디</th>
+                                <th className="w-[14%]">전화번호</th>
+                                <th className="w-[14%]">주소</th>
+                                <th className="w-[10%]">기업명</th>
+                                <th className="w-[10%]">상품명</th>
+                                <th className="w-[10%]">상품 갯수</th>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse table-fixed">
-                    <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
-                        <tr>
-                            <th className="py-3 px-2 text-center rounded-tl-lg whitespace-nowrap w-[70px]">이미지</th>
-                            <th
-                                className="py-3 px-2 border-b cursor-pointer select-none whitespace-nowrap w-[100px] text-center"
-                                onClick={() => handleSortChange("memId")}
-                            >
-                                아이디
-                            </th>
-                            <th className="py-3 px-2 border-b whitespace-nowrap w-[110px] text-center">전화번호</th>
-                            <th className="py-3 px-2 border-b whitespace-nowrap w-[150px] text-center truncate">주소</th>
-                            <th className="py-3 px-2 border-b whitespace-nowrap w-[120px] text-center truncate">기업명</th>
-                            <th className="py-3 px-2 border-b whitespace-nowrap w-[130px] text-center truncate">상품명</th>
-                            <th className="py-3 px-2 border-b whitespace-nowrap w-[80px] text-center">상품 갯수</th>
-
-                            <th className="py-3 px-2 border-b text-center w-[90px]">
-                                <div className="mb-1">신청상태</div>
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => {
-                                        setStatusFilter(e.target.value);
-                                        setCurrent(0);
-                                    }}
-                                    className="border rounded px-1 text-xs w-full"
-                                >
-                                    <option value="">전체</option>
-                                    <option value="REJECT">거부</option>
-                                    <option value="ACCEPT">수락</option>
-                                    <option value="WAIT">대기</option>
-                                    <option value="CANCEL">취소</option>
-                                    <option value="EXPIRED">만료</option>
-                                </select>
-                            </th>
-
-                            {[{ label: "만료일", value: "expDate" }, { label: "등록일", value: "regDate" }].map(
-                                ({ label, value }) => (
-                                    <th
-                                        key={value}
-                                        onClick={() => handleSortChange(value)}
-                                        className="cursor-pointer text-center select-none py-3 px-2 whitespace-nowrap w-[100px]"
+                                <th className="w-[10%]">
+                                    <div className="mb-1">신청상태</div>
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) => {
+                                            setStatusFilter(e.target.value);
+                                            setCurrent(0);
+                                        }}
                                     >
-                                        <div className="flex items-center justify-center space-x-1">
-                                            <span>{label}</span>
-                                            <div className="flex flex-col">
-                                                <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
-                                                    ▲
-                                                </span>
-                                                <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
-                                                    ▼
-                                                </span>
+                                        <option value="">전체</option>
+                                        <option value="REJECT">거부</option>
+                                        <option value="ACCEPT">수락</option>
+                                        <option value="WAIT">대기</option>
+                                        <option value="CANCEL">취소</option>
+                                        <option value="EXPIRED">만료</option>
+                                    </select>
+                                </th>
+
+                                {[{ label: "만료일", value: "expDate" }, { label: "등록일", value: "regDate" }].map(
+                                    ({ label, value }) => (
+                                        <th
+                                            key={value}
+                                            onClick={() => handleSortChange(value)}
+                                            className="cursor-pointer w-[8%]"
+                                        >
+                                            <div className="flex items-center justify-center space-x-1">
+                                                <span>{label}</span>
+                                                <div className="flex flex-col">
+                                                    <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
+                                                        ▲
+                                                    </span>
+                                                    <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
+                                                        ▼
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </th>
-                                )
-                            )}
-                        </tr>
-                    </thead>
-
-                    <tbody className="text-gray-600 text-xs">
-                        {regInfo.content.length === 0 ? (
-                            <tr>
-                                <td colSpan={10} className="text-center">
-                                    <p className="text-gray-500 text-lg mt-20">등록된 신청이 없습니다.</p>
-                                </td>
+                                        </th>
+                                    )
+                                )}
                             </tr>
-                        ) : (
-                            regInfo.content.map((data) => {
-                                const mainImage = data.imageList?.find((img) => img.isMain);
+                        </thead>
 
-                                return (
-                                    <tr key={data.demRegNum} className="border-b hover:bg-gray-50">
-                                        <td className="py-2 px-2 whitespace-nowrap text-center">
-                                            {mainImage ? (
-                                                <img
-                                                    src={`http://localhost:8090/view/${mainImage.imageUrl}`}
-                                                    alt={data.demName}
-                                                    onClick={() => moveToPath(`../../demonstration/detail/${data.demNum}`)}
-                                                    className="w-16 h-16 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer mx-auto"
-                                                />
-                                            ) : (
-                                                <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-md mx-auto text-[10px]">
-                                                    이미지 없음
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center">{data.memId}</td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center">{data.phone || "-"}</td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center truncate max-w-[120px]" title={data.addr}>
-                                            {data.addr || "-"}
-                                        </td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center truncate max-w-[120px]" title={data.companyName}>
-                                            {data.companyName || "-"}
-                                        </td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center truncate max-w-[130px]" title={data.demName}>
-                                            {data.demName || "-"}
-                                        </td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center">{data.itemNum ?? "-"}</td>
+                        <tbody className="text-gray-600">
+                            {regInfo.content.length === 0 ? (
+                                <tr>
+                                    <td colSpan={10} className="text-center">
+                                        <p className="text-gray-500 newText-3xl mt-20">등록된 신청이 없습니다.</p>
+                                    </td>
+                                </tr>
+                            ) : (
+                                regInfo.content.map((data) => {
+                                    const mainImage = data.imageList?.find((img) => img.isMain);
 
-                                        <td className="py-1 px-2 font-semibold whitespace-nowrap text-center">
-                                            <div>{getStateLabel(data.state)}</div>
-                                            {data.state === "WAIT" && (
-                                                <div className="mt-1 whitespace-nowrap">
-                                                    <button
-                                                        className="inline-block min-w-[50px] px-2 py-0.5 bg-green-500 text-white rounded text-[10px] mr-1"
-                                                        onClick={() => handleRental(data.demRegNum, "ACCEPT")}
-                                                    >
-                                                        수락
-                                                    </button>
-                                                    <button
-                                                        className="inline-block min-w-[50px] px-2 py-0.5 bg-red-500 text-white rounded text-[10px]"
-                                                        onClick={() => handleRental(data.demRegNum, "REJECT")}
-                                                    >
-                                                        거절
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </td>
+                                    return (
+                                        <tr key={data.demRegNum} className="hover:bg-gray-50 newText-sm text-center whitespace-nowrap">
+                                            <td>
+                                                {mainImage ? (
+                                                    <img
+                                                        src={`http://localhost:8090/view/${mainImage.imageUrl}`}
+                                                        alt={data.demName}
+                                                        onClick={() => moveToPath(`../../demonstration/detail/${data.demNum}`)}
+                                                        className="min-w-20 min-h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                    />
+                                                ) : (
+                                                    <img
+                                                        src={defaultImage}
+                                                        alt="default"
+                                                        className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                    />
+                                                )}
+                                            </td>
+                                            <td title={data.memId}>{data.memId}</td>
+                                            <td title={data.title}>{data.phone || "-"}</td>
+                                            <td title={data.addr} className="truncate max-w-[14%]" >
+                                                {data.addr || "-"}
+                                            </td>
+                                            <td title={data.companyName}>
+                                                {data.companyName || "-"}
+                                            </td>
+                                            <td title={data.demName}>
+                                                {data.demName || "-"}
+                                            </td>
+                                            <td>{data.itemNum ?? "-"}</td>
 
-                                        <td className="py-1 px-2 whitespace-nowrap text-center">
-                                            {data.expDate ? new Date(data.expDate).toLocaleDateString() : "-"}
-                                        </td>
-                                        <td className="py-1 px-2 whitespace-nowrap text-center">
-                                            {data.regDate ? new Date(data.regDate).toLocaleDateString() : "-"}
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        )}
-                    </tbody>
-                </table>
+                                            <td>
+                                                <div>{getStateLabel(data.state)}</div>
+                                                {data.state === "WAIT" ? (
+                                                    <div>
+                                                        <button
+                                                            button className="inline-block green-button text-[10px] px-2 py-1 leading-none mr-1"
+                                                            onClick={() => handleRental(data.demRegNum, "ACCEPT")}
+                                                        >
+                                                            수락
+                                                        </button>
+
+                                                        <button
+                                                            button className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
+                                                            onClick={() => handleRental(data.demRegNum, "REJECT")}
+                                                        >
+                                                            거절
+                                                        </button>
+                                                    </div>
+                                                ) : <></>}
+                                            </td>
+
+                                            <td>
+                                                {data.expDate ? new Date(data.expDate).toLocaleDateString() : "-"}
+                                            </td>
+                                            <td>
+                                                {data.regDate ? new Date(data.regDate).toLocaleDateString() : "-"}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center my-6">
                 <PageComponent totalPages={pageData.totalPages} current={current} setCurrent={setCurrent} />
             </div>
-        </div>
+        </>
     );
 }
 export default AdminRegComponent;
