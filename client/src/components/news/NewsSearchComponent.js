@@ -104,15 +104,13 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                 <div className="flex justify-center gap-2">
                     <button
                         type="submit"
-                        // 검정버튼 만들면 변경
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors newText-sm font-medium"
+                        className="dark-button newText-sm"
                     >검색
                     </button>
                     <button
                         type="button"
                         onClick={handleReset}
-                        // 검정버튼 만들면 변경
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors newText-sm font-medium"
+                        className="dark-button newText-sm"
                     >초기화
                     </button>  
                 </div>
