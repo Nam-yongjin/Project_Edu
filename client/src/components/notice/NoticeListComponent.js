@@ -135,11 +135,11 @@ const NoticeListComponent = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full table-fixed">
+              <table className="w-full table-auto">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     {loginState.role === 'ADMIN' && ( //관리자만 선택 가능
-                      <th className="w-12 px-2 py-3 text-center align-middle">
+                      <th className="w-12 px-2 py-3 text-center hidden sm:table-cell">
                         <input
                           type="checkbox"
                           checked={selectedNotices.length === notices.length && notices.length > 0}
@@ -150,9 +150,9 @@ const NoticeListComponent = () => {
                     )}
                     <th className="w-16 px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
                     <th className="px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
-                    <th className="w-28 px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
-                    <th className="w-36 px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
-                    <th className="w-24 px-3 py-3 text-center newText-sm font-medium text-gray-900">조회수</th>
+                    <th className="min-w-[70px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                    <th className="min-w-[90px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
+                    <th className="min-w-[70px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -172,7 +172,7 @@ const NoticeListComponent = () => {
                         className={`hover:bg-gray-50 ${notice.isPinned ? 'bg-yellow-50' : ''}`}
                       >
                         {loginState.role === 'ADMIN' && (
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 hidden sm:table-cell">
                             <input
                               type="checkbox"
                               checked={selectedNotices.includes(notice.noticeNum)}
@@ -181,9 +181,9 @@ const NoticeListComponent = () => {
                             />
                           </td>
                         )}
-                        <td className="px-4 py-3 text-center newText-sm text-gray-900">
+                        <td className="px-2 py-3 text-center newText-sm text-gray-900">
                           {notice.isPinned ? (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <span className="inline-block min-w-[40px] px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
                               공지
                             </span>
                           ) : (
@@ -192,16 +192,19 @@ const NoticeListComponent = () => {
                             totalElements - pinnedNotices.length - (currentPage * searchParams.size) - (index - pinnedNotices.length)
                           )}
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center">
+                        {/* 제목 */}
+                        <td className="px-2 py-3">
+                          <div className="flex items-center space-x-2">
                             <Link //제목 누르면 상세페이지로 넘어감
                               to={`/notice/NoticeDetail/${notice.noticeNum}`}
-                              className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                              className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate max-w-[100px] lg:max-w-[400px]"
+                              title={notice.title} // 마우스 오버 시 전체 제목 툴팁으로 표시
                             >
                               {notice.title}
                             </Link>
+                            {/* 첨부파일 아이콘 */}
                             {notice.fileCount > 0 && (
-                              <span className="ml-2 inline-flex items-center">
+                              <span className="inline-flex items-center flex-shrink-0">
                                 <svg 
                                   className="w-4 h-4 text-gray-400" 
                                   fill="none" 
@@ -217,8 +220,9 @@ const NoticeListComponent = () => {
                                 </svg>
                               </span>
                             )}
+                            {/* 고정글 아이콘 */}
                             {notice.isPinned && (
-                              <span className="ml-2 inline-flex items-center">
+                              <span className="inline-flex items-center flex-shrink-0">
                                 <svg 
                                   className="w-4 h-4 text-red-500" 
                                   fill="currentColor" 
@@ -234,13 +238,14 @@ const NoticeListComponent = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500">
+                        {/* overflow 방지 whitespace-nowrap*/}
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[70px]">
                           {notice.name}
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[90px]">
                           {formatDate(notice.createdAt)}
                         </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500">
+                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[70px] hidden sm:table-cell">
                           {notice.viewCount?.toLocaleString() || 0}
                         </td>
                       </tr>
