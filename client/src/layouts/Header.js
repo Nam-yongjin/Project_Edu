@@ -47,15 +47,17 @@ const Header = () => {
     },
     {
       name: "프로그램",
-      link: "/event",
+      link: "/event/info",
       sub: [
+        { name: "프로그램 소개", link: "/event/info" },
         { name: "프로그램 신청", link: "/event/list" },
       ],
     },
     {
       name: "공간 운영",
-      link: "/facility",
+      link: "/facility/info",
       sub: [
+        { name: "공간 소개", link: "/facility/info" },
         { name: "공간 예약", link: "/facility/list" },
       ],
     },

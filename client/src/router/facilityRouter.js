@@ -9,6 +9,7 @@ const FacilityDetailPage = lazy(() => import("../pages/facility/FacilityDetailPa
 const FacilityHolidayPage = lazy(() => import("../pages/facility/FacilityHolidayPage"))
 const FacilityReservationPage = lazy(() => import("../pages/facility/FacilityReservationPage"))
 const FacilityAdminReservationPage = lazy(() => import("../pages/facility/FacilityAdminReservationPage"))
+const FacilityInfoPage = lazy(() => import("../pages/facility/FacilityInfoPage"))
 
 const facilityRouter = () => {
 
@@ -40,6 +41,11 @@ const facilityRouter = () => {
         {
             path:"adminreservations",
             element: <Suspense fallback={<Loading />}><FacilityAdminReservationPage /></Suspense>,
+        },
+        
+        {
+            path:"info",
+            element: <Suspense fallback={<Loading />}><FacilityInfoPage /></Suspense>,
         },
         {
             // 자동 리다이렉션
