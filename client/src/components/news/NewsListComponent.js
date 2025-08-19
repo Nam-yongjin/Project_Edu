@@ -211,12 +211,12 @@ const NewsListComponent = () => {
 
         {/* 페이지네이션 */}
         <div className="flex justify-center mt-[50px]">
-          <PageComponent
-            totalPages={totalPages}
-            current={currentPage}
-            setCurrent={handlePageChange}
-          />
-        </div>
+          <PageComponent
+            totalPages={totalPages}
+            current={currentPage}
+            setCurrent={handlePageChange}
+          />
+        </div>
 
         {/* 하단 버튼 */}
         <div className="mb-8">

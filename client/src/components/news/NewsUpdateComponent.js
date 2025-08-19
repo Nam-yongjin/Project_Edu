@@ -323,9 +323,11 @@ const NewsUpdateComponent = () => {
                 <div className="flex justify-end space-x-4">
                     <button
                         className="green-button newText-sm"
+                        style={{ minWidth: "60px" }}
                         onClick={handleUpdate}>수정</button>
                     <button
                         className="nagative-button newText-sm"
+                        style={{ minWidth: "60px" }}
                         onClick={handleCancel}>취소</button>
                 </div>
             </div>
