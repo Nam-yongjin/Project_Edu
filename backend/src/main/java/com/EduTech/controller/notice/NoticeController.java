@@ -143,7 +143,7 @@ public class NoticeController {
                 .orElseThrow(() -> new EntityNotFoundException("파일을 찾을 수 없습니다. ID: " + notFileNum));
             
             // FileUtil을 사용하여 파일 다운로드
-            ResponseEntity<Resource> response = fileUtil.getFile(noticeFile.getFilePath(), null);
+            ResponseEntity<Resource> response = fileUtil.getFile(noticeFile.getFilePath());
             
             // 파일명을 한글로 다운로드하기 위한 헤더 설정
             String encodedFileName = URLEncoder.encode(noticeFile.getOriginalName(), StandardCharsets.UTF_8)
@@ -166,11 +166,11 @@ public class NoticeController {
     	try {
     		//noticeFiles에서 파일 찾기
     		String filePath = "notice-files/" + fileName;
-    		return fileUtil.getFile(filePath, "thumbnail");
+    		return fileUtil.getFile(filePath);
     		
     	} catch (Exception e) {
     		//파일을 찾을 수 없으면 기본 이미지 반환
-    		return fileUtil.getFile("default.png", null);
+    		return fileUtil.getFile("default.png");
     	}
     }
     
