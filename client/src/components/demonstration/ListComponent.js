@@ -4,7 +4,8 @@ import { getList } from "../../api/demApi";
 import PageComponent from "../common/PageComponent";
 import ImageSliderModal from "./ImageSliderModal";
 import useMove from "../../hooks/useMove";
-import SearchComponent from "../demonstration/SearchComponent"; 
+import SearchComponent from "../demonstration/SearchComponent";
+import { useSelector } from "react-redux";
 
 const ListComponent = () => {
   const initState = {
@@ -18,9 +19,10 @@ const ListComponent = () => {
   const [listData, setListData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
-  const { moveToPath } = useMove();
+  const { moveToPath, moveToLogin } = useMove();
   const [searchType, setSearchType] = useState("demName");
   const [search, setSearch] = useState("");
+  const loginState = useSelector((state) => state.loginState);
 
   const searchOptions = [
     { value: "demName", label: "상품명" },
@@ -85,12 +87,18 @@ const ListComponent = () => {
 
         <button
           disabled={item.itemNum === 0}
-          className={`mt-auto px-4 py-2 rounded-md shadow text-white ${
-            item.itemNum !== 0
+          className={`mt-auto px-4 py-2 rounded-md shadow text-white ${item.itemNum !== 0
               ? "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
               : "bg-gray-400 cursor-not-allowed"
-          }`}
-          onClick={() => moveToPath(`../detail/${item.demNum}`)}
+            }`}
+          onClick={() => {
+            if (loginState && loginState.memId) {
+              moveToPath(`../detail/${item.demNum}`)
+            } else {
+              alert("로그인이 필요합니다.");
+              moveToLogin();
+            }
+          }}
         >
           {item.itemNum !== 0 ? "대여 가능" : "대여 불가능"}
         </button>
