@@ -7,11 +7,17 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import '../swiperCss/main.css'
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { getAllBanners, getBannerImage, recordVisitor } from "../api/adminApi";
 
 import NoticeMainComponent from "../components/notice/NoticeMainComponent";
 import NewsMainComponent from "../components/news/NewsMainComponent";
 import EvtBannerComponent from "../components/event/EvtBannerComponent";
+
+import defaultImg from "../assets/default.jpg";
+import facilityMain from "../assets/facilityMain.jpg";
+import demonstrationMain from "../assets/demonstrationMain.jpg";
+import rightArrow from "../assets/rightArrow.png";
 
 const MainPage = () => {
     const [banners, setBanners] = useState([]);
@@ -65,6 +71,9 @@ const MainPage = () => {
                             ))}
                         </Swiper>
                     )}
+                    {banners.length === 0 && (
+                        <img src={defaultImg} className="w-full max-h-[70vh] aspect-video" />
+                    )}
 
                     <div className="min-blank absolute top-[30%] left-0 w-full z-20 pointer-events-none select-none">
                         <div className="max-w-screen-xl mx-auto">
@@ -77,12 +86,43 @@ const MainPage = () => {
                     </div>
                 </div>
                 <div className="my-10 max-w-screen-xl mx-auto ">
-                    <div className="min-blank my-10 grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                    <div className="min-blank my-10  ">
                         <EvtBannerComponent />
-                        <div className="px-6 py-4 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                    </div>
+                    <div className="min-blank my-10 ">
+                        <div className="px-6 pt-4 pb-8 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
                             <div className="newText-xl font-semibold mb-4">지원사업</div>
-                            <div>
-                                공간바로가기, 실증바로가기
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Link to={"/facility/info"}>
+                                    <div className="relative w-full aspect-[16/10] rounded-3xl overflow-hidden group">
+                                        <img
+                                            src={facilityMain}
+                                            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                            <span className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg">
+                                                공간대여 바로가기
+                                            </span>
+                                            <img src={rightArrow}/>
+                                            {/* <a href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Vector Squad - Flaticon</a> */}
+                                        </div>
+                                    </div>
+                                </Link>
+
+                                <Link to={"/demonstration/demInfo"}>
+                                    <div className="relative w-full aspect-[16/10] rounded-3xl overflow-hidden group">
+                                        <img
+                                            src={demonstrationMain}
+                                            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                            <span className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg">
+                                                실증대여 바로가기
+                                            </span>
+                                            <img src={rightArrow}/>
+                                        </div>
+                                    </div>
+                                </Link>
                             </div>
                         </div>
                     </div>

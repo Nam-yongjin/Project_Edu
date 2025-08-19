@@ -154,6 +154,9 @@ const Side = ({ isOpen, onClose }) => {
                                     }`}
                             >
                                 <li>
+                                    <Link to="/event/info" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>프로그램 소개</Link>
+                                </li>
+                                <li>
                                     <Link to="/event/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>프로그램 신청</Link>
                                 </li>
                                 {loginState.role === "ADMIN" ?
@@ -177,6 +180,9 @@ const Side = ({ isOpen, onClose }) => {
                                 className={`pl-4 transition-all duration-300 ease-in-out overflow-hidden ${openMenus['facility'] ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
                                     }`}
                             >
+                                <li>
+                                    <Link to="/facility/info" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 소개</Link>
+                                </li>
                                 <li>
                                     <Link to="/facility/list" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>공간 예약</Link>
                                 </li>

@@ -23,7 +23,7 @@ const SubEventHeader = () => {
                         <li className="mr-4 pb-2">
                             <Link
                                 to="/event/info"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/event/list") || location.pathname.includes("/event/detail")? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/event/info") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 프로그램소개

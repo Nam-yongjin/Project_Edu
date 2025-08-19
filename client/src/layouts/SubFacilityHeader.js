@@ -23,7 +23,7 @@ const SubFacilityHeader = () => {
                         <li className="mr-4 pb-2">
                             <Link
                                 to="/facility/info"
-                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/facility/list") || location.pathname.includes("/facility/detail")? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
+                                className={`font-bold text-gray-700 hover:text-blue-400 active:text-blue-600${location.pathname.includes("/facility/info") ? "text-blue-600 border-b-2 border-blue-600 active:text-blue-600" : ""
                                     }`}
                             >
                                 공간소개
