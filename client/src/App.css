@@ -180,7 +180,7 @@
 
 /* 회색버튼 */
 .normal-button{
-border-radius: 0.375rem; /* rounded-md */
+  border-radius: 0.375rem; /* rounded-md */
   padding: 0.5rem; /* p-2 */
   border-width: 1px; /* border */
   border-color: #d1d5db; /* border-gray-300 */
@@ -197,7 +197,7 @@ border-radius: 0.375rem; /* rounded-md */
 
 /* 빨간버튼 */
 .nagative-button{
-border-radius: 0.375rem; /* rounded-md */
+  border-radius: 0.375rem; /* rounded-md */
   padding: 0.5rem; /* p-2 */
   border-width: 1px; /* border */
   border-color: #ef4444; /* border-red-500 */
@@ -229,4 +229,23 @@ border-radius: 0.375rem; /* rounded-md */
 }
 .green-button:active {
   background-color: #047857; /* active:bg-green-700 */
+}
+
+/* 검정/짙은 회색 버튼 */
+.dark-button {
+  border-radius: 0.375rem; /* rounded-md */
+  padding: 0.5rem 1rem; /* px-4 py-2 */
+  font-weight: 600; /* font-semibold */
+  color: white; /* text-white */
+  background-color: #6b7280; /* bg-gray-500 */
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); /* transition-colors duration-150 */
+  border: none;
+}
+
+.dark-button:hover {
+  background-color: #4b5563; /* hover:bg-gray-600 */
+}
+
+.dark-button:active {
+  background-color: #374151; /* active:bg-gray-700 */
 }

@@ -49,8 +49,9 @@ const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
           )}
           
           <button
-              onClick={handleWrite}
+            onClick={handleWrite}
             className="positive-button newText-sm"
+            style={{ minWidth: "70px" }}
           >
             글쓰기
           </button>

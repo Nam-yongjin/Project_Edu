@@ -51,6 +51,7 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
           <button
               onClick={handleWrite}
             className="positive-button newText-sm"
+            style={{ minWidth: "70px" }}
           >
             글쓰기
           </button>
