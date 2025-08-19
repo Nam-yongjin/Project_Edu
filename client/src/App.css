@@ -265,3 +265,17 @@
 .dark-button:active {
   background-color: #374151; /* active:bg-gray-700 */
 }
+
+.disable-button {
+  border-radius: 0.375rem;      /* rounded-md */
+  padding: 0.5rem 1rem;         /* px-4 py-2 */
+  font-weight: 600;              /* font-semibold */
+  font-size: 0.875rem;           /* newText-sm 기준 */
+  line-height: 1.25rem;          /* newText-sm 기준 */
+  color: #6b7280;                /* text-gray-500 */
+  background-color: #d1d5db;     /* bg-gray-300 */
+  cursor: not-allowed;           /* 금지 표지판 커서 */
+  border: none;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
