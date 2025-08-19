@@ -179,7 +179,7 @@ const StatsComponent = () => {
                     <div className="flex flex-wrap justify-center overflow-x-auto">
                         <div className="page-shadow pt-10">
                             <div className="newText-xl font-semibold">
-                                실증별 등록 수, 비율
+                                실증별 등록 수 및 비율
                             </div>
                             <Plot
                                 data={[
@@ -195,7 +195,7 @@ const StatsComponent = () => {
                         </div>
                         <div className="page-shadow my-10 pt-10">
                             <div className="newText-xl font-semibold">
-                                실증별 대여 수, 비율
+                                실증별 대여 수 및 비율
                             </div>
                             <Plot
                                 data={[
