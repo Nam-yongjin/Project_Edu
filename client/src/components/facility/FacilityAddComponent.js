@@ -25,7 +25,6 @@ const FacilityAddComponent = () => {
 
   const [form, setForm] = useState(initialForm);
 
-  // ✅ 시만 보관
   const [startH, setStartH] = useState("");
   const [endH, setEndH] = useState("");
 

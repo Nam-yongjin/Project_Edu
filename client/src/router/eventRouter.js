@@ -7,6 +7,7 @@ const EventList = lazy(() => import("../pages/event/EventListPage"))
 const EventDetail = lazy(() => import("../pages/event/EventDetailPage"))
 const EventUpdate = lazy(() => import("../pages/event/EventUpdatePage"))
 const EventReservation = lazy(() => import("../pages/event/EventReservationPage"))
+const EventInfoPage = lazy(() => import("../pages/event/EventInfoPage"))
 
 const eventRouter = () => {
 
@@ -30,6 +31,10 @@ const eventRouter = () => {
         {
              path:"reservation",
             element: <Suspense fallback={<Loading />}><EventReservation /></Suspense>,
+        },
+        {
+             path:"info",
+            element: <Suspense fallback={<Loading />}><EventInfoPage /></Suspense>,
         },
         {
             // 자동 리다이렉션
