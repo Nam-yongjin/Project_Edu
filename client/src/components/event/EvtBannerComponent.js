@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import { getBannerEvent } from '../../api/eventApi';
 import { useNavigate } from 'react-router-dom';
 import useMove from "../../hooks/useMove";
@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 
 const HOST = "http://localhost:8090/view"; // 이미지 경로
 
@@ -38,22 +37,31 @@ const EvtBannerComponent = () => {
 
   return (
     <div className="px-6 py-4 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-      <h2 className="newText-xl font-semibold mb-4">프로그램</h2>
+      <h2 className="newText-xl font-semibold mb-4 ">프로그램</h2>
 
       <Swiper
-        modules={[Navigation, Pagination, Autoplay]}
-        navigation
-        pagination={{ clickable: true }}
+        modules={[Autoplay]}
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         loop
+        speed={800}
         spaceBetween={30}
-        slidesPerView={1}
+        breakpoints={{
+          0: {
+            slidesPerView: 1,
+          },
+          768: {
+            slidesPerView: 2,
+          },
+          1024: {
+            slidesPerView: 3,
+          },
+        }}
         className="w-full"
       >
         {banners.map((event, idx) => (
           <SwiperSlide key={idx}>
             <div
-              className="cursor-pointer text-center"
+              className="cursor-pointer text-center w-full max-w-[400px] mx-auto"
               onClick={() => {
                 if (loginState && loginState.memId) {
                   navigate(`/event/detail/${event.eventNum}`);
@@ -63,27 +71,31 @@ const EvtBannerComponent = () => {
                 }
               }}
             >
-              <img
-                src={event.mainImagePath ? `${HOST}/${event.mainImagePath}` : '/default/image.png'}
-                alt={event.eventName}
-                className="w-full h-[300px] object-cover rounded-xl mb-4"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/default/image.png';
-                }}
-              />
-              <p className="newText-lg font-bold text-green-700 mb-1">[{event.eventName}]</p>
-              <p className="newText-sm text-gray-600">
-                {event.eventStartPeriod?.slice(0, 10)} ~ {event.eventEndPeriod?.slice(0, 10)}
-              </p>
-              <p className="newText-sm text-gray-500">
-                {event.eventStartPeriod?.slice(11, 16)} ~ {event.eventEndPeriod?.slice(11, 16)}
-              </p>
-              <p className="newText-sm text-gray-500">
-                {event.category === 'STUDENT' ? '학생 대상'
-                  : event.category === 'TEACHER' ? '교직원 대상'
-                    : '일반 대상'}
-              </p>
+              <div className="w-full aspect-[4/3] rounded-xl overflow-hidden mb-4">
+                <img
+                  src={event.mainImagePath ? `${HOST}/${event.mainImagePath}` : '/default/image.png'}
+                  alt={event.eventName}
+                  className="w-full h-full object-cover object-center"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = '/default/image.png';
+                  }}
+                />
+              </div>
+              <div className='pb-2'>
+                <p className="newText-lg font-bold text-green-700 mb-1">[{event.eventName}]</p>
+                <p className="newText-sm text-gray-600">
+                  {event.eventStartPeriod?.slice(0, 10)} ~ {event.eventEndPeriod?.slice(0, 10)}
+                </p>
+                <p className="newText-sm text-gray-500">
+                  {event.eventStartPeriod?.slice(11, 16)} ~ {event.eventEndPeriod?.slice(11, 16)}
+                </p>
+                <p className="newText-sm text-gray-500">
+                  {event.category === 'STUDENT' ? '학생 대상'
+                    : event.category === 'TEACHER' ? '교직원 대상'
+                      : '일반 대상'}
+                </p>
+              </div>
             </div>
           </SwiperSlide>
         ))}
