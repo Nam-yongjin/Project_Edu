@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FacilityList } from "../../api/facilityApi";
+import useMove from "../../hooks/useMove";
+import { useSelector } from "react-redux";
 
 const PLACEHOLDER = "/placeholder.svg";
 const host = "http://localhost:8090/view";
@@ -31,6 +33,9 @@ const FacilityListComponent = () => {
   const [searchTrigger, setSearchTrigger] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const { moveToLogin } = useMove();
+  const loginState = useSelector((state) => state.loginState);
 
   useEffect(() => {
     const fetchList = async () => {
@@ -98,8 +103,22 @@ const FacilityListComponent = () => {
             <FacilityCard
               key={item.facRevNum}
               item={item}
-              onCardClick={() => navigate(`/facility/detail/${item.facRevNum}`)}
-              onApplyClick={() => navigate(`/facility/detail/${item.facRevNum}`)}
+              onCardClick={() => {
+                if (loginState && loginState.memId) {
+                  navigate(`/facility/detail/${item.facRevNum}`)
+                } else {
+                  alert("로그인이 필요합니다.");
+                  moveToLogin();
+                }
+              }}
+              onApplyClick={() => {
+                if (loginState && loginState.memId) {
+                  navigate(`/facility/detail/${item.facRevNum}`)
+                } else {
+                  alert("로그인이 필요합니다.");
+                  moveToLogin();
+                }
+              }}
             />
           ))}
         </div>
