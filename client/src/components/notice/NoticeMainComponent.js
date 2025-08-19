@@ -115,7 +115,6 @@ const NoticeMainComponent = () => {
                         className="block group-hover:text-blue-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-
                           <h3 className="newText-sm font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
 
 
