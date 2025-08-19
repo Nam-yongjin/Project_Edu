@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import { Navigate } from "react-router-dom";
 
 const FacilityAddPage = lazy(() => import("../pages/facility/FacilityAddPage"))
+const FacilityUpdatePage = lazy(() => import("../pages/facility/FacilityUpdatePage"))
 const FacilityListPage = lazy(() => import("../pages/facility/FacilityListPage"))
 const FacilityDetailPage = lazy(() => import("../pages/facility/FacilityDetailPage"))
 const FacilityHolidayPage = lazy(() => import("../pages/facility/FacilityHolidayPage"))
@@ -15,6 +16,10 @@ const facilityRouter = () => {
         {
             path:"add",
             element: <Suspense fallback={<Loading />}><FacilityAddPage /></Suspense>,
+        },
+        {
+            path:"update/:facRevNum",
+            element: <Suspense fallback={<Loading />}><FacilityUpdatePage /></Suspense>,
         },
         {
             path:"list",

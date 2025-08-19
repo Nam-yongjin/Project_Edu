@@ -89,6 +89,12 @@ public interface FacilityReserveRepository extends JpaRepository<FacilityReserve
     boolean existsByMember_MemIdAndFacDateAndStateIn(
             String memId, LocalDate facDate, Collection<FacilityState> states);
 
+    // 미래(오늘 포함)에 대기/승인 상태 예약이 있으면 장소 삭제를 막기 위해 사용
+    boolean existsByFacility_FacRevNumAndFacDateGreaterThanEqualAndStateIn(
+            Long facRevNum,
+            java.time.LocalDate dateFrom,
+            java.util.Set<com.EduTech.entity.facility.FacilityState> states
+    );
 
     // 회원 탈퇴 제한 체크
     @Query("""

@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
+import com.EduTech.dto.facility.FacilityUpdateRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.dto.facility.ReservedBlockDTO;
 import com.EduTech.entity.facility.Facility;
@@ -142,6 +145,103 @@ public class FacilityServiceImpl implements FacilityService {
 
         // 4) 저장
         facilityRepository.save(facility);
+    }
+    
+    // 시설 수정
+    @Override
+    @Transactional
+    public void updateFacility(FacilityUpdateRequestDTO dto,
+                               @Nullable List<MultipartFile> addImages) {
+
+        if (dto.getFacRevNum() == null) {
+            throw new IllegalArgumentException("facRevNum이 필요합니다.");
+        }
+
+        Facility facility = facilityRepository.findById(dto.getFacRevNum())
+                .orElseThrow(() -> new IllegalArgumentException("시설 정보를 찾을 수 없습니다. facRevNum=" + dto.getFacRevNum()));
+
+        // 1) 기본 필드 수정
+        if (dto.getFacName() != null)   facility.setFacName(dto.getFacName());
+        if (dto.getFacInfo() != null)   facility.setFacInfo(dto.getFacInfo());
+        if (dto.getCapacity() != null)  facility.setCapacity(dto.getCapacity());
+        if (dto.getFacItem() != null)   facility.setFacItem(dto.getFacItem());
+        if (dto.getEtc() != null)       facility.setEtc(dto.getEtc());
+
+        LocalTime start = dto.getReserveStart() != null ? dto.getReserveStart() : facility.getReserveStart();
+        LocalTime end   = dto.getReserveEnd()   != null ? dto.getReserveEnd()   : facility.getReserveEnd();
+
+        // 운영시간 갱신(둘 중 하나만 넘어온 경우 포함)
+        if (dto.getReserveStart() != null) facility.setReserveStart(dto.getReserveStart());
+        if (dto.getReserveEnd()   != null) facility.setReserveEnd(dto.getReserveEnd());
+
+        // 2) 운영시간 검증 (둘 다 세팅된 경우만)
+        if (start != null && end != null) {
+            if (!start.isBefore(end)) {
+                throw new IllegalArgumentException("예약 시작시간은 종료시간보다 앞서야 합니다.");
+            }
+        }
+
+        // 3) 이미지 삭제
+        if (dto.getRemoveImageIds() != null && !dto.getRemoveImageIds().isEmpty()) {
+            List<FacilityImage> toRemove = facility.getImages().stream()
+                    .filter(img -> dto.getRemoveImageIds().contains(img.getFacImageNum()))
+                    .collect(Collectors.toList());
+
+            // 실제 파일 삭제가 필요하면 FileUtil에 삭제 메서드를 추가/호출하세요.
+            // 예: fileUtil.deleteByUrl(img.getImageUrl());
+            for (FacilityImage img : toRemove) {
+                facility.removeImage(img); // 연관 제거 (orphanRemoval=true 권장)
+                facilityImageRepository.delete(img); // 명시적 삭제
+            }
+        }
+
+        // 4) 새 이미지 추가
+        if (addImages != null) {
+            for (MultipartFile image : addImages) {
+                if (image != null && !image.isEmpty()) {
+                    FacilityImage imgEntity = toFacilityImage(image); // 기존 저장 방식 재사용
+                    facility.addImage(imgEntity);
+                }
+            }
+        }
+
+        // 5) 저장(더티체킹)
+        facilityRepository.save(facility);
+    }
+    
+    // 시설 삭제
+    @Override
+    @Transactional
+    public void deleteFacility(Long facRevNum) {
+        if (facRevNum == null) {
+            throw new IllegalArgumentException("facRevNum이 필요합니다.");
+        }
+
+        Facility facility = facilityRepository.findById(facRevNum)
+                .orElseThrow(() -> new IllegalArgumentException("시설 정보를 찾을 수 없습니다. facRevNum=" + facRevNum));
+
+        // 오늘 이후 대기/승인 예약이 있으면 삭제 금지
+        boolean hasActiveFuture = facilityReserveRepository
+                .existsByFacility_FacRevNumAndFacDateGreaterThanEqualAndStateIn(
+                        facRevNum, LocalDate.now(), ACTIVE_STATES);
+
+        if (hasActiveFuture) {
+            throw new IllegalStateException("미래 일정에 대기/승인된 예약이 있어 삭제할 수 없습니다.");
+        }
+
+        // 이미지 실제 파일 삭제가 필요하면 FileUtil에 메서드 추가해서 호출
+        // for (FacilityImage img : facility.getImages()) {
+        //     fileUtil.deleteByUrl(img.getImageUrl());
+        // }
+
+        // 연관 이미지 먼저 제거(OrphanRemoval=true면 생략 가능)
+        List<FacilityImage> imgs = new ArrayList<>(facility.getImages());
+        for (FacilityImage img : imgs) {
+            facility.removeImage(img);
+            facilityImageRepository.delete(img);
+        }
+
+        facilityRepository.delete(facility);
     }
 
     // 시설 목록(사용중)
