@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getSearchList } from "../../api/eventApi";
 import { useNavigate } from "react-router-dom";
+import useMove from "../../hooks/useMove";
+import { useSelector } from "react-redux";
 
 const EventListComponent = () => {
   const [events, setEvents] = useState([]);
@@ -18,6 +20,9 @@ const EventListComponent = () => {
 
   const navigate = useNavigate();
   const host = "http://localhost:8090/view";
+
+  const { moveToLogin } = useMove();
+  const loginState = useSelector((state) => state.loginState);
 
   // 검색 API 호출
   useEffect(() => {
@@ -67,7 +72,12 @@ const EventListComponent = () => {
   };
 
   const handleCardClick = (eventNum) => {
-    navigate(`/event/detail/${eventNum}`);
+    if (loginState && loginState.memId) {
+      navigate(`/event/detail/${eventNum}`);
+    } else {
+      alert("로그인이 필요합니다.");
+      moveToLogin();
+    }
   };
 
   // 검색 버튼 클릭 시에만 keyword 검색
@@ -97,9 +107,8 @@ const EventListComponent = () => {
               setCategory(value);
               setPage(1);
             }}
-            className={`px-4 py-1 rounded-full border ${
-              category === value ? "bg-gray-700 text-white" : "bg-white text-gray-700"
-            }`}
+            className={`px-4 py-1 rounded-full border ${category === value ? "bg-gray-700 text-white" : "bg-white text-gray-700"
+              }`}
           >
             {label}
           </button>
