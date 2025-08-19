@@ -27,7 +27,7 @@ const EvtBannerComponent = () => {
   if (banners.length === 0) {
     return (
       <div className="px-6 py-4 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-        <h2 className="newText-xl font-semibold mb-4">프로그램</h2>
+        <h2 className="newText-3xl font-semibold mb-4">프로그램</h2>
         <div className="text-center p-6 text-gray-500">
           이달의 신청가능한 프로그램이 없습니다.
         </div>
@@ -37,7 +37,7 @@ const EvtBannerComponent = () => {
 
   return (
     <div className="px-6 py-4 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-      <h2 className="newText-xl font-semibold mb-4 ">프로그램</h2>
+      <h2 className="newText-3xl font-semibold mb-4 ">Program</h2>
 
       <Swiper
         modules={[Autoplay]}
@@ -61,7 +61,7 @@ const EvtBannerComponent = () => {
         {banners.map((event, idx) => (
           <SwiperSlide key={idx}>
             <div
-              className="cursor-pointer text-center w-full max-w-[400px] mx-auto"
+              className="cursor-pointer text-center w-full max-w-[400px] mx-auto "
               onClick={() => {
                 if (loginState && loginState.memId) {
                   navigate(`/event/detail/${event.eventNum}`);
@@ -71,11 +71,11 @@ const EvtBannerComponent = () => {
                 }
               }}
             >
-              <div className="w-full aspect-[4/3] rounded-xl overflow-hidden mb-4">
+              <div className="w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 ">
                 <img
                   src={event.mainImagePath ? `${HOST}/${event.mainImagePath}` : '/default/image.png'}
                   alt={event.eventName}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center hover:scale-105 ease-in-out duration-500"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     e.currentTarget.src = '/default/image.png';

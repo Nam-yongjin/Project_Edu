@@ -91,21 +91,22 @@ const MainPage = () => {
                     </div>
                     <div className="min-blank my-10 ">
                         <div className="px-6 pt-4 pb-8 rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-                            <div className="newText-xl font-semibold mb-4">지원사업</div>
+                            <div className="newText-3xl font-semibold mb-4">Support</div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Link to={"/facility/info"}>
                                     <div className="relative w-full aspect-[16/10] rounded-3xl overflow-hidden group">
                                         <img
                                             src={facilityMain}
-                                            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 "
                                         />
-                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                            <span className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg">
+                                        <div className="absolute inset-0 flex items-center justify-center z-10">
+                                            <span className="text-white text-2xl md:text-3xl font-bold transition-all duration-300 group-hover:drop-shadow-2xl">
                                                 공간대여 바로가기
                                             </span>
-                                            <img src={rightArrow}/>
+                                            <img src={rightArrow} className="w-6 h-6 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                                             {/* <a href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Vector Squad - Flaticon</a> */}
                                         </div>
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-pink-500 opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
                                     </div>
                                 </Link>
 
@@ -115,12 +116,13 @@ const MainPage = () => {
                                             src={demonstrationMain}
                                             className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                            <span className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg">
+                                        <div className="absolute inset-0 flex items-center justify-center z-10">
+                                            <span className="text-white text-2xl md:text-3xl font-bold transition-all duration-300 group-hover:drop-shadow-2xl">
                                                 실증대여 바로가기
                                             </span>
-                                            <img src={rightArrow}/>
+                                            <img src={rightArrow} className="w-6 h-6 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                                         </div>
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-600 to-blue-500 opacity-50 group-hover:opacity-70 transition-opacity duration-300"></div>
                                     </div>
                                 </Link>
                             </div>
