@@ -147,7 +147,7 @@ public class AdminController {
    // 배너 이미지 출력
    @GetMapping("/banner/view")
     public ResponseEntity<Resource> viewFile(@RequestParam("filePath") String filePath) {
-        return fileUtil.getFile(filePath, "");
+        return fileUtil.getFile(filePath);
     }
    
    // 교사 실증 신청 조회
