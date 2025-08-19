@@ -64,5 +64,15 @@ public interface EventInfoRepository extends JpaRepository<EventInfo, Long> {
     // 3. 리스트 정렬 및 범위 검색
     // ================================
 
-    List<EventInfo> findByEventStartPeriodBetweenAndState(LocalDateTime start, LocalDateTime end, EventState state);
+    @Query("""
+    		select e from EventInfo e
+    		where e.applyEndPeriod   > :monthStart
+    		  and e.applyStartPeriod < :nextMonthStart
+    		  and e.state = :state
+    		""")
+    		List<EventInfo> findBannerRecruiting(
+    		    @Param("monthStart") LocalDateTime monthStart,
+    		    @Param("nextMonthStart") LocalDateTime nextMonthStart,
+    		    @Param("state") EventState state
+    		);
 }
