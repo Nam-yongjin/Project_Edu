@@ -2,6 +2,7 @@ package com.EduTech.service.event;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -363,12 +364,16 @@ public class EventServiceImpl implements EventService {
     // 현재 신청 가능한 행사 배너
     @Override
     public List<EventInfoDTO> getbannerEvent() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = now.withDayOfMonth(1).withHour(0).withMinute(0);
-        LocalDateTime end = now.withDayOfMonth(now.toLocalDate().lengthOfMonth()).withHour(23).withMinute(59);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        LocalDateTime monthStart = LocalDate.now(zone).withDayOfMonth(1).atStartOfDay();
+        LocalDateTime nextMonthStart = monthStart.plusMonths(1);
 
-        return infoRepository.findByEventStartPeriodBetweenAndState(start, end, EventState.OPEN)
-            .stream().map(this::toInfoDTO).toList();
+        // 신청기간이 이번달과 겹치고, 상태가 OPEN(모집중)인 것
+        return infoRepository.findBannerRecruiting(
+                monthStart, nextMonthStart, EventState.OPEN
+            ).stream()
+             .map(this::toInfoDTO)
+             .toList();
     }
 
     // ─────────────────────────────────────────────────────
