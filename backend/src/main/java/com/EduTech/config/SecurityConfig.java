@@ -43,6 +43,12 @@ public class SecurityConfig {
 		// CSRF(사이트 간 요청 위조) 보호 기능을 비활성화, REST API에서는 일반적으로 CSRF 미사용
 		http.csrf(config -> config.disable());
 		
+		// (추가) preflight(OPTIONS) 는 인증 없이 통과
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .anyRequest().permitAll()
+        );
+		
 		// API 서버로 로그인
         http.formLogin(config -> {
             config.loginProcessingUrl("/api/login");
@@ -68,7 +74,7 @@ public class SecurityConfig {
 		CorsConfiguration configuration = new CorsConfiguration();
 
 		configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-		configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
+		configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
 		configuration.setAllowCredentials(true);
 

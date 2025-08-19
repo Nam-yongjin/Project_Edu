@@ -1,12 +1,10 @@
 import EvtDetailComponent from "../../components/event/EvtDetailComponent"
-import EvtTitleComponent from "../../components/event/EvtTitleComponent";
 import { useParams } from "react-router-dom";
 
 const EventDetailPage = () => {
     const {eventNum} = useParams();
     return (
         <div>
-            <EvtTitleComponent title="프로그램 상세 보기" />
             <EvtDetailComponent eventNum={eventNum}/>
         </div>
     );
