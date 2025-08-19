@@ -12,13 +12,39 @@ export const registerFacility = async (formData) => {
   return res.data;
 };
 
+// 시설 수정 요청
+export const updateFacility = async (formData) => {
+  const res = await jwtAxios.post(`${facility}/update`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
+const appendFiles = (formData, fieldName, files) => {
+  if (!files) return;
+  // <input type="file" multiple> 의 e.target.files(FileList)도 처리
+  const arr = Array.from(files);
+  arr.forEach(f => f && formData.append(fieldName, f));
+};
+
+// 시설 삭제 요청
+export const deleteFacilityById = async (facRevNum) => {
+  if (!facRevNum) throw new Error("facRevNum는 필수입니다.");
+  const res = await jwtAxios.delete(`${facility}/delete`, {
+    params: { facRevNum },
+  });
+  return res.data; // 컨트롤러는 200 OK (빈 바디)
+};
+
+// 시설 리스트
 export const FacilityList = async ({ page = 1, size = 12, keyword = "" }) => {
-  const res = await jwtAxios.get(`${facility}/list`, {
+  const res = await axios.get(`${facility}/list`, {
     params: { page, size, keyword }
   });
   return res.data;
 };
 
+// 시설 상세정보
 export const getFacilityDetail = async (facRevNum) => {
   const res = await jwtAxios.get(`${facility}/facilityDetail`, {
     params: { facRevNum }
@@ -40,6 +66,7 @@ export const getFacilityHolidays = async (facRevNum) => {
   return res.data;
 };
 
+// 휴무일 추가
 export const addPublicHoliday = async ({ date, label }) => {
   const res = await jwtAxios.post(`${facility}/addholiday`, { 
     date, label 
@@ -47,12 +74,14 @@ export const addPublicHoliday = async ({ date, label }) => {
   return res.data;
 };
 
+// 휴무일 삭제
 export const deleteHoliday = async (date) => {
   return (await jwtAxios.delete(`${facility}/deleteHoliday`, { 
     params: { date } 
   })).data;
 };
 
+// 장소 예약 신청
 export const createReservation = async ({ facRevNum, facDate, startTime, endTime }) => {
   const res = await jwtAxios.post(`${facility}/reserve`, {
     facRevNum,
