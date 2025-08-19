@@ -114,7 +114,7 @@ const NewsDetailComponent = () => {
                     <p className="text-red-600 mb-4">{error}</p>
                     <button 
                         onClick={handleList}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                        className="dark-button newText-sm"
                     >
                         목록으로 돌아가기
                     </button>
@@ -131,7 +131,7 @@ const NewsDetailComponent = () => {
                     <p className="text-gray-600 mb-4">뉴스를 찾을 수 없습니다.</p>
                     <button
                         onClick={handleList}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                        className="dark-button newText-sm"
                     >
                         목록으로 돌아가기
                     </button>
@@ -243,8 +243,7 @@ const NewsDetailComponent = () => {
                     <div className="flex justify-between">
                         <button 
                             onClick={handleList}
-                            // 검정버튼 만들면 수정
-                            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                            className="dark-button newText-sm"
                         >
                             목록
                         </button>

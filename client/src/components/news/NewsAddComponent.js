@@ -253,12 +253,14 @@ const NewsAddComponent = () => {
                 <div className="flex justify-end space-x-4">
                     <button
                         className="positive-button newText-sm"
+                        style={{ minWidth: "60px" }}
                         onClick={handleAdd}
                     >
                         등록
                     </button>
                     <button
                         className="nagative-button newText-sm"
+                        style={{ minWidth: "60px" }}
                         onClick={handleCancel}
                     >
                         취소
