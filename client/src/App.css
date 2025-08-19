@@ -16,10 +16,6 @@
 .nanum-gothic {
   font-family: "Nanum Gothic", sans-serif;
 }
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap');
-.noto-serif-kr {
-  font-family: "Noto Serif KR", serif;
-}
 
 /* 페이지 최소 좌우 여백 */
 .min-blank {
