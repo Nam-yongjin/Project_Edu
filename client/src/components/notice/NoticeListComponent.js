@@ -134,7 +134,6 @@ const NoticeListComponent = () => {
               <span className="ml-2 text-gray-600">로딩중...</span>
             </div>
           ) : (
-            <div className="overflow-x-auto">
               <table className="w-full table-auto">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
@@ -253,7 +252,6 @@ const NoticeListComponent = () => {
                   )}
                 </tbody>
               </table>
-            </div>
           )}
         </div>
 
