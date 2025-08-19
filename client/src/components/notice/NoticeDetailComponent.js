@@ -90,7 +90,7 @@ const NoticeDetailComponent = () => {
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <span className="ml-2 text-gray-600">로딩 중...</span>
+                    <span className="ml-2 text-gray-600 newText-base">로딩 중...</span>
                 </div>
             </div>
         );
@@ -116,7 +116,7 @@ const NoticeDetailComponent = () => {
         return (
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="text-center py-12">
-                    <p className="text-gray-600 mb-4">공지사항을 찾을 수 없습니다.</p>
+                    <p className="text-gray-600 mb-4 newText-base">공지사항을 찾을 수 없습니다.</p>
                     <button
                         onClick={handleList}
                         className="dark-button newText-sm"
@@ -144,7 +144,7 @@ const NoticeDetailComponent = () => {
                 <div className="px-6 py-8 border-b border-gray-200">
                     <div className="flex items-center gap-3 mb-2">
                         {notice.isPinned && (
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full newText-sm font-medium bg-red-100 text-red-800 whitespace-nowrap">
                                 공지
                             </span>
                         )}
@@ -215,7 +215,7 @@ const NoticeDetailComponent = () => {
                                         }}
                                     />
                                     <div
-                                        className="hidden p-4 text-center text-gray-500 bg-gray-50"
+                                        className="hidden p-4 text-center text-gray-500 bg-gray-50 newText-base"
                                     >
                                         이미지를 불러올 수 없습니다: {file.originalName}
                                         {/* 기본 이미지:<a href="https://pixabay.com/ko//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Pixabay</a>로부터 입수된 <a href="https://pixabay.com/ko/users/mollyroselee-9214707/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Mollyroselee</a>님의 이미지 입니다. */}
