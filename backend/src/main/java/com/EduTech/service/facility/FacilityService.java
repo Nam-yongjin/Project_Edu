@@ -25,6 +25,13 @@ public interface FacilityService {
     // 시설 추가
     void registerFacility(FacilityRegisterDTO dto, List<MultipartFile> images);
     
+    // 시설 수정
+    void updateFacility(com.EduTech.dto.facility.FacilityUpdateRequestDTO dto,
+            java.util.List<org.springframework.web.multipart.MultipartFile> addImages);
+
+    // 시설 삭제
+    void deleteFacility(Long facRevNum);
+    
     // 시설 조회
     Page<FacilityListDTO> getFacilityList(Pageable pageable, String keyword);
 
