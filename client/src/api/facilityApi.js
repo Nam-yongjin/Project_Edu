@@ -109,3 +109,12 @@ export const updateReservationState = async ({ reserveId, state }) => {
   const { data } = await jwtAxios.post(`${facility}/approve`, { reserveId, state });
   return data;
 };
+
+// 관리자 예약 강제 취소
+export const adminCancelReservation = async ({ reserveId, requesterId }) => {
+  if (!reserveId) throw new Error("reserveId는 필수입니다.");
+  const { data } = await jwtAxios.patch(`${facility}/admincancel`, null, {
+    params: { reserveId, requesterId },
+  });
+  return data;
+};
