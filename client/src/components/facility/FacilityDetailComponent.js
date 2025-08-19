@@ -1,21 +1,29 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+// FacilityDetailContent.jsx
+// - 관리자 전용 수정/삭제 버튼 추가
+// - 전체 코드에 한글 주석 적용
+
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   addDays, addMonths, startOfMonth, endOfMonth,
   startOfWeek, endOfWeek, isSameMonth, format,
   addMinutes, parse, differenceInMinutes
 } from "date-fns";
 import ko from "date-fns/locale/ko";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   getFacilityDetail,
   getAllHolidays,
   createReservation,
-  getReservedBlocks
+  getReservedBlocks,
+  deleteFacilityById, // 관리자 삭제 API
 } from "../../api/facilityApi";
 
 /* ==================== 이미지 URL 유틸 ==================== */
 const PLACEHOLDER = "/placeholder.svg";
 const host = "http://localhost:8090/view";
 function buildImageUrl(p) {
+  // 이미지 경로 문자열 또는 객체의 imageUrl 필드를 표준 URL로 변환
   const val = typeof p === "string" ? p : p?.imageUrl;
   if (!val) return PLACEHOLDER;
   if (/^https?:\/\//i.test(val)) return val;
@@ -31,7 +39,7 @@ const toYmd = (d) => format(d, "yyyy-MM-dd");
 const todayYmd = () => format(new Date(), "yyyy-MM-dd");
 const nowHHmm = () => format(new Date(), "HH:mm");
 
-/* "HH:mm[:ss]" 등 → "HH:mm" */
+// "HH:mm[:ss]" 또는 Date → "HH:mm"
 function normalizeHHmm(v) {
   if (v == null) return null;
   if (typeof v === "string") {
@@ -45,7 +53,7 @@ function normalizeHHmm(v) {
   return null;
 }
 
-/* 시작시간 라디오 목록(1시간 간격) */
+/* 시작시간 라디오 목록(1시간 간격) 생성 */
 function genStartSlots(openHHmm, closeHHmm) {
   const base = new Date();
   let s = parse(openHHmm, "HH:mm", base);
@@ -58,6 +66,7 @@ function genStartSlots(openHHmm, closeHHmm) {
   return out;
 }
 
+/* 시작시간 이후 종료시간까지 허용되는 최대 시간(상한 capHours) 계산 */
 function maxDurationHours(startHHmm, closeHHmm, capHours = 4) {
   const base = new Date();
   const s = parse(startHHmm, "HH:mm", base);
@@ -66,6 +75,7 @@ function maxDurationHours(startHHmm, closeHHmm, capHours = 4) {
   return Math.min(capHours, Math.floor(diffMin / 60));
 }
 
+/* 시작시각 + N시간 → 종료시각 "HH:mm" */
 function calcEndHHmm(startHHmm, hours) {
   const base = new Date();
   const s = parse(startHHmm, "HH:mm", base);
@@ -105,6 +115,10 @@ export default function FacilityDetailContent({ facRevNum }) {
   /* 예약 전송 상태/메시지 */
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState("");
+
+  /* 관리자 및 네비게이션 */
+  const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+  const navigate = useNavigate();
 
   /* -------------------- 상세 불러오기 -------------------- */
   useEffect(() => {
@@ -198,10 +212,11 @@ export default function FacilityDetailContent({ facRevNum }) {
   /* -------------------- 달력 -------------------- */
   const monthLabel = format(currentMonth, "yyyy. MM", { locale: ko });
 
-  /* 이전 달 금지 */
+  // 이전 달 이동 금지
   const minMonthStart = startOfMonth(new Date());
   const isPrevDisabled = startOfMonth(currentMonth) <= minMonthStart;
 
+  // 달력 그리드 데이터
   const weeks = useMemo(() => {
     const startMonth = startOfMonth(currentMonth);
     const endMonthDate = endOfMonth(currentMonth);
@@ -217,9 +232,11 @@ export default function FacilityDetailContent({ facRevNum }) {
     return rows;
   }, [currentMonth]);
 
+  // 휴무일 맵 조회
   const getHolidayItems = (d) => holidayMap.get(toYmd(d)) ?? [];
   const selectedDateHasAnyHoliday = selectedDate ? ((holidayMap.get(selectedDate)?.length || 0) > 0) : false;
 
+  // 날짜 클릭 처리
   function handleDayClick(d) {
     const ymd = toYmd(d);
     if (!isSameMonth(d, currentMonth)) return;
@@ -234,7 +251,7 @@ export default function FacilityDetailContent({ facRevNum }) {
   const open  = normalizeHHmm(data?.reserveStart) ?? "09:00";
   const close = normalizeHHmm(data?.reserveEnd)   ?? "18:00";
 
-  /* 오늘이면 "시작 시간이 현재 이후"인 슬롯만 표시 */
+  // 오늘이면 현재 시각 이후 슬롯만 노출
   const baseStartSlots = useMemo(() => {
     const base = genStartSlots(open, close);
     if (selectedDate === todayYmd()) {
@@ -244,12 +261,12 @@ export default function FacilityDetailContent({ facRevNum }) {
     return base;
   }, [open, close, selectedDate]);
 
-  /* ✅ 예약 블록을 고려하되 '제거' 대신 표시용 플래그를 부여 */
+  // 예약 블록을 고려하여 슬롯에 blocked 플래그 부여
   function buildFilteredStartSlots(slots, blocks) {
     return slots.map((s) => {
       const tmpEnd = calcEndHHmm(s.key, 1);
       const blocked = blocks.some((b) => overlaps(s.key, tmpEnd, b.start, b.end));
-      return { ...s, blocked }; // 예약 여부 표시
+      return { ...s, blocked };
     });
   }
   const startSlots = useMemo(
@@ -257,25 +274,29 @@ export default function FacilityDetailContent({ facRevNum }) {
     [baseStartSlots, reservedBlocks]
   );
 
+  // 시작시점 기준 허용 최대 시간(운영 종료와 4시간 상한 고려)
   const maxHrsFromStart = startKey ? maxDurationHours(startKey, close, 4) : 0;
+
+  // 선택한 구간 표시용 텍스트
   const endTimeText = (startKey && durationHrs)
     ? `${startKey} ~ ${calcEndHHmm(startKey, durationHrs)}`
     : "-";
 
-  /* 오늘이면 "시작 시간이 현재 이후"일 때만 허용 */
+  // 오늘이면 시작시각이 현재 이후여야 함
   const notPastTimeOK =
     !startKey || !durationHrs || (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
 
+  // 예약 버튼 활성 조건
   const canReserve =
     !!selectedDate && !!startKey && !!durationHrs && !selectedDateHasAnyHoliday && notPastTimeOK;
 
-  /* -------------------- 버튼 렌더 -------------------- */
+  /* -------------------- 선택 핸들러 -------------------- */
   function onChangeStart(key) {
     setStartKey(key);
     setDurationHrs(null);
   }
 
-  /* ✅ '이미 예약됨' 시각적 표시 + 라디오 비활성화 */
+  // 시작시간 라디오 렌더 (예약된 슬롯 비활성화 및 표시)
   function renderStartOptions() {
     return startSlots.map((s) => {
       const disabled =
@@ -308,11 +329,14 @@ export default function FacilityDetailContent({ facRevNum }) {
     });
   }
 
+  // 선택된 시작시각에서 h시간 사용이 가능한지(예약 블록과 겹치지 않는지) 판정
   function durationAllowedByBlocks(h) {
     if (!startKey) return false;
     const e = calcEndHHmm(startKey, h);
     return !reservedBlocks.some((b) => overlaps(startKey, e, b.start, b.end));
   }
+
+  // 이용시간 버튼 렌더
   function renderDurationButtons() {
     const hours = [1, 2, 3, 4];
     return hours.map((h) => {
@@ -372,6 +396,19 @@ export default function FacilityDetailContent({ facRevNum }) {
       })
       .finally(() => setSubmitting(false));
   }
+
+  /* -------------------- 관리자: 시설 삭제 핸들러 -------------------- */
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm("정말 이 시설을 삭제하시겠습니까?")) return;
+    try {
+      await deleteFacilityById(facRevNum);
+      alert("시설이 삭제되었습니다.");
+      navigate("/facility/list"); // 라우팅 경로는 프로젝트에 맞게 조정
+    } catch (err) {
+      const msg = err?.response?.data?.message || err.message || "삭제 중 오류가 발생했습니다.";
+      alert(`삭제 실패: ${msg}`);
+    }
+  }, [facRevNum, navigate]);
 
   /* -------------------- 렌더 전 안내문 색상 판단 -------------------- */
   const isErrorNotice =
@@ -464,6 +501,26 @@ export default function FacilityDetailContent({ facRevNum }) {
             <Row label="유의사항" value={data?.etc ?? "-"} />
           </dl>
 
+          {/* 관리자 전용: 수정/삭제 버튼 */}
+          {isAdmin && (
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                className="flex-1 h-10 rounded bg-yellow-500 text-white font-semibold hover:bg-yellow-600"
+                onClick={() => navigate(`/facility/update/${facRevNum}`)}
+              >
+                수정
+              </button>
+              <button
+                type="button"
+                className="flex-1 h-10 rounded bg-red-500 text-white font-semibold hover:bg-red-600"
+                onClick={handleDelete}
+              >
+                삭제
+              </button>
+            </div>
+          )}
+
           {/* 서버로부터 수신한 안내/오류 메시지 표시 */}
           {notice && (
             <div className={`mt-4 text-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
@@ -503,13 +560,13 @@ export default function FacilityDetailContent({ facRevNum }) {
         notice={notice}
         renderStartOptions={renderStartOptions}
         renderDurationButtons={renderDurationButtons}
-        /* 변경점: 하위 컴포넌트에 isErrorNotice 전달 */
         isErrorNotice={isErrorNotice}
       />
     </div>
   );
 }
 
+/* -------------------- 하위 컴포넌트: 달력/예약 패널 -------------------- */
 function CalendarAndReserve(props) {
   const {
     currentMonth, setCurrentMonth, isPrevDisabled, monthLabel, weeks, getHolidayItems,
@@ -517,9 +574,7 @@ function CalendarAndReserve(props) {
     selectedDateHasAnyHoliday, startSlots, startKey, setStartKey,
     durationHrs, setDurationHrs, maxHrsFromStart, endTimeText,
     canReserve, applyReserve, holLoading, holError, submitting, notice,
-    renderStartOptions, renderDurationButtons,
-    /* 변경점: 전달받은 isErrorNotice를 구조 분해 */
-    isErrorNotice
+    renderStartOptions, renderDurationButtons, isErrorNotice
   } = props;
 
   const onPrevMonth = () => { if (!isPrevDisabled) setCurrentMonth(addMonths(currentMonth, -1)); };
@@ -631,7 +686,7 @@ function CalendarAndReserve(props) {
             </div>
           </dl>
 
-          {/* 시작시간 */}
+          {/* 시작시간 선택 */}
           <div className="mt-3">
             <div className="text-sm font-medium text-gray-700 mb-2">시작시간</div>
             <div className="grid grid-cols-2 gap-2">
@@ -639,7 +694,7 @@ function CalendarAndReserve(props) {
             </div>
           </div>
 
-          {/* 이용시간 */}
+          {/* 이용시간 선택 */}
           <div className="mt-4">
             <div className="text-sm font-medium text-gray-700 mb-2">이용시간</div>
             <div className="flex flex-wrap gap-2">
@@ -652,6 +707,7 @@ function CalendarAndReserve(props) {
             </div>
           </div>
 
+          {/* 예약 신청 버튼 */}
           <button
             className="mt-5 w-full h-12 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 disabled:opacity-50"
             onClick={applyReserve}
@@ -660,7 +716,7 @@ function CalendarAndReserve(props) {
             {submitting ? "전송 중..." : "예약 신청하기"}
           </button>
 
-          {/* 패널 하단에도 알림 표시 */}
+          {/* 하단 알림 */}
           {notice && (
             <div className={`mt-3 text-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
               {notice}
@@ -672,6 +728,7 @@ function CalendarAndReserve(props) {
   );
 }
 
+/* -------------------- 상세 정보 행 컴포넌트 -------------------- */
 function Row({ label, value }) {
   return (
     <div className="grid grid-cols-3">

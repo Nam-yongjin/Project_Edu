@@ -17,7 +17,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,6 +35,7 @@ import com.EduTech.dto.facility.FacilityReserveAdminDTO;
 import com.EduTech.dto.facility.FacilityReserveApproveRequestDTO;
 import com.EduTech.dto.facility.FacilityReserveListDTO;
 import com.EduTech.dto.facility.FacilityReserveRequestDTO;
+import com.EduTech.dto.facility.FacilityUpdateRequestDTO;
 import com.EduTech.dto.facility.HolidayDayDTO;
 import com.EduTech.dto.facility.ReservedBlockDTO;
 import com.EduTech.dto.member.MemberDTO;
@@ -63,6 +63,24 @@ public class FacilityController {
         @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
         facilityService.registerFacility(dto, images == null ? List.of() : images);
+        return ResponseEntity.ok().build();
+    }
+    
+    // 시설 수정
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateFacility(
+            @RequestPart("dto") FacilityUpdateRequestDTO dto,
+            @RequestPart(name = "addImages", required = false) List<MultipartFile> addImages
+    ) {
+        facilityService.updateFacility(dto, addImages);
+        return ResponseEntity.noContent().build();
+    }
+    
+    // 시설 삭제
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteFacility(@RequestParam("facRevNum") Long facRevNum) {
+        facilityService.deleteFacility(facRevNum);
         return ResponseEntity.ok().build();
     }
     
