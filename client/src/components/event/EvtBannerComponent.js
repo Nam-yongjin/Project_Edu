@@ -3,6 +3,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { getBannerEvent } from '../../api/eventApi';
 import { useNavigate } from 'react-router-dom';
+import useMove from "../../hooks/useMove";
+import { useSelector } from "react-redux";
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -13,6 +15,9 @@ const HOST = "http://localhost:8090/view"; // 이미지 경로
 const EvtBannerComponent = () => {
   const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
+
+  const { moveToLogin } = useMove();
+  const loginState = useSelector((state) => state.loginState);
 
   useEffect(() => {
     getBannerEvent()
@@ -49,7 +54,14 @@ const EvtBannerComponent = () => {
           <SwiperSlide key={idx}>
             <div
               className="cursor-pointer text-center"
-              onClick={() => navigate(`/event/detail/${event.eventNum}`)}
+              onClick={() => {
+                if (loginState && loginState.memId) {
+                  navigate(`/event/detail/${event.eventNum}`);
+                } else {  // 로그인창 이동
+                  alert("로그인이 필요합니다.");
+                  moveToLogin();
+                }
+              }}
             >
               <img
                 src={event.mainImagePath ? `${HOST}/${event.mainImagePath}` : '/default/image.png'}
