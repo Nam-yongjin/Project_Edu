@@ -31,7 +31,9 @@ function EvtDetailComponent({ eventNum }) {
   const checkIfApplied = useCallback(async () => {
     if (!memId) return;
     try {
-      const res = await fetch(`${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`);
+      const res = await fetch(
+        `${API_HOST}/event/applied?eventNum=${eventNum}&memId=${encodeURIComponent(memId)}`
+      );
       if (!res.ok) throw new Error(await res.text());
       const isApplied = await res.json();
       setAlreadyApplied(isApplied);
@@ -47,11 +49,16 @@ function EvtDetailComponent({ eventNum }) {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "없음";
-    const date = new Date(dateStr);
-    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+    const d = new Date(dateStr);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${y}.${m}.${day} ${hh}:${mm}`;
   };
 
-  const getFullUrl = (path) => path?.startsWith("http") ? path : `${HOST}/${path}`;
+  const getFullUrl = (path) => (path?.startsWith("http") ? path : `${HOST}/${path}`);
 
   const isCanceled = event?.state === "CANCEL";
   const isEventStarted = event?.eventStartPeriod && now >= new Date(event.eventStartPeriod);
@@ -68,7 +75,8 @@ function EvtDetailComponent({ eventNum }) {
     event?.maxCapacity != null &&
     event.currCapacity >= event.maxCapacity;
 
-  const isDisabled = isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
+  const isDisabled =
+    isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
 
   const getApplyButtonText = () => {
     if (isCanceled) return "취소된 프로그램";
@@ -80,8 +88,10 @@ function EvtDetailComponent({ eventNum }) {
     return "신청하기";
   };
 
-  const getApplyButtonStyle = () =>
-    isDisabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600";
+  // 지정된 네이밍을 우선 활용: 가능하면 positive-button, 비활성은 읽기 쉬운 회색 버튼
+  const applyBtnClass = isDisabled
+    ? "normal-button !bg-gray-300 !text-gray-700 !border !border-gray-400 cursor-not-allowed w-full"
+    : "positive-button w-full";
 
   const handleApply = async () => {
     if (!memId) {
@@ -126,109 +136,177 @@ function EvtDetailComponent({ eventNum }) {
       download
       target="_blank"
       rel="noopener noreferrer"
-      className="block text-sm text-blue-600 hover:underline"
+      className="block newText-sm text-blue-600 hover:underline"
+      title={name || label}
     >
       {name || label}
     </a>
   );
 
-  const categoryLabel = {
-    TEACHER: "교사",
-    STUDENT: "학생",
-    USER: "일반인",
-  }[event?.category] || "미지정";
+  const categoryLabel =
+    {
+      TEACHER: "교사",
+      STUDENT: "학생",
+      USER: "일반인",
+    }[event?.category] || "미지정";
 
-  if (loading) return <div className="text-center p-10">로딩 중...</div>;
-  if (!event) return <div className="text-center p-10">프로그램 정보를 불러올 수 없습니다.</div>;
+  if (loading) {
+    return (
+      <div className="max-w-screen-xl mx-auto my-10">
+        <div className="min-blank page-shadow bg-white rounded-lg p-10 text-center newText-base">
+          로딩 중...
+        </div>
+      </div>
+    );
+  }
+  if (!event) {
+    return (
+      <div className="max-w-screen-xl mx-auto my-10">
+        <div className="min-blank page-shadow bg-white rounded-lg p-10 text-center newText-base">
+          프로그램 정보를 불러올 수 없습니다.
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded shadow mt-8 space-y-10">
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="md:w-1/2 flex items-center justify-center">
-          {event.mainImagePath ? (
-            <img
-              src={getFullUrl(event.mainImagePath)}
-              alt="프로그램 이미지"
-              className="rounded-xl w-full h-auto object-cover"
-            />
-          ) : (
-            <div className="w-full h-[400px] bg-gray-100 flex items-center justify-center text-gray-500">
-              이미지 없음
-            </div>
-          )}
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank page-shadow bg-white rounded-lg p-10">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="newText-3xl font-bold">프로그램 상세</h1>
+          <button className="normal-button newText-sm" onClick={() => navigate(-1)}>
+            목록으로
+          </button>
         </div>
 
-        <div className="md:w-1/2 space-y-4">
-          <div className="text-sm inline-block border border-blue-400 text-blue-600 px-3 py-1 rounded-full">
-            {categoryLabel}
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800">{event.eventName}</h2>
-
-          <div className="space-y-2 text-gray-700 text-sm">
-            <p><strong>장소:</strong> {event.place || "미정"}</p>
-            <p><strong>소개:</strong> {event.description || "내용 없음"}</p>
-            <p><strong>신청기간:</strong> {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}</p>
-            <p><strong>진행기간:</strong> {formatDate(event.eventStartPeriod)} ~ {formatDate(event.eventEndPeriod)}</p>
-            <p><strong>모집인원:</strong> {event.maxCapacity || 0}명</p>
-            <p><strong>현재인원:</strong> {event.currCapacity ?? 0}명</p>
-            <p><strong>기타 유의사항:</strong> {event.etc || "없음"}</p>
-          </div>
-
-          <div className="pt-6 space-y-4">
-            <button
-              className={`w-full py-3 rounded font-semibold transition ${getApplyButtonStyle()}`}
-              disabled={isDisabled}
-              onClick={handleApply}
-            >
-              {getApplyButtonText()}
-            </button>
-
-            {isAdmin && (
-              <div className="flex gap-4">
-                <button
-                  className="flex-1 bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
-                  onClick={() => navigate(`/event/update/${event.eventNum}`)}
-                >
-                  수정
-                </button>
-                {isCanceled ? (
-                  <button
-                    className="flex-1 bg-gray-400 text-white py-2 rounded cursor-not-allowed"
-                    disabled
-                  >
-                    취소 완료
-                  </button>
-                ) : (
-                  <button
-                    className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
-                    onClick={handleCancel}
-                  >
-                    프로그램 취소
-                  </button>
-                )}
+        {/* 상단 콘텐츠 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* 이미지 */}
+          <div className="flex items-center justify-center">
+            {event.mainImagePath ? (
+              <img
+                src={getFullUrl(event.mainImagePath)}
+                alt="프로그램 이미지"
+                className="rounded-xl w-full h-auto object-cover"
+              />
+            ) : (
+              <div className="w-full h-[360px] bg-gray-100 flex items-center justify-center newText-base text-gray-500 rounded-xl">
+                이미지 없음
               </div>
             )}
           </div>
-        </div>
-      </div>
 
-      {(event.filePath || event.mainImagePath || event.attachList?.length > 0 || event.imageList?.length > 0) && (
-        <div className="w-full">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">📎 첨부파일 목록</h3>
-          <div className="space-y-1">
-            {event.filePath &&
-              renderDownloadLink("대표 첨부파일", `${API_HOST}/event/download/main-file/${event.eventNum}`, event.originalName)}
-            {event.mainImagePath &&
-              renderDownloadLink("대표 이미지", `${API_HOST}/event/download/main-image/${event.eventNum}`, event.mainImageOriginalName)}
-            {event.attachList?.map((file) =>
-              renderDownloadLink("첨부파일", `${API_HOST}/event/download/file/${file.id}`, file.originalName, file.id)
-            )}
-            {event.imageList?.map((img) =>
-              renderDownloadLink("이미지", `${API_HOST}/event/download/image/${img.id}`, img.originalName, img.id)
-            )}
+          {/* 정보 */}
+          <div>
+            <div className="inline-flex items-center gap-2 newText-sm px-3 py-1 rounded-full border border-blue-400 text-blue-600 mb-3">
+              {categoryLabel}
+            </div>
+            <h2 className="newText-2xl font-bold text-gray-800 mb-4">{event.eventName}</h2>
+
+            {/* 정보 표기: 정의 리스트형으로 가독성 향상 */}
+            <dl className="grid grid-cols-[120px_1fr] gap-y-2 newText-base text-gray-700">
+              <dt className="font-semibold text-gray-600">장소</dt>
+              <dd>{event.place || "미정"}</dd>
+              <dt className="font-semibold text-gray-600">소개</dt>
+              <dd>{event.description || "내용 없음"}</dd>
+              <dt className="font-semibold text-gray-600">신청기간</dt>
+              <dd>
+                {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}
+              </dd>
+              <dt className="font-semibold text-gray-600">진행기간</dt>
+              <dd>
+                {formatDate(event.eventStartPeriod)} ~ {formatDate(event.eventEndPeriod)}
+              </dd>
+              <dt className="font-semibold text-gray-600">모집인원</dt>
+              <dd>{event.maxCapacity || 0}명</dd>
+              <dt className="font-semibold text-gray-600">현재인원</dt>
+              <dd>{event.currCapacity ?? 0}명</dd>
+              <dt className="font-semibold text-gray-600">기타 유의사항</dt>
+              <dd>{event.etc || "없음"}</dd>
+            </dl>
+
+            {/* 버튼 영역 */}
+            <div className="mt-6 space-y-4">
+              <button
+                className={`${applyBtnClass} newText-base py-3 rounded font-semibold`}
+                disabled={isDisabled}
+                onClick={handleApply}
+              >
+                {getApplyButtonText()}
+              </button>
+
+              {isAdmin && (
+                <div className="flex gap-3">
+                  <button
+                    className="normal-button newText-base flex-1"
+                    onClick={() => navigate(`/event/update/${event.eventNum}`)}
+                  >
+                    수정
+                  </button>
+
+                  {isCanceled ? (
+                    <button className="normal-button newText-base flex-1 cursor-not-allowed" disabled>
+                      취소 완료
+                    </button>
+                  ) : (
+                    <button className="nagative-button newText-base flex-1" onClick={handleCancel}>
+                      프로그램 취소
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      )}
+
+        {/* 첨부파일 섹션 */}
+        {(event.filePath ||
+          event.mainImagePath ||
+          (event.attachList && event.attachList.length > 0) ||
+          (event.imageList && event.imageList.length > 0)) && (
+          <div className="mt-10">
+            <h3 className="newText-xl font-semibold mb-3">📎 첨부파일 목록</h3>
+            <div className="space-y-1">
+              {/* 메인 이미지 */}
+              {event.mainImagePath &&
+                renderDownloadLink(
+                  "대표 이미지",
+                  `${API_HOST}/event/download/main-image/${event.eventNum}`,
+                  event.mainImageOriginalName
+                )}
+
+              {/* 이미지 리스트 */}
+              {event.imageList?.map((img) =>
+                renderDownloadLink(
+                  "이미지",
+                  `${API_HOST}/event/download/image/${img.id}`,
+                  img.originalName,
+                  img.id
+                )
+              )}
+
+              {/* 메인 첨부파일 */}
+              {event.filePath &&
+                renderDownloadLink(
+                  "대표 첨부파일",
+                  `${API_HOST}/event/download/main-file/${event.eventNum}`,
+                  event.originalName
+                )}
+
+              {/* 첨부파일 리스트 */}
+              {event.attachList?.map((file) =>
+                renderDownloadLink(
+                  "첨부파일",
+                  `${API_HOST}/event/download/file/${file.id}`,
+                  file.originalName,
+                  file.id
+                )
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
