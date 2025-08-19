@@ -23,12 +23,6 @@ const NoticeAddComponent = () => {
     });
 
     const getByteLength = (str) => new Blob([str]).size;
-    
-    //내용 작성칸 자동 조절
-    const autoTextareaHeight = (e) => {
-        e.target.style.height = 'auto';
-        e.target.style.height = e.target.scrollHeight + 'px';
-    };
 
     const validateForm = () => {
         const newErrors = {};
@@ -148,12 +142,10 @@ const NoticeAddComponent = () => {
                         value={notice.content}
                         onChange={(e) => {
                             setNotice({ ...notice, content:e.target.value });
-                            autoTextareaHeight(e);
                         }}
                         placeholder="내용을 입력하세요"
-                        rows={6} //아무것도 입력하지 않았을 때 보이는 줄의 개수
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                        style={{ minHeight: '144px' }}
+                        className="w-full input-focus"
+                        style={{ height: "300px", resize: "none", overflowY: "auto" }}
                     />
                     {errors.content && (
                         <p className="text-red-500 newText-sm mt-1">{errors.content}</p>

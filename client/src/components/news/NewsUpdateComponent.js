@@ -75,12 +75,6 @@ const NewsUpdateComponent = () => {
 
     const getByteLength = (str) => new Blob([str]).size;
 
-    // 내용 작성칸 자동 조절
-    const autoTextareaHeight = (e) => {
-        e.target.style.height = 'auto';
-        e.target.style.height = e.target.scrollHeight + 'px';
-    };
-
     // URL 유효성 검사
     const isValidUrl = (string) => {
         try {
@@ -269,10 +263,9 @@ const NewsUpdateComponent = () => {
                 {/* 내용 + 이미지 미리보기 */}
                 <div>
                     <label className="block font-medium mb-1">내용</label>
-                    <div className="border border-gray-300 rounded focus-within:ring-2 focus-within:ring-blue-400">
                         {/* 이미지 미리보기 */}
                         {news.imageUrl && (
-                            <div className="p-4 border-b border-gray-200 bg-gray-50">
+                            <div className="p-4 border border-gray-300 rounded bg-gray-50 mb-2">
                                 {isImageLoading && (
                                     <div className="flex items-center justify-center h-48 bg-gray-100 rounded">
                                         <div className="text-gray-500">이미지 로딩 중...</div>
@@ -285,7 +278,7 @@ const NewsUpdateComponent = () => {
                                             alt="뉴스 썸네일"
                                             onLoad={handleImageLoad}
                                             onError={handleImageError}
-                                            className="w-full max-w-md mx-auto h-auto object-contain rounded shadow-sm"
+                                            className="page-shadow"
                                             style={{ maxHeight: '300px' }}
                                         />
                                     </div>
@@ -305,16 +298,11 @@ const NewsUpdateComponent = () => {
                         {/* 내용 */}
                         <textarea
                             value={news.content}
-                            onChange={(e) => {
-                                setNews({ ...news, content: e.target.value });
-                                autoTextareaHeight(e);
-                            }}
+                            onChange={(e) => setNews({ ...news, content: e.target.value })}
                             placeholder="뉴스 내용을 입력하세요"
-                            rows={8}
-                            className="w-full px-3 py-2 border-none focus:outline-none resize-none"
-                            style={{ minHeight: '200px' }}
+                            className="w-full input-focus"
+                            style={{ minHeight: "300px", resize: "none", overflowY: "auto" }} 
                         />
-                    </div>
                     {errors.content && (
                         <p className="text-red-500 newText-sm mt-1">{errors.content}</p>
                     )}
