@@ -101,7 +101,7 @@ const NewsMainComponent = () => {
                         className="block group-hover:text-green-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-                          <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-green-600">
+                          <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-600 truncate max-w-[200px] lg:max-w-[400px]">
                             {truncateTitle(news.title)}
                           </h3>
                           
@@ -110,7 +110,7 @@ const NewsMainComponent = () => {
                             const createdDate = new Date(news.createdAt);
                             const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
                             return daysDiff <= 3 && (
-                              <span className="ml-2 text-xs font-bold text-red-500">
+                              <span className="ml-2 text-xs font-bold text-red-500 whitespace-nowrap">
                                 New !
                               </span>
                             );

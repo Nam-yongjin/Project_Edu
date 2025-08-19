@@ -94,7 +94,7 @@ const NoticeMainComponent = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start flex-1 min-w-0">
                     {/* 번호 또는 고정글 표시 */}
-                    <div className="flex-shrink-0 mr-3 mt-1">
+                    <div className="flex-shrink-0 mr-3 mt-1 w-[60px] flex justify-center items-center">
                       {notice.isPinned ? (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
                           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -103,7 +103,8 @@ const NoticeMainComponent = () => {
                           공지
                         </span>
                       ) : (
-                        <></>
+                        // 고정공지 아니면 같은 폭의 투명 박스로 자리 확보
+                        <div className="w-full h-4"></div>
                       )}
                     </div>
                     
@@ -114,7 +115,7 @@ const NoticeMainComponent = () => {
                         className="block group-hover:text-blue-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-                          <h3 className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600">
+                          <h3 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
                             {truncateTitle(notice.title)}
                           </h3>
                           
@@ -123,7 +124,7 @@ const NoticeMainComponent = () => {
                             const createdDate = new Date(notice.createdAt);
                             const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
                             return daysDiff <= 3 && (
-                              <span className="ml-2 text-xs font-bold text-red-500">
+                              <span className="ml-2 text-xs font-bold text-red-500 whitespace-nowrap">
                                 New !
                               </span>
                             );
