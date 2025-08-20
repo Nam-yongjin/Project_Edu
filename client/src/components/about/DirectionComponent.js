@@ -9,6 +9,7 @@ const DirectionComponent = () => {
     const addr = "건국대학교 서울캠퍼스";
     const addrDetail = "서울특별시 광진구 능동로 120 신공학관 1F";
     const tel = "Tel. 02-123-0698,9";
+    const email = "E-mail. seouledtech@konkuk.ac.kr";
     const Latitude = 37.540404735269824;
     const Longitude = 127.07935535096505;
 
@@ -90,6 +91,8 @@ const DirectionComponent = () => {
                     {addrDetail}
                     <br />
                     {tel}
+                    <br/>
+                    {email}
                 </div>
             </div>
         </div>
