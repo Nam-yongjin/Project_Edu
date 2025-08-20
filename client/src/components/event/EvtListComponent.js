@@ -84,6 +84,9 @@ const EventListComponent = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto my-10">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold mb-4">프로그램 신청</h1>
+      </div>
       <div className="min-blank">
         {/* 카테고리 필터 */}
         <div className="flex gap-2 mb-6 justify-center">
