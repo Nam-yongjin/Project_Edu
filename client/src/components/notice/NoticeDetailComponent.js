@@ -165,7 +165,8 @@ const NoticeDetailComponent = () => {
                             </svg>
                             <span>작성일: {formatDate(notice.createdAt)}</span>
                         </div>
-                        {notice.updatedAt && notice.updatedAt !== notice.createdAt && (
+                        {/* formatDate로 감싸야 날짜를 작성일이랑 수정일이 다를 때를 제대로 인식함 */}
+                        {notice.updatedAt && formatDate(notice.updatedAt) !== formatDate(notice.createdAt) && (
                             <div className="flex items-center gap-1">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -183,32 +184,36 @@ const NoticeDetailComponent = () => {
                     </div>
                 </div>
 
-                {/* 내용 */}
-                <div className="px-6 py-6">
-                    <div className="prose max-w-none text-gray-800 leanding-relaxed whitespace-pre-wrap newText-base">
-                        {notice.content || '내용이 없습니다.'}
+                {/* 내용 + 이미지 */}
+                <div className="px-6">
+                    {/* 내용 */}
+                    <div className="py-6">
+                        <div className="prose max-w-none text-gray-800 leanding-relaxed whitespace-pre-wrap newText-base">
+                            {notice.content || '내용이 없습니다.'}
+                        </div>
                     </div>
 
                     {/* 이미지 표시 */}
                     {imageFiles.length > 0 && (
-                        <div className="mt-8">
-                            <div className="grid gap-4">
+                        <div className="pt-2 pb-8">
+                            <div className="space-y-3">
                                 {imageFiles.map((file, index) => (
-                                    <div key={index} className="rounded-lg">
+                                    <div key={index}>
                                         <img
                                             src={`http://localhost:8090/api/notice/view/${file.savedName}`}
                                             alt={file.originalName}
-                                            className="max-w-full h-auto mx-auto block page-shadow"
+                                            className="max-w-full h-auto mx-auto block"
                                             style={{
                                                 width: 'auto',
                                                 height: 'auto',
-                                                maxWidth: '100%', //화면 크기보다 클 때만 줄임
+                                                maxWidth: '50%',
+                                                maxHeight: '50%',
                                                 display: 'block',
-                                                margin: '20px auto',
-                                                imageRendering: 'high-quality', //고화질 렌더링
-                                                imageRendering: '-webkit-optimize-contrast' //웹킷 최적화
+                                                margin: '0 auto',
+                                                imageRendering: 'high-quality',
+                                                imageRendering: '-webkit-optimize-contrast'
                                             }}
-                                            loading="lazy" //지연 로딩
+                                            loading="lazy"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 e.target.nextSibling.style.display = 'block';
@@ -218,7 +223,6 @@ const NoticeDetailComponent = () => {
                                             className="hidden p-4 text-center text-gray-500 bg-gray-50 newText-base"
                                         >
                                             이미지를 불러올 수 없습니다: {file.originalName}
-                                            {/* 기본 이미지:<a href="https://pixabay.com/ko//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Pixabay</a>로부터 입수된 <a href="https://pixabay.com/ko/users/mollyroselee-9214707/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Mollyroselee</a>님의 이미지 입니다. */}
                                         </div>
                                     </div>
                                 ))}
@@ -226,6 +230,7 @@ const NoticeDetailComponent = () => {
                         </div>
                     )}
                 </div>
+
                 {/* 첨부파일 */}
                 {attachmentFiles.length > 0 && (
                     <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
