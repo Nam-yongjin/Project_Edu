@@ -1,9 +1,3 @@
-// EvtAddComponent.jsx
-// 이미지 업로드/미리보기를 "하나"로 통합
-// - 사용자는 한 곳에서 여러 이미지를 선택
-// - 첫 번째(또는 사용자가 지정한) 이미지를 대표로 사용
-// - 오른쪽 카드에서 모든 이미지가 함께 보이고, 각 썸네일에서 '대표지정' / '삭제' 가능
-
 import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -133,18 +127,14 @@ const EvtAddComponent = () => {
 
     setImages((prev) => {
       const next = [...prev, ...previews];
-      // 기존 이미지가 없었다면 대표는 0으로 유지
       return next;
     });
     if (images.length === 0) setMainIndex(0);
-    // input 재선택 대비
     e.target.value = "";
   };
 
   // 대표 지정
-  const setAsMain = (idx) => {
-    setMainIndex(idx);
-  };
+  const setAsMain = (idx) => setMainIndex(idx);
 
   // 이미지 삭제
   const removeImage = (idx) => {
@@ -153,7 +143,6 @@ const EvtAddComponent = () => {
       const removed = next.splice(idx, 1)[0];
       if (removed?.url) URL.revokeObjectURL(removed.url);
 
-      // 대표 인덱스 보정
       if (idx === mainIndex) {
         setMainIndex(0);
       } else if (idx < mainIndex) {
@@ -194,7 +183,7 @@ const EvtAddComponent = () => {
 
       const formData = new FormData();
 
-      // 대표/그 외 구분만 서버 형식에 맞춰 전송
+      // 대표/그 외 구분
       if (images.length === 0) {
         formData.append("mainImage", await urlToFile(defaultImage));
       } else {
@@ -217,7 +206,10 @@ const EvtAddComponent = () => {
         eventStartPeriod: formatDateTime(evt.eventStartPeriod),
         eventEndPeriod: formatDateTime(evt.eventEndPeriod),
       };
-      formData.append("dto", new Blob([JSON.stringify(dto)], { type: "application/json" }));
+      formData.append(
+        "dto",
+        new Blob([JSON.stringify(dto)], { type: "application/json" })
+      );
 
       await postAddEvent(formData);
       alert("등록 완료");
@@ -230,23 +222,58 @@ const EvtAddComponent = () => {
     }
   }, [attachFiles, evt, images, mainFile, mainIndex, moveToPath]);
 
+  // ---------- 파일 선택 라인 요약 텍스트 ----------
+  const imageSummary =
+    images.length > 0 ? `${images.length}장 선택됨` : "선택된 파일 없음";
+
+  // 첨부파일 개수 카운트 로직 개선 (mainFile도 있으면 +1)
+  const fileCount = (mainFile ? 1 : 0) + attachFiles.length;
+  const attachSummaryText =
+    fileCount > 0 ? `${fileCount}개 첨부됨` : "선택된 파일 없음";
+
   return (
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
         <h2 className="text-center newText-3xl font-bold mb-10">프로그램 등록</h2>
-
-        {/* 좌(폼) / 우(이미지 미리보기 카드) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 좌측: 폼 */}
           <div className="lg:col-span-2 page-shadow rounded-2xl border bg-white p-6">
             <div className="grid grid-cols-1 gap-4">
-              {/* 텍스트 입력들 */}
+              {/* 텍스트 입력 */}
               {[
-                { label: "프로그램명", name: "eventName", type: "text", required: true, placeholder: "프로그램명 입력" },
-                { label: "소개", name: "eventInfo", type: "textarea", required: true, placeholder: "프로그램 소개 입력" },
-                { label: "장소", name: "place", type: "text", required: true, placeholder: "장소 입력" },
-                { label: "모집 인원", name: "maxCapacity", type: "number", required: true, placeholder: "최대 인원 수" },
-                { label: "유의사항", name: "etc", type: "textarea", placeholder: "주의사항 또는 안내사항" },
+                {
+                  label: "프로그램명",
+                  name: "eventName",
+                  type: "text",
+                  required: true,
+                  placeholder: "프로그램명 입력",
+                },
+                {
+                  label: "소개",
+                  name: "eventInfo",
+                  type: "textarea",
+                  required: true,
+                  placeholder: "프로그램 소개 입력",
+                },
+                {
+                  label: "장소",
+                  name: "place",
+                  type: "text",
+                  required: true,
+                  placeholder: "장소 입력",
+                },
+                {
+                  label: "모집 인원",
+                  name: "maxCapacity",
+                  type: "number",
+                  required: true,
+                  placeholder: "최대 인원 수",
+                },
+                {
+                  label: "유의사항",
+                  name: "etc",
+                  type: "textarea",
+                  placeholder: "주의사항 또는 안내사항",
+                },
               ].map(({ label, name, type, required, placeholder }) => (
                 <div key={name} className="flex items-start gap-4">
                   <label className="w-32 newText-base font-semibold pt-2">
@@ -278,11 +305,13 @@ const EvtAddComponent = () => {
               {[
                 { name: "applyStartPeriod", label: "모집 시작일" },
                 { name: "applyEndPeriod", label: "모집 종료일" },
-                { name: "eventStartPeriod", label: "행사 시작일" },
-                { name: "eventEndPeriod", label: "행사 종료일" },
+                { name: "eventStartPeriod", label: "프로그램 시작" },
+                { name: "eventEndPeriod", label: "프로그램 종료" },
               ].map(({ name, label }) => (
                 <div key={name} className="flex items-center gap-4">
-                  <label className="w-32 newText-base font-semibold">{label} *</label>
+                  <label className="w-32 newText-base font-semibold">
+                    {label} <span className="text-red-500">*</span>
+                  </label>
                   <DatePicker
                     selected={evt[name]}
                     onChange={(date) => handleDateChange(name, date)}
@@ -299,7 +328,9 @@ const EvtAddComponent = () => {
 
               {/* 모집 대상 */}
               <div className="flex items-center gap-4">
-                <label className="w-32 newText-base font-semibold">모집 대상 *</label>
+                <label className="w-32 newText-base font-semibold">
+                  모집 대상 *
+                </label>
                 <select
                   name="category"
                   value={evt.category}
@@ -312,23 +343,47 @@ const EvtAddComponent = () => {
                 </select>
               </div>
 
-              {/* 이미지 업로드(통합) */}
+              {/* 이미지 업로드 */}
               <div className="flex items-center gap-4">
                 <label className="w-32 newText-base font-semibold">이미지</label>
-                <input type="file" accept="image/*" multiple onChange={handleImagesChange} />
+                <label htmlFor="image-input" className="positive-button newText-base cursor-pointer">
+                  파일 선택
+                </label>
+                <input
+                  id="image-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImagesChange}
+                  className="hidden"
+                />
+                <span className="newText-sm text-gray-500">{imageSummary}</span>
               </div>
 
-              {/* 첨부파일 */}
+              {/* 첨부파일 업로드 */}
               <div className="flex items-center gap-4">
                 <label className="w-32 newText-base font-semibold">첨부파일</label>
-                <input type="file" accept=".pdf,.doc,.hwp" multiple onChange={handleAttachChange} />
+                <label htmlFor="attach-input" className="positive-button newText-base cursor-pointer">
+                  파일 선택
+                </label>
+                <input
+                  id="attach-input"
+                  type="file"
+                  accept=".pdf,.doc,.hwp"
+                  multiple
+                  onChange={handleAttachChange}
+                  className="hidden"
+                />
+                <span className="newText-sm text-gray-500">{attachSummaryText}</span>
               </div>
+
+              {/* 첨부파일 실제 목록 */}
               <div className="ml-32 space-y-1">
-                {mainFile && <p className="newText-sm">대표: {mainFile.name}</p>}
+                {mainFile && (
+                  <p className="newText-sm">{mainFile.name}</p>
+                )}
                 {attachFiles.map((f, i) => (
-                  <p key={i} className="newText-sm">
-                    {f.name}
-                  </p>
+                  <p key={i} className="newText-sm">{f.name}</p>
                 ))}
               </div>
 
@@ -337,11 +392,14 @@ const EvtAddComponent = () => {
                 <button
                   onClick={register}
                   disabled={submitting}
-                  className="newText-base positive-button"
+                  className="positive-button newText-base"
                 >
                   {submitting ? "등록 중..." : "프로그램 등록"}
                 </button>
-                <button onClick={() => navigate(-1)} className="newText-base normal-button">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="normal-button newText-base"
+                >
                   뒤로가기
                 </button>
               </div>
@@ -367,7 +425,9 @@ const EvtAddComponent = () => {
                   ))}
                 </div>
               ) : (
-                <p className="newText-sm text-gray-500">추가된 이미지가 없습니다.</p>
+                <p className="newText-sm text-gray-500">
+                  추가된 이미지가 없습니다.
+                </p>
               )}
             </section>
           </aside>
