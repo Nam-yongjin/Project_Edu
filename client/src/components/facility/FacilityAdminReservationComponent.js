@@ -90,71 +90,22 @@ const thisMonthRange = () => {
 };
 
 // ==================== PageComponent 브리지 ====================
-// 다양한 PageComponent 시그니처(pageList/pageNums/DTO/단순 숫자형)에 대응
-function PageBridge({ page, pageSize, totalCount, onChange, blockSize = 10 }) {
-  // 내부는 0-based, PageComponent는 1-based를 기대한다고 가정
+// PageComponent는 (totalPages, current[0-based], setCurrent[0-based])만 기대함.
+// 상위(AdminFacilityReservations)는 onChange에서 1-based를 기대하므로 여기서 변환 처리.
+function PageBridge({ page, pageSize, totalCount, onChange }) {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const current = Math.min(totalPages, Math.max(1, page + 1)); // 1-based 보정
+  const safeCurrent = Math.max(0, Math.min(totalPages - 1, Number(page) || 0));
 
-  // 블록 계산
-  const currentBlock = Math.floor((current - 1) / blockSize);
-  const start = currentBlock * blockSize + 1; // 1-based 시작
-  const end = Math.min(start + blockSize - 1, totalPages);
-  const prev = start > 1;
-  const next = end < totalPages;
-
-  // 페이지 목록(1-based)
-  const pageNums = Array.from(
-    { length: Math.max(0, end - start + 1) },
-    (_, i) => start + i
-  );
-
-  // 일부 컴포넌트가 prevPage/nextPage 숫자를 기대하는 경우 대비
-  const prevPage = prev ? start - 1 : 1;
-  const nextPage = next ? end + 1 : totalPages;
-
-  // 공용 이동 콜백
-  const movePage = (p1) => {
-    // p1은 1-based로 가정
-    const p = Number(p1);
-    if (!Number.isFinite(p)) return;
-    onChange(Math.min(totalPages, Math.max(1, p)));
+  const setCurrent = (nextZero) => {
+    const nz = Math.max(0, Math.min(totalPages - 1, Number(nextZero)));
+    onChange(nz + 1); // 상위 onChange는 1-based를 기대
   };
 
   return (
     <PageComponent
-      // DTO 스타일
-      pageResponse={{
-        start,
-        end,
-        prev,
-        next,
-        pageNums,
-        current,
-        totalPages,
-        totalCount,
-        pageSize,
-      }}
-      // 개별 키 스타일
-      start={start}
-      end={end}
-      prev={prev}
-      next={next}
-      prevPage={prevPage}
-      nextPage={nextPage}
-      pageNums={pageNums}
-      pageList={pageNums} // pageList 키를 쓰는 구현체 대응
-      current={current}
-      // 단순 숫자형 스타일
-      currentPage={current}
       totalPages={totalPages}
-      totalItems={totalCount}
-      pageSize={pageSize}
-      blockSize={blockSize}
-      // 콜백 이름들 호환
-      movePage={movePage}
-      onPageChange={movePage}
-      onChange={movePage}
+      current={safeCurrent}   // 0-based
+      setCurrent={setCurrent} // 0-based 인덱스로 호출
     />
   );
 }
@@ -338,7 +289,7 @@ export default function AdminFacilityReservations() {
 
     if (r.state === "WAITING") {
       return (
-        <div className="flex gap-2">
+        <div className="flex items-center justify-center gap-2">
           <button
             disabled={disabled}
             onClick={() => handleApprove(r)}
@@ -362,7 +313,7 @@ export default function AdminFacilityReservations() {
         return <span className="newText-sm text-gray-400">-</span>;
       }
       return (
-        <div className="flex gap-2">
+        <div className="flex items-center justify-center gap-2">
           <button
             disabled={disabled}
             onClick={() => handleAdminCancel(r)}
@@ -499,40 +450,40 @@ export default function AdminFacilityReservations() {
           </div>
         </div>
 
-        {/* 데이터 표 */}
+        {/* 데이터 표 - 전체 가운데 정렬 */}
         <div className="page-shadow overflow-x-auto rounded-2xl border bg-white">
           <table className="min-w-full newText-sm">
             <thead>
-              <tr className="bg-gray-50 text-left">
+              <tr className="bg-gray-50 text-center">
                 <th
-                  className="px-4 py-3 cursor-pointer"
+                  className="px-4 py-3 text-center cursor-pointer"
                   onClick={() => onChangeSort("reserveId")}
                 >
                   예약ID
                 </th>
                 <th
-                  className="px-4 py-3 cursor-pointer"
+                  className="px-4 py-3 text-center cursor-pointer"
                   onClick={() => onChangeSort("facName")}
                 >
                   공간명
                 </th>
-                <th className="px-2 py-3">공간번호</th>
+                <th className="px-2 py-3 text-center">공간번호</th>
                 <th
-                  className="px-4 py-3 cursor-pointer"
+                  className="px-4 py-3 text-center cursor-pointer"
                   onClick={() => onChangeSort("facDate")}
                 >
                   이용일
                 </th>
-                <th className="px-4 py-3">이용 시간</th>
-                <th className="px-4 py-3">신청자</th>
-                <th className="px-4 py-3">상태</th>
+                <th className="px-4 py-3 text-center">이용 시간</th>
+                <th className="px-4 py-3 text-center">신청자</th>
+                <th className="px-4 py-3 text-center">상태</th>
                 <th
-                  className="px-4 py-3 cursor-pointer"
+                  className="px-4 py-3 text-center cursor-pointer"
                   onClick={() => onChangeSort("reserveAt")}
                 >
                   신청일
                 </th>
-                <th className="px-4 py-3">액션</th>
+                <th className="px-4 py-3 text-center">액션</th>
               </tr>
             </thead>
             <tbody>
@@ -568,35 +519,37 @@ export default function AdminFacilityReservations() {
                   const chip = chipOf(r.state, r.facDate); // 이용일 반영
                   const mem = r.memId || "-";
                   return (
-                    <tr key={r.reserveId} className="border-t">
-                      <td className="px-4 py-3 whitespace-nowrap">
+                    <tr key={r.reserveId} className="border-t text-center">
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
                         {r.reserveId}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
                         {r.facName}
                       </td>
-                      <td className="px-2 py-3 whitespace-nowrap text-gray-600">
+                      <td className="px-2 py-3 whitespace-nowrap text-gray-600 text-center">
                         {r.facRevNum}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
                         {formatYmdDots(r.facDate)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
                         {hhmm(r.startTime)} ~ {hhmm(r.endTime)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">{mem}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        {mem}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
                         <span
                           className={`text-white newText-xs px-2 py-0.5 rounded ${chip.cls}`}
                         >
                           {chip.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-gray-600">
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-600 text-center">
                         {formatDateTime(r.reserveAt)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center gap-2">
                           {renderActions(r)}
                           <button
                             onClick={() =>
@@ -622,7 +575,6 @@ export default function AdminFacilityReservations() {
             page={page} // 0-based
             pageSize={pageSize}
             totalCount={totalCount}
-            blockSize={10}
             onChange={(next1Based) => {
               // next1Based는 1-based, 내부 상태는 0-based로 변환
               const nextZero = Math.max(0, Math.min(totalPages - 1, next1Based - 1));

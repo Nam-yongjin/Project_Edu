@@ -1,4 +1,3 @@
-// src/pages/facility/FacilityListComponent.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FacilityList } from "../../api/facilityApi";
@@ -6,7 +5,6 @@ import useMove from "../../hooks/useMove";
 import { useSelector } from "react-redux";
 import PageComponent from "../common/PageComponent";
 
-// ✅ Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Scrollbar } from "swiper/modules";
 import "swiper/css";
@@ -36,7 +34,7 @@ const FacilityListComponent = () => {
   // 1-based 로컬 페이지 (PageComponent는 0-based이므로 변환해서 전달)
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const size = 8; // ✅ 한 페이지 8개 고정
+  const size = 8;
 
   const [list, setList] = useState([]);
   const [keyword, setKeyword] = useState("");
@@ -51,7 +49,7 @@ const FacilityListComponent = () => {
       setError("");
       try {
         const res = await FacilityList({
-          page: Math.max(page - 1, 0), // API 0-based
+          page: Math.max(page - 1, 0),
           size,
           keyword: keyword.trim(),
         });
@@ -87,7 +85,7 @@ const FacilityListComponent = () => {
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
         {/* 타이틀 */}
-        <h1 className="newText-3xl font-bold text-center mb-8">공간/체험 신청</h1>
+        <h1 className="newText-3xl font-bold text-center mb-8">공간 예약</h1>
 
         {/* 검색 */}
         <div className="flex flex-wrap gap-2 mb-6 items-center justify-center">
@@ -144,8 +142,8 @@ const FacilityListComponent = () => {
           <div className="mt-8 flex justify-center">
             <PageComponent
               totalPages={totalPages}
-              current={page - 1} // 0-based로 전달
-              setCurrent={(idx) => setPage(idx + 1)} // 콜백은 1-based로 환산
+              current={page - 1}
+              setCurrent={(idx) => setPage(idx + 1)}
             />
           </div>
         )}
@@ -187,7 +185,7 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
   );
 };
 
-/** 리스트 썸네일 슬라이더 (4:3 비율) — Swiper Scrollbar 적용 */
+// 리스트 썸네일 슬라이더 (4:3 비율) — Swiper Scrollbar 적용 
 const ImageSlider = ({ images = [], alt = "facility" }) => {
   const slides = images.length > 0 ? images : [PLACEHOLDER];
 

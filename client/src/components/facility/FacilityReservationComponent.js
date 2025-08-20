@@ -43,31 +43,22 @@ const getStatusChip = (state) => {
 };
 
 /* ==================== PageComponent 브리지 ==================== */
-// PageComponent 구현의 prop 시그니처 차이를 흡수하기 위한 어댑터 
-function PageBridge({ page, totalPages, blockSize = 10, onChange }) {
+// PageComponent는 (totalPages, current[0-based], setCurrent[0-based])만 기대함.
+// 여기서 상위 onChange는 1-based를 기대하므로 변환을 담당.
+function PageBridge({ page, totalPages, onChange }) {
   const tp = Math.max(1, Number(totalPages) || 1);
-  const current = Math.min(tp, Math.max(1, page + 1)); // 1-based
-  const currentBlock = Math.floor((current - 1) / blockSize);
-  const start = currentBlock * blockSize + 1;
-  const end = Math.min(start + blockSize - 1, tp);
-  const prev = start > 1;
-  const next = end < tp;
-  const pageNums = Array.from({ length: Math.max(0, end - start + 1) }, (_, i) => start + i);
-  const movePage = (p1) => {
-    const p = Math.min(tp, Math.max(1, Number(p1)));
-    onChange(p); // 1-based 전달
+  const safeCurrent = Math.max(0, Math.min(tp - 1, Number(page) || 0)); // 0-based
+
+  const setCurrent = (nextZero) => {
+    const nz = Math.max(0, Math.min(tp - 1, Number(nextZero)));
+    onChange(nz + 1); // 상위는 1-based로 받음
   };
+
   return (
     <PageComponent
-      // DTO 스타일
-      pageResponse={{ start, end, prev, next, pageNums, current, totalPages: tp }}
-      // 개별 키 스타일
-      start={start} end={end} prev={prev} next={next}
-      pageNums={pageNums} pageList={pageNums} current={current}
-      // 단순 숫자형 스타일
-      currentPage={current} totalPages={tp} blockSize={blockSize}
-      // 콜백 호환
-      movePage={movePage} onPageChange={movePage} onChange={movePage}
+      totalPages={tp}
+      current={safeCurrent}   // 0-based
+      setCurrent={setCurrent} // 0-based 인덱스로 호출
     />
   );
 }
@@ -91,7 +82,11 @@ const FacilityReservationComponent = () => {
         });
         setReservations(data?.content || []);
         setTotalPages(Math.max(1, data?.totalPages || 1));
-        setTotalElements(Number.isFinite(data?.totalElements) ? data.totalElements : (data?.content?.length || 0));
+        setTotalElements(
+          Number.isFinite(data?.totalElements)
+            ? data.totalElements
+            : (data?.content?.length || 0)
+        );
         setPage(targetPage);
       } catch (error) {
         console.error("공간 예약 이력 불러오기 실패:", error);
@@ -219,7 +214,6 @@ const FacilityReservationComponent = () => {
           <PageBridge
             page={page}
             totalPages={totalPages}
-            blockSize={10}
             onChange={(next1Based) => {
               const nextZero = Math.max(0, Math.min(totalPages - 1, next1Based - 1));
               setPage(nextZero);
