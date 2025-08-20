@@ -187,7 +187,7 @@ const DetailComponent = ({ demNum }) => {
                 <div className="min-blank">
                     <div className="newText-3xl font-bold ">실증 물품 대여 예약</div>
                     <div className="w-full overflow-x-auto">
-                       <div className="flex gap-10 min-w-full border-2 border-black p-2">
+                        <div className="flex gap-10 min-w-full border-2 border-black p-2">
                             {/* 이미지 영역 */}
                             <div className="w-1/2 min-h-[500px]">
                                 <img
@@ -211,22 +211,49 @@ const DetailComponent = ({ demNum }) => {
                             />
 
                             {/* 설명 영역 */}
-                            <div className="w-1/2 max-h-[500px] overflow-y-auto break-words">
-                             <span className="text-black newText-2xl font-bold">카테고리:</span> <span className="text-black newText-2xl font-bold">{dem.category}</span>
-                            <div className="w-full max-h-[500px] overflow-y-auto break-words border-2 border-[#64b5f6]"></div>
-                                <span className="text-blue-600 newText-2xl font-bold">물품명:</span> {dem.demName}
-                                <br />
-                                <span className="text-blue-600 newText-2xl font-bold">제조사:</span> {dem.demMfr}
-                                <br />
-                                <span className="text-blue-600 newText-2xl font-bold">물품소개:</span> {dem.demInfo}
-                                <br />
-                                <span className="text-blue-600 newText-2xl font-bold">수량:</span> {dem.itemNum + "개"}
+                            <div className="w-1/2 max-h-[500px] overflow-y-auto break-words p-6 bg-gray-50 rounded-lg">
+                                {/* 카테고리 */}
+                                <div className="mb-6 pb-4 border-b border-gray-300">
+                                    <span className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full text-lg font-bold">
+                                        {dem.category}
+                                    </span>
+                                </div>
+
+                                {/* 물품 정보 */}
+                                <div className="space-y-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-blue-600 text-lg font-bold mb-1">물품명</span>
+                                        <span className="text-gray-800 text-xl font-semibold">{dem.demName}</span>
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <span className="text-blue-600 text-lg font-bold mb-1">제조사</span>
+                                        <span className="text-gray-700 text-lg">{dem.demMfr}</span>
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <span className="text-blue-600 text-lg font-bold mb-1">수량</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-lg font-bold ${dem.itemNum > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {dem.itemNum}개
+                                            </span>
+                                            <span className={`text-sm px-2 py-1 rounded-full ${dem.itemNum > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                                }`}>
+                                                {dem.itemNum > 0 ? '대여 가능' : '대여 불가'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <span className="text-blue-600 text-lg font-bold mb-2">물품소개</span>
+                                        <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                            <span className="text-gray-700 leading-relaxed whitespace-pre-wrap">{dem.demInfo}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-
-
 
                     <div>
                         <div className="flex mt-2 w-1/2 whitespace-nowrap">
@@ -257,7 +284,7 @@ const DetailComponent = ({ demNum }) => {
 
                             <div className="space-y-6 w-1/2 mx-auto">
                                 {/* 날짜 선택 박스 */}
-                                <div className="border border-black p-6 rounded h-[200px] flex flex-col justify-center space-y-4">
+                                <div className="border border-black p-6 rounded h-[150px] flex flex-col justify-center space-y-4">
                                     <div className="flex items-center gap-4">
                                         <img src={calendar} className="w-8 h-8" alt="calendar" />
                                         {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
