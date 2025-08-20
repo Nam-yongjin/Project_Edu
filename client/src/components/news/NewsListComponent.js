@@ -32,7 +32,7 @@ const NewsListComponent = () => {
   //언론보도 목록 조회
   const fetchArticles = async (params = searchParams) => {
     setLoading(true);
-    try{
+    try {
       const response = await NewsList(params); //컨트롤러에 전달되는 매개변수
       setArticles(response.content || []);
       setTotalPages(response.totalPages || 0);
@@ -104,7 +104,7 @@ const NewsListComponent = () => {
   };
 
   // 뉴스 정렬
-    const allArticles = articles;
+  const allArticles = articles;
 
   return (
     <div className="max-w-screen-xl mx-auto my-10">
@@ -130,82 +130,82 @@ const NewsListComponent = () => {
               <span className="ml-2 text-gray-600 newText-base">로딩중...</span>
             </div>
           ) : (
-              <table className="w-full table-auto">
-                <thead className="bg-gray-50 border-b border-gray-200">
+            <table className="w-full table-auto">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  {loginState.role === 'ADMIN' && ( //관리자만 선택 가능
+                    <th className="w-12 px-2 py-3 text-center hidden sm:table-cell">
+                      <input
+                        type="checkbox"
+                        checked={selectedArticles.length === articles.length && articles.length > 0}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                    </th>
+                  )}
+                  <th className="min-w-[50px] px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
+                  <th className="w-full px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
+                  <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                  <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
+                  <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {allArticles.length === 0 ? ( //뉴스가 없을 때
                   <tr>
-                    {loginState.role === 'ADMIN' && ( //관리자만 선택 가능
-                      <th className="w-12 px-2 py-3 text-center hidden sm:table-cell">
-                        <input
-                          type="checkbox"
-                          checked={selectedArticles.length === articles.length && articles.length > 0}
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </th>
-                    )}
-                    <th className="min-w-[50px] px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
-                    <th className="w-full px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
-                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
-                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성일</th>
-                    <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
+                    <td
+                      colSpan={loginState.role === 'ADMIN' ? 6 : 5}
+                      className="px-4 py-12 text-center text-gray-500 newText-base"
+                    >
+                      등록된 뉴스가 없습니다.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {allArticles.length === 0 ? ( //뉴스가 없을 때
-                    <tr>
-                      <td 
-                        colSpan={loginState.role === 'ADMIN' ? 6 : 5}
-                        className="px-4 py-12 text-center text-gray-500 newText-base"
-                      >
-                        등록된 뉴스가 없습니다.
+                ) : (
+                  allArticles.map((news, index) => (
+                    <tr
+                      key={news.newsNum}
+                      className={`hover:bg-gray-50`}
+                    >
+                      {loginState.role === 'ADMIN' && (
+                        <td className="px-4 py-3 hidden sm:table-cell">
+                          <input
+                            type="checkbox"
+                            checked={selectedArticles.includes(news.newsNum)}
+                            onChange={(e) => handleCheckboxChange(news.newsNum, e.target.checked)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                        </td>
+                      )}
+                      {/* 역순 번호 */}
+                      <td className="px-2 py-3 text-center newText-sm text-gray-900 whitespace-nowrap min-w-[50px]">
+                        {totalElements - (currentPage * searchParams.size) - index}
+                      </td>
+                      {/* 제목 */}
+                      <td className="px-2 py-3">
+                        <div className="flex items-center space-x-2">
+                          <Link //제목 누르면 상세페이지로 넘어감
+                            to={`/news/NewsDetail/${news.newsNum}`}
+                            className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate min-w-[120px] max-w-[150px] lg:max-w-[700px]"
+                            title={news.title}
+                          >
+                            {news.title}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
+                        {news.name}
+                      </td>
+                      <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
+                        {formatDate(news.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px] hidden sm:table-cell">
+                        {news.viewCount?.toLocaleString() || 0}
                       </td>
                     </tr>
-                  ) : (
-                    allArticles.map((news, index) => (
-                      <tr 
-                        key={news.newsNum}
-                        className={`hover:bg-gray-50`}
-                      >
-                        {loginState.role === 'ADMIN' && (
-                          <td className="px-4 py-3 hidden sm:table-cell">
-                            <input
-                              type="checkbox"
-                              checked={selectedArticles.includes(news.newsNum)}
-                              onChange={(e) => handleCheckboxChange(news.newsNum, e.target.checked)}
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                          </td>
-                        )}
-                        {/* 역순 번호 */}
-                        <td className="px-2 py-3 text-center newText-sm text-gray-900 whitespace-nowrap min-w-[50px]">
-                          {totalElements - (currentPage * searchParams.size) - index}
-                        </td>
-                        {/* 제목 */}
-                        <td className="px-2 py-3">
-                          <div className="flex items-center space-x-2">
-                            <Link //제목 누르면 상세페이지로 넘어감
-                              to={`/news/NewsDetail/${news.newsNum}`}
-                              className="newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate min-w-[120px] max-w-[150px] lg:max-w-[700px]"
-                              title={news.title}
-                            >
-                              {news.title}
-                            </Link>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
-                          {news.name}
-                        </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px]">
-                          {formatDate(news.createdAt)}
-                        </td>
-                        <td className="px-4 py-3 text-center newText-sm text-gray-500 whitespace-nowrap min-w-[100px] hidden sm:table-cell">
-                          {news.viewCount?.toLocaleString() || 0}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                  ))
+                )}
+              </tbody>
+            </table>
           )}
         </div>
 

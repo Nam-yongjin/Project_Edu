@@ -63,7 +63,7 @@ const NoticeMainComponent = () => {
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h2 className="newText-2xl font-bold text-gray-900">공지사항</h2>
-          <Link 
+          <Link
             to="/notice/NoticeList"
             className="text-gray-600 hover:text-gray-800 newText-base transition-colors duration-200 flex items-center font-medium"
           >
@@ -87,7 +87,7 @@ const NoticeMainComponent = () => {
         ) : (
           <ul className="space-y-3">
             {notices.map((notice, index) => (
-              <li 
+              <li
                 key={notice.noticeNum}
                 className="group hover:bg-gray-50 rounded-lg p-3 transition-all duration-200 border-l-4 border-transparent hover:border-blue-500"
               >
@@ -107,10 +107,10 @@ const NoticeMainComponent = () => {
                         <div className="w-full h-4"></div>
                       )}
                     </div>
-                    
+
                     {/* 제목과 메타 정보 */}
                     <div className="flex-1 min-w-0">
-                      <Link 
+                      <Link
                         to={`/notice/NoticeDetail/${notice.noticeNum}`}
                         className="block group-hover:text-blue-600 transition-colors duration-200"
                       >
@@ -118,7 +118,7 @@ const NoticeMainComponent = () => {
                           <h3 className="newText-base font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
                             {truncateTitle(notice.title)}
                           </h3>
-                          
+
                           {/* New 표시 (최근 3일 이내) */}
                           {(() => {
                             const createdDate = new Date(notice.createdAt);
@@ -129,7 +129,7 @@ const NoticeMainComponent = () => {
                               </span>
                             );
                           })()}
-                          
+
                           {/* 첨부파일 아이콘 */}
                           {notice.fileCount > 0 && (
                             <div className="flex-shrink-0 ml-2" title="첨부파일">
@@ -139,7 +139,7 @@ const NoticeMainComponent = () => {
                             </div>
                           )}
                         </div>
-                        
+
                         {/* 작성자 및 조회수 */}
                         <div className="flex items-center mt-1 newText-sm text-gray-500">
                           <span>{notice.name}</span>

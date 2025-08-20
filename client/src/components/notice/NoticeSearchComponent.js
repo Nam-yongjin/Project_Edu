@@ -20,7 +20,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
     };
 
     const handlePinnedChange = (e) => {
-        const {value} = e.target;
+        const { value } = e.target;
         setSearchForm(prev => ({
             ...prev,
             isPinned: value === "all" ? null : value === "pinned"
@@ -89,7 +89,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                 {/* 고정글 필터와 기간 검색 */}
                 {loginState.role === 'ADMIN' ? (
                     <div className="flex flex-wrap items-center gap-4">
-                        <div  className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                             <label className="newText-sm font-medium text-gray-700">고정글:</label>
                             <select
                                 name="pinnedFilter"
@@ -136,7 +136,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                         onClick={handleReset}
                         className="dark-button newText-sm"
                     >초기화
-                    </button>  
+                    </button>
                 </div>
             </form>
         </div>

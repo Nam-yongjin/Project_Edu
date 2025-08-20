@@ -112,7 +112,7 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                         onClick={handleReset}
                         className="dark-button newText-sm"
                     >초기화
-                    </button>  
+                    </button>
                 </div>
             </form>
         </div>

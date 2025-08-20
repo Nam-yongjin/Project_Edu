@@ -9,7 +9,7 @@ const NoticeDetailComponent = () => {
     const { noticeNum } = useParams();
     const { moveToPath } = useMove();
     const navigate = useNavigate();
-    
+
     const [notice, setNotice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -63,7 +63,7 @@ const NoticeDetailComponent = () => {
         if (window.confirm("정말 삭제하시겠습니까?")) {
             try {
                 await deleteNotice(Number(noticeNum));
-                console.log("삭제할 공지사항:",noticeNum);
+                console.log("삭제할 공지사항:", noticeNum);
                 alert("공지사항이 삭제되었습니다.");
 
                 moveToPath("/notice/NoticeList")
@@ -96,12 +96,12 @@ const NoticeDetailComponent = () => {
         );
     }
     //에러 발생
-   if (error) {
+    if (error) {
         return (
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="text-center py-12">
                     <p className="text-red-600 mb-4">{error}</p>
-                    <button 
+                    <button
                         onClick={handleList}
                         className="dark-button newText-sm"
                     >
@@ -128,11 +128,11 @@ const NoticeDetailComponent = () => {
         );
     }
     //이미지 파일과 일반 파일 분리
-    const imageFiles = notice.files?.filter(file => 
+    const imageFiles = notice.files?.filter(file =>
         file.originalName?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/i)
     ) || [];
-    
-    const attachmentFiles = notice.files?.filter(file => 
+
+    const attachmentFiles = notice.files?.filter(file =>
         !file.originalName?.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/i)
     ) || [];
 
@@ -155,7 +155,7 @@ const NoticeDetailComponent = () => {
                     <div className="flex flex-wrap items-center gap-6 newText-sm text-gray-600 mt-4">
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             <span>작성자: {notice.name || '-'}</span>
                         </div>
@@ -165,7 +165,7 @@ const NoticeDetailComponent = () => {
                             </svg>
                             <span>작성일: {formatDate(notice.createdAt)}</span>
                         </div>
-                         {notice.updatedAt && notice.updatedAt !== notice.createdAt && (
+                        {notice.updatedAt && notice.updatedAt !== notice.createdAt && (
                             <div className="flex items-center gap-1">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -189,43 +189,43 @@ const NoticeDetailComponent = () => {
                         {notice.content || '내용이 없습니다.'}
                     </div>
 
-                {/* 이미지 표시 */}
-                {imageFiles.length > 0 && (
-                    <div className="mt-8">
-                        <div className="grid gap-4">
-                            {imageFiles.map((file, index) => (
-                                <div key={index} className="rounded-lg">
-                                    <img
-                                        src={`http://localhost:8090/api/notice/view/${file.savedName}`}
-                                        alt={file.originalName}
-                                        className="max-w-full h-auto mx-auto block page-shadow"
-                                        style={{
-                                            width: 'auto',
-                                            height: 'auto',
-                                            maxWidth: '100%', //화면 크기보다 클 때만 줄임
-                                            display: 'block',
-                                            margin: '20px auto',
-                                            imageRendering: 'high-quality', //고화질 렌더링
-                                            imageRendering: '-webkit-optimize-contrast' //웹킷 최적화
-                                        }}
-                                        loading="lazy" //지연 로딩
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'block';
-                                        }}
-                                    />
-                                    <div
-                                        className="hidden p-4 text-center text-gray-500 bg-gray-50 newText-base"
-                                    >
-                                        이미지를 불러올 수 없습니다: {file.originalName}
-                                        {/* 기본 이미지:<a href="https://pixabay.com/ko//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Pixabay</a>로부터 입수된 <a href="https://pixabay.com/ko/users/mollyroselee-9214707/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Mollyroselee</a>님의 이미지 입니다. */}
+                    {/* 이미지 표시 */}
+                    {imageFiles.length > 0 && (
+                        <div className="mt-8">
+                            <div className="grid gap-4">
+                                {imageFiles.map((file, index) => (
+                                    <div key={index} className="rounded-lg">
+                                        <img
+                                            src={`http://localhost:8090/api/notice/view/${file.savedName}`}
+                                            alt={file.originalName}
+                                            className="max-w-full h-auto mx-auto block page-shadow"
+                                            style={{
+                                                width: 'auto',
+                                                height: 'auto',
+                                                maxWidth: '100%', //화면 크기보다 클 때만 줄임
+                                                display: 'block',
+                                                margin: '20px auto',
+                                                imageRendering: 'high-quality', //고화질 렌더링
+                                                imageRendering: '-webkit-optimize-contrast' //웹킷 최적화
+                                            }}
+                                            loading="lazy" //지연 로딩
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'block';
+                                            }}
+                                        />
+                                        <div
+                                            className="hidden p-4 text-center text-gray-500 bg-gray-50 newText-base"
+                                        >
+                                            이미지를 불러올 수 없습니다: {file.originalName}
+                                            {/* 기본 이미지:<a href="https://pixabay.com/ko//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Pixabay</a>로부터 입수된 <a href="https://pixabay.com/ko/users/mollyroselee-9214707/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=9553822">Mollyroselee</a>님의 이미지 입니다. */}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
-                </div>  
+                    )}
+                </div>
                 {/* 첨부파일 */}
                 {attachmentFiles.length > 0 && (
                     <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
@@ -237,7 +237,7 @@ const NoticeDetailComponent = () => {
                                         <svg className="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                         </svg>
-                                       <a
+                                        <a
                                             href={file.downloadUrl}
                                             download
                                             target="_blank"
@@ -252,11 +252,11 @@ const NoticeDetailComponent = () => {
                         </div>
                     </div>
                 )}
-                
+
                 {/* 버튼 */}
                 <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                     <div className="flex justify-between">
-                        <button 
+                        <button
                             onClick={handleList}
                             className="dark-button newText-sm"
                         >
@@ -264,22 +264,22 @@ const NoticeDetailComponent = () => {
                         </button>
 
                         {loginState.role === 'ADMIN' ? (
-                        <div className="flex gap-2">
-                            <button 
-                                onClick={handleUpdate}
-                                className="green-button newText-sm"
-                            >
-                                수정하기
-                            </button>
-                            <button 
-                                onClick={handleDelete}
-                                className="nagative-button newText-sm"
-                            >
-                                삭제하기
-                            </button>
-                        </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={handleUpdate}
+                                    className="green-button newText-sm"
+                                >
+                                    수정하기
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="nagative-button newText-sm"
+                                >
+                                    삭제하기
+                                </button>
+                            </div>
                         ) : (<></>)}
-                    </div>                
+                    </div>
                 </div>
             </div>
         </div>
