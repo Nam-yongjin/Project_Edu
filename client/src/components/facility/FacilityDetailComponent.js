@@ -1,6 +1,3 @@
-// src/components/facility/FacilityDetailContent.jsx
-// 상단 배너(공간 상세정보) 추가 + 기존 UI 그대로 유지
-
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   addDays, addMonths, startOfMonth, endOfMonth,
@@ -107,7 +104,11 @@ export default function FacilityDetailContent({ facRevNum }) {
     setDetailLoading(true);
     setErr("");
     getFacilityDetail(facRevNum)
-      .then((d) => mounted && (setData(d), setIdx(0)))
+      .then((d) => {
+        if (!mounted) return;
+        setData(d);
+        setIdx(0); // 정렬 후 0번(대표)이 보이도록
+      })
       .catch((e) => mounted && setErr(e?.response?.data?.message || e.message || "공간 정보를 불러오지 못했습니다."))
       .finally(() => mounted && setDetailLoading(false));
     return () => { mounted = false; };
@@ -157,12 +158,24 @@ export default function FacilityDetailContent({ facRevNum }) {
     return () => { mounted = false; };
   }, [facRevNum, selectedDate]);
 
-  /* 이미지 */
+  /* ===== 이미지: 대표 먼저 오도록 정렬 ===== */
   const srcs = useMemo(() => {
-    const raw = data?.images ?? [];
-    const arr = (Array.isArray(raw) && raw.length ? raw : [null]).map(buildImageUrl).filter(Boolean);
-    return arr.length ? arr : [PLACEHOLDER];
+    const raw = Array.isArray(data?.images) ? data.images : [];
+    if (!raw.length) return [PLACEHOLDER];
+
+    // 객체 배열(추천 스키마: { imageUrl, mainImage, ... }) 기준으로 대표 먼저
+    const sorted = [...raw].sort((a, b) => {
+      const aMain = !!(typeof a === "object" && a?.mainImage);
+      const bMain = !!(typeof b === "object" && b?.mainImage);
+      // true 먼저 오도록: bMain - aMain (true=1, false=0)
+      return (bMain ? 1 : 0) - (aMain ? 1 : 0);
+    });
+
+    // 문자열만 있으면 정렬 의미 없지만 안전하게 처리
+    const urls = sorted.map(buildImageUrl).filter(Boolean);
+    return urls.length ? urls : [PLACEHOLDER];
   }, [data]);
+
   const n = srcs.length;
   const onTouchStart = (e) => (touchX.current = e.touches[0].clientX);
   const onTouchEnd = (e) => {
@@ -235,24 +248,21 @@ export default function FacilityDetailContent({ facRevNum }) {
   function applyReserve() {
     if (!canReserve || submitting) return;
     setSubmitting(true);
-    setNotice("");
+
     createReservation({
       facRevNum,
       facDate: selectedDate,
       startTime: startKey,
       endTime: calcEndHHmm(startKey, durationHrs),
     })
-      .then((res) => {
-        setNotice(res?.message || "예약 신청이 완료되었습니다. (승인 대기)");
-        return getReservedBlocks(facRevNum, selectedDate);
+      .then(() => {
+        alert("예약 신청이 완료되었습니다."); // ✅ 완료 알림
+        navigate("/facility/list");          // ✅ 리스트 페이지로 이동
       })
-      .then((blocks) => {
-        const list = (Array.isArray(blocks) ? blocks : [])
-          .map((b) => ({ start: b.start.slice(0, 5), end: b.end.slice(0, 5) }))
-          .sort((a, b) => (a.start < b.start ? -1 : 1));
-        setReservedBlocks(list);
+      .catch((e) => {
+        // 실패 시에도 알림으로 보여줍니다.
+        alert(e?.response?.data?.message || e?.message || "예약 신청 중 오류가 발생했습니다.");
       })
-      .catch((e) => setNotice(e?.response?.data?.message || e?.message || "예약 신청 중 오류가 발생했습니다."))
       .finally(() => setSubmitting(false));
   }
 
@@ -552,7 +562,7 @@ function DetailCalendarSection(props) {
             {[1,2,3,4].map((h) => {
               const allowedByClose = startKey ? (h <= maxHrs) : false;
               const allowedByNow = !startKey ? false : (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
-              const allowedByBlocks = startKey ? !false : false; // 이미 startSlots에서 1시간 충돌 검증, 추가로 구간 충돌은 신청시 재검증됨
+              const allowedByBlocks = startKey ? !false : false;
               const allowed = allowedByClose && allowedByNow && !selectedDateHasHoliday && (allowedByBlocks || true);
               const selected = durationHrs === h;
               return (

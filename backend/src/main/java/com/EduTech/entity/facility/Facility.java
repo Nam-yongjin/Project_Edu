@@ -58,6 +58,12 @@ public class Facility { // 장소 정보
         img.setFacility(this); // 한쪽만 add, 중복 방지
     }
 
+    public void markAsMain(FacilityImage target) {
+        for (FacilityImage img : images) {
+            img.setMainImage(img == target);
+        }
+    }
+    
     public void removeImage(FacilityImage img) {
         images.remove(img);
         img.setFacility(null);

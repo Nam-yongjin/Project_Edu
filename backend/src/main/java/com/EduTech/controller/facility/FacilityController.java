@@ -110,7 +110,7 @@ public class FacilityController {
             facilityService.reserveFacility(dto, memId);
             return ResponseEntity.ok(Map.of("message", "예약 신청이 완료되었습니다. (승인 대기)"));
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // 예: "해당 시설에서 오늘은 이미 예약하셨습니다. (하루 1회 제한)"
+            // 예: "해당 시설에서 해당일자는 이미 예약하셨습니다. (하루 1회 제한)"
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {

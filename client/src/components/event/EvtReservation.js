@@ -115,7 +115,7 @@ const ReservationListComponent = () => {
               return (
                 <div
                   key={item.evtRevNum}
-                  className="page-shadow rounded-md border border-gray-100 p-4 flex items-start gap-4"
+                  className="page-border rounded-md border border-gray-100 p-4 flex items-start gap-4"
                 >
                   {/* 썸네일 */}
                   <div className="w-24 h-24 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
