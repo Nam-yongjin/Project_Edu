@@ -3,21 +3,21 @@ const ItemModal = ({ maxQty, value, onChange, onConfirm, onClose }) => {
     const maxAllowed = Math.min(maxQty, 30);  // 재고 수량 vs 최대 대여 가능 수량 중 작은 값
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-[320px] space-y-4">
-                <h2 className="text-xl font-semibold text-center">수량 입력</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-[320px] space-y-4 min-blank">
+                <h2 className="newText-xl font-bold text-center">수량 입력</h2>
                 <input
                     type="number"
                     min={1}
                     max={maxAllowed}
                     value={value}
                     onChange={(e) => onChange(Number(e.target.value))}
-                    className="w-full border p-2 rounded text-center text-lg"
+                    className="w-full border p-2 rounded text-center newText-lg"
                 />
                 <div className="flex justify-end gap-3 pt-2">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 rounded border hover:bg-gray-100"
+                        className="px-4 py-2 rounded border normal-button"
                     >
                         취소
                     </button>
@@ -41,7 +41,7 @@ const ItemModal = ({ maxQty, value, onChange, onConfirm, onClose }) => {
                             onConfirm();
 
                         }}
-                        className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                        className="px-4 py-2 rounded positive-button"
                     >
                         확인
                     </button>

@@ -108,6 +108,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 
 			if (m != null) {
 				dto.setAddr(m.getAddr());
+				dto.setAddrDetail(m.getAddrDetail());
 				dto.setPhone(m.getPhone());
 				if (m.getTeacher() != null)
 					dto.setSchoolName(m.getTeacher().getSchoolName());

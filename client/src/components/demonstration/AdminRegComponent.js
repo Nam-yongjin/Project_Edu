@@ -187,7 +187,7 @@ const AdminRegComponent = () => {
                                                         src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                         alt={data.demName}
                                                         onClick={() => moveToPath(`../../demonstration/detail/${data.demNum}`)}
-                                                        className="min-w-20 min-h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                        className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
                                                     />
                                                 ) : (
                                                     <img
@@ -199,13 +199,13 @@ const AdminRegComponent = () => {
                                             </td>
                                             <td title={data.memId}>{data.memId}</td>
                                             <td title={data.title}>{data.phone || "-"}</td>
-                                            <td title={data.addr} className="truncate max-w-[14%]" >
-                                                {data.addr || "-"}
+                                            <td title={data.addr+" "+data.addrDetail} className="truncate max-w-[100px]" >
+                                                {data.addr+" "+data.addrDetail|| "-"}
                                             </td>
-                                            <td title={data.companyName}>
+                                            <td title={data.companyName} className="truncate max-w-[100px]">
                                                 {data.companyName || "-"}
                                             </td>
-                                            <td title={data.demName}>
+                                            <td title={data.demName} className="truncate max-w-[100px]">
                                                 {data.demName || "-"}
                                             </td>
                                             <td>{data.itemNum ?? "-"}</td>
