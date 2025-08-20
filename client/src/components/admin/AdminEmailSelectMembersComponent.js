@@ -252,7 +252,7 @@ const AdminEmailSelectMembersComponent = () => {
                         state: { selectedMembers },
                     });
                 }}
-                className="bg-yellow-300 hover:bg-yellow-200 text-white font-semibold py-2 px-4 rounded"
+                className="min-blank positive-button newText-base"
             >
                 선택 회원 메시지 보내기
             </button>

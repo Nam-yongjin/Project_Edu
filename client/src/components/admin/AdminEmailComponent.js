@@ -193,7 +193,7 @@ const AdminEmailComponent = ({ members }) => {
       <div className="text-center">
         <button
           onClick={handleSend}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="positive-button newText-base"
         >
           이메일 보내기
         </button>
