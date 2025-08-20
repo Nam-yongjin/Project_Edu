@@ -24,6 +24,7 @@ public class DemonstrationListReserveDTO { // 실증 교사 신청 조회하는 
 	private String schoolName; // 학교 이름
 	private String demName;
 	private String addr; 
+	private String addrDetail;
 	private String phone; 
 	private Long bItemNum;
 	private List<ResRequestDTO> requestDTO;

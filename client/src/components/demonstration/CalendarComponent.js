@@ -176,12 +176,12 @@ const CalendarComponent = ({ selectedDate, setSelectedDate, demNum, disabledDate
             <>
               <abbr className={getDayClass(date)}>{date.getDate()}</abbr>
               {disabled ? (
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] text-black font-semibold select-none">
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] text-black newText-xs whitespace-nowrap select-none">
                   예약불가
                 </div>
               ) : (
                 <button
-                  className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 w-[50px] text-center rounded bg-blue-600 text-white hover:bg-blue-700"
+                  className="absolute bottom-1 left-1/2 -translate-x-1/2 newText-xs px-2 py-1 w-[50px] text-center rounded positive-button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleReserve(date);

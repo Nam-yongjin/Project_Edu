@@ -295,6 +295,7 @@ public class AdminServiceImpl implements AdminService {
 			                dto.setCompanyName(member.getCompany().getCompanyName());
 			            }
 			            dto.setAddr(member.getAddr());
+			            dto.setAddrDetail(member.getAddrDetail());
 			            dto.setPhone(member.getPhone());
 			        }
 
@@ -394,6 +395,7 @@ public class AdminServiceImpl implements AdminService {
 		                dto.setSchoolName(member.getTeacher().getSchoolName());
 		            }
 		            dto.setAddr(member.getAddr());
+		            dto.setAddrDetail(member.getAddrDetail());
 		            dto.setPhone(member.getPhone());
 		        }
 

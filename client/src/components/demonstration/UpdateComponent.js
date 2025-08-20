@@ -102,6 +102,18 @@ const UpdateComponent = ({ demNum }) => {
   };
 
   const update = () => {
+    if (dem.demName.length > 100) {
+    alert("물품명은 100자 이내여야 합니다.");
+    return;
+  }
+  if (dem.demInfo.length > 1000) {
+    alert("물품 소개는 1000자 이내여야 합니다.");
+    return;
+  }
+  if (dem.demMfr.length > 200) {
+    alert("제조사는 200자 이내여야 합니다.");
+    return;
+  }
     const newErrors = {};
     if (!dem.demName.trim()) newErrors.demName = "물품명은 필수입니다.";
     if (!dem.demMfr.trim()) newErrors.demMfr = "제조사는 필수입니다.";

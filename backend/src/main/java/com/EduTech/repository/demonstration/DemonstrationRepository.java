@@ -30,7 +30,7 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 	Page<DemonstrationPageListDTO> selectPageDemMfr(Pageable pageable, @Param("search") String search,@Param("state")DemonstrationState state);
 
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지)
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationDetailDTO(d.demNum, d.demName, d.demInfo,d.demMfr, d.itemNum, reg.expDate) FROM Demonstration d, DemonstrationRegistration reg WHERE d.demNum = reg.demonstration.demNum AND d.demNum=:demNum")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationDetailDTO(d.demNum, d.demName, d.demInfo,d.demMfr, d.itemNum,reg.expDate,d.category) FROM Demonstration d, DemonstrationRegistration reg WHERE d.demNum = reg.demonstration.demNum AND d.demNum=:demNum")
 	DemonstrationDetailDTO selectPageDetailDem(@Param("demNum") Long demNum);
 
 	@Modifying // JPQL에서 업데이트하는 방식 (기업의 실증 등록내용을 수정시켜주는 쿼리문)
