@@ -105,16 +105,16 @@ const NewsMainComponent = () => {
                             {truncateTitle(news.title)}
                           </h3>
 
-                            {/* New 표시 (최근 3일 이내) */}
-                            {(() => {
-                              const createdDate = new Date(news.createdAt);
-                              const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
-                              return daysDiff <= 3 && (
-                                <span className="ml-2 newText-sm font-bold text-red-500 whitespace-nowrap">
-                                  New !
-                                </span>
-                              );
-                            })()}
+                          {/* New 표시 (최근 3일 이내) */}
+                          {(() => {
+                            const createdDate = new Date(news.createdAt);
+                            const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+                            return daysDiff <= 3 && (
+                              <span className="ml-2 newText-sm font-bold text-red-500 whitespace-nowrap">
+                                New !
+                              </span>
+                            );
+                          })()}
                         </div>
 
                         {/* 작성자 및 조회수 */}

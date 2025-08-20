@@ -4,16 +4,16 @@ import useMove from "../../hooks/useMove";
 import { deleteNotices } from "../../api/noticeApi";
 
 const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
-    const loginState = useSelector((state) => state.loginState);
-    const { moveToPath } = useMove(); //경로 이동
+  const loginState = useSelector((state) => state.loginState);
+  const { moveToPath } = useMove(); //경로 이동
 
-    const handleWrite = (e) => {
-        e.preventDefault();
-        moveToPath("/notice/AddNotice");
-    };
-  
-    // 선택된 공지사항 삭제
-    const handleDelete = async () => { //공지글 선택 삭제
+  const handleWrite = (e) => {
+    e.preventDefault();
+    moveToPath("/notice/AddNotice");
+  };
+
+  // 선택된 공지사항 삭제
+  const handleDelete = async () => { //공지글 선택 삭제
     if (selectedNotices.length === 0) {
       alert("삭제할 공지사항을 선택해주세요.");
       return;
@@ -47,17 +47,17 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
               선택 삭제 ({selectedNotices.length})
             </button>
           )}
-          
+
           <button
-              onClick={handleWrite}
+            onClick={handleWrite}
             className="positive-button newText-sm"
             style={{ minWidth: "70px" }}
           >
             글쓰기
           </button>
-          
+
           {selectedNotices.length === 1 && (
-             <button
+            <button
               onClick={() => moveToPath(`/notice/UpdateNotice/${selectedNotices[0]}`)}
               className="green-button newText-sm"
             >
@@ -65,7 +65,7 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
             </button>
           )}
         </div>
-       ) : (<></>)}
+      ) : (<></>)}
     </div>
   );
 };

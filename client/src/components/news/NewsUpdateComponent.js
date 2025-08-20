@@ -33,7 +33,7 @@ const NewsUpdateComponent = () => {
 
     // 뉴스 데이터 불러오기
     useEffect(() => {
-        console.log("뉴스 데이터 불러오기", {newsNum});
+        console.log("뉴스 데이터 불러오기", { newsNum });
 
         const fetchNewsUpdate = async () => {
             if (!newsNum) {
@@ -151,6 +151,11 @@ const NewsUpdateComponent = () => {
 
     // 수정 버튼
     const handleUpdate = async () => {
+
+        // 수정 확인
+        const isConfirmed = window.confirm("정말 이 공지사항을 수정하시겠습니까?");
+        if (!isConfirmed) return; // 취소하면 바로 종료
+
         // 유효성 검사
         if (!validateForm()) {
             return;
@@ -263,46 +268,46 @@ const NewsUpdateComponent = () => {
                 {/* 내용 + 이미지 미리보기 */}
                 <div>
                     <label className="block font-medium mb-1 newText-base">내용</label>
-                        {/* 이미지 미리보기 */}
-                        {news.imageUrl && (
-                            <div className="p-4 border border-gray-300 rounded bg-gray-50 mb-2">
-                                {isImageLoading && (
-                                    <div className="flex items-center justify-center h-48 bg-gray-100 rounded">
-                                        <div className="text-gray-500 newText-base">이미지 로딩 중...</div>
+                    {/* 이미지 미리보기 */}
+                    {news.imageUrl && (
+                        <div className="p-4 border border-gray-300 rounded bg-gray-50 mb-2">
+                            {isImageLoading && (
+                                <div className="flex items-center justify-center h-48 bg-gray-100 rounded">
+                                    <div className="text-gray-500 newText-base">이미지 로딩 중...</div>
+                                </div>
+                            )}
+                            {!imageLoadError && !isImageLoading && (
+                                <div className="relative">
+                                    <img
+                                        src={news.imageUrl}
+                                        alt="뉴스 썸네일"
+                                        onLoad={handleImageLoad}
+                                        onError={handleImageError}
+                                        className="page-shadow newText-base"
+                                        style={{ maxHeight: '300px' }}
+                                    />
+                                </div>
+                            )}
+                            {imageLoadError && (
+                                <div className="flex items-center justify-center h-48 bg-gray-100 rounded border-2 border-dashed border-gray-300">
+                                    <div className="text-center text-gray-500">
+                                        <div className="newText-4xl mb-2">🖼️</div>
+                                        <div>이미지를 불러올 수 없습니다</div>
+                                        <div className="newText-sm">URL을 확인해주세요</div>
                                     </div>
-                                )}
-                                {!imageLoadError && !isImageLoading && (
-                                    <div className="relative">
-                                        <img
-                                            src={news.imageUrl}
-                                            alt="뉴스 썸네일"
-                                            onLoad={handleImageLoad}
-                                            onError={handleImageError}
-                                            className="page-shadow newText-base"
-                                            style={{ maxHeight: '300px' }}
-                                        />
-                                    </div>
-                                )}
-                                {imageLoadError && (
-                                    <div className="flex items-center justify-center h-48 bg-gray-100 rounded border-2 border-dashed border-gray-300">
-                                        <div className="text-center text-gray-500">
-                                            <div className="newText-4xl mb-2">🖼️</div>
-                                            <div>이미지를 불러올 수 없습니다</div>
-                                            <div className="newText-sm">URL을 확인해주세요</div>
-                                        </div>
-                                    </div>        
-                                )}
-                            </div>
-                        )}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                        {/* 내용 */}
-                        <textarea
-                            value={news.content}
-                            onChange={(e) => setNews({ ...news, content: e.target.value })}
-                            placeholder="뉴스 내용을 입력하세요"
-                            className="w-full input-focus newText-base"
-                            style={{ minHeight: "300px", resize: "none", overflowY: "auto" }} 
-                        />
+                    {/* 내용 */}
+                    <textarea
+                        value={news.content}
+                        onChange={(e) => setNews({ ...news, content: e.target.value })}
+                        placeholder="뉴스 내용을 입력하세요"
+                        className="w-full input-focus newText-base"
+                        style={{ minHeight: "300px", resize: "none", overflowY: "auto" }}
+                    />
                     {errors.content && (
                         <p className="text-red-500 newText-sm mt-1">{errors.content}</p>
                     )}

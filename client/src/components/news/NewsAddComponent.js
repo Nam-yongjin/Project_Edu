@@ -4,7 +4,7 @@ import { createNews } from "../../api/newsApi";
 
 const NewsAddComponent = () => {
     const { moveToPath } = useMove();
-    
+
     // 초기값 객체
     const initState = {
         title: '',
@@ -14,7 +14,7 @@ const NewsAddComponent = () => {
     };
 
     const [news, setNews] = useState(initState);
-    
+
     // 에러 객체
     const [errors, setErrors] = useState({
         title: '',
@@ -44,21 +44,21 @@ const NewsAddComponent = () => {
         if (!isValidUrl(url)) return false;
         const imageExtensions = ['.jpg', '.jpeg', '.png'];
         const urlLower = url.toLowerCase();
-        return imageExtensions.some(ext => urlLower.includes(ext)) || 
-               urlLower.includes('image') || 
-               urlLower.includes('img');
+        return imageExtensions.some(ext => urlLower.includes(ext)) ||
+            urlLower.includes('image') ||
+            urlLower.includes('img');
     };
 
     const validateForm = () => {
         const newErrors = {};
-    
+
         // 제목 검사
         if (!news.title.trim()) {
             newErrors.title = "제목을 입력하세요.";
         } else if (news.title.length > 100) {
             newErrors.title = "제목은 최대 100자까지 입력 가능합니다.";
         }
-    
+
         // 내용 검사
         if (!news.content.trim()) {
             newErrors.content = "내용을 입력하세요.";
@@ -75,7 +75,7 @@ const NewsAddComponent = () => {
         if (news.linkUrl && !isValidUrl(news.linkUrl)) {
             newErrors.linkUrl = "올바른 URL을 입력하세요.";
         }
-    
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -85,7 +85,7 @@ const NewsAddComponent = () => {
         const url = e.target.value;
         setNews({ ...news, imageUrl: url });
         setImageLoadError(false);
-        
+
         if (url && isValidImageUrl(url)) {
             setIsImageLoading(true);
         }
@@ -107,26 +107,26 @@ const NewsAddComponent = () => {
     const handleAdd = async () => {
         if (!validateForm()) {
             return;
-    }
+        }
 
-    try {
-        const newsData = {
-            title: news.title,
-            content: news.content,
-            imageUrl: news.imageUrl || null,
-            linkUrl: news.linkUrl || null
-        };
+        try {
+            const newsData = {
+                title: news.title,
+                content: news.content,
+                imageUrl: news.imageUrl || null,
+                linkUrl: news.linkUrl || null
+            };
 
-        await createNews(newsData); // 그냥 객체로 전송
+            await createNews(newsData); // 그냥 객체로 전송
 
-        alert("뉴스가 등록되었습니다.");
-        moveToPath("/news/NewsList");
+            alert("뉴스가 등록되었습니다.");
+            moveToPath("/news/NewsList");
 
-    } catch (error) {
-        console.error("뉴스 등록 실패:", error);
-        // ... 에러 처리
-    }
-};
+        } catch (error) {
+            console.error("뉴스 등록 실패:", error);
+            // ... 에러 처리
+        }
+    };
 
     // 취소 버튼
     const handleCancel = () => {
@@ -140,7 +140,7 @@ const NewsAddComponent = () => {
             <div className="min-blank mt-4 px-10 p-6 bg-white page-shadow space-y-6">
                 <h2 className="newText-2xl my-4 font-bold">뉴스 등록</h2>
                 <hr className="border-gray-200 my-4" />
-                
+
                 {/* 제목 */}
                 <div>
                     <label className="block font-medium newText-base mb-1">제목</label>
@@ -192,49 +192,49 @@ const NewsAddComponent = () => {
                 {/* 내용 + 이미지 미리보기 */}
                 <div>
                     <label className="block font-medium newText-base mb-1">내용</label>
-                        {/* 이미지 미리보기 */}
-                        {news.imageUrl && (
-                            <div className="p-4 border border-gray-300 rounded bg-gray-50 mb-2">
-                                {isImageLoading && (
-                                    <div className="flex items-center justify-center h-48 bg-gray-100 rounded">
-                                        <div className="text-gray-500 newText-base">이미지 로딩 중...</div>
+                    {/* 이미지 미리보기 */}
+                    {news.imageUrl && (
+                        <div className="p-4 border border-gray-300 rounded bg-gray-50 mb-2">
+                            {isImageLoading && (
+                                <div className="flex items-center justify-center h-48 bg-gray-100 rounded">
+                                    <div className="text-gray-500 newText-base">이미지 로딩 중...</div>
+                                </div>
+                            )}
+                            {!imageLoadError && !isImageLoading && (
+                                <div className="relative">
+                                    <img
+                                        src={news.imageUrl}
+                                        alt="뉴스 썸네일"
+                                        onLoad={handleImageLoad}
+                                        onError={handleImageError}
+                                        className="page-shadow newText-base"
+                                        style={{ maxHeight: '300px' }}
+                                    />
+                                </div>
+                            )}
+                            {imageLoadError && (
+                                <div className="flex items-center justify-center h-48 bg-gray-100 rounded border-2 border-dashed border-gray-300">
+                                    <div className="text-center text-gray-500">
+                                        <div className="newText-4xl mb-2">🖼️</div>
+                                        <div>이미지를 불러올 수 없습니다</div>
+                                        <div className="newText-sm">URL을 확인해주세요</div>
                                     </div>
-                                )}
-                                {!imageLoadError && !isImageLoading && (
-                                    <div className="relative">
-                                        <img
-                                            src={news.imageUrl}
-                                            alt="뉴스 썸네일"
-                                            onLoad={handleImageLoad}
-                                            onError={handleImageError}
-                                            className="page-shadow newText-base"
-                                            style={{ maxHeight: '300px' }}
-                                        />
-                                    </div>
-                                )}
-                                {imageLoadError && (
-                                    <div className="flex items-center justify-center h-48 bg-gray-100 rounded border-2 border-dashed border-gray-300">
-                                        <div className="text-center text-gray-500">
-                                            <div className="newText-4xl mb-2">🖼️</div>
-                                            <div>이미지를 불러올 수 없습니다</div>
-                                            <div className="newText-sm">URL을 확인해주세요</div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                        
-                        {/* 내용 입력 */}
-                        <textarea
-                            value={news.content}
-                            onChange={(e) => setNews({ ...news, content: e.target.value })}
-                            placeholder="뉴스 내용을 입력하세요"
-                            className="w-full input-focus newText-base"
-                            style={{ minHeight: "300px", resize: "none", overflowY: "auto" }} 
-                        />
-                        {errors.content && (
-                            <p className="text-red-500 newText-sm mt-1">{errors.content}</p>
-                        )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* 내용 입력 */}
+                    <textarea
+                        value={news.content}
+                        onChange={(e) => setNews({ ...news, content: e.target.value })}
+                        placeholder="뉴스 내용을 입력하세요"
+                        className="w-full input-focus newText-base"
+                        style={{ minHeight: "300px", resize: "none", overflowY: "auto" }}
+                    />
+                    {errors.content && (
+                        <p className="text-red-500 newText-sm mt-1">{errors.content}</p>
+                    )}
                 </div>
 
                 {/* 버튼 */}
