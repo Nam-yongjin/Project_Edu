@@ -147,7 +147,7 @@ function EvtDetailComponent({ eventNum }) {
     {
       TEACHER: "교사",
       STUDENT: "학생",
-      USER: "일반인",
+      USER: "시민참여",
     }[event?.category] || "미지정";
 
   if (loading) {
