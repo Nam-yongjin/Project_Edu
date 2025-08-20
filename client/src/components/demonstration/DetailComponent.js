@@ -126,9 +126,9 @@ const DetailComponent = ({ demNum }) => {
 
     const reservation = (updatedItemNum) => {
         if (loginState.role !== "TEACHER") {
-                alert("교사만 예약 가능합니다.");
-                return;
-            }
+            alert("교사만 예약 가능합니다.");
+            return;
+        }
         const loadData = async () => {
 
             if (!selectedDate || selectedDate.length === 0) {
@@ -161,8 +161,8 @@ const DetailComponent = ({ demNum }) => {
                 return;
             }
 
-            if (reserveCheck) { // 이미 해당 상품을 예약한 회원 일경우, return
-                alert('이미 해당 상품을 예약 하셨습니다.');
+            if (reserveCheck) { // 이미 해당 물품을 예약한 회원 일경우, return
+                alert('이미 해당 물품을 예약 하셨습니다.');
                 return;
             }
 
@@ -183,140 +183,153 @@ const DetailComponent = ({ demNum }) => {
 
     return (
         <>
-            {/* 최상위 div에 mx-auto 추가하여 화면 중앙 배치 */}
-            <div className="max-w-screen-lg mb-2 mx-auto">
-                {/* 이미지와 텍스트 영역 flex 컨테이너에 justify-center 추가로 가로 중앙 정렬 */}
-                <div className="flex items-start gap-4 justify-center">
-                    <img
-                        onClick={() => {
-                            const urlList = fileList.imageList.map(img => `http://localhost:8090/view/${img.imageUrl}`);
-                            setSelectedImages(urlList);
-                            setModalOpen(true);
-                        }}
-                        src={mainImageUrl}
-                        alt="default"
-                        className="w-40 h-40 object-cover mb-10 w-[500px] h-[300px]"
-                    />
-
-                    <ImageSliderModal
-                        open={modalOpen}
-                        onClose={() => setModalOpen(false)}
-                        imageList={selectedImages}
-                    />
-
-                    {/* 텍스트 영역에 ml-[100px] 제거하여 중앙정렬 방해 안함 */}
-                    <div className="space-y-1 mt-3">
-                        <span className="text-blue-600">장비명:</span> {dem.demName}
-                        <br />
-                        <span className="text-blue-600">제조사:</span> {dem.demMfr}
-                        <br />
-                        <span className="text-blue-600">물품소개:</span> {dem.demInfo}
-                        <br />
-                        <span className="text-blue-600">수량: </span> {dem.itemNum}
-                    </div>
-                </div>
-                <div>
-                    <div className="flex gap-2 mt-2 text-[10px]">
-                        <h2 className="text-xl text-blue-600 font-semibold">날짜 선택</h2> (신청기간은 연속으로 최소 하루 부터 신청 가능합니다.(최대90일))
-                        <div className="ml-[60px] flex gap-2">
-                            <div className="w-10 h-5 rounded-full bg-gray-300 flex items-center justify-center border-2 border-black border-solid">
-                                불가
-                            </div>
-                            <div className="w-10 h-5 rounded-full bg-white flex items-center justify-center border-2 border-black border-solid">
-                                가능
-                            </div>
-                            <div className="w-10 h-5 rounded-full bg-emerald-100 flex items-center justify-center border-2 border-black border-solid">
-                                선택
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap lg:flex-nowrap gap-x-10 mt-6">
-                        {/* 캘린더 */}
-                        <div className="flex-1 min-w-[300px]">
-                            <CalendarComponent
-                                selectedDate={selectedDate}
-                                setSelectedDate={setSelectedDate}
-                                demNum={demNum}
-                                disabledDates={disabledDates}
-                                setDisabledDates={setDisabledDates}
-                            />
-                        </div>
-
-                        {/* 날짜 선택 및 버튼 등 */}
-                        <div className="space-y-6 w-full max-w-md">
-                            <div className="border border-black p-4 rounded space-y-4 w-full">
-                                <div className="flex items-center gap-3">
-                                    <img src={calendar} className="w-6 h-6" alt="calendar" />
-                                    {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
-                                    <label className="text-base font-semibold w-[100px]">예약 시작일:</label>
-                                    <DatePicker
-                                        className="border p-1 text-sm flex-1 min-w-0 box-border"
-                                        selected={startDate}
-                                        onChange={handleStartDateChange}
-                                        dateFormat="yyyy-MM-dd"
-                                        placeholderText="날짜를 선택하세요"
-                                        minDate={new Date()}
-                                        name="startDate"
-                                        locale={ko}
-                                        onMonthChange={(date) => {
-                                            fetchDisabledDates(date.getFullYear(), date.getMonth());
-                                        }}
-                                        excludeDates={disabledDates.map(d => new Date(d))}
-                                    />
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <img src={calendar} className="w-6 h-6" alt="calendar" />
-                                    {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
-                                    <label className="text-base font-semibold w-[100px]">예약 종료일:</label>
-                                    <DatePicker
-                                        className="border p-1 text-sm flex-1 min-w-0 box-border"
-                                        selected={endDate}
-                                        onChange={handleEndDateChange}
-                                        dateFormat="yyyy-MM-dd"
-                                        placeholderText="날짜를 선택하세요"
-                                        minDate={new Date()}
-                                        name="endDate"
-                                        locale={ko}
-                                        onMonthChange={(date) => {
-                                            fetchDisabledDates(date.getFullYear(), date.getMonth());
-                                        }}
-                                        excludeDates={disabledDates.map(d => new Date(d))}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <button
-                                    className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2 px-4 rounded w-full mb-[190px]"
-                                    onClick={() => setShowQtyModal(true)}
-                                >
-                                    예약 신청하기
-                                </button>
-                            </div>
-                            {showQtyModal && (
-                                <ItemModal
-                                    maxQty={dem.itemNum} // 현재 남은 재고 수량 전달
-                                    value={reservationQty}
-                                    onChange={(val) => setReservationQty(val)}
-                                    onConfirm={() => {
-                                        setShowQtyModal(false);
-                                        setDem(prev => {
-                                            const updatedDem = { ...prev, itemNum: prev.itemNum - reservationQty };
-                                            reservation(updatedDem.itemNum);
-                                            return updatedDem;
-                                        });
+            <div className="max-w-screen-xl mx-auto my-10">
+                <div className="min-blank">
+                    <div className="newText-3xl font-bold ">실증 물품 대여 예약</div>
+                    <div className="w-full overflow-x-auto">
+                       <div className="flex gap-10 min-w-full border-2 border-black p-2">
+                            {/* 이미지 영역 */}
+                            <div className="w-1/2 min-h-[500px]">
+                                <img
+                                    onClick={() => {
+                                        const urlList = fileList.imageList.map(
+                                            (img) => `http://localhost:8090/view/${img.imageUrl}`
+                                        );
+                                        setSelectedImages(urlList);
+                                        setModalOpen(true);
                                     }}
-                                    onClose={() => setShowQtyModal(false)}
+                                    src={mainImageUrl}
+                                    alt="default"
+                                    className="min-w-[500px] min-h-[500px] object-cover rounded  border border-black"
                                 />
-                            )}
+                            </div>
 
-                            <div className="border border-black p-4 rounded flex items-start gap-3 bg-gray-50">
-                                <img src={megaphone} className="w-8 h-8 mt-1" alt="megaphone" />
-                                {/*<a href="https://www.flaticon.com/free-icons/advertising" title="advertising icons">Advertising icons created by Tanah Basah - Flaticon</a> */}
-                                <div className="text-sm leading-relaxed">
-                                    관리자의 승인 후 예약이 확정되며, 마이페이지에서 확인하실 수 있습니다.<br />
-                                    <span className="text-red-600 font-semibold">* 24시간 이내 승인 (주말 제외)</span>
+                            <ImageSliderModal
+                                open={modalOpen}
+                                onClose={() => setModalOpen(false)}
+                                imageList={selectedImages}
+                            />
+
+                            {/* 설명 영역 */}
+                            <div className="w-1/2 max-h-[500px] overflow-y-auto break-words">
+                             <span className="text-black newText-2xl font-bold">카테고리:</span> <span className="text-black newText-2xl font-bold">{dem.category}</span>
+                            <div className="w-full max-h-[500px] overflow-y-auto break-words border-2 border-[#64b5f6]"></div>
+                                <span className="text-blue-600 newText-2xl font-bold">물품명:</span> {dem.demName}
+                                <br />
+                                <span className="text-blue-600 newText-2xl font-bold">제조사:</span> {dem.demMfr}
+                                <br />
+                                <span className="text-blue-600 newText-2xl font-bold">물품소개:</span> {dem.demInfo}
+                                <br />
+                                <span className="text-blue-600 newText-2xl font-bold">수량:</span> {dem.itemNum + "개"}
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div>
+                        <div className="flex mt-2 w-1/2 whitespace-nowrap">
+                            <h2 className="newText-base text-blue-600 font-bold mr-3">날짜 선택</h2> <span className="text-xs mr-3 mt-1">(신청기간은 연속으로 최소 하루 부터 신청 가능합니다.(최대90일))</span>
+                            <div className="flex gap-2 newText-xs">
+                                <div className="w-10 h-5 rounded-full bg-gray-300 flex items-center justify-center border-2 border-black border-solid">
+                                    불가
+                                </div>
+                                <div className="w-10 h-5 rounded-full bg-white flex items-center justify-center border-2 border-black border-solid">
+                                    가능
+                                </div>
+                                <div className="w-10 h-5 rounded-full bg-emerald-100 flex items-center justify-center border-2 border-black border-solid">
+                                    선택
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap lg:flex-nowrap gap-x-10 mt-6">
+                            {/* 캘린더 */}
+                            <div className="flex-1 w-full">
+                                <CalendarComponent
+                                    selectedDate={selectedDate}
+                                    setSelectedDate={setSelectedDate}
+                                    demNum={demNum}
+                                    disabledDates={disabledDates}
+                                    setDisabledDates={setDisabledDates}
+                                />
+                            </div>
+
+                            <div className="space-y-6 w-1/2 mx-auto">
+                                {/* 날짜 선택 박스 */}
+                                <div className="border border-black p-6 rounded h-[200px] flex flex-col justify-center space-y-4">
+                                    <div className="flex items-center gap-4">
+                                        <img src={calendar} className="w-8 h-8" alt="calendar" />
+                                        {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
+                                        <label className="text-lg font-semibold w-[120px]">예약 시작일:</label>
+                                        <DatePicker
+                                            className="border p-2 text-base flex-1 min-w-0 box-border"
+                                            selected={startDate}
+                                            onChange={handleStartDateChange}
+                                            dateFormat="yyyy-MM-dd"
+                                            placeholderText="날짜를 선택하세요"
+                                            minDate={new Date()}
+                                            name="startDate"
+                                            locale={ko}
+                                            onMonthChange={(date) => fetchDisabledDates(date.getFullYear(), date.getMonth())}
+                                            excludeDates={disabledDates.map(d => new Date(d))}
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <img src={calendar} className="w-8 h-8" alt="calendar" />
+                                        {/* <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Stockio - Flaticon</a>*/}
+                                        <label className="newText-base font-bold w-[120px]">예약 종료일:</label>
+                                        <DatePicker
+                                            className="border p-2 text-base flex-1 min-w-0 box-border"
+                                            selected={endDate}
+                                            onChange={handleEndDateChange}
+                                            dateFormat="yyyy-MM-dd"
+                                            placeholderText="날짜를 선택하세요"
+                                            minDate={new Date()}
+                                            name="endDate"
+                                            locale={ko}
+                                            onMonthChange={(date) => fetchDisabledDates(date.getFullYear(), date.getMonth())}
+                                            excludeDates={disabledDates.map(d => new Date(d))}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* 예약 버튼 */}
+                                <div className="space-y-2">
+                                    <button
+                                        className="positive-button py-3 px-6 rounded w-full newText-base"
+                                        onClick={() => setShowQtyModal(true)}
+                                    >
+                                        예약 신청하기
+                                    </button>
+                                </div>
+
+                                {showQtyModal && (
+                                    <ItemModal
+                                        maxQty={dem.itemNum} // 현재 남은 재고 수량 전달
+                                        value={reservationQty}
+                                        onChange={(val) => setReservationQty(val)}
+                                        onConfirm={() => {
+                                            setShowQtyModal(false);
+                                            setDem(prev => {
+                                                const updatedDem = { ...prev, itemNum: prev.itemNum - reservationQty };
+                                                reservation(updatedDem.itemNum);
+                                                return updatedDem;
+                                            });
+                                        }}
+                                        onClose={() => setShowQtyModal(false)}
+                                    />
+                                )}
+
+                                {/* 안내 박스 */}
+                                <div className="border border-black p-6 rounded flex items-center gap-4 bg-gray-50 h-[150px] mt-4 newText-base">
+                                    <img src={megaphone} className="w-10 h-10" alt="megaphone" />
+                                    {/*<a href="https://www.flaticon.com/free-icons/advertising" title="advertising icons">Advertising icons created by Tanah Basah - Flaticon</a> */}
+                                    <div className="leading-relaxed flex-1">
+                                        관리자의 승인 후 예약이 확정되며, 마이페이지에서 확인하실 수 있습니다.<br />
+                                        <span className="text-red-600 font-bold">* 24시간 이내 승인 (주말 제외)</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

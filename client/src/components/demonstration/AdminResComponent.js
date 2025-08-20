@@ -178,21 +178,21 @@ const AdminResComponent = () => {
                           src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                           alt={member.demName}
                           onClick={() => moveToPath(`../../demonstration/detail/${member.demNum}`)}
-                          className="min-w-20 min-h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                          className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
                         />
                       ) : (
                         <img
                           src={defaultImage}
                           alt="default"
-                          className="min-w-20 min-h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                          className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
                         />
                       )}
                     </td>
                     <td title={member.memId}>{member.memId}</td>
                     <td title={member.phone}>{member.phone || "-"}</td>
-                    <td title={member.addr} className="truncate max-w-[14%]">{member.addr || "-"}</td>
-                    <td title={member.schoolName}>{member.schoolName || "-"}</td>
-                    <td title={member.demName}>{member.demName || "-"}</td>
+                    <td title={member.addr+" "+member.addrDetail} className="truncate max-w-[100px]">{member.addr+" "+member.addrDetail || "-"}</td>
+                    <td title={member.schoolName} className="truncate max-w-[100px]">{member.schoolName || "-"}</td>
+                    <td title={member.demName} className="truncate max-w-[100px]">{member.demName || "-"}</td>
                     <td>{member.bitemNum ?? "-"}</td>
                     <td>
                       <div>{getStateLabel(member.state)}</div>
@@ -270,7 +270,7 @@ const AdminResComponent = () => {
       {/* 모달 */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
             <h2 className="newText-3xl font-bold mb-1">신청 내역</h2>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {modalData.map((req, idx) => (
