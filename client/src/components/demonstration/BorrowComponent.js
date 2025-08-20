@@ -111,7 +111,7 @@ const BorrowComponent = () => {
                     />
 
                     <div className="overflow-x-auto">
-                        <p className="text-gray-600 mt-1 my-2">
+                        <p className="text-gray-600 my-5">
                             전체 {pageData.totalElements}건의 신청 내역이 있습니다.</p>
                         <table className="w-full">
                             <thead className="bg-gray-100 text-gray-700 newText-base">
@@ -185,7 +185,7 @@ const BorrowComponent = () => {
                                                             src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                             alt={item.demName}
                                                             onClick={() => moveToPath(`../detail/${item.demNum}`)}
-                                                            className="min-w-20 min-h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                            className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
                                                         />
                                                     ) : (
                                                         <img
@@ -195,8 +195,9 @@ const BorrowComponent = () => {
                                                         />
                                                     )}
                                                 </td>
-                                                <td>{item.demName}</td>
-                                                <td>{item.demMfr}</td>
+                                                <td className="truncate max-w-[100px]" title={item.demName}>{item.demName}</td>
+                                                <td className="truncate max-w-[100px]" title={item.demMfr}>{item.demMfr}</td>
+
                                                 <td>{item.itemNum}</td>
                                                 <td>
                                                     {item.expDate ? new Date(item.expDate).toLocaleDateString() : "-"}
@@ -205,25 +206,27 @@ const BorrowComponent = () => {
                                                     {item.regDate ? new Date(item.regDate).toLocaleDateString() : "-"}
                                                 </td>
                                                 <td>{getStateLabel(itemState)}</td>
-                                                <td className="py-3 px-4 text-center flex flex-col gap-1 items-stretch">
+                                                <td className="py-2 px-2 text-center">
                                                     <button
                                                         disabled={itemState !== "WAIT"}
-                                                        className={`rounded newText-sm ${itemState === "WAIT" ? "positive-button cursor-pointer" : "disable-button"}`}
+                                                        className={`block w-full max-w-full rounded min-w-[12%] ${itemState === "WAIT" ? "positive-button cursor-pointer" : "disable-button"}`}
                                                         onClick={() => moveToPath(`/demonstration/update/${item.demNum}`)}
                                                     >
                                                         물품 수정
                                                     </button>
 
+
                                                     <button
                                                         disabled={itemState !== "WAIT"}
-                                                        className={`rounded newText-sm ${itemState === "WAIT" ? "nagative-button cursor-pointer" : "disable-button"}`}
+                                                        className={`block w-full max-w-full mt-1 rounded  ${itemState === "WAIT" ? "nagative-button cursor-pointer" : "disable-button"}`}
                                                         onClick={() => onDeleteDem(item.demNum)}
                                                     >
                                                         물품 삭제
                                                     </button>
+
                                                     <button
                                                         disabled={itemState === "REJECT" || itemState === "EXPIRED" || itemState === "CANCEL"}
-                                                        className={`rounded newText-sm ${itemState === "WAIT" || itemState === "ACCEPT" ? "normal-button cursor-pointer" : "disable-button"}`}
+                                                        className={`block w-full max-w-full mt-1 rounded  ${itemState === "WAIT" || itemState === "ACCEPT" ? "normal-button cursor-pointer" : "disable-button"}`}
                                                         onClick={() => {
                                                             setSelectedDemNum(item.demNum);
                                                             setIsModalOpen(true);
@@ -232,6 +235,7 @@ const BorrowComponent = () => {
                                                         회원 정보
                                                     </button>
                                                 </td>
+
                                             </tr>
                                         );
                                     })

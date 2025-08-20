@@ -24,6 +24,7 @@ public class DemonstrationListRegistrationDTO { // 기업 실증 조회에 사�
 	private String companyName; // 기업명
 	private String demName;
 	private String addr; 
+	private String addrDetail;
 	private String phone; 
 	private Long itemNum;
 	private List<DemonstrationImageDTO> imageList=new ArrayList<>(); 
