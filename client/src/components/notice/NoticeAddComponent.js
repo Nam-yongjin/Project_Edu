@@ -24,23 +24,32 @@ const NoticeAddComponent = () => {
 
     const getByteLength = (str) => new Blob([str]).size;
 
+    // 허용된 파일 확장자
+    const ALLOWED_FILE_TYPES = ["jpg", "jpeg", "png", "pdf", "hwp", "doc", "docx"];
+
+    // 단일 파일 최대 크기
+    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
+    // 첨부파일 최대 개수
+    const MAX_TOTAL_FILES = 5;
+
     const validateForm = () => {
         const newErrors = {};
-    
+
         //제목 검사
         if (!notice.title.trim()) {
             newErrors.title = "제목을 입력하세요.";
         } else if (notice.title.length > 100) {
             newErrors.title = "제목은 최대 100자까지 입력 가능합니다.";
         }
-    
+
         //내용 검사
         if (!notice.content.trim()) {
             newErrors.content = "내용을 입력하세요.";
         } else if (getByteLength(notice.content) > 65535) {
             newErrors.content = "내용이 너무 깁니다. 글자 수를 줄여주세요.";
         }
-    
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -49,20 +58,44 @@ const NoticeAddComponent = () => {
     const handleFileChange = (e) => {
         //e.target.files는 특수한 객체라 .map으로 바로 쓸 수 없어서 Array.from을 활용해 일반배열로 바꿔줌
         const files = Array.from(e.target.files);
-        setNotice({ ...notice, files }); //기존 상태 유지하면서 files만 새로 바꿈
-        };
+        const invalidFiles = [];
+        const validFiles = [];
+
+        // 총 파일 개수 제한 (기존 파일 + 새로 선택한 파일)
+        if (files.length + notice.files.length > MAX_TOTAL_FILES) {
+            alert(`첨부파일은 최대 ${MAX_TOTAL_FILES}개까지 업로드 가능합니다.`);
+            return;
+        }
+        files.forEach(file => {
+            const ext = file.name.split('.').pop().toLowerCase(); //확장자 추출 
+
+            if (!ALLOWED_FILE_TYPES.includes(ext)) {
+                invalidFiles.push(`${file.name} (허용되지 않는 유형)`);
+            } else if (file.size > MAX_FILE_SIZE) {
+                invalidFiles.push(`${file.name} (100MB 초과)`);
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        if (invalidFiles.length > 0) {
+            alert(`다음 파일은 업로드할 수 없습니다:\n${invalidFiles.join("\n")}`);
+        }
+
+        setNotice({ ...notice, files: [...notice.files, ...validFiles] }); //허용된 파일만 저장
+    };
 
     //파일 등록 취소
     const handleRemoveFile = (indexToRemove) => {
-            const updatedFiles = [...notice.files];
-            updatedFiles.splice(indexToRemove, 1);
-            setNotice({ ...notice, files: updatedFiles });
+        const updatedFiles = [...notice.files];
+        updatedFiles.splice(indexToRemove, 1);
+        setNotice({ ...notice, files: updatedFiles });
     };
 
     //등록 버튼
     const handleAdd = async () => {
         //유효성 검사 실행
-        if (!validateForm()){
+        if (!validateForm()) {
             return;
         }
 
@@ -96,7 +129,7 @@ const NoticeAddComponent = () => {
         } catch (error) {
             console.error("공지사항 등록 실패:", error);
 
-             // 백엔드 유효성 에러 처리
+            // 백엔드 유효성 에러 처리
             if (error.response?.status === 400 && error.response?.data?.errors) {
                 const backendErrors = {};
                 error.response.data.errors.forEach(err => {
@@ -106,7 +139,7 @@ const NoticeAddComponent = () => {
             } else {
                 alert("등록 중 오류가 발생했습니다.");
             }
-        } 
+        }
     };
 
     //취소 버튼
@@ -114,22 +147,22 @@ const NoticeAddComponent = () => {
         if (window.confirm("작성을 취소하고 목록으로 돌아가시겠습니까?")) {
             moveToPath("/notice/NoticeList");
         }
-    }   
+    }
 
-   return (
+    return (
         <div className="max-w-screen-xl mx-auto my-10">
             <div className="min-blank mt-4 px-10 p-6 bg-white page-shadow space-y-6">
                 <h2 className="newText-2xl my-4 font-bold">공지사항 등록</h2>
                 <hr className="border-gray-200 my-4" />
                 {/* 제목 */}
                 <div>
-                    <label className="block font-medium mb-1">제목</label>
+                    <label className="block font-medium mb-1 newText-base">제목</label>
                     <input
                         type="text"
                         value={notice.title}
                         onChange={(e) => setNotice({ ...notice, title: e.target.value })}
                         placeholder="제목을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                     />
                     {errors.title && (
                         <p className="text-red-500 newText-sm mt-1">{errors.title}</p>
@@ -137,14 +170,14 @@ const NoticeAddComponent = () => {
                 </div>
                 {/* 내용 */}
                 <div>
-                    <label className="block font-medium mb-1">내용</label>
+                    <label className="block font-medium mb-1 newText-base">내용</label>
                     <textarea
                         value={notice.content}
                         onChange={(e) => {
-                            setNotice({ ...notice, content:e.target.value });
+                            setNotice({ ...notice, content: e.target.value });
                         }}
                         placeholder="내용을 입력하세요"
-                        className="w-full input-focus"
+                        className="w-full input-focus newText-base"
                         style={{ height: "300px", resize: "none", overflowY: "auto" }}
                     />
                     {errors.content && (
@@ -167,20 +200,20 @@ const NoticeAddComponent = () => {
                 </div>
                 {/* 첨부파일 */}
                 <div>
-                    <label className="block font-medium mb-1">첨부파일</label>
+                    <label className="block font-medium mb-1 newText-base">첨부파일</label>
                     <input
                         type="file"
                         multiple //여러 개의 파일을 한 번에 선택
                         accept=".jpg, .jpeg, .png, .pdf, .hwp, .doc, .docx" //업로드 파일 유형 제한
                         onChange={handleFileChange}
-                        className="w-full"
+                        className="w-full newText-base"
                     />
                 </div>
 
                 {/* 파일 미리 보기 */}
                 {notice.files.length > 0 && (
                     <div>
-                        <strong className="block mb-2">첨부 파일:</strong>
+                        <strong className="block mb-2 newText-base">첨부 파일:</strong>
                         <ul className="flex overflow-x-auto space-x-4">
                             {notice.files.map((file, index) => (
                                 <li key={index}
@@ -189,7 +222,7 @@ const NoticeAddComponent = () => {
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveFile(index)}
-                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 newText-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                                         title="삭제"
                                     >✕</button>
 

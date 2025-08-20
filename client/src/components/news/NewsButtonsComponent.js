@@ -4,16 +4,16 @@ import useMove from "../../hooks/useMove";
 import { deleteNewsByIds } from "../../api/newsApi";
 
 const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
-    const loginState = useSelector((state) => state.loginState);
-    const { moveToPath } = useMove(); //경로 이동
+  const loginState = useSelector((state) => state.loginState);
+  const { moveToPath } = useMove(); //경로 이동
 
-    const handleWrite = (e) => {
-        e.preventDefault();
-        moveToPath("/news/AddNews");
-    };
-  
-    // 선택된 뉴스 삭제
-    const handleDelete = async () => { //뉴스 선택 삭제
+  const handleWrite = (e) => {
+    e.preventDefault();
+    moveToPath("/news/AddNews");
+  };
+
+  // 선택된 뉴스 삭제
+  const handleDelete = async () => { //뉴스 선택 삭제
     if (selectedArticles.length === 0) {
       alert("삭제할 뉴스를 선택해주세요.");
       return;
@@ -47,7 +47,7 @@ const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
               선택 삭제 ({selectedArticles.length})
             </button>
           )}
-          
+
           <button
             onClick={handleWrite}
             className="positive-button newText-sm"
@@ -55,9 +55,9 @@ const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
           >
             글쓰기
           </button>
-          
+
           {selectedArticles.length === 1 && (
-             <button
+            <button
               onClick={() => moveToPath(`/news/UpdateNews/${selectedArticles[0]}`)}
               className="green-button newText-sm"
             >
@@ -65,7 +65,7 @@ const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
             </button>
           )}
         </div>
-       ) : (<></>)}
+      ) : (<></>)}
     </div>
   );
 };

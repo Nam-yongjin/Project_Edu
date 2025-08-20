@@ -51,7 +51,7 @@ const NoticeMainComponent = () => {
       <div className="w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-2 text-gray-600">로딩중...</span>
+          <span className="ml-2 text-gray-600 newText-base">로딩중...</span>
         </div>
       </div>
     );
@@ -62,10 +62,10 @@ const NoticeMainComponent = () => {
       {/* 헤더 */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h2 className="newText-xl font-bold text-gray-900">공지사항</h2>
-          <Link 
+          <h2 className="newText-2xl font-bold text-gray-900">공지사항</h2>
+          <Link
             to="/notice/NoticeList"
-            className="text-gray-600 hover:text-gray-800 text-sm transition-colors duration-200 flex items-center font-medium"
+            className="text-gray-600 hover:text-gray-800 newText-base transition-colors duration-200 flex items-center font-medium"
           >
             더보기
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ const NoticeMainComponent = () => {
       {/* 내용 */}
       <div className="p-6">
         {notices.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 newText-base">
             <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-2-1V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-5" />
             </svg>
@@ -87,7 +87,7 @@ const NoticeMainComponent = () => {
         ) : (
           <ul className="space-y-3">
             {notices.map((notice, index) => (
-              <li 
+              <li
                 key={notice.noticeNum}
                 className="group hover:bg-gray-50 rounded-lg p-3 transition-all duration-200 border-l-4 border-transparent hover:border-blue-500"
               >
@@ -96,7 +96,7 @@ const NoticeMainComponent = () => {
                     {/* 번호 또는 고정글 표시 */}
                     <div className="flex-shrink-0 mr-3 mt-1 w-[60px] flex justify-center items-center">
                       {notice.isPinned ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full newText-xs font-medium bg-red-100 text-red-800 border border-red-200">
                           <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />
                           </svg>
@@ -107,31 +107,29 @@ const NoticeMainComponent = () => {
                         <div className="w-full h-4"></div>
                       )}
                     </div>
-                    
+
                     {/* 제목과 메타 정보 */}
                     <div className="flex-1 min-w-0">
-                      <Link 
+                      <Link
                         to={`/notice/NoticeDetail/${notice.noticeNum}`}
                         className="block group-hover:text-blue-600 transition-colors duration-200"
                       >
                         <div className="flex items-center">
-                          <h3 className="newText-sm font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
-
-
+                          <h3 className="newText-base font-medium text-gray-900 group-hover:text-blue-600 truncate max-w-[200px] lg:max-w-[400px]">
                             {truncateTitle(notice.title)}
                           </h3>
-                          
+
                           {/* New 표시 (최근 3일 이내) */}
                           {(() => {
                             const createdDate = new Date(notice.createdAt);
                             const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
                             return daysDiff <= 3 && (
-                              <span className="ml-2 text-xs font-bold text-red-500 whitespace-nowrap">
+                              <span className="ml-2 newText-sm font-bold text-red-500 whitespace-nowrap">
                                 New !
                               </span>
                             );
                           })()}
-                          
+
                           {/* 첨부파일 아이콘 */}
                           {notice.fileCount > 0 && (
                             <div className="flex-shrink-0 ml-2" title="첨부파일">
@@ -141,9 +139,9 @@ const NoticeMainComponent = () => {
                             </div>
                           )}
                         </div>
-                        
+
                         {/* 작성자 및 조회수 */}
-                        <div className="flex items-center mt-1 text-xs text-gray-500">
+                        <div className="flex items-center mt-1 newText-sm text-gray-500">
                           <span>{notice.name}</span>
                           {notice.viewCount !== undefined && (
                             <>
@@ -158,7 +156,7 @@ const NoticeMainComponent = () => {
 
                   {/* 날짜 */}
                   <div className="flex-shrink-0 ml-4">
-                    <time className="text-xs text-gray-500 font-medium">
+                    <time className="newText-sm text-gray-500 font-medium">
                       {formatDate(notice.createdAt)}
                     </time>
                   </div>

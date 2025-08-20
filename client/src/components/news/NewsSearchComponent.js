@@ -71,7 +71,7 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                             value={searchForm.keyword}
                             onChange={handleInputChange}
                             placeholder="검색어를 입력하세요"
-                            className="w-full input-focus"
+                            className="w-full input-focus newText-base"
                         />
                     </div>
                 </div>
@@ -112,7 +112,7 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                         onClick={handleReset}
                         className="dark-button newText-sm"
                     >초기화
-                    </button>  
+                    </button>
                 </div>
             </form>
         </div>

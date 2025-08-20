@@ -9,7 +9,7 @@ const NewsDetailComponent = () => {
     const { newsNum } = useParams();
     const { moveToPath } = useMove();
     const navigate = useNavigate();
-    
+
     const [news, setNews] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -100,7 +100,7 @@ const NewsDetailComponent = () => {
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="flex justify-center items-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <span className="ml-2 text-gray-600">로딩 중...</span>
+                    <span className="ml-2 text-gray-600 newText-base">로딩 중...</span>
                 </div>
             </div>
         );
@@ -112,7 +112,7 @@ const NewsDetailComponent = () => {
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="text-center py-12">
                     <p className="text-red-600 mb-4">{error}</p>
-                    <button 
+                    <button
                         onClick={handleList}
                         className="dark-button newText-sm"
                     >
@@ -128,7 +128,7 @@ const NewsDetailComponent = () => {
         return (
             <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
                 <div className="text-center py-12">
-                    <p className="text-gray-600 mb-4">뉴스를 찾을 수 없습니다.</p>
+                    <p className="text-gray-600 mb-4 newText-base">뉴스를 찾을 수 없습니다.</p>
                     <button
                         onClick={handleList}
                         className="dark-button newText-sm"
@@ -154,7 +154,7 @@ const NewsDetailComponent = () => {
                     <div className="flex flex-wrap items-center gap-6 newText-sm text-gray-600 mt-4">
                         <div className="flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> 
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             <span>작성자: {news.name || '-'}</span>
                         </div>
@@ -203,7 +203,7 @@ const NewsDetailComponent = () => {
                                 }}
                             />
                             <div
-                                className="hidden p-4 text-center text-gray-500 bg-gray-50 rounded-lg"
+                                className="hidden p-4 text-center text-gray-500 bg-gray-50 rounded-lg newText-base"
                             >
                                 이미지를 불러올 수 없습니다.
                             </div>
@@ -213,11 +213,11 @@ const NewsDetailComponent = () => {
 
                 {/* 내용 */}
                 <div className="px-6 py-6">
-                    <div className="prose max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap">
+                    <div className="prose max-w-none newText-base text-gray-800 leading-relaxed whitespace-pre-wrap">
                         {news.content || '내용이 없습니다.'}
                     </div>
                 </div>
-                
+
                 {/* 외부 링크 */}
                 {news.linkUrl && (
                     <div className="px-6 py-4 border-t border-gray-200 bg-blue-50">
@@ -237,11 +237,11 @@ const NewsDetailComponent = () => {
                         </div>
                     </div>
                 )}
-                
+
                 {/* 버튼 */}
                 <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                     <div className="flex justify-between">
-                        <button 
+                        <button
                             onClick={handleList}
                             className="dark-button newText-sm"
                         >
@@ -250,13 +250,13 @@ const NewsDetailComponent = () => {
 
                         {loginState.role === 'ADMIN' && (
                             <div className="flex gap-2">
-                                <button 
+                                <button
                                     onClick={handleUpdate}
                                     className="green-button newText-sm"
                                 >
                                     수정하기
                                 </button>
-                                <button 
+                                <button
                                     onClick={handleDelete}
                                     className="nagative-button newText-sm"
                                 >
@@ -264,7 +264,7 @@ const NewsDetailComponent = () => {
                                 </button>
                             </div>
                         )}
-                    </div>                
+                    </div>
                 </div>
             </div>
         </div>
