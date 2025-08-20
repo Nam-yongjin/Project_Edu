@@ -208,6 +208,9 @@ const NoticeAddComponent = () => {
                         onChange={handleFileChange}
                         className="w-full newText-base"
                     />
+                    <p className="text-gray-400 newText-sm mt-2">
+                        허용되는 파일 유형: jpg, jpeg, png, pdf, hwp, doc, docx
+                    </p>
                 </div>
 
                 {/* 파일 미리 보기 */}
