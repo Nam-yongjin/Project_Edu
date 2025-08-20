@@ -127,7 +127,6 @@ public class EventServiceImpl implements EventService {
                     event.getImageList().add(EventImage.builder()
                         .filePath(result.get("filePath"))
                         .originalName(result.get("originalName"))
-                        .isMain(false)
                         .eventInfo(event)
                         .build());
                 }
@@ -206,7 +205,6 @@ public class EventServiceImpl implements EventService {
                     origin.getImageList().add(EventImage.builder()
                         .filePath(fileInfo.get("filePath"))
                         .originalName(fileInfo.get("originalName"))
-                        .isMain(false)
                         .eventInfo(origin)
                         .build());
                 }

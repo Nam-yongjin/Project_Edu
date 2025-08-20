@@ -18,8 +18,6 @@ public class EventImage {
     private String filePath;
 
     private String originalName;
-    
-    private boolean isMain;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_num")
