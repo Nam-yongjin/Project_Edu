@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState, useCallback } from "react"
 import {
   addDays, addMonths, startOfMonth, endOfMonth,
   startOfWeek, endOfWeek, isSameMonth, format,
-  addMinutes, parse, differenceInMinutes
+  addMinutes, parse, differenceInMinutes, isBefore,
+  isEqual,
 } from "date-fns";
 import ko from "date-fns/locale/ko";
 import { useSelector } from "react-redux";
@@ -43,7 +44,7 @@ function normalizeHHmm(v) {
   try {
     const d = new Date(v);
     if (!Number.isNaN(d.getTime())) return format(d, "HH:mm");
-  } catch {}
+  } catch { }
   return null;
 }
 function genStartSlots(openHHmm, closeHHmm) {
@@ -149,7 +150,7 @@ export default function FacilityDetailContent({ facRevNum }) {
         const list = (Array.isArray(blocks) ? blocks : [])
           .map((b) => ({
             start: typeof b.start === "string" ? b.start.slice(0, 5) : b.start,
-            end  : typeof b.end   === "string" ? b.end.slice(0, 5)   : b.end,
+            end: typeof b.end === "string" ? b.end.slice(0, 5) : b.end,
           }))
           .sort((a, b) => (a.start < b.start ? -1 : 1));
         setReservedBlocks(list);
@@ -188,7 +189,9 @@ export default function FacilityDetailContent({ facRevNum }) {
   /* 달력 */
   const monthLabel = format(currentMonth, "yyyy. MM", { locale: ko });
   const minMonthStart = startOfMonth(new Date());
-  const isPrevDisabled = startOfMonth(currentMonth) <= minMonthStart;
+  const maxMonthStart = startOfMonth(addMonths(new Date(), 2)); // 3개월 뒤까지, 즉 2달 뒤까지
+  const isPrevDisabled = isBefore(currentMonth, minMonthStart);
+  const isNextDisabled = isBefore(maxMonthStart, currentMonth) || isEqual(maxMonthStart, currentMonth);
 
   const weeks = useMemo(() => {
     const startMonth = startOfMonth(currentMonth);
@@ -219,8 +222,8 @@ export default function FacilityDetailContent({ facRevNum }) {
   }
 
   /* 슬롯/버튼 데이터 */
-  const open  = normalizeHHmm(data?.reserveStart) ?? "09:00";
-  const close = normalizeHHmm(data?.reserveEnd)   ?? "18:00";
+  const open = normalizeHHmm(data?.reserveStart) ?? "09:00";
+  const close = normalizeHHmm(data?.reserveEnd) ?? "18:00";
 
   const baseStartSlots = useMemo(() => {
     const base = genStartSlots(open, close);
@@ -314,13 +317,8 @@ export default function FacilityDetailContent({ facRevNum }) {
           {/* 이미지 카드 */}
           <div
             className="page-shadow bg-white rounded-xl overflow-hidden select-none"
-            onTouchStart={(e)=> (touchX.current = e.touches[0].clientX)}
-            onTouchEnd={(e)=> {
-              if (touchX.current == null) return;
-              const dx = e.changedTouches[0].clientX - touchX.current;
-              if (Math.abs(dx) > 40) setIdx((p) => (dx > 0 ? (p - 1 + n) % n : (p + 1) % n));
-              touchX.current = null;
-            }}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
             <div className="relative aspect-[4/3] w-full">
               <img
@@ -397,6 +395,7 @@ export default function FacilityDetailContent({ facRevNum }) {
           setCurrentMonth={setCurrentMonth}
           monthLabel={monthLabel}
           isPrevDisabled={isPrevDisabled}
+          isNextDisabled={isNextDisabled}
           weeks={weeks}
           getHolidayItems={getHolidayItems}
           selectedDate={selectedDate}
@@ -425,15 +424,42 @@ export default function FacilityDetailContent({ facRevNum }) {
   );
 }
 
-/* ---------- 하단 캘린더/예약 ---------- */
+/* ---------- 하단 캘린더/예약 컴포넌트 ---------- */
 function DetailCalendarSection(props) {
   const {
-    currentMonth, setCurrentMonth, monthLabel, isPrevDisabled, weeks, getHolidayItems,
+    currentMonth, setCurrentMonth, monthLabel, isPrevDisabled, isNextDisabled, weeks, getHolidayItems,
     selectedDate, handleDayClick, open, close, selectedDateHasHoliday,
     startSlots, startKey, setStartKey, durationHrs, setDurationHrs, maxHrs,
     endTimeText, canReserve, applyReserve, holLoading, holError, submitting,
     notice, isErrorNotice
   } = props;
+
+  const handlePrevClick = useCallback(() => {
+    if (!isPrevDisabled) setCurrentMonth(addMonths(currentMonth, -1));
+  }, [currentMonth, isPrevDisabled, setCurrentMonth]);
+
+  const handleNextClick = useCallback(() => {
+    if (!isNextDisabled) setCurrentMonth(addMonths(currentMonth, 1));
+  }, [currentMonth, isNextDisabled, setCurrentMonth]);
+
+  const isToday = (d) => toYmd(d) === todayYmd();
+  const isPast = (d) => toYmd(d) < todayYmd();
+
+  const handleDurationClick = useCallback((h) => {
+    if (h <= maxHrs) {
+      const selectedStartSlot = startSlots.find(s => s.key === startKey);
+      if (selectedStartSlot && selectedStartSlot.blocked) return;
+
+      const endHHmm = calcEndHHmm(startKey, h);
+      const isOverlapping = reservedBlocks.some(b => overlaps(startKey, endHHmm, b.start, b.end));
+
+      if (isOverlapping) {
+        alert("선택한 시간대에 이미 예약이 존재합니다. 다른 시간대를 선택해주세요.");
+        return;
+      }
+      setDurationHrs(h);
+    }
+  }, [startKey, maxHrs, reservedBlocks, startSlots, setDurationHrs]);
 
   return (
     <div className="mt-8 flex items-start gap-6">
@@ -441,24 +467,25 @@ function DetailCalendarSection(props) {
       <div className="flex-1 page-shadow bg-white rounded-xl p-5">
         <div className="flex items-center justify-center gap-4 mb-4">
           <button
-            onClick={() => !isPrevDisabled && setCurrentMonth(addMonths(currentMonth, -1))}
+            onClick={handlePrevClick}
             className={`normal-button ${isPrevDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
             disabled={isPrevDisabled}
           >
             &lt;
           </button>
-        <div className="newText-3xl font-bold tracking-wide">{monthLabel}</div>
+          <div className="newText-3xl font-bold tracking-wide">{monthLabel}</div>
           <button
-            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="normal-button"
+            onClick={handleNextClick}
+            className={`normal-button ${isNextDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
+            disabled={isNextDisabled}
           >
             &gt;
           </button>
         </div>
 
         <div className="grid grid-cols-7 text-center newText-sm font-semibold text-gray-500 mb-2">
-          {["일","월","화","수","목","금","토"].map((d, i) => (
-            <div key={i} className={i===0 ? "text-red-500" : i===6 ? "text-blue-500" : ""}>{d}요일</div>
+          {["일", "월", "화", "수", "목", "금", "토"].map((d, i) => (
+            <div key={i} className={i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : ""}>{d}요일</div>
           ))}
         </div>
 
@@ -470,8 +497,7 @@ function DetailCalendarSection(props) {
               const items = getHolidayItems(d);
               const isHoliday = items.length > 0;
               const isSelected = selectedDate === ymd;
-              const isPast = ymd < todayYmd();
-              const isToday = ymd === todayYmd();
+              const isDisabled = !inMonth || isPast(d);
 
               return (
                 <button
@@ -481,24 +507,21 @@ function DetailCalendarSection(props) {
                   className={[
                     "h-[96px] bg-white text-left p-2 relative focus:outline-none",
                     "transition",
-                    isPast ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer",
-                    !inMonth && "text-gray-300",
+                    isDisabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer",
                     isHoliday && "ring-2 ring-red-300",
                     isSelected && "outline outline-2 outline-blue-400",
                   ].filter(Boolean).join(" ")}
-                  disabled={isPast}
+                  disabled={isDisabled}
                 >
-                  <div className={`absolute top-2 right-2 newText-sm ${di===0 ? "text-red-500" : di===6 ? "text-blue-500" : "text-gray-600"}`}>
+                  <div className={`absolute top-2 right-2 newText-sm ${di === 0 ? "text-red-500" : di === 6 ? "text-blue-500" : "text-gray-600"}`}>
                     {format(d, "d")}
                   </div>
-                  {isToday && <span className="absolute left-2 top-2 newText-xs text-blue-600">오늘</span>}
+                  {isToday(d) && <span className="absolute left-2 top-2 newText-xs text-blue-600">오늘</span>}
                   <div className="mt-6 flex flex-col gap-1">
                     {items.map((it, i2) => (
                       <span
                         key={i2}
-                        className={`inline-block w-fit text-[11px] px-2 py-0.5 rounded-full ${
-                          it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
-                        }`}
+                        className={`inline-block w-fit text-[11px] px-2 py-0.5 rounded-full ${it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}
                       >
                         {it.label}
                       </span>
@@ -536,7 +559,7 @@ function DetailCalendarSection(props) {
                   className={[
                     "rounded-md border text-center py-2 transition newText-sm",
                     selected ? "positive-button" : "normal-button",
-                    disabled && "opacity-50 cursor-not-allowed",
+                    disabled ? "opacity-50 cursor-not-allowed" : "",
                   ].join(" ")}
                   title={s.blocked ? "이미 예약된 시간입니다" : undefined}
                 >
@@ -559,11 +582,8 @@ function DetailCalendarSection(props) {
         <div className="mt-4">
           <div className="newText-sm font-medium text-gray-700 mb-2">이용시간</div>
           <div className="grid grid-cols-4 gap-2">
-            {[1,2,3,4].map((h) => {
-              const allowedByClose = startKey ? (h <= maxHrs) : false;
-              const allowedByNow = !startKey ? false : (selectedDate !== todayYmd() ? true : (startKey > nowHHmm()));
-              const allowedByBlocks = startKey ? !false : false;
-              const allowed = allowedByClose && allowedByNow && !selectedDateHasHoliday && (allowedByBlocks || true);
+            {[1, 2, 3, 4].map((h) => {
+              const allowed = startKey && (h <= maxHrs);
               const selected = durationHrs === h;
               return (
                 <button
@@ -573,9 +593,9 @@ function DetailCalendarSection(props) {
                   className={[
                     "rounded-md text-center py-2 transition newText-sm",
                     selected ? "positive-button" : "normal-button",
-                    (!allowed) && "opacity-50 cursor-not-allowed",
+                    !allowed ? "opacity-50 cursor-not-allowed" : "",
                   ].join(" ")}
-                  onClick={() => allowed && setDurationHrs(h)}
+                  onClick={() => allowed && handleDurationClick(h)}
                   disabled={!allowed}
                 >
                   {h}시간
