@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAdminReservations, updateReservationState, adminCancelReservation } from "../../api/facilityApi";
+import {
+  getAdminReservations,
+  updateReservationState,
+  adminCancelReservation,
+} from "../../api/facilityApi";
+import PageComponent from "../../components/common/PageComponent";
 
-// ==================== 날짜/시간 유틸 ====================
+// ==================== 유틸 ====================
 // 2자리 패딩
 const pad2 = (n) => String(n).padStart(2, "0");
 
 // Date -> 'YYYY-MM-DD'
-const toYmd = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const toYmd = (d) =>
+  `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 
 // 'YYYY-MM-DD' or Date/DateTime string -> 'YYYY.MM.DD'
 const formatYmdDots = (v) => {
@@ -42,17 +48,21 @@ const isPastUseDate = (ymd) => {
 };
 
 // 상태 칩 계산
-// - APPROVED 이면서 이용일이 지났으면 "완료" 라벨로 보여준다
+// - APPROVED 이면서 이용일이 지났으면 "완료" 라벨
 const chipOf = (state, facDate) => {
   if (state === "APPROVED" && isPastUseDate(facDate)) {
     return { label: "완료", cls: "bg-slate-500" };
   }
   switch (state) {
-    case "APPROVED":   return { label: "승인 완료", cls: "bg-green-500" };
-    case "REJECTED":   return { label: "거절",     cls: "bg-red-500"   };
-    case "CANCELLED":  return { label: "취소",     cls: "bg-red-500"   };
+    case "APPROVED":
+      return { label: "승인 완료", cls: "bg-green-500" };
+    case "REJECTED":
+      return { label: "거절", cls: "bg-red-500" };
+    case "CANCELLED":
+      return { label: "취소", cls: "bg-red-500" };
     case "WAITING":
-    default:           return { label: "승인 대기", cls: "bg-gray-500"  };
+    default:
+      return { label: "승인 대기", cls: "bg-gray-500" };
   }
 };
 
@@ -64,8 +74,8 @@ const todayRange = () => {
 };
 const thisWeekRange = () => {
   const t = new Date();
-  const day = t.getDay();                 // 0(일)~6(토)
-  const diffToMon = (day + 6) % 7;        // 월요일까지 뒤로 이동
+  const day = t.getDay(); // 0(일)~6(토)
+  const diffToMon = (day + 6) % 7; // 월요일까지 뒤로 이동
   const mon = new Date(t);
   mon.setDate(t.getDate() - diffToMon);
   const sun = new Date(mon);
@@ -78,6 +88,76 @@ const thisMonthRange = () => {
   const last = new Date(t.getFullYear(), t.getMonth() + 1, 0);
   return { from: toYmd(first), to: toYmd(last) };
 };
+
+// ==================== PageComponent 브리지 ====================
+// 다양한 PageComponent 시그니처(pageList/pageNums/DTO/단순 숫자형)에 대응
+function PageBridge({ page, pageSize, totalCount, onChange, blockSize = 10 }) {
+  // 내부는 0-based, PageComponent는 1-based를 기대한다고 가정
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const current = Math.min(totalPages, Math.max(1, page + 1)); // 1-based 보정
+
+  // 블록 계산
+  const currentBlock = Math.floor((current - 1) / blockSize);
+  const start = currentBlock * blockSize + 1; // 1-based 시작
+  const end = Math.min(start + blockSize - 1, totalPages);
+  const prev = start > 1;
+  const next = end < totalPages;
+
+  // 페이지 목록(1-based)
+  const pageNums = Array.from(
+    { length: Math.max(0, end - start + 1) },
+    (_, i) => start + i
+  );
+
+  // 일부 컴포넌트가 prevPage/nextPage 숫자를 기대하는 경우 대비
+  const prevPage = prev ? start - 1 : 1;
+  const nextPage = next ? end + 1 : totalPages;
+
+  // 공용 이동 콜백
+  const movePage = (p1) => {
+    // p1은 1-based로 가정
+    const p = Number(p1);
+    if (!Number.isFinite(p)) return;
+    onChange(Math.min(totalPages, Math.max(1, p)));
+  };
+
+  return (
+    <PageComponent
+      // DTO 스타일
+      pageResponse={{
+        start,
+        end,
+        prev,
+        next,
+        pageNums,
+        current,
+        totalPages,
+        totalCount,
+        pageSize,
+      }}
+      // 개별 키 스타일
+      start={start}
+      end={end}
+      prev={prev}
+      next={next}
+      prevPage={prevPage}
+      nextPage={nextPage}
+      pageNums={pageNums}
+      pageList={pageNums} // pageList 키를 쓰는 구현체 대응
+      current={current}
+      // 단순 숫자형 스타일
+      currentPage={current}
+      totalPages={totalPages}
+      totalItems={totalCount}
+      pageSize={pageSize}
+      blockSize={blockSize}
+      // 콜백 이름들 호환
+      movePage={movePage}
+      onPageChange={movePage}
+      onChange={movePage}
+    />
+  );
+}
 
 // ==================== 메인 컴포넌트 ====================
 export default function AdminFacilityReservations() {
@@ -97,7 +177,7 @@ export default function AdminFacilityReservations() {
   const [savingId, setSavingId] = useState(null); // reserveId 또는 null
 
   // 클라이언트 페이징/정렬
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(0); // 0-based
   const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState("reserveAt");
   const [sortDir, setSortDir] = useState("DESC");
@@ -125,17 +205,22 @@ export default function AdminFacilityReservations() {
     return sortDir === "DESC" ? arr.reverse() : arr;
   }, [rows, sortKey, sortDir]);
 
-  // 페이징
+  // 페이징 적용된 데이터
   const paged = useMemo(() => {
     const start = page * pageSize;
     return sorted.slice(start, start + pageSize);
   }, [sorted, page, pageSize]);
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const totalCount = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   // 데이터 로드
   const fetchData = async () => {
-    if (from && to && new Date(`${from}T00:00:00`) > new Date(`${to}T00:00:00`)) {
+    if (
+      from &&
+      to &&
+      new Date(`${from}T00:00:00`) > new Date(`${to}T00:00:00`)
+    ) {
       setError("시작일이 종료일보다 클 수 없습니다.");
       return;
     }
@@ -148,9 +233,10 @@ export default function AdminFacilityReservations() {
         to: to || undefined,
       });
       setRows(Array.isArray(data) ? data : []);
-      setPage(0);
+      setPage(0); // 조회 시 첫 페이지로 이동
     } catch (e) {
-      const msg = e?.response?.data?.message || e?.message || "목록을 불러오지 못했습니다.";
+      const msg =
+        e?.response?.data?.message || e?.message || "목록을 불러오지 못했습니다.";
       setError(msg);
       if (e?.response?.status === 401) {
         alert("관리자 로그인이 필요합니다.");
@@ -169,16 +255,38 @@ export default function AdminFacilityReservations() {
 
   // 빠른 범위 선택
   const quick = {
-    today: () => { const r = todayRange(); setFrom(r.from); setTo(r.to); fetchData(); },
-    week: () => { const r = thisWeekRange(); setFrom(r.from); setTo(r.to); fetchData(); },
-    month: () => { const r = thisMonthRange(); setFrom(r.from); setTo(r.to); fetchData(); },
-    all: () => { setFrom(""); setTo(""); fetchData(); },
+    today: () => {
+      const r = todayRange();
+      setFrom(r.from);
+      setTo(r.to);
+      fetchData();
+    },
+    week: () => {
+      const r = thisWeekRange();
+      setFrom(r.from);
+      setTo(r.to);
+      fetchData();
+    },
+    month: () => {
+      const r = thisMonthRange();
+      setFrom(r.from);
+      setTo(r.to);
+      fetchData();
+    },
+    all: () => {
+      setFrom("");
+      setTo("");
+      fetchData();
+    },
   };
 
   // 정렬 변경
   const onChangeSort = (k) => {
     if (sortKey === k) setSortDir((d) => (d === "ASC" ? "DESC" : "ASC"));
-    else { setSortKey(k); setSortDir("DESC"); }
+    else {
+      setSortKey(k);
+      setSortDir("DESC");
+    }
   };
 
   // ====== 액션 공통: 서버 상태 변경 후 재조회 ======
@@ -188,7 +296,9 @@ export default function AdminFacilityReservations() {
       await updateReservationState({ reserveId, state: nextState });
       await fetchData();
     } catch (e) {
-      alert(e?.response?.data?.message || e?.message || "상태 변경에 실패했습니다.");
+      alert(
+        e?.response?.data?.message || e?.message || "상태 변경에 실패했습니다."
+      );
     } finally {
       setSavingId(null);
     }
@@ -211,7 +321,8 @@ export default function AdminFacilityReservations() {
   // 관리자 강제취소
   const handleAdminCancel = (r) => {
     if (!r?.reserveId) return;
-    if (!window.confirm(`예약 ${r.reserveId}을(를) 강제 취소하시겠습니까?`)) return;
+    if (!window.confirm(`예약 ${r.reserveId}을(를) 강제 취소하시겠습니까?`))
+      return;
     setSavingId(r.reserveId);
     adminCancelReservation({ reserveId: r.reserveId, requesterId: r.memId })
       .then(() => fetchData())
@@ -222,8 +333,6 @@ export default function AdminFacilityReservations() {
   };
 
   // 액션 렌더링
-  // - WAITING: 승인/거절
-  // - APPROVED: 이용일이 지나지 않은 경우에만 강제취소
   const renderActions = (r) => {
     const disabled = savingId === r.reserveId;
 
@@ -233,196 +342,294 @@ export default function AdminFacilityReservations() {
           <button
             disabled={disabled}
             onClick={() => handleApprove(r)}
-            className={`px-3 py-1 rounded text-white ${disabled ? "bg-green-300 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
-          >승인</button>
+            className={`green-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+          >
+            승인
+          </button>
           <button
             disabled={disabled}
             onClick={() => handleReject(r)}
-            className={`px-3 py-1 rounded text-white ${disabled ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
-          >거절</button>
+            className={`nagative-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+          >
+            거절
+          </button>
         </div>
       );
     }
 
     if (r.state === "APPROVED") {
-      // 이용일이 오늘 이전이면 강제취소 버튼 숨김
       if (isPastUseDate(r.facDate)) {
-        return <span className="text-gray-400">-</span>;
+        return <span className="newText-sm text-gray-400">-</span>;
       }
       return (
         <div className="flex gap-2">
           <button
             disabled={disabled}
             onClick={() => handleAdminCancel(r)}
-            className={`px-3 py-1 rounded text-white ${disabled ? "bg-red-300 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}`}
-          >강제취소</button>
+            className={`nagative-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+          >
+            강제취소
+          </button>
         </div>
       );
     }
 
-    return <span className="text-gray-400">-</span>;
+    return <span className="newText-sm text-gray-400">-</span>;
   };
 
   // ==================== 렌더 ====================
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">공간 예약 현황 (관리자)</h2>
+    <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank">
+        <h2 className="newText-3xl font-bold mb-6 text-center">
+          공간 예약 현황 (관리자)
+        </h2>
 
-      {/* 필터 박스 */}
-      <div className="rounded-2xl border p-4 mb-4 bg-white shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-600 mb-1">상태</label>
+        {/* 필터 박스 */}
+        <div className="page-shadow rounded-2xl border p-4 mb-4 bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+            <div className="flex flex-col">
+              <label className="newText-xs text-gray-600 mb-1">상태</label>
+              <select
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="input-focus newText-base rounded px-3 py-2"
+              >
+                <option value="">전체</option>
+                <option value="WAITING">승인 대기</option>
+                <option value="APPROVED">승인 완료</option>
+                <option value="REJECTED">거절</option>
+                {/* 필요 시 <option value="CANCELLED">취소</option> 추가 */}
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label className="newText-xs text-gray-600 mb-1">시작일</label>
+              <input
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && fetchData()}
+                className="input-focus newText-base rounded px-3 py-2"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="newText-xs text-gray-600 mb-1">종료일</label>
+              <input
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && fetchData()}
+                className="input-focus newText-base rounded px-3 py-2"
+              />
+            </div>
+            <div className="flex gap-2 md:col-span-2">
+              <button
+                onClick={fetchData}
+                className="positive-button newText-base flex-1 rounded px-3 py-2"
+              >
+                조회
+              </button>
+              <button
+                onClick={quick.today}
+                className="normal-button newText-base px-3 py-2"
+              >
+                오늘
+              </button>
+              <button
+                onClick={quick.week}
+                className="normal-button newText-base px-3 py-2"
+              >
+                이번주
+              </button>
+              <button
+                onClick={quick.month}
+                className="normal-button newText-base px-3 py-2"
+              >
+                이번달
+              </button>
+              <button
+                onClick={quick.all}
+                className="normal-button newText-base px-3 py-2"
+              >
+                전체
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 옵션 바 */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div className="newText-sm text-gray-600">
+            총 <b>{totalCount}</b>건
+            <span className="ml-2 text-gray-400">
+              ({page + 1}/{totalPages})
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="newText-sm text-gray-600">정렬</label>
             <select
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              className="border rounded px-3 py-2"
+              value={`${sortKey}:${sortDir}`}
+              onChange={(e) => {
+                const [k, d] = e.target.value.split(":");
+                setSortKey(k);
+                setSortDir(d);
+              }}
+              className="input-focus newText-base rounded px-2 py-1"
             >
-              <option value="">전체</option>
-              <option value="WAITING">승인 대기</option>
-              <option value="APPROVED">승인 완료</option>
-              <option value="REJECTED">거절</option>
-              {/* 필요 시 <option value="CANCELLED">취소</option> 추가 */}
+              <option value="reserveAt:DESC">신청일 ↓</option>
+              <option value="reserveAt:ASC">신청일 ↑</option>
+              <option value="facDate:DESC">이용일 ↓</option>
+              <option value="facDate:ASC">이용일 ↑</option>
+              <option value="facName:ASC">공간명 A→Z</option>
+              <option value="facName:DESC">공간명 Z→A</option>
+            </select>
+            <label className="newText-sm text-gray-600 ml-3">페이지 크기</label>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(0);
+              }}
+              className="input-focus newText-base rounded px-2 py-1"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
             </select>
           </div>
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-600 mb-1">시작일</label>
-            <input
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && fetchData()}
-              className="border rounded px-3 py-2"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-600 mb-1">종료일</label>
-            <input
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && fetchData()}
-              className="border rounded px-3 py-2"
-            />
-          </div>
-          <div className="flex gap-2 md:col-span-2">
-            <button onClick={fetchData} className="flex-1 bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-700">조회</button>
-            <button onClick={quick.today} className="px-3 py-2 border rounded hover:bg-gray-50">오늘</button>
-            <button onClick={quick.week} className="px-3 py-2 border rounded hover:bg-gray-50">이번주</button>
-            <button onClick={quick.month} className="px-3 py-2 border rounded hover:bg-gray-50">이번달</button>
-            <button onClick={quick.all} className="px-3 py-2 border rounded hover:bg-gray-50">전체</button>
-          </div>
         </div>
-      </div>
 
-      {/* 옵션 바 */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-        <div className="text-sm text-gray-600">총 <b>{rows.length}</b>건</div>
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600">정렬</label>
-          <select
-            value={`${sortKey}:${sortDir}`}
-            onChange={(e) => {
-              const [k, d] = e.target.value.split(":");
-              setSortKey(k); setSortDir(d);
+        {/* 데이터 표 */}
+        <div className="page-shadow overflow-x-auto rounded-2xl border bg-white">
+          <table className="min-w-full newText-sm">
+            <thead>
+              <tr className="bg-gray-50 text-left">
+                <th
+                  className="px-4 py-3 cursor-pointer"
+                  onClick={() => onChangeSort("reserveId")}
+                >
+                  예약ID
+                </th>
+                <th
+                  className="px-4 py-3 cursor-pointer"
+                  onClick={() => onChangeSort("facName")}
+                >
+                  공간명
+                </th>
+                <th className="px-2 py-3">공간번호</th>
+                <th
+                  className="px-4 py-3 cursor-pointer"
+                  onClick={() => onChangeSort("facDate")}
+                >
+                  이용일
+                </th>
+                <th className="px-4 py-3">이용 시간</th>
+                <th className="px-4 py-3">신청자</th>
+                <th className="px-4 py-3">상태</th>
+                <th
+                  className="px-4 py-3 cursor-pointer"
+                  onClick={() => onChangeSort("reserveAt")}
+                >
+                  신청일
+                </th>
+                <th className="px-4 py-3">액션</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="px-4 py-8 text-center newText-base text-gray-500"
+                  >
+                    불러오는 중…
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="px-4 py-8 text-center newText-base text-red-600"
+                  >
+                    {error}
+                  </td>
+                </tr>
+              ) : paged.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="px-4 py-8 text-center newText-base text-gray-500"
+                  >
+                    데이터가 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                paged.map((r) => {
+                  const chip = chipOf(r.state, r.facDate); // 이용일 반영
+                  const mem = r.memId || "-";
+                  return (
+                    <tr key={r.reserveId} className="border-t">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {r.reserveId}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {r.facName}
+                      </td>
+                      <td className="px-2 py-3 whitespace-nowrap text-gray-600">
+                        {r.facRevNum}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {formatYmdDots(r.facDate)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {hhmm(r.startTime)} ~ {hhmm(r.endTime)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">{mem}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span
+                          className={`text-white newText-xs px-2 py-0.5 rounded ${chip.cls}`}
+                        >
+                          {chip.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-600">
+                        {formatDateTime(r.reserveAt)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          {renderActions(r)}
+                          <button
+                            onClick={() =>
+                              navigate(`/facility/detail/${r.facRevNum}`)
+                            }
+                            className="normal-button newText-base px-3 py-1 rounded"
+                          >
+                            상세보기
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 페이지네이션 - PageComponent 브리지 사용 */}
+        <div className="mt-4 flex justify-center">
+          <PageBridge
+            page={page} // 0-based
+            pageSize={pageSize}
+            totalCount={totalCount}
+            blockSize={10}
+            onChange={(next1Based) => {
+              // next1Based는 1-based, 내부 상태는 0-based로 변환
+              const nextZero = Math.max(0, Math.min(totalPages - 1, next1Based - 1));
+              setPage(nextZero);
             }}
-            className="border rounded px-2 py-1 text-sm"
-          >
-            <option value="reserveAt:DESC">신청일 ↓</option>
-            <option value="reserveAt:ASC">신청일 ↑</option>
-            <option value="facDate:DESC">이용일 ↓</option>
-            <option value="facDate:ASC">이용일 ↑</option>
-            <option value="facName:ASC">공간명 A→Z</option>
-            <option value="facName:DESC">공간명 Z→A</option>
-          </select>
-          <label className="text-sm text-gray-600 ml-3">페이지 크기</label>
-          <select
-            value={pageSize}
-            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-            className="border rounded px-2 py-1 text-sm"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
+          />
         </div>
-      </div>
-
-      {/* 데이터 표 */}
-      <div className="overflow-x-auto rounded-2xl border bg-white shadow-sm">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 text-left">
-              <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("reserveId")}>예약ID</th>
-              <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("facName")}>공간명</th>
-              <th className="px-2 py-3">공간번호</th>
-              <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("facDate")}>이용일</th>
-              <th className="px-4 py-3">이용 시간</th>
-              <th className="px-4 py-3">신청자</th>
-              <th className="px-4 py-3">상태</th>
-              <th className="px-4 py-3 cursor-pointer" onClick={() => onChangeSort("reserveAt")}>신청일</th>
-              <th className="px-4 py-3">액션</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-500">불러오는 중…</td></tr>
-            ) : error ? (
-              <tr><td colSpan={9} className="px-4 py-8 text-center text-red-600">{error}</td></tr>
-            ) : paged.length === 0 ? (
-              <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-500">데이터가 없습니다.</td></tr>
-            ) : (
-              paged.map((r) => {
-                const chip = chipOf(r.state, r.facDate); // 이용일 반영
-                const mem = r.memId || "-";
-                return (
-                  <tr key={r.reserveId} className="border-t">
-                    <td className="px-4 py-3 whitespace-nowrap">{r.reserveId}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{r.facName}</td>
-                    <td className="px-2 py-3 whitespace-nowrap text-gray-600">{r.facRevNum}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{formatYmdDots(r.facDate)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{hhmm(r.startTime)} ~ {hhmm(r.endTime)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{mem}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`text-white text-xs px-2 py-0.5 rounded ${chip.cls}`}>{chip.label}</span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-600">{formatDateTime(r.reserveAt)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {renderActions(r)}
-                        <button
-                          onClick={() => navigate(`/facility/detail/${r.facRevNum}`)}
-                          className="border px-3 py-1 rounded hover:bg-gray-50"
-                        >상세보기</button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 페이지네이션 */}
-      <div className="mt-4 flex justify-center items-center gap-2 text-blue-600 font-semibold">
-        <button
-          className="px-2 py-1 disabled:text-gray-400"
-          disabled={page === 0}
-          onClick={() => setPage((p) => Math.max(0, p - 1))}
-        >{"<"}</button>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            className={`px-2 py-1 ${page === i ? "underline text-blue-800" : "hover:text-blue-800"}`}
-            onClick={() => setPage(i)}
-          >{i + 1}</button>
-        ))}
-        <button
-          className="px-2 py-1 disabled:text-gray-400"
-          disabled={page >= totalPages - 1}
-          onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-        >{">"}</button>
       </div>
     </div>
   );

@@ -83,13 +83,13 @@ public class FacilityServiceImpl implements FacilityService {
     private static final EnumSet<FacilityState> ACTIVE_STATES =
             EnumSet.of(FacilityState.WAITING, FacilityState.APPROVED);
 
-    /** FacilityReserve → FacilityReserveListDTO 매핑 (대표 이미지: 첫 번째 이미지) */
+    // FacilityReserve → FacilityReserveListDTO 매핑 (대표 이미지: 첫 번째 이미지)
     private FacilityReserveListDTO toDTO(FacilityReserve r) {
         // 엔티티 이미지 목록
-        List<FacilityImage> imgEntities =
-                (r.getFacility() == null || r.getFacility().getImages() == null)
-                        ? List.of()
-                        : r.getFacility().getImages();
+    	List<FacilityImage> imgEntities =
+    	        (r.getFacility() == null || r.getFacility().getImages() == null)
+    	            ? List.of()
+    	            : r.getFacility().getImages();
 
         // 전체 URL 리스트
         List<String> images = imgEntities.stream()
@@ -98,7 +98,17 @@ public class FacilityServiceImpl implements FacilityService {
                 .toList();
 
         // 대표 이미지: 첫 번째 이미지(플래그 의존 X)
-        String mainImageUrl = images.isEmpty() ? null : images.get(0);
+        String mainImageUrl = imgEntities.stream()
+                .filter(i -> Boolean.TRUE.equals(i.getMainImage()))
+                .map(FacilityImage::getImageUrl)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseGet(() -> imgEntities.stream()
+                    .map(FacilityImage::getImageUrl)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null)
+                );
 
         return FacilityReserveListDTO.builder()
                 .reserveId(r.getReserveId())
@@ -170,44 +180,83 @@ public class FacilityServiceImpl implements FacilityService {
         LocalTime start = dto.getReserveStart() != null ? dto.getReserveStart() : facility.getReserveStart();
         LocalTime end   = dto.getReserveEnd()   != null ? dto.getReserveEnd()   : facility.getReserveEnd();
 
-        // 운영시간 갱신(둘 중 하나만 넘어온 경우 포함)
         if (dto.getReserveStart() != null) facility.setReserveStart(dto.getReserveStart());
         if (dto.getReserveEnd()   != null) facility.setReserveEnd(dto.getReserveEnd());
 
-        // 2) 운영시간 검증 (둘 다 세팅된 경우만)
-        if (start != null && end != null) {
-            if (!start.isBefore(end)) {
-                throw new IllegalArgumentException("예약 시작시간은 종료시간보다 앞서야 합니다.");
-            }
+        if (start != null && end != null && !start.isBefore(end)) {
+            throw new IllegalArgumentException("예약 시작시간은 종료시간보다 앞서야 합니다.");
         }
 
-        // 3) 이미지 삭제
+        // 2) 기존 이미지 삭제
         if (dto.getRemoveImageIds() != null && !dto.getRemoveImageIds().isEmpty()) {
             List<FacilityImage> toRemove = facility.getImages().stream()
                     .filter(img -> dto.getRemoveImageIds().contains(img.getFacImageNum()))
-                    .collect(Collectors.toList());
+                    .toList();
 
-            // 실제 파일 삭제가 필요하면 FileUtil에 삭제 메서드를 추가/호출하세요.
-            // 예: fileUtil.deleteByUrl(img.getImageUrl());
             for (FacilityImage img : toRemove) {
-                facility.removeImage(img); // 연관 제거 (orphanRemoval=true 권장)
-                facilityImageRepository.delete(img); // 명시적 삭제
+                facility.removeImage(img);              // 연관 제거
+                facilityImageRepository.delete(img);    // 명시적 삭제
+                // 필요 시 파일시스템 삭제 로직 추가
             }
         }
 
-        // 4) 새 이미지 추가
+        // 3) 새 이미지 추가 (순서를 유지: addImages에 대표가 온다면 첫 번째)
+        List<FacilityImage> newlyAdded = new ArrayList<>();
         if (addImages != null) {
-            for (MultipartFile image : addImages) {
-                if (image != null && !image.isEmpty()) {
-                    FacilityImage imgEntity = toFacilityImage(image); // 기존 저장 방식 재사용
-                    facility.addImage(imgEntity);
+            for (MultipartFile mf : addImages) {
+                if (mf != null && !mf.isEmpty()) {
+                    FacilityImage img = toFacilityImage(mf);
+                    img.setMainImage(false);
+                    facility.addImage(img);
+                    newlyAdded.add(img);
                 }
             }
         }
 
-        // 5) 저장(더티체킹)
+     // 대표 이미지 결정
+        FacilityImage targetMain = null;
+
+        // (1) 프론트에서 보낸 기존 대표 id 우선
+        if (dto.getMainImageId() != null &&
+            (dto.getRemoveImageIds() == null || !dto.getRemoveImageIds().contains(dto.getMainImageId()))) {
+
+            Long id = dto.getMainImageId();
+            targetMain = facility.getImages().stream()
+                    .filter(img -> id.equals(img.getFacImageNum()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        // (2) 없으면 새로 추가된 첫 번째
+        if (targetMain == null && !newlyAdded.isEmpty()) {
+            targetMain = newlyAdded.get(0);
+        }
+
+        // (3) 그래도 없으면 기존 대표 유지, 없으면 남은 첫 번째
+        boolean hasMain = facility.getImages().stream()
+                .anyMatch(img -> Boolean.TRUE.equals(img.getMainImage()));
+        if (targetMain == null && !hasMain) {
+            targetMain = facility.getImages().stream()
+                    .filter(img -> dto.getRemoveImageIds() == null
+                                || !dto.getRemoveImageIds().contains(img.getFacImageNum()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        // 대표 플래그 반영
+        if (targetMain != null) {
+            // 엔티티에 helper가 있으면 사용
+            facility.markAsMain(targetMain);
+
+            // helper가 없다면 이렇게:
+            // facility.getImages().forEach(i -> i.setMainImage(false));
+            // targetMain.setMainImage(true);
+        }
+
+
+        // 5) 저장
         facilityRepository.save(facility);
-    }
+    }	
     
     // 시설 삭제
     @Override
@@ -281,6 +330,7 @@ public class FacilityServiceImpl implements FacilityService {
                     d.setFacImageNum(img.getFacImageNum());
                     d.setImageName(img.getImageName());
                     d.setImageUrl(img.getImageUrl());
+                    d.setMainImage(img.getMainImage());
                     return d;
                 })
                 .collect(Collectors.toList());
@@ -349,7 +399,7 @@ public class FacilityServiceImpl implements FacilityService {
                 .existsByFacility_FacRevNumAndMember_MemIdAndFacDateAndStateIn(
                         facility.getFacRevNum(), memId, req.getFacDate(), ACTIVE_STATES);
         if (already) {
-            throw new IllegalStateException("해당 시설에서 오늘은 이미 예약하셨습니다. (하루 1회 제한)");
+            throw new IllegalStateException("해당 시설의 해당일자는 이미 예약하셨습니다. (하루 1회 제한)");
         }
 
         final FacilityReserve reserve = new FacilityReserve();

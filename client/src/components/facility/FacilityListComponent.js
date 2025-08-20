@@ -6,6 +6,12 @@ import useMove from "../../hooks/useMove";
 import { useSelector } from "react-redux";
 import PageComponent from "../common/PageComponent";
 
+// ✅ Swiper
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Scrollbar } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/scrollbar";
+
 const PLACEHOLDER = "/placeholder.svg";
 const host = "http://localhost:8090/view";
 
@@ -19,7 +25,7 @@ const buildImageUrl = (p) => {
   path = path.replace(/^https?:\/\/[^/]+/i, "");
   path = path.replace(/^\/?view\/?/, "/");
   if (!path.startsWith("/")) path = `/${path}`;
-  return `${host}${path}`.replace(/([^:]\/)\/+/g, "$1");
+  return `${host}${path}`.replace(/([^:]\/)\/+?/g, "$1");
 };
 
 const FacilityListComponent = () => {
@@ -138,7 +144,7 @@ const FacilityListComponent = () => {
           <div className="mt-8 flex justify-center">
             <PageComponent
               totalPages={totalPages}
-              current={page - 1}                 // 0-based로 전달
+              current={page - 1} // 0-based로 전달
               setCurrent={(idx) => setPage(idx + 1)} // 콜백은 1-based로 환산
             />
           </div>
@@ -181,90 +187,33 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
   );
 };
 
-/** 리스트 썸네일 슬라이더 (4:3 비율) */
+/** 리스트 썸네일 슬라이더 (4:3 비율) — Swiper Scrollbar 적용 */
 const ImageSlider = ({ images = [], alt = "facility" }) => {
-  const [idx, setIdx] = useState(0);
-  const [startX, setStartX] = useState(null);
-  const [dragging, setDragging] = useState(false);
-
-  const prev = () => setIdx((i) => (i === 0 ? images.length - 1 : i - 1));
-  const next = () => setIdx((i) => (i === images.length - 1 ? 0 : i + 1));
-
-  const onTouchStart = (e) => { setStartX(e.touches[0].clientX); setDragging(true); };
-  const onTouchEnd = (e) => {
-    if (!dragging || startX == null) return;
-    const d = e.changedTouches[0].clientX - startX;
-    if (d < -40) next();
-    if (d > 40) prev();
-    setDragging(false); setStartX(null);
-  };
-  const onMouseDown = (e) => { setStartX(e.clientX); setDragging(true); };
-  const onMouseUp = (e) => {
-    if (!dragging || startX == null) return;
-    const d = e.clientX - startX;
-    if (d < -40) next();
-    if (d > 40) prev();
-    setDragging(false); setStartX(null);
-  };
+  const slides = images.length > 0 ? images : [PLACEHOLDER];
 
   return (
-    <div
-      className="relative w-full pb-[75%] bg-gray-100 select-none overflow-hidden"
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-    >
-      {/* 슬라이드 트랙 */}
-      <div
-        className="absolute inset-0 h-full flex transition-transform duration-500"
-        style={{ transform: `translateX(-${idx * 100}%)`, width: `${images.length * 100}%` }}
-      >
-        {images.map((src, i) => (
-          <div key={`${src}-${i}`} className="relative w-full h-full shrink-0">
-            <img
-              src={src}
-              alt={`${alt}-${i + 1}`}
-              className="absolute inset-0 w-full h-full object-cover block"
-              loading="lazy"
-              onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {images.length > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="normal-button !px-2 !py-0.5 rounded-full absolute left-2 top-1/2 -translate-y-1/2"
-            aria-label="이전 이미지"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); next(); }}
-            className="normal-button !px-2 !py-0.5 rounded-full absolute right-2 top-1/2 -translate-y-1/2"
-            aria-label="다음 이미지"
-          >
-            ›
-          </button>
-
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setIdx(i); }}
-                className={`w-2.5 h-2.5 rounded-full ${i === idx ? "bg-white" : "bg-white/60"} ring-1 ring-black/10`}
-                aria-label={`이미지 ${i + 1}`}
+    <div className="relative w-full pb-[75%] bg-gray-100 select-none overflow-hidden">
+      <div className="absolute inset-0">
+        <Swiper
+          modules={[Scrollbar]}
+          scrollbar={{ hide: true }}
+          className="w-full h-full"
+        >
+          {slides.map((src, i) => (
+            <SwiperSlide key={`${src}-${i}`}>
+              <img
+                src={src}
+                alt={`${alt}-${i + 1}`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = PLACEHOLDER;
+                }}
               />
-            ))}
-          </div>
-        </>
-      )}
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     </div>
   );
 };

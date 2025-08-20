@@ -111,7 +111,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
   if (!evt) {
     return (
-      <div className="max-w-screen-xl mx-auto my-10">
+      <div className="max-w-screen-lg mx-auto my-10">
         <div className="min-blank page-shadow bg-white rounded-lg p-10 text-center newText-base">
           프로그램 정보를 불러오는 중...
         </div>
@@ -120,7 +120,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
   }
 
   return (
-    <div className="max-w-screen-xl mx-auto my-10">
+    <div className="max-w-screen-lg mx-auto my-10">
       <div className="min-blank bg-white rounded-lg shadow page-shadow p-10">
         <h2 className="text-center newText-3xl font-bold mb-10">프로그램 수정</h2>
 
@@ -239,10 +239,10 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
           {/* 버튼 영역 */}
           <div className="flex justify-end gap-4 mt-6">
-            <button onClick={handleUpdate} disabled={submitting} className="green-button">
+            <button onClick={handleUpdate} disabled={submitting} className="newText-base green-button">
               {submitting ? "수정 중..." : "프로그램 수정"}
             </button>
-            <button onClick={moveToReturn} className="normal-button">
+            <button onClick={moveToReturn} className="newText-base normal-button">
               뒤로가기
             </button>
           </div>

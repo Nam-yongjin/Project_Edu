@@ -9,4 +9,5 @@ public class FacilityImageDTO {
     private Long facImageNum;  // 이미지 고유 번호.
     private String imageName;  // 이미지 원본 이름
     private String imageUrl;   // 이미지 접근 경로
+    private Boolean mainImage; // 대표 이미지 여부
 }
