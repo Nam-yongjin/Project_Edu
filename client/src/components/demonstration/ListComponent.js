@@ -58,17 +58,22 @@ const ListComponent = () => {
         <div
           className="h-[220px] w-full overflow-hidden cursor-pointer"
           onClick={() => {
-            const urlList = item.imageList.map(
-              (img) => `http://localhost:8090/view/${img.imageUrl}`
-            );
+            const urlList = [
+              ...item.imageList
+                .filter(img => img.isMain)           // 메인 이미지만 먼저
+                .map(img => `http://localhost:8090/view/${img.imageUrl}`),
+              ...item.imageList
+                .filter(img => !img.isMain)          // 나머지 이미지
+                .map(img => `http://localhost:8090/view/${img.imageUrl}`)
+            ];
             setSelectedImages(urlList);
             setModalOpen(true);
-          }}   
+          }}
         >
           <img
             src={mainImageUrl}
             alt={`equipment-${item.demNum}`}
-            className="w-full h-full object-cover transition-transform"
+            
           />
         </div>
 
@@ -107,8 +112,8 @@ const ListComponent = () => {
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
         <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
-         <p className="text-gray-600 my-1 newText-base">
-                            전체 {listData.totalElements}건의 물품이 있습니다.</p>
+        <p className="text-gray-600 my-1 newText-base">
+          전체 {listData.totalElements}건의 물품이 있습니다.</p>
         <div className="py-2">
           <SearchComponent
             search={search}
