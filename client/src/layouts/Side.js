@@ -296,7 +296,7 @@ const Side = ({ isOpen, onClose }) => {
                                             <Link to="/facility/holiday" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>휴무일 관리</Link>
                                         </li>
                                         <li>
-                                            <Link to="/admin/adminSelectEmail" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>메일 보내기</Link>
+                                            <Link to="/admin/adminSelectEmail" className="block p-2 rounded hover:bg-gray-100" onClick={onClose}>메일 전송</Link>
                                         </li>
                                     </ul>
                                 </li>

@@ -89,7 +89,7 @@ const Header = () => {
         { name: "배너 관리", link: "/admin/banner" },
         { name: "통계 확인", link: "/admin/stats" },
         { name: "휴무일 관리", link: "/facility/holiday" },
-        { name: "메일 보내기", link: "/admin/adminSelectEmail" },
+        { name: "메일 전송", link: "/admin/adminSelectEmail" },
       ],
     });
     const eventMenu = mainMenus.find(menu => menu.name === "프로그램");

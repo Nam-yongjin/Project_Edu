@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { viewMembers, memberStateChange } from "../../api/adminApi";
 import PageComponent from "../common/PageComponent";
-import { useNavigate } from "react-router-dom";
 const AdminMembersComponent = () => {
     const [members, setMembers] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [selectedState, setSelectedState] = useState("");
-    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useState({
         memId: "",
         name: "",
