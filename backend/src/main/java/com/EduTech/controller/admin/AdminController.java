@@ -163,6 +163,7 @@ public class AdminController {
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/demReg")
    public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+	   System.out.println(demonstrationSearchDTO);
       PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = adminService.getAllDemReg(demonstrationSearchDTO);
       return AllDemReg;
    }

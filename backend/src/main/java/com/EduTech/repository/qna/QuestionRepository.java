@@ -1,5 +1,7 @@
 package com.EduTech.repository.qna;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,8 +15,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long>,JpaSpe
 	// 질문 글 수정하는 쿼리문
 	@Modifying
 	@Transactional
-	@Query("UPDATE Question SET title=:title, content=:content, state=:state WHERE questionNum=:questionNum")
-	void updateQuestion(@Param("title") String title,@Param("content") String content,@Param("state") Boolean state, @Param("questionNum") Long questionNum);
+	@Query("UPDATE Question SET title=:title, content=:content, state=:state,updatedAt=:updatedAt WHERE questionNum=:questionNum")
+	void updateQuestion(@Param("title") String title,@Param("content") String content,@Param("state") Boolean state, @Param("questionNum") Long questionNum,@Param("updatedAt") LocalDateTime updatedAt);
 	
 	@Modifying
 	@Transactional

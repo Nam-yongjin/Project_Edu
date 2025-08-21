@@ -3,6 +3,7 @@ import { questionAdd } from "../../api/qnaApi";
 import useMove from "../../hooks/useMove";
 import lock from '../../assets/lock.png';
 import lockNO from '../../assets/lockNo.png';
+
 const AddComponent = () => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
@@ -57,7 +58,8 @@ const AddComponent = () => {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="글 내용을 입력하세요..."
-        className="w-full min-h-[300px] border border-gray-300 p-2 rounded resize-y"
+        className="w-full min-h-[300px] border border-gray-300 p-2 rounded resize-y whitespace-pre-wrap"
+        style={{ whiteSpace: 'pre-wrap' }}
       />
   
       <div className="mt-4 text-right">

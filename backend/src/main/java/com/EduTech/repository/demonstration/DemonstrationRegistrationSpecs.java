@@ -81,15 +81,10 @@ public class DemonstrationRegistrationSpecs {
 	}
 
 	
-	public static Specification<DemonstrationRegistration> withSearchAndSortAdmin(
-			 String type,
-		        String search,
-		        String sortBy,
-		        String sort,
-		        String statusFilter) {
-
+	public static Specification<DemonstrationRegistration> withSearchAdmin(
+	        String type, String search, String statusFilter) {
+	    
 	    return (root, query, cb) -> {
-	    	query.distinct(true);
 	        Join<DemonstrationRegistration, Demonstration> demJoin = root.join("demonstration", JoinType.LEFT);
 	        Join<DemonstrationRegistration, Member> memberJoin = root.join("member", JoinType.LEFT);
 	        Join<Member, Company> teacherJoin = memberJoin.join("company", JoinType.LEFT);
@@ -120,24 +115,12 @@ public class DemonstrationRegistrationSpecs {
 	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.CANCEL));
 	                    break;
 	                case "expired":
-	                      predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
-	                      break;
+	                    predicates.add(cb.equal(root.get("state"), DemonstrationState.EXPIRED));
+	                    break;
 	            }
 	        }
 
-	        Path<?> sortPath;
-	        if ("expDate".equalsIgnoreCase(sortBy)) {
-	            sortPath = root.get("expDate");
-	        }  else {
-	            sortPath = root.get("regDate");
-	        }
-
-	        if ("desc".equalsIgnoreCase(sort)) {
-	            query.orderBy(cb.desc(sortPath));
-	        } else {
-	            query.orderBy(cb.asc(sortPath));
-	        }
-
+	        // 정렬 제거 - Pageable에서 처리
 	        return cb.and(predicates.toArray(new Predicate[0]));
 	    };
 	}
