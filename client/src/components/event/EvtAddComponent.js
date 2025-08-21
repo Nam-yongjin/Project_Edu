@@ -9,7 +9,7 @@ import defaultImage from "../../assets/default.jpg";
 import { postAddEvent } from "../../api/eventApi";
 import useMove from "../../hooks/useMove";
 
-// 오른쪽 카드 내부의 썸네일 타일
+// 오른쪽 카드 내부의 썸네일 타일 (텍스트 크기와 버튼 스타일 고정 적용)
 const ImageTile = React.memo(function ImageTile({
   src,
   title,
@@ -87,13 +87,13 @@ const EvtAddComponent = () => {
   const [images, setImages] = useState([]);
   const [mainIndex, setMainIndex] = useState(0);
 
-  // 첨부파일 상태
+  // 첨부파일 상태 (첫 파일은 대표)
   const [mainFile, setMainFile] = useState(null);
   const [attachFiles, setAttachFiles] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
 
-  // 입력 변경
+  // 입력 변경 (모든 입력 요소에 newText-* 및 input-focus 사용)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEvt((prev) => ({ ...prev, [name]: value }));
@@ -104,7 +104,7 @@ const EvtAddComponent = () => {
     setEvt((prev) => ({ ...prev, [name]: date }));
   };
 
-  // yyyy-MM-dd HH:mm
+  // yyyy-MM-dd HH:mm 포맷
   const formatDateTime = (date) => {
     const yyyy = date.getFullYear();
     const MM = String(date.getMonth() + 1).padStart(2, "0");
@@ -114,7 +114,7 @@ const EvtAddComponent = () => {
     return `${yyyy}-${MM}-${dd} ${HH}:${mm}`;
   };
 
-  // 이미지 선택(누적)
+  // 이미지 선택(누적) - 미리보기 URL 생성
   const handleImagesChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
@@ -136,14 +136,16 @@ const EvtAddComponent = () => {
   // 대표 지정
   const setAsMain = (idx) => setMainIndex(idx);
 
-  // 이미지 삭제
+  // 이미지 삭제 (대표 인덱스 보정 및 미리보기 URL 해제)
   const removeImage = (idx) => {
     setImages((prev) => {
       const next = [...prev];
       const removed = next.splice(idx, 1)[0];
       if (removed?.url) URL.revokeObjectURL(removed.url);
 
-      if (idx === mainIndex) {
+      if (next.length === 0) {
+        setMainIndex(0);
+      } else if (idx === mainIndex) {
         setMainIndex(0);
       } else if (idx < mainIndex) {
         setMainIndex((i) => Math.max(0, i - 1));
@@ -152,7 +154,7 @@ const EvtAddComponent = () => {
     });
   };
 
-  // 첨부파일 선택(첫 파일은 대표)
+  // 첨부파일 선택(첫 파일은 대표로 저장, 나머지는 서브 목록)
   const handleAttachChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
@@ -169,21 +171,21 @@ const EvtAddComponent = () => {
     [images]
   );
 
-  // 기본 이미지 파일 생성
+  // 기본 이미지 파일 생성 (대표 이미지 미선택 시 사용)
   const urlToFile = async (url, name = "default.jpg", mime = "image/jpeg") => {
     const res = await fetch(url);
     const blob = await res.blob();
     return new File([blob], name, { type: mime });
   };
 
-  // 등록
+  // 등록 처리: dto(JSON) + 파일(FormData) 전송
   const register = useCallback(async () => {
     try {
       setSubmitting(true);
 
       const formData = new FormData();
 
-      // 대표/그 외 구분
+      // 대표/그 외 이미지 구분하여 전송
       if (images.length === 0) {
         formData.append("mainImage", await urlToFile(defaultImage));
       } else {
@@ -196,9 +198,11 @@ const EvtAddComponent = () => {
         });
       }
 
+      // 첨부파일(대표 + 서브)
       if (mainFile) formData.append("mainFile", mainFile);
       attachFiles.forEach((f) => formData.append("attachList", f));
 
+      // DTO 직렬화 (날짜는 문자열 포맷으로 전송)
       const dto = {
         ...evt,
         applyStartPeriod: formatDateTime(evt.applyStartPeriod),
@@ -226,19 +230,23 @@ const EvtAddComponent = () => {
   const imageSummary =
     images.length > 0 ? `${images.length}장 선택됨` : "선택된 파일 없음";
 
-  // 첨부파일 개수 카운트 로직 개선 (mainFile도 있으면 +1)
+  // 첨부파일 개수 카운트(대표 포함)
   const fileCount = (mainFile ? 1 : 0) + attachFiles.length;
   const attachSummaryText =
     fileCount > 0 ? `${fileCount}개 첨부됨` : "선택된 파일 없음";
 
   return (
+    // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 좌우 여백: 고정 클래스 사용 */}
       <div className="min-blank">
         <h2 className="text-center newText-3xl font-bold mb-10">프로그램 등록</h2>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 좌측: 입력 폼 카드 (페이지 그림자, 입력창 스타일, 텍스트 크기 적용) */}
           <div className="lg:col-span-2 page-shadow rounded-2xl border bg-white p-6">
             <div className="grid grid-cols-1 gap-4">
-              {/* 텍스트 입력 */}
+              {/* 텍스트 입력 그룹 */}
               {[
                 {
                   label: "프로그램명",
@@ -277,7 +285,7 @@ const EvtAddComponent = () => {
               ].map(({ label, name, type, required, placeholder }) => (
                 <div key={name} className="flex items-start gap-4">
                   <label className="w-32 newText-base font-semibold pt-2">
-                    {label} {required && <span className="text-red-500">*</span>}
+                    {label} {required && <span className="newText-base text-red-500">*</span>}
                   </label>
                   {type === "textarea" ? (
                     <textarea
@@ -301,7 +309,7 @@ const EvtAddComponent = () => {
                 </div>
               ))}
 
-              {/* 날짜/시간 */}
+              {/* 날짜/시간 선택 (input-focus, newText-base) */}
               {[
                 { name: "applyStartPeriod", label: "모집 시작일" },
                 { name: "applyEndPeriod", label: "모집 종료일" },
@@ -310,7 +318,7 @@ const EvtAddComponent = () => {
               ].map(({ name, label }) => (
                 <div key={name} className="flex items-center gap-4">
                   <label className="w-32 newText-base font-semibold">
-                    {label} <span className="text-red-500">*</span>
+                    {label} <span className="newText-base text-red-500">*</span>
                   </label>
                   <DatePicker
                     selected={evt[name]}
@@ -326,10 +334,10 @@ const EvtAddComponent = () => {
                 </div>
               ))}
 
-              {/* 모집 대상 */}
+              {/* 모집 대상 (select에도 newText-base 적용) */}
               <div className="flex items-center gap-4">
                 <label className="w-32 newText-base font-semibold">
-                  모집 대상 *
+                  모집 대상 <span className="newText-base text-red-500">*</span>
                 </label>
                 <select
                   name="category"
@@ -337,16 +345,19 @@ const EvtAddComponent = () => {
                   onChange={handleChange}
                   className="input-focus newText-base flex-1 placeholder-gray-400"
                 >
-                  <option value="USER">일반인</option>
-                  <option value="STUDENT">학생</option>
-                  <option value="TEACHER">교사</option>
+                  <option className="newText-base" value="USER">일반인</option>
+                  <option className="newText-base" value="STUDENT">학생</option>
+                  <option className="newText-base" value="TEACHER">교사</option>
                 </select>
               </div>
 
-              {/* 이미지 업로드 */}
+              {/* 이미지 업로드 (요약 텍스트 newText-sm 적용) */}
               <div className="flex items-center gap-4">
                 <label className="w-32 newText-base font-semibold">이미지</label>
-                <label htmlFor="image-input" className="positive-button newText-base cursor-pointer">
+                <label
+                  htmlFor="image-input"
+                  className="positive-button newText-base cursor-pointer"
+                >
                   파일 선택
                 </label>
                 <input
@@ -360,10 +371,13 @@ const EvtAddComponent = () => {
                 <span className="newText-sm text-gray-500">{imageSummary}</span>
               </div>
 
-              {/* 첨부파일 업로드 */}
+              {/* 첨부파일 업로드 (대표 + 서브, 요약 텍스트 newText-sm 적용) */}
               <div className="flex items-center gap-4">
                 <label className="w-32 newText-base font-semibold">첨부파일</label>
-                <label htmlFor="attach-input" className="positive-button newText-base cursor-pointer">
+                <label
+                  htmlFor="attach-input"
+                  className="positive-button newText-base cursor-pointer"
+                >
                   파일 선택
                 </label>
                 <input
@@ -377,17 +391,17 @@ const EvtAddComponent = () => {
                 <span className="newText-sm text-gray-500">{attachSummaryText}</span>
               </div>
 
-              {/* 첨부파일 실제 목록 */}
+              {/* 첨부파일 실제 목록 표시 (텍스트 크기 고정) */}
               <div className="ml-32 space-y-1">
-                {mainFile && (
-                  <p className="newText-sm">{mainFile.name}</p>
-                )}
+                {mainFile && <p className="newText-sm">{mainFile.name}</p>}
                 {attachFiles.map((f, i) => (
-                  <p key={i} className="newText-sm">{f.name}</p>
+                  <p key={i} className="newText-sm">
+                    {f.name}
+                  </p>
                 ))}
               </div>
 
-              {/* 버튼 */}
+              {/* 액션 버튼 영역 (버튼 스타일 고정) */}
               <div className="flex justify-end gap-4 mt-6">
                 <button
                   onClick={register}
@@ -406,7 +420,7 @@ const EvtAddComponent = () => {
             </div>
           </div>
 
-          {/* 우측: 이미지 미리보기 카드(통합) */}
+          {/* 우측: 이미지 미리보기 카드 (페이지 그림자, 텍스트 크기 고정) */}
           <aside className="lg:col-span-1 lg:sticky lg:top-6">
             <section className="page-shadow rounded-2xl border bg-white p-4">
               <h4 className="newText-lg font-semibold mb-2">이미지 미리보기</h4>
@@ -425,9 +439,7 @@ const EvtAddComponent = () => {
                   ))}
                 </div>
               ) : (
-                <p className="newText-sm text-gray-500">
-                  추가된 이미지가 없습니다.
-                </p>
+                <p className="newText-sm text-gray-500">추가된 이미지가 없습니다.</p>
               )}
             </section>
           </aside>

@@ -83,7 +83,7 @@ export default function FacilityDetailComponent() {
 
     const dateStr = toYmd(d);
     const existing = getHolidayItems(d);
-    const hasPublic = existing.some((it) => it.type === "PUBLIC"); // 오타 수정
+    const hasPublic = existing.some((it) => it.type === "PUBLIC");
 
     setError(null);
     setInfo("");
@@ -158,9 +158,11 @@ export default function FacilityDetailComponent() {
   };
 
   return (
+    // 최상단: 고정 클래스
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 바로 아래: 좌우 여백 고정 */}
       <div className="min-blank">
-        {/* 상단 타이틀: 가운데 정렬, 목록 버튼 제거 */}
+        {/* 상단 타이틀 */}
         <h2 className="newText-3xl font-bold text-center mb-6">휴무일 관리</h2>
 
         {/* 달력 카드 영역 */}

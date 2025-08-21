@@ -275,7 +275,7 @@ public class FacilityServiceImpl implements FacilityService {
                         facRevNum, LocalDate.now(), ACTIVE_STATES);
 
         if (hasActiveFuture) {
-            throw new IllegalStateException("미래 일정에 대기/승인된 예약이 있어 삭제할 수 없습니다.");
+            throw new IllegalStateException("일정에 대기/승인된 예약이 있어 삭제할 수 없습니다.");
         }
 
         // 이미지 실제 파일 삭제가 필요하면 FileUtil에 메서드 추가해서 호출

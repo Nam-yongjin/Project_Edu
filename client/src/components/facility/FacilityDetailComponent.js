@@ -8,12 +8,12 @@ import {
 import ko from "date-fns/locale/ko";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   getFacilityDetail,
   getAllHolidays,
   createReservation,
   getReservedBlocks,
-  deleteFacilityById,
 } from "../../api/facilityApi";
 
 /* ---------- 이미지 URL 유틸 ---------- */
@@ -44,7 +44,7 @@ function normalizeHHmm(v) {
   try {
     const d = new Date(v);
     if (!Number.isNaN(d.getTime())) return format(d, "HH:mm");
-  } catch { }
+  } catch {}
   return null;
 }
 function genStartSlots(openHHmm, closeHHmm) {
@@ -108,7 +108,7 @@ export default function FacilityDetailContent({ facRevNum }) {
       .then((d) => {
         if (!mounted) return;
         setData(d);
-        setIdx(0); // 정렬 후 0번(대표)이 보이도록
+        setIdx(0);
       })
       .catch((e) => mounted && setErr(e?.response?.data?.message || e.message || "공간 정보를 불러오지 못했습니다."))
       .finally(() => mounted && setDetailLoading(false));
@@ -163,16 +163,11 @@ export default function FacilityDetailContent({ facRevNum }) {
   const srcs = useMemo(() => {
     const raw = Array.isArray(data?.images) ? data.images : [];
     if (!raw.length) return [PLACEHOLDER];
-
-    // 객체 배열(추천 스키마: { imageUrl, mainImage, ... }) 기준으로 대표 먼저
     const sorted = [...raw].sort((a, b) => {
       const aMain = !!(typeof a === "object" && a?.mainImage);
       const bMain = !!(typeof b === "object" && b?.mainImage);
-      // true 먼저 오도록: bMain - aMain (true=1, false=0)
       return (bMain ? 1 : 0) - (aMain ? 1 : 0);
     });
-
-    // 문자열만 있으면 정렬 의미 없지만 안전하게 처리
     const urls = sorted.map(buildImageUrl).filter(Boolean);
     return urls.length ? urls : [PLACEHOLDER];
   }, [data]);
@@ -186,17 +181,29 @@ export default function FacilityDetailContent({ facRevNum }) {
     touchX.current = null;
   };
 
-  /* 달력 */
-  const monthLabel = format(currentMonth, "yyyy. MM", { locale: ko });
-  const minMonthStart = startOfMonth(new Date());
-  const maxMonthStart = startOfMonth(addMonths(new Date(), 2)); // 3개월 뒤까지, 즉 2달 뒤까지
-  const isPrevDisabled = isBefore(currentMonth, minMonthStart);
-  const isNextDisabled = isBefore(maxMonthStart, currentMonth) || isEqual(maxMonthStart, currentMonth);
+  /* 달력 경계(현재월 포함 + 3개월) */
+  const monthStart = useMemo(() => startOfMonth(currentMonth), [currentMonth]);
+  const minMonthStart = useMemo(() => startOfMonth(new Date()), []);
+  const maxMonthStart = useMemo(() => startOfMonth(addMonths(new Date(), 3)), []);
+
+  const isPrevDisabled = useMemo(
+    () => isEqual(monthStart, minMonthStart) || isBefore(monthStart, minMonthStart),
+    [monthStart, minMonthStart]
+  );
+  const isNextDisabled = useMemo(
+    () => isEqual(monthStart, maxMonthStart) || isBefore(maxMonthStart, monthStart),
+    [monthStart, maxMonthStart]
+  );
+
+  const monthLabel = useMemo(
+    () => format(currentMonth, "yyyy. MM", { locale: ko }),
+    [currentMonth]
+  );
 
   const weeks = useMemo(() => {
-    const startMonth = startOfMonth(currentMonth);
+    const startMonth_ = startOfMonth(currentMonth);
     const endMonthDate = endOfMonth(currentMonth);
-    const gridStart = startOfWeek(startMonth, { weekStartsOn: 0 });
+    const gridStart = startOfWeek(startMonth_, { weekStartsOn: 0 });
     const gridEnd = endOfWeek(endMonthDate, { weekStartsOn: 0 });
     const rows = [];
     let day = gridStart;
@@ -259,11 +266,10 @@ export default function FacilityDetailContent({ facRevNum }) {
       endTime: calcEndHHmm(startKey, durationHrs),
     })
       .then(() => {
-        alert("예약 신청이 완료되었습니다."); // ✅ 완료 알림
-        navigate("/facility/list");          // ✅ 리스트 페이지로 이동
+        alert("예약 신청이 완료되었습니다.");
+        navigate("/facility/list");
       })
       .catch((e) => {
-        // 실패 시에도 알림으로 보여줍니다.
         alert(e?.response?.data?.message || e?.message || "예약 신청 중 오류가 발생했습니다.");
       })
       .finally(() => setSubmitting(false));
@@ -272,11 +278,16 @@ export default function FacilityDetailContent({ facRevNum }) {
   const handleDelete = useCallback(async () => {
     if (!window.confirm("정말 이 시설을 삭제하시겠습니까?")) return;
     try {
-      await deleteFacilityById(facRevNum);
+      await axios.delete("http://localhost:8090/api/facility/delete", { params: { facRevNum } });
       alert("시설이 삭제되었습니다.");
       navigate("/facility/list");
     } catch (err) {
-      alert(err?.response?.data?.message || err?.message || "삭제 중 오류가 발생했습니다.");
+      alert(
+        err?.response?.data ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "삭제 중 오류가 발생했습니다."
+      );
     }
   }, [facRevNum, navigate]);
 
@@ -289,7 +300,7 @@ export default function FacilityDetailContent({ facRevNum }) {
     return (
       <div className="max-w-screen-xl mx-auto my-10">
         <div className="min-blank page-shadow bg-white rounded-xl p-10 text-center">
-          {err ? <p className="newText-base text-red-600">{err}</p> : <p className="newText-base">불러오는 중…</p>}
+          {err ? <p className="newText-base text-red-600">{err}</p> : <p className="newText-base">불러오는 중...</p>}
         </div>
       </div>
     );
@@ -299,7 +310,7 @@ export default function FacilityDetailContent({ facRevNum }) {
   return (
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
-        {/* ====== 상단 배너(큰 틀) : 공간 상세정보 ====== */}
+        {/* ====== 상단 배너 ====== */}
         <header className="page-shadow rounded-xl overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-blue-50 via-sky-50 to-white border border-blue-100 px-6 py-5 flex items-center justify-between">
             <div>
@@ -334,14 +345,14 @@ export default function FacilityDetailContent({ facRevNum }) {
                   <button
                     aria-label="이전 이미지"
                     onClick={() => setIdx((idx - 1 + n) % n)}
-                    className="normal-button !px-3 !py-1 rounded-full absolute left-3 top-1/2 -translate-y-1/2"
+                    className="normal-button newText-base !px-3 !py-1 rounded-full absolute left-3 top-1/2 -translate-y-1/2"
                   >
                     ‹
                   </button>
                   <button
                     aria-label="다음 이미지"
                     onClick={() => setIdx((idx + 1) % n)}
-                    className="normal-button !px-3 !py-1 rounded-full absolute right-3 top-1/2 -translate-y-1/2"
+                    className="normal-button newText-base !px-3 !py-1 rounded-full absolute right-3 top-1/2 -translate-y-1/2"
                   >
                     ›
                   </button>
@@ -431,7 +442,8 @@ function DetailCalendarSection(props) {
     selectedDate, handleDayClick, open, close, selectedDateHasHoliday,
     startSlots, startKey, setStartKey, durationHrs, setDurationHrs, maxHrs,
     endTimeText, canReserve, applyReserve, holLoading, holError, submitting,
-    notice, isErrorNotice
+    notice, isErrorNotice,
+    reservedBlocks,
   } = props;
 
   const handlePrevClick = useCallback(() => {
@@ -468,7 +480,7 @@ function DetailCalendarSection(props) {
         <div className="flex items-center justify-center gap-4 mb-4">
           <button
             onClick={handlePrevClick}
-            className={`normal-button ${isPrevDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
+            className={`normal-button newText-base ${isPrevDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
             disabled={isPrevDisabled}
           >
             &lt;
@@ -476,7 +488,7 @@ function DetailCalendarSection(props) {
           <div className="newText-3xl font-bold tracking-wide">{monthLabel}</div>
           <button
             onClick={handleNextClick}
-            className={`normal-button ${isNextDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
+            className={`normal-button newText-base ${isNextDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
             disabled={isNextDisabled}
           >
             &gt;
@@ -521,7 +533,7 @@ function DetailCalendarSection(props) {
                     {items.map((it, i2) => (
                       <span
                         key={i2}
-                        className={`inline-block w-fit text-[11px] px-2 py-0.5 rounded-full ${it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}
+                        className={`inline-block w-fit newText-xs px-2 py-0.5 rounded-full ${it.type === "PUBLIC" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}
                       >
                         {it.label}
                       </span>
@@ -533,7 +545,7 @@ function DetailCalendarSection(props) {
           )}
         </div>
 
-        {holLoading && <div className="mt-3 newText-sm text-gray-500">휴무일 불러오는 중…</div>}
+        {holLoading && <div className="mt-3 newText-sm text-gray-500">휴무일 불러오는 중...</div>}
         {holError && <div className="mt-2 newText-sm text-red-500">{holError}</div>}
       </div>
 
@@ -604,13 +616,13 @@ function DetailCalendarSection(props) {
             })}
           </div>
 
-          <div className="mt-2 newText-sm text-gray-600">
+        <div className="mt-2 newText-sm text-gray-600">
             선택한 시간: <span className="font-medium text-gray-900">{startKey && durationHrs ? endTimeText : "-"}</span>
           </div>
         </div>
 
         <button
-          className={`mt-5 w-full ${canReserve ? "positive-button" : "normal-button opacity-50 cursor-not-allowed"}`}
+          className={`mt-5 w-full newText-base ${canReserve ? "positive-button" : "normal-button opacity-50 cursor-not-allowed"}`}
           onClick={applyReserve}
           disabled={!canReserve || submitting}
         >

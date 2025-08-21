@@ -34,11 +34,14 @@ const hhmm = (v) => {
 };
 const getStatusChip = (state) => {
   switch (state) {
-    case "APPROVED":   return { label: "승인 완료", cls: "bg-green-500" };
+    case "APPROVED":
+      return { label: "승인 완료", cls: "bg-green-500" };
     case "CANCEL":
-    case "CANCELLED":  return { label: "취소 완료", cls: "bg-red-500" };
+    case "CANCELLED":
+      return { label: "취소 완료", cls: "bg-red-500" };
     case "WAITING":
-    default:           return { label: "승인 대기", cls: "bg-gray-500" };
+    default:
+      return { label: "승인 대기", cls: "bg-gray-500" };
   }
 };
 
@@ -65,7 +68,7 @@ function PageBridge({ page, totalPages, onChange }) {
 
 const FacilityReservationComponent = () => {
   const [reservations, setReservations] = useState([]);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(0);              // 0-based (PageComponent와 호환)
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
   const pageSize = 5;
@@ -139,7 +142,9 @@ const FacilityReservationComponent = () => {
   };
 
   return (
+    // 최상단: 고정 클래스
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 바로 아래: 좌우 여백 고정 */}
       <div className="min-blank">
         {/* 타이틀 */}
         <h2 className="newText-3xl font-bold mb-6 text-center">공간 예약 내역</h2>
@@ -152,6 +157,7 @@ const FacilityReservationComponent = () => {
             reservations.map((item) => {
               const chip = getStatusChip(item.state);
               const thumb = buildImageUrl(item.mainImageUrl);
+              const cancelDisabled = !isCancelable(item);
               return (
                 <div key={item.reserveId} className="page-shadow rounded-2xl border bg-white p-4">
                   <div className="flex items-start gap-4">
@@ -167,9 +173,18 @@ const FacilityReservationComponent = () => {
 
                     {/* 정보 */}
                     <div className="flex-1 newText-base">
-                      <p className="mb-1"><span className="newText-sm text-gray-600">공간명</span> <b>{item.facName}</b></p>
-                      <p className="mb-1"><span className="newText-sm text-gray-600">이용일</span> {formatDateYmd(item.facDate)}</p>
-                      <p className="mb-1"><span className="newText-sm text-gray-600">이용 시간</span> {hhmm(item.startTime)} ~ {hhmm(item.endTime)}</p>
+                      <p className="mb-1">
+                        <span className="newText-sm text-gray-600">공간명</span>{" "}
+                        <b>{item.facName}</b>
+                      </p>
+                      <p className="mb-1">
+                        <span className="newText-sm text-gray-600">이용일</span>{" "}
+                        {formatDateYmd(item.facDate)}
+                      </p>
+                      <p className="mb-1">
+                        <span className="newText-sm text-gray-600">이용 시간</span>{" "}
+                        {hhmm(item.startTime)} ~ {hhmm(item.endTime)}
+                      </p>
                       <p className="mb-1">
                         <span className="newText-sm text-gray-600">상태</span>{" "}
                         <span className={`inline-block px-2 py-0.5 rounded text-white newText-xs ${chip.cls}`}>
@@ -182,8 +197,9 @@ const FacilityReservationComponent = () => {
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => handleCancelReservation(item.reserveId)}
-                        disabled={!isCancelable(item)}
-                        className={`nagative-button newText-base px-3 py-1 rounded disabled:opacity-50`}
+                        disabled={cancelDisabled}
+                        className={`nagative-button newText-base px-3 py-1 rounded ${cancelDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                        title={getCancelButtonLabel(item)}
                       >
                         {getCancelButtonLabel(item)}
                       </button>
