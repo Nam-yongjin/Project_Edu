@@ -40,6 +40,7 @@ public class News extends BaseEntity{
 	private String linkUrl; //외부 기사 링크
 	
 	@Builder.Default
+	@Column(updatable = false)
 	private Long viewCount = 0L;	//0으로 초기화 해서 Null값 방지
 	
 	public void increaseViewCount() { //조회수 증가
