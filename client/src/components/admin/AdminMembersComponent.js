@@ -123,7 +123,7 @@ const AdminMembersComponent = () => {
                     onChange={handleSearchChange}
                     className="input-focus"
                 >
-                    <option value="">역할 선택</option>
+                    <option value="">유형 선택</option>
                     <option value="USER">일반</option>
                     <option value="STUDENT">학생</option>
                     <option value="TEACHER">교사</option>
