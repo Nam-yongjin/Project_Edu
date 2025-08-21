@@ -13,6 +13,7 @@ const NoticeListComponent = () => {
   //상태변수들
   //const [상태 변수, 상태 변경 함수] = useState(초기값);
   const [notices, setNotices] = useState([]);
+  const [pinnedNotices, setPinnedNotices] = useState([]); // 고정 공지 별도 관리
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
@@ -31,11 +32,33 @@ const NoticeListComponent = () => {
     sortDirection: "DESC"
   });
 
-  //공지사항 목록 조회
+  // 고정 공지 별도 조회
+  const fetchPinnedNotices = async () => {
+    try {
+      const pinnedParams = {
+        ...searchParams,
+        isPinned: true,
+        page: 0,
+        size: 100 // 충분히 큰 값으로 모든 고정 공지 조회
+      };
+      const response = await NoticeList(pinnedParams);
+      setPinnedNotices(response.content || []);
+    } catch (error) {
+      console.error("고정 공지사항 조회 실패:", error);
+      setPinnedNotices([]);
+    }
+  };
+
+  //공지사항 목록 조회 (일반 공지만)
   const fetchNotices = async (params = searchParams) => {
     setLoading(true);
     try {
-      const response = await NoticeList(params); //컨트롤러에 전달되는 매개변수
+      // 일반 공지만 조회 (고정 공지 제외)
+      const normalParams = {
+        ...params,
+        isPinned: false
+      };
+      const response = await NoticeList(normalParams);
       setNotices(response.content || []);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);
@@ -50,6 +73,7 @@ const NoticeListComponent = () => {
 
   //처음 페이지 들어오면 초기 데이터를 나타냄
   useEffect(() => {
+    fetchPinnedNotices(); // 고정 공지 조회
     fetchNotices();
   }, []);
 
@@ -60,6 +84,28 @@ const NoticeListComponent = () => {
       page: 0 //검색 시 첫 페이지로
     };
     setSearchParams(updatedParams);
+    
+    // 검색 시에도 고정 공지는 별도로 조회
+    if (updatedParams.keyword || updatedParams.searchType !== "ALL" || 
+        updatedParams.startDate || updatedParams.endDate) {
+      // 검색 조건이 있을 때는 고정 공지도 같은 조건으로 필터링
+      const pinnedSearchParams = {
+        ...updatedParams,
+        isPinned: true,
+        page: 0,
+        size: 100
+      };
+      NoticeList(pinnedSearchParams).then(response => {
+        setPinnedNotices(response.content || []);
+      }).catch(error => {
+        console.error("고정 공지사항 검색 실패:", error);
+        setPinnedNotices([]);
+      });
+    } else {
+      // 검색 조건이 없을 때는 모든 고정 공지 표시
+      fetchPinnedNotices();
+    }
+    
     fetchNotices(updatedParams);
     setSelectedNotices([]); //선택 초기화
   };
@@ -87,7 +133,7 @@ const NoticeListComponent = () => {
   // 전체 선택/해제
   const handleSelectAll = (isChecked) => {
     if (isChecked) {
-      const allNoticeNums = notices.map(notice => notice.noticeNum);
+      const allNoticeNums = [...pinnedNotices, ...notices].map(notice => notice.noticeNum);
       setSelectedNotices(allNoticeNums);
     } else {
       setSelectedNotices([]);
@@ -105,10 +151,11 @@ const NoticeListComponent = () => {
     });
   };
 
-  // 고정글과 일반글 분리 및 정렬
-  const pinnedNotices = notices.filter(notice => notice.isPinned);
-  const normalNotices = notices.filter(notice => !notice.isPinned);
-  const allNotices = [...pinnedNotices, ...normalNotices];
+  // 표시할 공지사항 목록 (고정 공지 + 일반 공지)
+  const allNotices = [...pinnedNotices, ...notices];
+
+  // 전체 공지사항 수 계산 (서버에서 받은 일반 공지 수 + 고정 공지 수)
+  const totalNoticeCount = totalElements + pinnedNotices.length;
 
   return (
     <div className="max-w-screen-xl mx-auto my-10">
@@ -116,7 +163,7 @@ const NoticeListComponent = () => {
         <div className="mb-6">
           <h1 className="newText-2xl font-bold text-gray-900">공지사항</h1>
           <p className="text-gray-600 mt-1 newText-base">
-            전체 {totalElements}건의 공지사항이 있습니다.
+            전체 {totalNoticeCount}건의 공지사항이 있습니다.
           </p>
         </div>
 
@@ -141,7 +188,7 @@ const NoticeListComponent = () => {
                     <th className="w-12 px-2 py-3 text-center hidden sm:table-cell">
                       <input
                         type="checkbox"
-                        checked={selectedNotices.length === notices.length && notices.length > 0}
+                        checked={selectedNotices.length === allNotices.length && allNotices.length > 0}
                         onChange={(e) => handleSelectAll(e.target.checked)}
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
@@ -187,8 +234,8 @@ const NoticeListComponent = () => {
                           </span>
                         ) : (
                           //일반글 역순 번호 계산
-                          //전체 일반글 개수 - (현재 페이지 × 페이지 크기) - 현재 일반글 인덱스
-                          totalElements - pinnedNotices.length - (currentPage * searchParams.size) - (index - pinnedNotices.length)
+                          //전체 일반글 개수 - (현재 페이지 × 페이지 크기) - 현재 일반글 인덱스 (고정공지 제외)
+                          totalElements - (currentPage * searchParams.size) - (index - pinnedNotices.length)
                         )}
                       </td>
                       {/* 제목 */}
@@ -271,6 +318,7 @@ const NoticeListComponent = () => {
             selectedNotices={selectedNotices}
             onDelete={() => {
               // 삭제 후 목록 새로고침
+              fetchPinnedNotices(); // 고정 공지도 새로고침
               fetchNotices();
               setSelectedNotices([]);
             }}
