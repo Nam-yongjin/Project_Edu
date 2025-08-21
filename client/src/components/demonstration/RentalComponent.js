@@ -6,6 +6,7 @@ import useMove from "../../hooks/useMove";
 import CalendarComponent from "./CalendarComponent";
 import ItemModal from "./itemModal";
 import { useSelector } from "react-redux";
+import defaultImage from '../../assets/default.jpg';
 const RentalComponent = () => {
     const isTeacher = useSelector((state) => state.loginState?.role === "TEACHER");
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
@@ -46,7 +47,7 @@ const RentalComponent = () => {
     const [reservationQty, setReservationQty] = useState(1); // 수량 설정
     const [isExtendModalOpen, setIsExtendModalOpen] = useState(false); // 날짜 연장용 모달창 상태 변수
     const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
-     const [disabledExtendDate, setdisabledExtendDate] = useState([]);
+    const [disabledExtendDate, setdisabledExtendDate] = useState([]);
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
@@ -105,19 +106,6 @@ const RentalComponent = () => {
         } else {
             setSortBy(column);
             setSort("asc");
-        }
-    };
-
-
-    // 전체선택 체크박스 핸들러
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            const allIds = listData.content
-                .filter(item => item.state !== "CANCEL") // cancel 제외
-                .map((item) => item.demNum);
-            setSelectedItems(new Set(allIds));
-        } else {
-            setSelectedItems(new Set());
         }
     };
 
@@ -255,7 +243,7 @@ const RentalComponent = () => {
         return `${y}-${m}-${d}`;
     }
 
-    const handleExtendButtonClick = (demNum,endDate) => {
+    const handleExtendButtonClick = (demNum, endDate) => {
         setdisabledExtendDate(endDate);
         setSelectedDemNum(demNum);
         setIsExtendModalOpen(true);
@@ -284,79 +272,56 @@ const RentalComponent = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-6">
-            <SearchComponent
-                search={search}
-                setSearch={setSearch}
-                type={type}
-                setType={setType}
-                onSearchClick={onSearchClick}
-                searchOptions={searchOptions}
-            />
-            <div className="overflow-x-auto mt-6">
+        <div className="max-w-screen-xl mx-auto my-10">
+            <div className="min-blank">
+                <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
+                <div className="py-2">
+                    <SearchComponent
+                        search={search}
+                        setSearch={setSearch}
+                        type={type}
+                        setType={setType}
+                        onSearchClick={onSearchClick}
+                        searchOptions={searchOptions}
+                    />
+                </div>
                 <p className="text-gray-600 my-1 newText-base">
                     전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
 
                 <div className="overflow-x-auto mt-6">
-                    <table className="min-w-full bg-white rounded-lg shadow-md">
-                        <thead>
-                            <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
-                                {/* 전체선택 체크박스 th */}
-                                <th className="py-3 px-4 text-center">
-                                    <input
-                                        type="checkbox"
-                                        onChange={handleSelectAll}
-                                        checked={
-                                            listData.content.filter(item => item.state !== "CANCEL").length > 0 &&
-                                            selectedItems.size === listData.content.filter(item => item.state !== "CANCEL").length
-                                        }
-                                    />
-                                </th>
-                                <th className="py-3 px-4 text-left rounded-tl-lg">대표 이미지</th>
-                                <th className="py-3 px-4 text-left">상품명</th>
-                                <th className="py-3 px-4 text-left">기업명</th>
-                                <th className="py-3 px-4 text-left">대여개수</th>
+                    <table className="w-full">
+                        <thead className="bg-gray-100 text-gray-700 newText-base">
+                            <tr className="newText-base whitespace-nowrap">
+                                <th className="w-[8%]">대표 이미지</th>
+                                <th className="w-[8%]">물품명</th>
+                                <th className="w-[10%]">기업명</th>
+                                <th className="w-[10%]">신청갯수</th>
 
-                                {[
-                                    { label: "시작일", value: "startDate" },
-                                    { label: "마감일", value: "endDate" },
-                                    { label: "등록일", value: "applyAt" },
-                                ].map(({ label, value }) => (
-                                    <th
-                                        key={value}
-                                        onClick={() => handleSortChange(value)}
-                                        className="cursor-pointer text-center select-none py-3 px-4"
-                                    >
-                                        <div className="flex items-center justify-center space-x-1">
-                                            <span>{label}</span>
-                                            <div className="flex flex-col">
-                                                <span
-                                                    className={`text-xs leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"
-                                                        }`}
-                                                >
-                                                    ▲
-                                                </span>
-                                                <span
-                                                    className={`text-xs leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"
-                                                        }`}
-                                                >
-                                                    ▼
-                                                </span>
+                                {[{ label: "시작일", value: "startDate" }, { label: "마감일", value: "endDate" }, { label: "등록일", value: "applyAt" }].map(
+                                    ({ label, value }) => (
+                                        <th key={value} onClick={() => handleSortChange(value)} className="cursor-pointer w-[8%]">
+                                            <div className="flex items-center justify-center space-x-1">
+                                                <span>{label}</span>
+                                                <div className="flex flex-col">
+                                                    <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
+                                                        ▲
+                                                    </span>
+                                                    <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
+                                                        ▼
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </th>
-                                ))}
-
-                                <th className="py-3 px-2 border-b flex flex-col items-center space-y-1 whitespace-nowrap w-[90px]">
-                                    <span>신청상태</span>
+                                        </th>
+                                    )
+                                )}
+                                <th className="w-[10%]">
+                                    <div className="mb-1">신청 상태</div>
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => {
                                             setStatusFilter(e.target.value);
                                             setCurrent(0);
-                                        }}
-                                        className="border rounded px-1 text-xs w-full"
-                                    >
+                                        }}>
                                         <option value="">전체</option>
                                         <option value="REJECT">거부</option>
                                         <option value="ACCEPT">수락</option>
@@ -366,78 +331,56 @@ const RentalComponent = () => {
                                     </select>
                                 </th>
                                 {/* 버튼 3개 컬럼 */}
-                                <th className="py-3 px-4 text-center"></th>
-                                <th className="py-3 px-4 text-left"></th>
+                                <th className="w-[8%]">반납/연장 신청</th>
+                                <th className="w-[8%]">예약 수정</th>
                             </tr>
                         </thead>
-                        <tbody className="text-gray-600 text-sm">
+
+                        <tbody className="text-gray-600">
                             {listData.content.length === 0 ? (
                                 <tr>
-                                    <td colSpan={10} className="py-10 text-center text-gray-500">
-                                        대여한 상품이 없습니다.
+                                    <td colSpan={10} className="text-center">
+                                        <p className="text-gray-500 newText-3xl mt-20">대여 내역이 없습니다.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 listData.content.map((item) => {
                                     const mainImage = item.imageList?.find((img) => img.isMain === true);
-                                    const isCancelled = item.state === "CANCEL";
-                                    const isRejected = item.state === "REJECT";
-                                    const pendingRequests =
-                                        item.requestType !== null && item.reqState !== null
-                                            ? [{ type: item.requestType, state: item.reqState }].filter(
-                                                (req) => req.state === "WAIT"
-                                            )
-                                            : [];
-
+                                    const memberState = item.state;
                                     return (
-                                        <tr
-                                            key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`}
-                                            className={`border-b border-gray-200 hover:bg-gray-50 cursor-default ${isCancelled ? "bg-gray-100 text-gray-400" : ""}`}
-                                        >
-                                            {/* 체크박스 */}
-                                            <td className="py-3 px-4 text-center">
-                                                {item.state === "WAIT" ? (
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedItems.has(item.demNum)}
-                                                        onChange={(e) => handleSelectOne(e, item.demNum)}
-                                                    />
-                                                ) : (
-                                                    <span></span>
-                                                )}
-                                            </td>
-
-                                            {/* 이미지 */}
-                                            <td className="py-3 px-4">
+                                        <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                                            <td className="py-2 px-2 whitespace-nowrap text-center">
                                                 {mainImage ? (
                                                     <img
                                                         onClick={() => moveToPath(`../detail/${item.demNum}`)}
                                                         src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                         alt={item.demName}
-                                                        className="w-20 h-20 object-contain rounded-md shadow-sm hover:scale-105 transition-transform cursor-pointer"
+                                                        className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
                                                     />
                                                 ) : (
-                                                    <div className="w-20 h-20 flex items-center justify-center bg-gray-100 text-gray-400 rounded-md">
-                                                        이미지 없음
-                                                    </div>
+                                                    <img
+                                                        src={defaultImage}
+                                                        alt="default"
+                                                        className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                    />
                                                 )}
                                             </td>
 
                                             {/* 기본 정보 */}
-                                            <td className="py-3 px-4">{item.demName}</td>
-                                            <td className="py-3 px-4">{item.companyName}</td>
-                                            <td className="py-3 px-4">{item.bitemNum}</td>
-                                            <td className="py-3 px-4 text-center">{item.startDate}</td>
-                                            <td className="py-3 px-4 text-center">{item.endDate}</td>
-                                            <td className="py-3 px-4 text-center">{item.applyAt}</td>
+                                            <td title={item.demName} className="truncate max-w-[100px]">{item.demName || "-"}</td>
+                                            <td title={item.companyName} className="truncate max-w-[100px]">{item.companyName || "-"}</td>
+                                            <td>{item.bitemNum || "-"}</td>
+                                            <td>{item.startDate || "-"}</td>
+                                            <td>{item.endDate || "-"}</td>
+                                            <td>{item.applyAt || "-"}</td>
 
                                             {/* 상태 표시 칸 */}
-                                            <td className="py-3 px-4 text-center align-center">
+                                            <td>
                                                 <div>{getStateLabel(item.state)}</div>
                                             </td>
 
                                             {/* 진행중 요청 칸 */}
-                                            <td className="py-3 px-4 text-center align-top text-xs text-blue-600">
+                                            <td className="newText-base text-blue-600">
                                                 {Array.isArray(item.reqState) && Array.isArray(item.requestType) ? (
                                                     item.reqState
                                                         .map((state, idx) => ({ state, type: item.requestType[idx] }))
@@ -462,7 +405,7 @@ const RentalComponent = () => {
                                             </td>
 
                                             {/* 버튼 칸 */}
-                                            <td className="py-3 px-4 text-center flex flex-col space-y-1 items-center">
+                                            <td className="my-1 flex flex-col space-y-1 items-center">
                                                 {(() => {
                                                     const reqStates = Array.isArray(item.reqState) ? item.reqState : [];
                                                     const hasWaitState = reqStates.some(state => String(state).toUpperCase() === "WAIT");
@@ -473,9 +416,9 @@ const RentalComponent = () => {
                                                             <button
                                                                 disabled={itemState !== "WAIT"}
                                                                 onClick={() => handleActionClick(item.demNum, "예약변경")}
-                                                                className={`px-2 py-1 rounded text-xs w-full ${itemState === "WAIT"
-                                                                    ? "bg-yellow-400 hover:bg-yellow-500 text-white cursor-pointer"
-                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                                className={`px-2 py-1 rounded newText-xs w-full ${itemState === "WAIT"
+                                                                    ? "positive-button"
+                                                                    : "disable-button"
                                                                     }`}
                                                             >
                                                                 예약변경
@@ -483,10 +426,10 @@ const RentalComponent = () => {
 
                                                             <button
                                                                 disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                                onClick={() => handleExtendButtonClick(item.demNum,item.endDate)}
-                                                                className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                    ? "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                                onClick={() => handleExtendButtonClick(item.demNum, item.endDate)}
+                                                                className={`px-2 py-1 rounded newText-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                    ? "green-button"
+                                                                    : "disable-button"
                                                                     }`}
                                                             >
                                                                 대여연장
@@ -495,9 +438,9 @@ const RentalComponent = () => {
                                                             <button
                                                                 disabled={itemState !== "ACCEPT" || hasWaitState}
                                                                 onClick={() => handleActionClick(item.demNum, "반납")}
-                                                                className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                    ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                                className={`px-2 py-1 rounded newText-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                    ? "nagative-button"
+                                                                    : "disable-button"
                                                                     }`}
                                                             >
                                                                 반납
@@ -513,115 +456,114 @@ const RentalComponent = () => {
                         </tbody>
                     </table>
                 </div>
-            </div>
 
-            {isExtendModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-lg font-bold mb-4">대여 연장 신청</h2>
-                        <label className="block mb-2">연장할 날짜</label>
-                        <input
-                            type="date"
-                            className="border rounded p-2 w-full mb-4"
-                            value={extendDate}
-                             min={disabledExtendDate}
-                            onChange={(e) => setExtendDate(e.target.value)}
-                        />
-           
-                        <div className="flex justify-end gap-2">
-                            <button
-                                className="px-4 py-2 bg-gray-300 rounded"
-                                onClick={() => setIsExtendModalOpen(false)}
-                            >
-                                취소
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-green-500 text-white rounded"
-                                onClick={() => {
-                                    if (!extendDate) {
-                                        alert("날짜를 선택해주세요.");
-                                        return;
-                                    }
-                                    handleExtendConfirm(extendDate);
-                                }}
-                            >
-                                확인
-                            </button>
+                {isExtendModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
+                            <h2 className="newText-3xl font-bold mb-1">대여 연장 신청</h2>
+                            <label className="block mb-2">연장할 날짜</label>
+                            <input
+                                type="date"
+                                className="border rounded p-2 w-full mb-4"
+                                value={extendDate}
+                                min={disabledExtendDate}
+                                onChange={(e) => setExtendDate(e.target.value)}
+                            />
 
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    className="px-4 py-2 bg-gray-300 rounded"
+                                    onClick={() => setIsExtendModalOpen(false)}
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    className="px-4 py-2 positive-button"
+                                    onClick={() => {
+                                        if (!extendDate) {
+                                            alert("날짜를 선택해주세요.");
+                                            return;
+                                        }
+                                        handleExtendConfirm(extendDate);
+                                    }}
+                                >
+                                    확인
+                                </button>
+
+                            </div>
                         </div>
                     </div>
+                )}
+
+                {/* 우측 하단 예약 취소 버튼 */}
+                <div className="flex justify-end mt-4">
+                    <button
+                        onClick={handleCancelReservation}
+                        className={"px-4 py-2 rounded normal-button"}
+                    >
+                        예약 취소
+                    </button>
                 </div>
-            )}
 
-            {/* 우측 하단 예약 취소 버튼 */}
-            <div className="flex justify-end mt-4">
-                <button
-                    onClick={handleCancelReservation}
-                    className={"px-4 py-2 rounded text-white bg-gray-400"}
-                >
-                    예약 취소
-                </button>
-            </div>
+                {showModifyModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
+                            <h2 className="newText-3xl font-bold mb-1">예약 날짜 변경</h2>
+                            <CalendarComponent
+                                selectedDate={selectedDate}
+                                setSelectedDate={setSelectedDate}
+                                demNum={selectedDemNum}
+                                disabledDates={disabledDates}
+                                setDisabledDates={setDisabledDates}
+                                exceptDate={exceptDate}
+                            />
 
-            {showModifyModal && (
-                <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-md w-[500px]">
-                        <h2 className="text-xl mb-4 font-bold">예약 날짜 변경</h2>
-
-                        <CalendarComponent
-                            selectedDate={selectedDate}
-                            setSelectedDate={setSelectedDate}
-                            demNum={selectedDemNum}
-                            disabledDates={disabledDates}
-                            setDisabledDates={setDisabledDates}
-                            exceptDate={exceptDate}
-                        />
-
-                        <div className="mt-6 flex justify-end gap-3">
-                            <button
-                                className="bg-gray-300 px-4 py-2 rounded"
-                                onClick={() => setShowModifyModal(false)}
-                            >
-                                취소
-                            </button>
-                            <button
-                                className="bg-blue-500 text-white px-4 py-2 rounded"
-                                onClick={() => {
-                                    if (!selectedDate) {
-                                        alert("날짜를 선택해주세요.");
-                                        return;
-                                    }
-                                    setShowQtyModal(true);
-                                }}
-                            >
-                                변경
-                            </button>
+                            <div className="mt-6 flex justify-end gap-3">
+                                <button
+                                    className="normal-button px-4 py-2 rounded"
+                                    onClick={() => setShowModifyModal(false)}
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    className="positive-button px-4 py-2 rounded"
+                                    onClick={() => {
+                                        if (!selectedDate) {
+                                            alert("날짜를 선택해주세요.");
+                                            return;
+                                        }
+                                        setShowQtyModal(true);
+                                    }}
+                                >
+                                    변경
+                                </button>
+                            </div>
                         </div>
                     </div>
+                )}
+
+                {showQtyModal && (
+                    <ItemModal
+                        maxQty={maxQty}
+                        value={reservationQty}
+                        onChange={(val) => setReservationQty(val)}
+                        onConfirm={() => {
+                            const selectedItem = listData.content.find(item => item.demNum === selectedDemNum);
+                            const updatedItemNum = maxQty - reservationQty + (selectedItem?.bitemNum ?? 0);
+                            reservationUpdate(updatedItemNum);
+                            setShowQtyModal(false);
+                        }}
+                        onClose={() => setShowQtyModal(false)}
+                    />
+                )}
+
+                <div className="flex justify-center my-6">
+                    <PageComponent
+                        totalPages={pageData.totalPages}
+                        current={current}
+                        setCurrent={setCurrent}
+                    />
                 </div>
-            )}
-
-            {showQtyModal && (
-                <ItemModal
-                    maxQty={maxQty}
-                    value={reservationQty}
-                    onChange={(val) => setReservationQty(val)}
-                    onConfirm={() => {
-                        const selectedItem = listData.content.find(item => item.demNum === selectedDemNum);
-                        const updatedItemNum = maxQty - reservationQty + (selectedItem?.bitemNum ?? 0);
-                        reservationUpdate(updatedItemNum);
-                        setShowQtyModal(false);
-                    }}
-                    onClose={() => setShowQtyModal(false)}
-                />
-            )}
-
-            <div className="flex justify-center mt-6">
-                <PageComponent
-                    totalPages={pageData.totalPages}
-                    current={current}
-                    setCurrent={setCurrent}
-                />
             </div>
         </div>
     );
