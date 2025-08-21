@@ -1,5 +1,6 @@
 package com.EduTech.service.qna;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -109,9 +110,32 @@ public class QuestionServiceImpl implements QuestionService{
 		Question q = questionRepository.findById(questionUpdateDTO.getQuestionNum())
 				.orElseThrow(() -> new EntityNotFoundException("질문이 존재하지 않습니다."));
 
+<<<<<<< HEAD
 		// 작성자 아니고 admin 아니면 권한 없음
 		if (!q.getMember().getMemId().equals(memId) && !"admin".equals(memId)) {
 			throw new AccessDeniedException("수정 권한이 없습니다.");
+=======
+		    // 작성자 아니고 admin 아니면 권한 없음
+		    if (!q.getMember().getMemId().equals(memId) && !"admin".equals(memId)) {
+		        throw new AccessDeniedException("수정 권한이 없습니다.");
+		    }
+
+		questionRepository.updateQuestion(questionUpdateDTO.getTitle(),questionUpdateDTO.getContent(),questionUpdateDTO.getState(),questionUpdateDTO.getQuestionNum(),LocalDateTime.now());
+	}
+	
+	//  질문 글 삭제할때 사용하는 기능
+		public void deleteQuestions(List<Long> questionNums,String memId) {
+			// 글 작성 아이디 알기 위해 question 객체 받아옴
+			List<Question> questions = questionRepository.findAllById(questionNums);
+
+		    // 작성자 아니고 admin 아니면 권한 없음
+		    for (Question q : questions) {
+		        if (!q.getMember().getMemId().equals(memId) && !"admin".equals(memId)) {
+		            throw new AccessDeniedException("삭제 권한이 없습니다.");
+		        }
+		    }
+			questionRepository.deleteAllById(questionNums);
+>>>>>>> refs/heads/Demonstration
 		}
 
 		q.setTitle(questionUpdateDTO.getTitle());

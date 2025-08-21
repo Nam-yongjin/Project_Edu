@@ -294,7 +294,7 @@ const RentalComponent = () => {
                 searchOptions={searchOptions}
             />
             <div className="overflow-x-auto mt-6">
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 my-1 newText-base">
                     전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
 
                 <div className="overflow-x-auto mt-6">

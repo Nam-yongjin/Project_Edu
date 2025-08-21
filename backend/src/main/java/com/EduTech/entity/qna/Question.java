@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -37,7 +38,8 @@ public class Question extends BaseEntity{
 	@Column(nullable = false) //제목
 	private String title;
 	
-	@Column(nullable = false) //내용
+	@Lob
+	@Column(columnDefinition = "TEXT",nullable=false) 
 	private String content;
 	 
 	@Column(nullable = false) //공개여부
