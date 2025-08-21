@@ -98,172 +98,174 @@ const AdminResComponent = () => {
 
   return (
     <>
-    <div className="max-w-screen-xl mx-auto my-10">
-      <div className="min-blank">
-        <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
-        <div className="py-2">
-          <SearchComponent
-            search={search} setSearch={setSearch}
-            type={type} setType={setType}
-            onSearchClick={onSearchClick}
-            searchOptions={searchOptions}
-          />
-        </div>
+      <div className="max-w-screen-xl mx-auto my-10">
+        <div className="min-blank">
+          <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
+          <div className="py-2">
+            <SearchComponent
+              search={search} setSearch={setSearch}
+              type={type} setType={setType}
+              onSearchClick={onSearchClick}
+              searchOptions={searchOptions}
+            />
+          </div>
 
-       <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-100 text-gray-700 newText-base">
-            <tr className="newText-base whitespace-nowrap">
-              <th className="w-[10%]">이미지</th>
-              <th className="w-[5%]">아이디</th>
-              <th className="w-[10%]">전화번호</th>
-              <th className="w-[14%]">주소</th>
-              <th className="w-[10%]">학교명</th>
-              <th className="w-[10%]">물품명</th>
-              <th className="w-[10%]">신청 갯수</th>
-              <th className="w-[10%]">
-                <div className="mb-1">신청 상태</div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setCurrent(0);
-                  }}>
-                  <option value="">전체</option>
-                  <option value="REJECT">거부</option>
-                  <option value="ACCEPT">수락</option>
-                  <option value="WAIT">대기</option>
-                  <option value="CANCEL">취소</option>
-                  <option value="EXPIRED">만료</option>
-                </select>
-              </th>
-
-              {[{ label: "시작일", value: "startDate" }, { label: "마감일", value: "endDate" }, { label: "등록일", value: "applyAt" }].map(
-                ({ label, value }) => (
-                  <th key={value} onClick={() => handleSortChange(value)} className="cursor-pointer w-[8%]">
-                    <div className="flex items-center justify-center space-x-1">
-                      <span>{label}</span>
-                      <div className="flex flex-col">
-                        <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
-                          ▲
-                        </span>
-                        <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
-                          ▼
-                        </span>
-                      </div>
-                    </div>
+          <div className="overflow-x-auto">
+            <p className="text-gray-600 my-1 newText-base">
+              전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
+            <table className="w-full">
+              <thead className="bg-gray-100 text-gray-700 newText-base">
+                <tr className="newText-base whitespace-nowrap">
+                  <th className="w-[10%]">이미지</th>
+                  <th className="w-[5%]">아이디</th>
+                  <th className="w-[10%]">전화번호</th>
+                  <th className="w-[14%]">주소</th>
+                  <th className="w-[10%]">학교명</th>
+                  <th className="w-[10%]">물품명</th>
+                  <th className="w-[10%]">신청 갯수</th>
+                  <th className="w-[10%]">
+                    <div className="mb-1">신청 상태</div>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => {
+                        setStatusFilter(e.target.value);
+                        setCurrent(0);
+                      }}>
+                      <option value="">전체</option>
+                      <option value="REJECT">거부</option>
+                      <option value="ACCEPT">수락</option>
+                      <option value="WAIT">대기</option>
+                      <option value="CANCEL">취소</option>
+                      <option value="EXPIRED">만료</option>
+                    </select>
                   </th>
-                )
-              )}
-              <th className="min-w-[14%]">반납/연장 신청</th>
-            </tr>
-          </thead>
 
-          <tbody className="text-gray-600">
-            {resInfo.content.length === 0 ? (
-              <tr>
-                <td colSpan={13} className="text-center">
-                  <p className="text-gray-500 newText-3xl mt-20">등록된 신청이 없습니다.</p>
-                </td>
-              </tr>
-            ) : (
-              resInfo.content.map((member) => {
-                const mainImage = member.imageList?.find((img) => img.isMain === true);
-                const memberState = member.state;
-                return (
-                  <tr key={`${member.demRevNum}_${member.startDate}_${member.endDate}_${member.applyAt}_${member.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
-                    <td className="py-2 px-2 whitespace-nowrap text-center">
-                      {mainImage ? (
-                        <img
-                          src={`http://localhost:8090/view/${mainImage.imageUrl}`}
-                          alt={member.demName}
-                          onClick={() => moveToPath(`../../demonstration/detail/${member.demNum}`)}
-                          className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
-                        />
-                      ) : (
-                        <img
-                          src={defaultImage}
-                          alt="default"
-                          className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
-                        />
-                      )}
-                    </td>
-                    <td title={member.memId}>{member.memId}</td>
-                    <td title={member.phone}>{member.phone || "-"}</td>
-                    <td title={member.addr+" "+member.addrDetail} className="truncate max-w-[100px]">{member.addr+" "+member.addrDetail || "-"}</td>
-                    <td title={member.schoolName} className="truncate max-w-[100px]">{member.schoolName || "-"}</td>
-                    <td title={member.demName} className="truncate max-w-[100px]">{member.demName || "-"}</td>
-                    <td>{member.bitemNum ?? "-"}</td>
-                    <td>
-                      <div>{getStateLabel(member.state)}</div>
-                      {member.state === "WAIT" ?
-                      <div>
-                          <button
-                            button className="inline-block green-button text-[10px] px-2 py-1 leading-none mr-1"
-                            onClick={() => handleRental(member.demRevNum, "ACCEPT")}
-                          >
-                            수락
-                          </button>
-                          <button
-                            className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
-                            onClick={() => handleRental(member.demRevNum, "REJECT")}
-                          >
-                            거절
-                          </button>
-                        </div>: <></>}
-                    </td>
-                    <td>{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
-                    <td>{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
-                    <td>{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
-                    <td>
-                      {member.requestDTO && member.requestDTO.length > 0 ? (
-                        member.requestDTO.some(req => req.state === "WAIT") ? (
-                          <div className="flex flex-col items-center space-y-1">
-                            {member.requestDTO.filter(req => req.state === "WAIT").map((req, idx) => (
-                              <div key={idx} className="flex flex-col items-center space-y-1">
-                                {req.type === "EXTEND" && (
-                                  <div className="newText-sm text-gray-600">연장일: {req.updateDate}</div>
-                                )}
-                                <div className="font-semibold newText-sm">
-                                  {req.type === "EXTEND" ? "연장 신청" : "반납 신청"}
-                                </div>
-                                <div>
-                                  <button
-                                    className="inline-block green-button text-[10px] px-2 py-1 leading-none mr-1"
-                                    onClick={() => handleRequest(member.demRevNum, "ACCEPT", req.type)}
-                                  >
-                                    수락
-                                  </button>
-                                  <button
-                                    className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
-                                    onClick={() => handleRequest(member.demRevNum, "REJECT", req.type)}
-                                  >
-                                    거절
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
+                  {[{ label: "시작일", value: "startDate" }, { label: "마감일", value: "endDate" }, { label: "등록일", value: "applyAt" }].map(
+                    ({ label, value }) => (
+                      <th key={value} onClick={() => handleSortChange(value)} className="cursor-pointer w-[8%]">
+                        <div className="flex items-center justify-center space-x-1">
+                          <span>{label}</span>
+                          <div className="flex flex-col">
+                            <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
+                              ▲
+                            </span>
+                            <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
+                              ▼
+                            </span>
                           </div>
-                        ) : (
-                          <button
-                            className="positive-button"
-                            onClick={() => openModal(member.requestDTO)}
-                          >
-                            내역 확인
-                          </button>
-                        )
-                      ) : "-"}
+                        </div>
+                      </th>
+                    )
+                  )}
+                  <th className="min-w-[14%]">반납/연장 신청</th>
+                </tr>
+              </thead>
+
+              <tbody className="text-gray-600">
+                {resInfo.content.length === 0 ? (
+                  <tr>
+                    <td colSpan={13} className="text-center">
+                      <p className="text-gray-500 newText-3xl mt-20">등록된 신청이 없습니다.</p>
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                ) : (
+                  resInfo.content.map((member) => {
+                    const mainImage = member.imageList?.find((img) => img.isMain === true);
+                    const memberState = member.state;
+                    return (
+                      <tr key={`${member.demRevNum}_${member.startDate}_${member.endDate}_${member.applyAt}_${member.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                        <td className="py-2 px-2 whitespace-nowrap text-center">
+                          {mainImage ? (
+                            <img
+                              src={`http://localhost:8090/view/${mainImage.imageUrl}`}
+                              alt={member.demName}
+                              onClick={() => moveToPath(`../../demonstration/detail/${member.demNum}`)}
+                              className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                            />
+                          ) : (
+                            <img
+                              src={defaultImage}
+                              alt="default"
+                              className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                            />
+                          )}
+                        </td>
+                        <td title={member.memId}>{member.memId}</td>
+                        <td title={member.phone}>{member.phone || "-"}</td>
+                        <td title={member.addr + " " + member.addrDetail} className="truncate max-w-[100px]">{member.addr + " " + member.addrDetail || "-"}</td>
+                        <td title={member.schoolName} className="truncate max-w-[100px]">{member.schoolName || "-"}</td>
+                        <td title={member.demName} className="truncate max-w-[100px]">{member.demName || "-"}</td>
+                        <td>{member.bitemNum ?? "-"}</td>
+                        <td>
+                          <div>{getStateLabel(member.state)}</div>
+                          {member.state === "WAIT" ?
+                            <div>
+                              <button
+                                button className="inline-block green-button text-[10px] px-2 py-1 leading-none mr-1"
+                                onClick={() => handleRental(member.demRevNum, "ACCEPT")}
+                              >
+                                수락
+                              </button>
+                              <button
+                                className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
+                                onClick={() => handleRental(member.demRevNum, "REJECT")}
+                              >
+                                거절
+                              </button>
+                            </div> : <></>}
+                        </td>
+                        <td>{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
+                        <td>{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
+                        <td>{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
+                        <td>
+                          {member.requestDTO && member.requestDTO.length > 0 ? (
+                            member.requestDTO.some(req => req.state === "WAIT") ? (
+                              <div className="flex flex-col items-center space-y-1">
+                                {member.requestDTO.filter(req => req.state === "WAIT").map((req, idx) => (
+                                  <div key={idx} className="flex flex-col items-center space-y-1">
+                                    {req.type === "EXTEND" && (
+                                      <div className="newText-sm text-gray-600">연장일: {req.updateDate}</div>
+                                    )}
+                                    <div className="font-semibold newText-sm">
+                                      {req.type === "EXTEND" ? "연장 신청" : "반납 신청"}
+                                    </div>
+                                    <div>
+                                      <button
+                                        className="inline-block green-button text-[10px] px-2 py-1 leading-none mr-1"
+                                        onClick={() => handleRequest(member.demRevNum, "ACCEPT", req.type)}
+                                      >
+                                        수락
+                                      </button>
+                                      <button
+                                        className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
+                                        onClick={() => handleRequest(member.demRevNum, "REJECT", req.type)}
+                                      >
+                                        거절
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <button
+                                className="positive-button"
+                                onClick={() => openModal(member.requestDTO)}
+                              >
+                                내역 확인
+                              </button>
+                            )
+                          ) : "-"}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-    <div className="flex justify-center my-6">
+      <div className="flex justify-center my-6">
         <PageComponent totalPages={pageData.totalPages} current={current} setCurrent={setCurrent} />
       </div>
 
@@ -291,7 +293,7 @@ const AdminResComponent = () => {
           </div>
         </div>
       )}
-      </>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 package com.EduTech.repository.qna;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,8 +18,8 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>{
 	// 답변 글 수정하는 쿼리문
 	@Modifying
 	@Transactional
-	@Query("UPDATE Answer SET content=:content WHERE answerNum=:answerNum")
-	void updateAnswer(@Param("content") String content, @Param("answerNum") Long answerNum);	
+	@Query("UPDATE Answer SET content=:content, updatedAt=:updatedAt WHERE answerNum=:answerNum")
+	void updateAnswer(@Param("content") String content, @Param("answerNum") Long answerNum,@Param("updatedAt") LocalDateTime updatedAt);	
 	
 	// 답변 글 조회하는 쿼리문
 	@Query("SELECT new com.EduTech.dto.qna.AnswerDTO(a.createdAt, a.content, a.answerNum,a.updatedAt,a.question.questionNum) FROM Answer a WHERE a.question.questionNum IN :questionNum")

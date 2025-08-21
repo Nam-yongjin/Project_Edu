@@ -1,8 +1,7 @@
 package com.EduTech.service.qna;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +53,7 @@ public class AnswerServiceImpl implements AnswerService {
 	    Answer answer = answerRepository.findById(answerUpdateDTO.getAnswerNum())
 	            .orElseThrow(() -> new EntityNotFoundException("답변이 존재하지 않습니다."));
 
-	    answerRepository.updateAnswer(answerUpdateDTO.getContent(), answer.getAnswerNum());
+	    answerRepository.updateAnswer(answerUpdateDTO.getContent(), answer.getAnswerNum(),LocalDateTime.now());
 	}
 
 	// 관리자가 답변 글 삭제

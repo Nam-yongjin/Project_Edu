@@ -1,5 +1,6 @@
 package com.EduTech.service.qna;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -124,7 +125,7 @@ public class QuestionServiceImpl implements QuestionService {
 		        throw new AccessDeniedException("수정 권한이 없습니다.");
 		    }
 
-		questionRepository.updateQuestion(questionUpdateDTO.getTitle(),questionUpdateDTO.getContent(),questionUpdateDTO.getState(),questionUpdateDTO.getQuestionNum());
+		questionRepository.updateQuestion(questionUpdateDTO.getTitle(),questionUpdateDTO.getContent(),questionUpdateDTO.getState(),questionUpdateDTO.getQuestionNum(),LocalDateTime.now());
 	}
 	
 	//  질문 글 삭제할때 사용하는 기능

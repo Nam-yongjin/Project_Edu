@@ -233,27 +233,36 @@ public class AdminServiceImpl implements AdminService {
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
 		@Override
 		public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
-			  Integer pageCount = searchDTO.getPageCount();
+			 Integer pageCount = searchDTO.getPageCount();
 			    String type = searchDTO.getType();
 			    String search = searchDTO.getSearch();
 			    String sortBy = searchDTO.getSortBy();
 			    String sort = searchDTO.getSort();
 			    String statusFilter = searchDTO.getStatusFilter();
 
-			    if (pageCount == null || pageCount < 0)
-			        pageCount = 0;
-			    if (!StringUtils.hasText(sortBy))
-			        sortBy = "regDate";
-			    if (!StringUtils.hasText(sort))
-			        sort = "desc";
+			    
+			    if (pageCount == null || pageCount < 0) pageCount = 0;
+			    if (!StringUtils.hasText(sortBy)) sortBy = "regDate";
+			    if (!StringUtils.hasText(sort)) sort = "desc";
 
-			    Pageable pageable = PageRequest.of(pageCount, 10);
+			    // 정렬 방향 결정
+			    Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+			    
+			    Sort sortOrder;
+			    if ("expDate".equalsIgnoreCase(sortBy)) {
+			        sortOrder = Sort.by(direction, "expDate").and(Sort.by(Sort.Direction.DESC, "demRegNum"));
+			    } else {
+			        sortOrder = Sort.by(direction, "regDate").and(Sort.by(Sort.Direction.DESC, "demRegNum"));
+			    }
 
-			    Specification<DemonstrationRegistration>spec = DemonstrationRegistrationSpecs.withSearchAndSortAdmin(type,search,sortBy,sort,statusFilter);
+			    Pageable pageable = PageRequest.of(pageCount, 10, sortOrder);
 
-			    // DemonstrationReserve 페이징 조회
+			    // 검색 조건만 처리하는 Specification 사용
+			    Specification<DemonstrationRegistration> spec = DemonstrationRegistrationSpecs.withSearchAdmin(type, search, statusFilter);
+
+			    // 나머지 코드는 동일...
 			    Page<DemonstrationRegistration> regPage = demonstrationRegistrationRepository.findAll(spec, pageable);
-
+			    
 			    // 관련 demNum 리스트 추출 (중복 제거)
 			    List<Long> demNums = regPage.stream()
 			        .map(reg -> reg.getDemonstration().getDemNum())
