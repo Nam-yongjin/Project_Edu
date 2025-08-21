@@ -1,6 +1,3 @@
-// FacilityUpdateComponent.jsx
-// 통합 미리보기 + 대표이미지 지정 가능(기존/신규 한 카드에서 관리)
-
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -131,7 +128,7 @@ export default function FacilityUpdateComponent({ facRevNum: facRevNumProp }) {
         setNewImages([]);
         setErrors({});
 
-        // 🔥 서버가 내려준 대표 플래그 기준으로 대표 인덱스 설정
+        // 서버가 내려준 대표 플래그 기준으로 대표 인덱스 설정
         const initMainIdx = imgs.length ? getInitialMainIndex(imgs) : 0;
         setMainIndex(initMainIdx);
       })
@@ -443,36 +440,36 @@ export default function FacilityUpdateComponent({ facRevNum: facRevNumProp }) {
           </div>
 
           {/* 우측: 통합 이미지 미리보기 (대표지정 가능) */}
-  <aside className="lg:col-span-1 lg:sticky lg:top-6">
-    <section className="page-shadow rounded-2xl border bg-white p-4">
-      <h4 className="newText-lg font-semibold mb-3">이미지 미리보기</h4>
+          <aside className="lg:col-span-1 lg:sticky lg:top-6">
+            <section className="page-shadow rounded-2xl border bg-white p-4">
+              <h4 className="newText-lg font-semibold mb-3">이미지 미리보기</h4>
 
-      {allImages.length ? (
-        <div className="grid grid-cols-2 gap-3">
-          {allImages.map((it, idx) => (
-            <ThumbTile
-              key={`${it.kind}-${it.kind === "existing" ? it.id : it.tempIdx}`}
-              src={it.url}
-              title={`${it.kind === "existing" ? "기존" : "신규"} ${idx + 1}`}
-              isMain={idx === mainIndex}
-              isExisting={it.kind === "existing"}
-              marked={it.kind === "existing" ? it.marked : false}
-              onToggleDelete={() => onTileDelete(idx)}
-              onSetMain={() => setAsMain(idx)}
-            />
-          ))}
-        </div>
-      ) : (
-        <p className="newText-sm text-gray-500">표시할 이미지가 없습니다.</p>
-      )}
+              {allImages.length ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {allImages.map((it, idx) => (
+                    <ThumbTile
+                      key={`${it.kind}-${it.kind === "existing" ? it.id : it.tempIdx}`}
+                      src={it.url}
+                      title={`${it.kind === "existing" ? "기존" : "신규"} ${idx + 1}`}
+                      isMain={idx === mainIndex}
+                      isExisting={it.kind === "existing"}
+                      marked={it.kind === "existing" ? it.marked : false}
+                      onToggleDelete={() => onTileDelete(idx)}
+                      onSetMain={() => setAsMain(idx)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="newText-sm text-gray-500">표시할 이미지가 없습니다.</p>
+              )}
 
-      {!!removeImageIds.length && (
-        <p className="newText-xs text-red-600 mt-3">
-          삭제 예정(기존): {removeImageIds.join(", ")}
-        </p>
-      )}
-    </section>
-  </aside>
+              {!!removeImageIds.length && (
+                <p className="newText-xs text-red-600 mt-3">
+                  삭제 예정(기존): {removeImageIds.join(", ")}
+                </p>
+              )}
+            </section>
+          </aside>
         </div>
       </div>
     </div>
