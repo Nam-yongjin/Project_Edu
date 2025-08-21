@@ -63,7 +63,7 @@ const ListComponent = () => {
             );
             setSelectedImages(urlList);
             setModalOpen(true);
-          }}
+          }}   
         >
           <img
             src={mainImageUrl}
