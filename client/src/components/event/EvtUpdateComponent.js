@@ -1,3 +1,17 @@
+// EvtUpdateComponent.jsx
+// - 요청사항 반영 리팩토링 버전
+// - 전역 키트 클래스 고정 사용:
+//   - 텍스트: newText-4xl / 3xl / 2xl / xl / lg / base / sm / xs (모든 텍스트 요소에 newText-* 적용)
+//   - 좌우 여백: min-blank (최상단 div 바로 아래 div 고정)
+//   - 페이지 그림자: page-shadow
+//   - 입력창: input-focus
+//   - 버튼: positive-button / normal-button / nagative-button / green-button
+// - 레이아웃:
+//   - 최상단 div: max-w-screen-xl mx-auto my-10 (고정)
+//   - 바로 아래 div: min-blank (고정)
+// - 기타:
+//   - 이모티콘 미사용
+
 import { useState, useEffect, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -10,7 +24,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
   const [evt, setEvt] = useState(null);
   const [mainImage, setMainImage] = useState(null); // {file,url,name}
-  const [imageList, setImageList] = useState([]); // [{file,url,name}]
+  const [imageList, setImageList] = useState([]);   // [{file,url,name}]
   const [mainFile, setMainFile] = useState(null);
   const [attachFiles, setAttachFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +43,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
           daysOfWeek: data.daysOfWeek || [],
         });
       } catch (err) {
-        console.error("❌ 프로그램 조회 실패", err);
+        console.error("프로그램 조회 실패", err);
         alert("프로그램 정보를 불러오는 데 실패했습니다.");
         moveToReturn();
       }
@@ -38,11 +52,13 @@ const EvtUpdateComponent = ({ eventNum }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventNum]);
 
+  // 입력값 변경
   const handleChangeEvt = (e) => {
     const { name, value } = e.target;
     setEvt((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 날짜 변경
   const handleDateChange = (name, date) => {
     setEvt((prev) => ({ ...prev, [name]: date }));
   };
@@ -51,11 +67,13 @@ const EvtUpdateComponent = ({ eventNum }) => {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
+
     const previews = files.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       name: file.name,
     }));
+
     // 기존 미리보기 URL 정리
     if (mainImage?.url) URL.revokeObjectURL(mainImage.url);
     imageList.forEach((img) => img?.url && URL.revokeObjectURL(img.url));
@@ -69,11 +87,13 @@ const EvtUpdateComponent = ({ eventNum }) => {
   const handleAttachChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
+
     setMainFile(files[0]);
     setAttachFiles(files.slice(1));
     e.target.value = "";
   };
 
+  // 이미지 삭제
   const deleteMainImage = () => {
     if (mainImage?.url) URL.revokeObjectURL(mainImage.url);
     setMainImage(null);
@@ -96,6 +116,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
     [mainImage, imageList]
   );
 
+  // yyyy-MM-dd HH:mm 포맷
   const formatDateTime = (date) => {
     if (!(date instanceof Date) || isNaN(date)) return "";
     const yyyy = date.getFullYear();
@@ -106,9 +127,11 @@ const EvtUpdateComponent = ({ eventNum }) => {
     return `${yyyy}-${MM}-${dd} ${HH}:${mm}`;
   };
 
-  const handleUpdate = async () => {
+  // 수정 처리
+  const handleUpdate = useCallback(async () => {
     try {
       setSubmitting(true);
+
       const formData = new FormData();
       if (mainImage) formData.append("mainImage", mainImage.file);
       imageList.forEach((img) => formData.append("imageList", img.file));
@@ -133,19 +156,20 @@ const EvtUpdateComponent = ({ eventNum }) => {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [attachFiles, evt, imageList, mainFile, mainImage, moveToPath, eventNum]);
 
-  // --- 상단 요약 텍스트 (등록 화면과 톤 맞춤) ---
+  // --- 상단 요약 텍스트 ---
   const imageCount = (mainImage ? 1 : 0) + imageList.length;
   const imageSummary = imageCount > 0 ? `${imageCount}장 선택됨` : "선택된 파일 없음";
 
   const fileCount = (mainFile ? 1 : 0) + attachFiles.length;
   const attachSummaryText = fileCount > 0 ? `${fileCount}개 첨부됨` : "선택된 파일 없음";
 
+  // 로딩 뷰
   if (!evt) {
     return (
-      <div className="max-w-screen-lg mx-auto my-10">
-        <div className="min-blank page-shadow bg-white rounded-lg p-10 text-center newText-base">
+      <div className="max-w-screen-xl mx-auto my-10">
+        <div className="min-blank page-shadow bg-white rounded-2xl p-10 text-center newText-base">
           프로그램 정보를 불러오는 중...
         </div>
       </div>
@@ -153,8 +177,10 @@ const EvtUpdateComponent = ({ eventNum }) => {
   }
 
   return (
+    // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-lg mx-auto my-10">
-      <div className="min-blank bg-white rounded-2xl page-shadow p-10">
+      {/* 좌우 여백: 고정 클래스 사용 */}
+      <div className="min-blank page-shadow bg-white rounded-2xl p-10">
         <h2 className="text-center newText-3xl font-bold mb-10">프로그램 수정</h2>
 
         <div className="grid grid-cols-1 gap-4">
@@ -168,7 +194,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
           ].map(({ label, name, type, required, placeholder }) => (
             <div key={name} className="flex items-start gap-4">
               <label className="w-32 newText-base font-semibold pt-2">
-                {label} {required && <span className="text-red-500">*</span>}
+                {label} {required && <span className="newText-base text-red-500">*</span>}
               </label>
 
               {type === "textarea" ? (
@@ -195,16 +221,18 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
           {/* 모집 대상 */}
           <div className="flex items-center gap-4">
-            <label className="w-32 newText-base font-semibold">모집 대상 *</label>
+            <label className="w-32 newText-base font-semibold">
+              모집 대상 <span className="newText-base text-red-500">*</span>
+            </label>
             <select
               name="category"
               value={evt.category}
               onChange={handleChangeEvt}
               className="input-focus newText-base flex-1"
             >
-              <option value="USER">일반인</option>
-              <option value="STUDENT">학생</option>
-              <option value="TEACHER">교사</option>
+              <option className="newText-base" value="USER">일반인</option>
+              <option className="newText-base" value="STUDENT">학생</option>
+              <option className="newText-base" value="TEACHER">교사</option>
             </select>
           </div>
 
@@ -216,7 +244,9 @@ const EvtUpdateComponent = ({ eventNum }) => {
             { name: "eventEndPeriod", label: "프로그램 종료" },
           ].map(({ name, label }) => (
             <div key={name} className="flex items-center gap-4">
-              <label className="w-32 newText-base font-semibold">{label} *</label>
+              <label className="w-32 newText-base font-semibold">
+                {label} <span className="newText-base text-red-500">*</span>
+              </label>
               <DatePicker
                 selected={evt[name]}
                 onChange={(date) => handleDateChange(name, date)}
@@ -231,10 +261,13 @@ const EvtUpdateComponent = ({ eventNum }) => {
             </div>
           ))}
 
-          {/* 이미지 업로드 (라벨 버튼 + 숨김 input) */}
+          {/* 이미지 업로드 */}
           <div className="flex items-center gap-4">
             <label className="w-32 newText-base font-semibold">이미지</label>
-            <label htmlFor="update-image-input" className="positive-button newText-base cursor-pointer">
+            <label
+              htmlFor="update-image-input"
+              className="positive-button newText-base cursor-pointer"
+            >
               파일 선택
             </label>
             <input
@@ -248,10 +281,13 @@ const EvtUpdateComponent = ({ eventNum }) => {
             <span className="newText-sm text-gray-500">{imageSummary}</span>
           </div>
 
-          {/* 첨부파일 업로드 (라벨 버튼 + 숨김 input) */}
+          {/* 첨부파일 업로드 */}
           <div className="flex items-center gap-4">
             <label className="w-32 newText-base font-semibold">첨부파일</label>
-            <label htmlFor="update-attach-input" className="positive-button newText-base cursor-pointer">
+            <label
+              htmlFor="update-attach-input"
+              className="positive-button newText-base cursor-pointer"
+            >
               파일 선택
             </label>
             <input
@@ -267,7 +303,6 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
           {/* 선택된 파일 실제 목록 */}
           <div className="ml-32 grid grid-cols-1 gap-2">
-            {/* 이미지 목록은 아래의 미리보기 카드로 대체 */}
             {mainFile && <PreviewTextCard title="대표 첨부파일" name={mainFile.name} />}
             {attachFiles.map((f, i) => (
               <PreviewTextCard key={i} title="기타 첨부파일" name={f.name} />
@@ -282,8 +317,8 @@ const EvtUpdateComponent = ({ eventNum }) => {
                 name={mainImage.name}
                 url={mainImage.url}
                 onDelete={deleteMainImage}
-              />)
-            }
+              />
+            )}
             {imageList.map((img, idx) => (
               <PreviewImageCard
                 key={idx}
@@ -297,7 +332,11 @@ const EvtUpdateComponent = ({ eventNum }) => {
 
           {/* 버튼 영역 */}
           <div className="flex justify-end gap-4 mt-6">
-            <button onClick={handleUpdate} disabled={submitting} className="positive-button newText-base">
+            <button
+              onClick={handleUpdate}
+              disabled={submitting}
+              className="positive-button newText-base"
+            >
               {submitting ? "수정 중..." : "프로그램 수정"}
             </button>
             <button onClick={moveToReturn} className="normal-button newText-base">
@@ -310,6 +349,7 @@ const EvtUpdateComponent = ({ eventNum }) => {
   );
 };
 
+// 미리보기 카드(이미지)
 const PreviewImageCard = ({ title, name, url, onDelete }) => (
   <div className="page-shadow border rounded-2xl p-3 bg-white">
     <div className="flex justify-between items-center">
@@ -323,6 +363,7 @@ const PreviewImageCard = ({ title, name, url, onDelete }) => (
   </div>
 );
 
+// 미리보기 카드(텍스트)
 const PreviewTextCard = ({ title, name }) => (
   <div className="page-shadow border rounded-2xl p-3 bg-white">
     <p className="newText-sm font-semibold text-blue-600">{title}</p>

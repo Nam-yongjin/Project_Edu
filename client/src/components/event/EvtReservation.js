@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getReservationList, cancelReservation } from "../../api/eventApi";
 import PageComponent from "../common/PageComponent";
 
-const ReservationListComponent = () => {
+const EvtReservation = () => {
   const [reservations, setReservations] = useState([]);
   const [page, setPage] = useState(0);            // 0-based (PageComponent와 호환)
   const [totalPages, setTotalPages] = useState(1);
@@ -206,4 +206,4 @@ const ReservationListComponent = () => {
   );
 };
 
-export default ReservationListComponent;
+export default EvtReservation;
