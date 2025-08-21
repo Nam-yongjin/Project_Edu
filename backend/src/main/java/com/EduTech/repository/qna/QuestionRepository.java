@@ -9,17 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.entity.qna.Question;
 
-public interface QuestionRepository extends JpaRepository<Question, Long>,JpaSpecificationExecutor<Question>{	
-	// 질문 글 수정하는 쿼리문
+public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
+//	// 질문 글 수정하는 쿼리문
+//	@Modifying
+//	@Transactional
+//	@Query("UPDATE Question SET title=:title, content=:content, state=:state WHERE questionNum=:questionNum")
+//	void updateQuestion(@Param("title") String title,@Param("content") String content,@Param("state") Boolean state, @Param("questionNum") Long questionNum);
+
 	@Modifying
 	@Transactional
-	@Query("UPDATE Question SET title=:title, content=:content, state=:state WHERE questionNum=:questionNum")
-	void updateQuestion(@Param("title") String title,@Param("content") String content,@Param("state") Boolean state, @Param("questionNum") Long questionNum);
-	
-	@Modifying
-	@Transactional
-	@Query("UPDATE Question SET view=view+1 WHERE questionNum=:questionNum")
-	void updateQuestion(@Param("questionNum") Long questionNum);	
-	
-	
+	@Query("UPDATE Question q SET q.view = q.view + 1 WHERE q.questionNum=:questionNum")
+	int increaseViewCount(@Param("questionNum") Long questionNum);
+
 }

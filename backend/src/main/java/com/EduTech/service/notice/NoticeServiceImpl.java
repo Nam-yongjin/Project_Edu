@@ -196,11 +196,12 @@ public class NoticeServiceImpl implements NoticeService {
     // 조회수 증가
     @Override
     public void increaseViewCount(Long noticeNum) {
-        Notice notice = noticeRepository.findById(noticeNum)
-                .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
+//        Notice notice = noticeRepository.findById(noticeNum)
+//                .orElseThrow(() -> new EntityNotFoundException("공지사항을 찾을 수 없습니다. ID: " + noticeNum));
         
-        notice.increaseViewCount();
-        noticeRepository.save(notice);
+        noticeRepository.increaseViewCount(noticeNum);
+//        notice.increaseViewCount();
+//        noticeRepository.save(notice);
     }
     
     // 헬퍼메소드

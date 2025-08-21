@@ -148,11 +148,12 @@ public class NewsServiceImpl implements NewsService {
     //뉴스 조회수 증가
     @Override
     public void increaseViewCount(Long newsNum) {
-        News news = newsRepository.findById(newsNum)
-                .orElseThrow(() -> new EntityNotFoundException("뉴스를 찾을 수 없습니다. ID: " + newsNum));
+//        News news = newsRepository.findById(newsNum)
+//                .orElseThrow(() -> new EntityNotFoundException("뉴스를 찾을 수 없습니다. ID: " + newsNum));
         
-        news.increaseViewCount();
-        newsRepository.save(news);
+        newsRepository.increaseViewCount(newsNum);
+//        news.increaseViewCount();
+//        newsRepository.save(news);
     }
     
 // 헬퍼메소드
