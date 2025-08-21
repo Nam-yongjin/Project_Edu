@@ -78,12 +78,12 @@ const StatsComponent = () => {
                 <div className="border-b border-gray-300 pb-10">
                     <div className="newText-2xl font-semibold my-4">회원</div>
                     <div className="newText-lg">
-                        <div>총 회원 수: {members.total_member} 명</div>
+                        <div>총 회원 가입자: {members.total_member} 명</div>
                     </div>
                     <div className="flex justify-center mt-4">
                         <div className="page-shadow pt-10 ">
                             <div className="newText-xl font-semibold">
-                                회원 유형별 수 및 비율
+                                회원 유형별 가입자 수 및 비율
                             </div>
                             <Plot
                                 data={[
@@ -107,7 +107,7 @@ const StatsComponent = () => {
                     <div className="flex flex-wrap justify-center overflow-x-auto border-b border-gray-300">
                         <div className="page-shadow pt-10">
                             <div className="newText-xl font-semibold">
-                                프로그램별 등록 수
+                                프로그램 유형별 등록 수
                             </div>
                             <Plot
                                 data={[
@@ -123,7 +123,7 @@ const StatsComponent = () => {
                         </div>
                         <div className="page-shadow my-10 pt-10">
                             <div className="newText-xl font-semibold">
-                                프로그램별 신청자 수
+                                프로그램 유형별 신청자 수
                             </div>
                             <Plot
                                 data={[
@@ -173,13 +173,13 @@ const StatsComponent = () => {
                 <div className="">
                     <div className="newText-2xl font-semibold my-10">실증</div>
                     <div className="newText-lg">
-                        <div>총 등록 실증 수: {demReg.total_demReg} 개</div>
-                        <div>총 대여 실증 수: {demRev.total_demRev} 개</div>
+                        <div>총 실증 등록 수: {demReg.total_demReg} 개</div>
+                        <div>총 실증 대여 수: {demRev.total_demRev} 개</div>
                     </div>
                     <div className="flex flex-wrap justify-center overflow-x-auto">
                         <div className="page-shadow pt-10">
                             <div className="newText-xl font-semibold">
-                                실증별 등록 수 및 비율
+                                실증 유형별 등록 수 및 비율
                             </div>
                             <Plot
                                 data={[
@@ -195,7 +195,7 @@ const StatsComponent = () => {
                         </div>
                         <div className="page-shadow my-10 pt-10">
                             <div className="newText-xl font-semibold">
-                                실증별 대여 수 및 비율
+                                실증 유형별 대여 수 및 비율
                             </div>
                             <Plot
                                 data={[
