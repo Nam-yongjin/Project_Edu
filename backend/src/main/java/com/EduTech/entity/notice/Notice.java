@@ -52,7 +52,7 @@ public class Notice extends BaseEntity{
 	private boolean isPinned = false; //고정여부
 	
 	@Builder.Default
-	@Column(updatable = false)
+	@Column(updatable = false) // 조회수가 오르면 수정일이 변경되는것 방지
 	private Long viewCount = 0L; //조회수, 0으로 초기화 해서 Null값 방지
 	
 	@ManyToOne(fetch = FetchType.LAZY) //여러 개의 공지사항 게시글을 한 명의 Admin이 작성 가능, 지연로딩

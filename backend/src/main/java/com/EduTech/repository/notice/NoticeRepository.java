@@ -31,5 +31,9 @@ public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecif
 	//Query 사용해서 fetch join을 명시적으로 처리
 	@Query("SELECT n FROM Notice n LEFT JOIN FETCH n.noticeFiles WHERE n.noticeNum = :noticeNum")
 	Optional<Notice> findByIdWithFiles(@Param("noticeNum") Long noticeNum);
+	
+	@Modifying
+	@Query("UPDATE Notice n SET n.viewCount = n.viewCount + 1 WHERE n.noticeNum = :noticeNum")
+	int increaseViewCount(@Param("noticeNum") Long noticeNum);
 		
 }

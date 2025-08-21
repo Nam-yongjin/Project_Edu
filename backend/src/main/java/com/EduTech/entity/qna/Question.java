@@ -43,7 +43,7 @@ public class Question extends BaseEntity{
 	@Column(nullable = false) //공개여부
 	private Boolean state;
 	
-	@Column(nullable = false, updatable = false) //조회수
+	@Column(nullable = false, updatable = false) // 조회수가 오르면 수정일이 변경되는것 방지
 	private Long view;	
 	
 	@ManyToOne //여러 질문글을 하나의 회원이 작성
