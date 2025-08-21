@@ -26,6 +26,5 @@ public interface QuestionService {
 	// 문의 사항 조회 기능
 	PageResponseDTO<QuestionDTO> QnAView(SearchDTO searchDTO);
 
-	// 문의 사항 조회수 증가
-	void increaseViewCount(Long questionNum);
+	
 }
