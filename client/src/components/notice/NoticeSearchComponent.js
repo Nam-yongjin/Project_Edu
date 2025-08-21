@@ -98,8 +98,8 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                                 className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="all">전체</option>
-                                <option value="pinned">공지글만</option>
-                                <option value="normal">일반글만</option>
+                                <option value="pinned">고정글</option>
+                                <option value="normal">일반글</option>
                             </select>
                         </div>
 
