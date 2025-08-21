@@ -65,7 +65,7 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
       <div className="fixed inset-0 z-50 flex items-center justify-center max-w-screen-xl mx-auto">
-        <div className="bg-white rounded-lg p-6 w-full min-h-[400px] min-blank">
+        <div className="bg-white rounded-lg p-6 w-full min-h-[400px]">
           <h2 className="newText-xl font-bold mb-1">회원 정보</h2>
           <div className="mb-4 flex w-full max-w-md">
             <SearchComponent
