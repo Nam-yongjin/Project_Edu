@@ -82,40 +82,46 @@ export default function FacilityAddComponent() {
   }, []);
 
   // 파일 선택(누적) → 이미지 배열에 추가, 첫 추가 시 대표 인덱스 0
-  const onFilePick = useCallback((e) => {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+  const onFilePick = useCallback(
+    (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
 
-    const previews = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      name: file.name,
-    }));
+      const previews = files.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        name: file.name,
+      }));
 
-    setImages((prev) => [...prev, ...previews]);
-    if (images.length === 0) setMainIndex(0);
+      setImages((prev) => [...prev, ...previews]);
+      if (images.length === 0) setMainIndex(0);
 
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }, [images.length]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    },
+    [images.length]
+  );
 
   // 대표 지정
   const setAsMain = useCallback((idx) => setMainIndex(idx), []);
 
   // 이미지 삭제(대표 인덱스 보정)
-  const deleteImage = useCallback((idx) => {
-    setImages((prev) => {
-      const next = [...prev];
-      const removed = next.splice(idx, 1)[0];
-      if (removed?.url) URL.revokeObjectURL(removed.url);
+  const deleteImage = useCallback(
+    (idx) => {
+      setImages((prev) => {
+        const next = [...prev];
+        const removed = next.splice(idx, 1)[0];
+        if (removed?.url) URL.revokeObjectURL(removed.url);
 
-      if (idx === mainIndex) {
-        setMainIndex(0);
-      } else if (idx < mainIndex) {
-        setMainIndex((i) => Math.max(0, i - 1));
-      }
-      return next;
-    });
-  }, [mainIndex]);
+        if (idx === mainIndex) {
+          setMainIndex(0);
+        } else if (idx < mainIndex) {
+          setMainIndex((i) => Math.max(0, i - 1));
+        }
+        return next;
+      });
+    },
+    [mainIndex]
+  );
 
   // 검증
   const validate = useCallback(() => {
@@ -193,7 +199,9 @@ export default function FacilityAddComponent() {
   );
 
   return (
+    // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 좌우 여백: 고정 클래스 사용 */}
       <div className="min-blank">
         <h2 className="newText-3xl font-bold mb-8 text-center">공간 등록</h2>
 
@@ -209,7 +217,7 @@ export default function FacilityAddComponent() {
               ].map(({ label, name, type, required, placeholder }) => (
                 <div className="flex items-start gap-4" key={name}>
                   <label className="w-32 newText-base font-semibold pt-2">
-                    {label} {required && <span className="text-red-500">*</span>}
+                    {label} {required && <span className="newText-base text-red-500">*</span>}
                   </label>
                   <div className="flex-1">
                     <input
@@ -236,7 +244,7 @@ export default function FacilityAddComponent() {
                 return (
                   <div className="flex items-start gap-4" key={field}>
                     <label className="w-32 newText-base font-semibold pt-2">
-                      {label} {required && <span className="text-red-500">*</span>}
+                      {label} {required && <span className="newText-base text-red-500">*</span>}
                     </label>
                     <div className="flex-1">
                       {kind === "textarea" ? (
@@ -277,7 +285,7 @@ export default function FacilityAddComponent() {
                       >
                         <option value="">시 선택</option>
                         {HOURS.map((h) => (
-                          <option key={h} value={h}>
+                          <option key={h} value={h} className="newText-base">
                             {h}
                           </option>
                         ))}
@@ -292,7 +300,7 @@ export default function FacilityAddComponent() {
                       >
                         <option value="">시 선택</option>
                         {HOURS.map((h) => (
-                          <option key={h} value={h}>
+                          <option key={h} value={h} className="newText-base">
                             {h}
                           </option>
                         ))}
@@ -321,7 +329,9 @@ export default function FacilityAddComponent() {
                     onChange={onFilePick}
                     className={`input-focus newText-base w-full ${errors.images ? "border-red-500" : ""}`}
                   />
-                  <p className="newText-sm text-gray-500 mt-1">대표로 사용할 이미지는 우측 미리보기에서 '대표지정'을 눌러 설정하세요.</p>
+                  <p className="newText-sm text-gray-500 mt-1">
+                    대표로 사용할 이미지는 우측 미리보기에서 '대표지정'을 눌러 설정하세요.
+                  </p>
                   {errors.images && <p className="newText-sm text-red-600 mt-1">{errors.images}</p>}
                 </div>
               </div>

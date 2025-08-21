@@ -78,10 +78,13 @@ public class FacilityController {
     
     // 시설 삭제
     @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteFacility(@RequestParam("facRevNum") Long facRevNum) {
-        facilityService.deleteFacility(facRevNum);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteFacility(@RequestParam("facRevNum") Long facRevNum) {
+        try {
+            facilityService.deleteFacility(facRevNum);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     
     // 시설 조회(사용)

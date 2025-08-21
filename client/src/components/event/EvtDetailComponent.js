@@ -7,16 +7,20 @@ const HOST = "http://localhost:8090/view";
 const API_HOST = "http://localhost:8090/api";
 
 function EvtDetailComponent({ eventNum }) {
+  // 상태
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
 
+  // 전역
   const navigate = useNavigate();
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
   const memId = useSelector((state) => state.loginState?.memId);
 
+  // 시각 기준
   const now = new Date();
 
+  // 상세 조회
   const fetchEvent = useCallback(async () => {
     try {
       const data = await getEventById(eventNum);
@@ -28,6 +32,7 @@ function EvtDetailComponent({ eventNum }) {
     }
   }, [eventNum]);
 
+  // 신청 여부 조회
   const checkIfApplied = useCallback(async () => {
     if (!memId) return;
     try {
@@ -47,6 +52,7 @@ function EvtDetailComponent({ eventNum }) {
     checkIfApplied();
   }, [fetchEvent, checkIfApplied]);
 
+  // 날짜 포맷
   const formatDate = (dateStr) => {
     if (!dateStr) return "없음";
     const d = new Date(dateStr);
@@ -58,11 +64,15 @@ function EvtDetailComponent({ eventNum }) {
     return `${y}.${m}.${day} ${hh}:${mm}`;
   };
 
+  // 리소스 경로 보정
   const getFullUrl = (path) => (path?.startsWith("http") ? path : `${HOST}/${path}`);
 
+  // 상태 판별
   const isCanceled = event?.state === "CANCEL";
-  const isEventStarted = event?.eventStartPeriod && now >= new Date(event.eventStartPeriod);
-  const isEventEnded = event?.eventEndPeriod && now > new Date(event.eventEndPeriod);
+  const isEventStarted =
+    event?.eventStartPeriod && now >= new Date(event.eventStartPeriod);
+  const isEventEnded =
+    event?.eventEndPeriod && now > new Date(event.eventEndPeriod);
 
   const isApplyPeriod = () =>
     event?.applyStartPeriod &&
@@ -75,9 +85,11 @@ function EvtDetailComponent({ eventNum }) {
     event?.maxCapacity != null &&
     event.currCapacity >= event.maxCapacity;
 
+  // 버튼 비활성 조건
   const isDisabled =
     isCanceled || isEventStarted || isEventEnded || alreadyApplied || !isApplyPeriod() || isFull();
 
+  // 신청 버튼 라벨
   const getApplyButtonText = () => {
     if (isCanceled) return "취소된 프로그램";
     if (isEventEnded) return "프로그램 완료";
@@ -88,11 +100,12 @@ function EvtDetailComponent({ eventNum }) {
     return "신청하기";
   };
 
-  // 지정된 네이밍을 우선 활용: 가능하면 positive-button, 비활성은 읽기 쉬운 회색 버튼
+  // 신청 버튼 스타일 (지정된 네이밍 우선)
   const applyBtnClass = isDisabled
     ? "normal-button !bg-gray-300 !text-gray-700 !border !border-gray-400 cursor-not-allowed w-full"
     : "positive-button w-full";
 
+  // 신청 처리
   const handleApply = async () => {
     if (!memId) {
       alert("로그인한 사용자만 신청할 수 있습니다.");
@@ -110,8 +123,9 @@ function EvtDetailComponent({ eventNum }) {
     }
   };
 
+  // 프로그램 취소(관리자)
   const handleCancel = async () => {
-    if (!window.confirm("정말 이 프로그램를 취소하시겠습니까?")) return;
+    if (!window.confirm("정말 이 프로그램을 취소하시겠습니까?")) return;
 
     if ((event.currCapacity ?? 0) > 0) {
       const confirmCancel = window.confirm(
@@ -122,13 +136,14 @@ function EvtDetailComponent({ eventNum }) {
 
     try {
       await deleteEvent(event.eventNum);
-      alert("프로그램가 취소되었습니다.");
+      alert("프로그램이 취소되었습니다.");
       navigate("/event/list");
     } catch (err) {
       alert("프로그램 취소 실패: " + (err.response?.data?.message || err.message));
     }
   };
 
+  // 다운로드 링크 렌더
   const renderDownloadLink = (label, url, name, key) => (
     <a
       key={key}
@@ -143,13 +158,15 @@ function EvtDetailComponent({ eventNum }) {
     </a>
   );
 
+  // 카테고리 라벨
   const categoryLabel =
     {
       TEACHER: "교사",
       STUDENT: "학생",
-      USER: "시민참여",
+      USER: "일반인",
     }[event?.category] || "미지정";
 
+  // 로딩/에러 상태 뷰
   if (loading) {
     return (
       <div className="max-w-screen-xl mx-auto my-10">
@@ -169,13 +186,15 @@ function EvtDetailComponent({ eventNum }) {
     );
   }
 
+  // 본문
   return (
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 좌우 여백 고정 */}
       <div className="min-blank page-shadow bg-white rounded-lg p-10">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="newText-3xl font-bold">프로그램 상세</h1>
-          <button className="normal-button newText-sm" onClick={() => navigate(-1)}>
+          <button className="normal-button newText-base" onClick={() => navigate(-1)}>
             목록으로
           </button>
         </div>
@@ -204,24 +223,30 @@ function EvtDetailComponent({ eventNum }) {
             </div>
             <h2 className="newText-2xl font-bold text-gray-800 mb-4">{event.eventName}</h2>
 
-            {/* 정보 표기: 정의 리스트형으로 가독성 향상 */}
+            {/* 정보 표기: 정의 리스트 */}
             <dl className="grid grid-cols-[120px_1fr] gap-y-2 newText-base text-gray-700">
               <dt className="font-semibold text-gray-600">장소</dt>
               <dd>{event.place || "미정"}</dd>
+
               <dt className="font-semibold text-gray-600">소개</dt>
-              <dd>{event.description || "내용 없음"}</dd>
+              <dd>{event.eventInfo || "내용 없음"}</dd>
+
               <dt className="font-semibold text-gray-600">신청기간</dt>
               <dd>
                 {formatDate(event.applyStartPeriod)} ~ {formatDate(event.applyEndPeriod)}
               </dd>
+
               <dt className="font-semibold text-gray-600">진행기간</dt>
               <dd>
                 {formatDate(event.eventStartPeriod)} ~ {formatDate(event.eventEndPeriod)}
               </dd>
+
               <dt className="font-semibold text-gray-600">모집인원</dt>
               <dd>{event.maxCapacity || 0}명</dd>
+
               <dt className="font-semibold text-gray-600">현재인원</dt>
               <dd>{event.currCapacity ?? 0}명</dd>
+
               <dt className="font-semibold text-gray-600">기타 유의사항</dt>
               <dd>{event.etc || "없음"}</dd>
             </dl>
@@ -246,11 +271,17 @@ function EvtDetailComponent({ eventNum }) {
                   </button>
 
                   {isCanceled ? (
-                    <button className="normal-button newText-base flex-1 cursor-not-allowed" disabled>
+                    <button
+                      className="normal-button newText-base flex-1 cursor-not-allowed"
+                      disabled
+                    >
                       취소 완료
                     </button>
                   ) : (
-                    <button className="nagative-button newText-base flex-1" onClick={handleCancel}>
+                    <button
+                      className="nagative-button newText-base flex-1"
+                      onClick={handleCancel}
+                    >
                       프로그램 취소
                     </button>
                   )}
@@ -266,7 +297,7 @@ function EvtDetailComponent({ eventNum }) {
           (event.attachList && event.attachList.length > 0) ||
           (event.imageList && event.imageList.length > 0)) && (
           <div className="mt-10">
-            <h3 className="newText-xl font-semibold mb-3">📎 첨부파일 목록</h3>
+            <h3 className="newText-xl font-semibold mb-3">첨부파일 목록</h3>
             <div className="space-y-1">
               {/* 메인 이미지 */}
               {event.mainImagePath &&

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FacilityList } from "../../api/facilityApi";
 import useMove from "../../hooks/useMove";
@@ -23,7 +23,8 @@ const buildImageUrl = (p) => {
   path = path.replace(/^https?:\/\/[^/]+/i, "");
   path = path.replace(/^\/?view\/?/, "/");
   if (!path.startsWith("/")) path = `/${path}`;
-  return `${host}${path}`.replace(/([^:]\/)\/+?/g, "$1");
+  // 중복 슬래시 정리
+  return `${host}${path}`.replace(/([^:]\/)\/+/g, "$1");
 };
 
 const FacilityListComponent = () => {
@@ -34,7 +35,7 @@ const FacilityListComponent = () => {
   // 1-based 로컬 페이지 (PageComponent는 0-based이므로 변환해서 전달)
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const size = 8;
+  const size = 8; // 한 페이지 8개 고정
 
   const [list, setList] = useState([]);
   const [keyword, setKeyword] = useState("");
@@ -49,7 +50,7 @@ const FacilityListComponent = () => {
       setError("");
       try {
         const res = await FacilityList({
-          page: Math.max(page - 1, 0),
+          page: Math.max(page - 1, 0), // 서버에는 0-based로 전달
           size,
           keyword: keyword.trim(),
         });
@@ -76,10 +77,24 @@ const FacilityListComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTrigger]);
 
-  const handleSearch = () => {
-    setPage(1);
+  // 검색 실행
+  const handleSearch = useCallback(() => {
+    setPage(1); // 검색 시 첫 페이지로 이동(1-based)
     setSearchTrigger((v) => !v);
-  };
+  }, []);
+
+  // 로그인 여부 체크 후 상세 이동
+  const goDetailIfLoggedIn = useCallback(
+    (facRevNum) => {
+      if (loginState && loginState.memId) {
+        navigate(`/facility/detail/${facRevNum}`);
+      } else {
+        alert("로그인이 필요합니다.");
+        moveToLogin();
+      }
+    },
+    [loginState, moveToLogin, navigate]
+  );
 
   return (
     <div className="max-w-screen-xl mx-auto my-10">
@@ -116,37 +131,23 @@ const FacilityListComponent = () => {
               <FacilityCard
                 key={item.facRevNum}
                 item={item}
-                onCardClick={() => {
-                  if (loginState && loginState.memId) {
-                    navigate(`/facility/detail/${item.facRevNum}`);
-                  } else {
-                    alert("로그인이 필요합니다.");
-                    moveToLogin();
-                  }
-                }}
-                onApplyClick={() => {
-                  if (loginState && loginState.memId) {
-                    navigate(`/facility/detail/${item.facRevNum}`);
-                  } else {
-                    alert("로그인이 필요합니다.");
-                    moveToLogin();
-                  }
-                }}
+                onCardClick={() => goDetailIfLoggedIn(item.facRevNum)}
+                onApplyClick={() => goDetailIfLoggedIn(item.facRevNum)}
               />
             ))}
           </div>
         )}
 
-        {/* 페이지네이션 (공용 0-based 컴포넌트 사용) */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center">
-            <PageComponent
-              totalPages={totalPages}
-              current={page - 1}
-              setCurrent={(idx) => setPage(idx + 1)}
-            />
-          </div>
-        )}
+        {/* 페이지네이션: 총 페이지가 1이어도 항상 표시 */}
+        <div className="mt-8 flex justify-center">
+          <PageComponent
+            totalPages={Math.max(totalPages, 1)}
+            current={page - 1}
+            setCurrent={(idx) => setPage(idx + 1)}
+            hideOnSinglePage={false} // PageComponent가 이 prop을 지원하는 경우 단일 페이지도 표시
+            blockSize={10}
+          />
+        </div>
       </div>
     </div>
   );
@@ -154,12 +155,15 @@ const FacilityListComponent = () => {
 
 const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
   const { facName, facInfo, capacity } = item;
-  const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
-  const srcs = (images.length ? images : [null]).map(buildImageUrl);
+
+  const srcs = useMemo(() => {
+    const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
+    return (images.length ? images : [null]).map(buildImageUrl);
+  }, [item]);
 
   return (
     <div
-      className="page-shadow rounded-xl bg-white overflow-hidden hover:shadow-lg transition cursor-pointer"
+      className="page-shadow rounded-2xl bg-white overflow-hidden hover:shadow-lg transition cursor-pointer"
       onClick={onCardClick}
     >
       <ImageSlider images={srcs} alt={facName} />
@@ -185,18 +189,14 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
   );
 };
 
-// 리스트 썸네일 슬라이더 (4:3 비율) — Swiper Scrollbar 적용 
+// 리스트 썸네일 슬라이더 (4:3 비율) — Swiper Scrollbar 적용
 const ImageSlider = ({ images = [], alt = "facility" }) => {
   const slides = images.length > 0 ? images : [PLACEHOLDER];
 
   return (
     <div className="relative w-full pb-[75%] bg-gray-100 select-none overflow-hidden">
       <div className="absolute inset-0">
-        <Swiper
-          modules={[Scrollbar]}
-          scrollbar={{ hide: true }}
-          className="w-full h-full"
-        >
+        <Swiper modules={[Scrollbar]} scrollbar={{ hide: true }} className="w-full h-full">
           {slides.map((src, i) => (
             <SwiperSlide key={`${src}-${i}`}>
               <img

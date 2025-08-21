@@ -330,7 +330,9 @@ export default function AdminFacilityReservations() {
 
   // ==================== 렌더 ====================
   return (
+    // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 좌우 여백: 고정 클래스 사용 */}
       <div className="min-blank">
         <h2 className="newText-3xl font-bold mb-6 text-center">
           공간 예약 현황 (관리자)
@@ -493,7 +495,7 @@ export default function AdminFacilityReservations() {
                     colSpan={9}
                     className="px-4 py-8 text-center newText-base text-gray-500"
                   >
-                    불러오는 중…
+                    불러오는 중...
                   </td>
                 </tr>
               ) : error ? (
