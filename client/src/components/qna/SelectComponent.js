@@ -4,7 +4,9 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import SearchComponent from "./SearchComponent";
 import ButtonsComponent from "./ButtonsComponent";
+import PageComponent from "../common/PageComponent";
 import lock from '../../assets/lock.png';
+
 const SelectComponent = () => {
     const pageSize = 10; // 페이지당 글 개수 (API와 동일해야 함)
 
@@ -32,10 +34,6 @@ const SelectComponent = () => {
     const [pageData, setPageData] = useState(initState);
     const [current, setCurrent] = useState(0);
     const [selectedQuestion, setSelectedQuestion] = useState([]);
-    // 전체 글 개수 계산 (공지글 없는 경우 그대로 totalElements 이용)
-    // 공지글 처리 부분은 삭제했습니다 (데이터 구조에 따라 공지글 분리 필요하면 알려주세요)
-
-
 
     // 데이터 가져오기
     const fetchData = (params = searchParams) => {
@@ -87,7 +85,7 @@ const SelectComponent = () => {
         setSelectedQuestion([]); // 선택 초기화
     };
 
-    // 페이지 변경
+    // 페이지 변경 (PageComponent용)
     const handlePageChange = (page) => {
         const updatedParams = {
             ...searchParams,
@@ -129,203 +127,162 @@ const SelectComponent = () => {
         });
     };
 
-    // 페이지네이션 렌더링
-    const renderPagination = () => {
-        if (pageData.totalPages <= 0) return null;
-
-        const pages = [];
-        const startPage = Math.max(0, current - 2);
-        const endPage = Math.min(pageData.totalPages - 1, current + 2);
-
-        if (current > 0) {
-            pages.push(
-                <button
-                    key="prev"
-                    onClick={() => handlePageChange(current - 1)}
-                    className="px-3 py-1 mx-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                >
-                    이전
-                </button>
-            );
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(
-                <button
-                    key={i}
-                    onClick={() => handlePageChange(i)}
-                    className={`px-3 py-1 mx-1 rounded ${current === i
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        }`}
-                >
-                    {i + 1}
-                </button>
-            );
-        }
-
-        if (current < pageData.totalPages - 1) {
-            pages.push(
-                <button
-                    key="next"
-                    onClick={() => handlePageChange(current + 1)}
-                    className="px-3 py-1 mx-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                >
-                    다음
-                </button>
-            );
-        }
-
-        return <div className="flex justify-center items-center mt-6">{pages}</div>;
-    };
-
     return (
-        <div className="w-full px-4 mt-10 sm:px-6 md:px-8 lg:px-12 max-w-screen-xl mx-auto">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">문의사항</h1>
-                <p className="text-gray-600 mt-1">
-                    전체 {pageData.totalElements}건의 문의사항이 있습니다.
-                </p>
-            </div>
+        <div className="max-w-screen-xl mx-auto my-10">
+            <div className="min-blank">
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900">문의사항</h1>
+                    <p className="text-gray-600 mt-1">
+                        전체 {pageData.totalElements}건의 문의사항이 있습니다.
+                    </p>
+                </div>
 
-            {/* 검색 컴포넌트 */}
-            <SearchComponent onSearch={handleSearch} initialValues={searchParams} />
+                {/* 검색 컴포넌트 */}
+                <SearchComponent onSearch={handleSearch} initialValues={searchParams} />
 
-            {/* 질문 테이블 */}
-            <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
-                {loading ? (
-                    <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                        <span className="ml-2 text-gray-600">로딩중...</span>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full table-fixed">
-                            <thead className="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    {loginState.role === "ADMIN" && (
-                                        <th className="w-12 px-2 py-3 text-center align-middle">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    selectedQuestion.length === listData.length &&
-                                                    listData.length > 0
-                                                }
-                                                onChange={(e) => handleSelectAll(e.target.checked)}
-                                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                            />
-                                        </th>
-                                    )}
-                                    <th className="w-16 px-2 py-3 text-center text-sm font-medium text-gray-900">
-                                        번호
-                                    </th>
-                                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-900">
-                                        제목
-                                    </th>
-                                    <th className="w-28 px-3 py-3 text-center text-sm font-medium text-gray-900">
-                                        작성자
-                                    </th>
-                                    <th className="w-36 px-3 py-3 text-center text-sm font-medium text-gray-900">
-                                        작성일
-                                    </th>
-                                    <th className="w-24 px-3 py-3 text-center text-sm font-medium text-gray-900">
-                                        조회수
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200 ">
-                                {listData.length === 0 ? (
+                {/* 질문 테이블 */}
+                <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                    {loading ? (
+                        <div className="flex justify-center items-center py-12">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            <span className="ml-2 text-gray-600">로딩중...</span>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full table-fixed">
+                                <thead className="bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <td
-                                            colSpan={loginState.role === "ADMIN" ? 6 : 5}
-                                            className="px-4 py-12 text-center text-gray-500"
-                                        >
-                                            등록된 문의사항이 없습니다.
-                                        </td>
+                                        {loginState.role === "ADMIN" && (
+                                            <th className="w-12 px-2 py-3 text-center align-middle">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        selectedQuestion.length === listData.length &&
+                                                        listData.length > 0
+                                                    }
+                                                    onChange={(e) => handleSelectAll(e.target.checked)}
+                                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                />
+                                            </th>
+                                        )}
+                                        <th className="w-16 px-2 py-3 text-center text-sm font-medium text-gray-900">
+                                            번호
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-900">
+                                            제목
+                                        </th>
+                                        <th className="w-28 px-3 py-3 text-center text-sm font-medium text-gray-900">
+                                            작성자
+                                        </th>
+                                        <th className="w-36 px-3 py-3 text-center text-sm font-medium text-gray-900">
+                                            작성일
+                                        </th>
+                                        <th className="w-24 px-3 py-3 text-center text-sm font-medium text-gray-900">
+                                            조회수
+                                        </th>
                                     </tr>
-                                ) : (
-                                    listData.map((question, index) => (
-                                        <tr
-                                            key={question.questionNum}
-                                        >
-                                            {loginState.role === "ADMIN" && (
-                                                <td className="px-4 py-3 text-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedQuestion.includes(question.questionNum)}
-                                                        onChange={(e) =>
-                                                            handleCheckboxChange(question.questionNum, e.target.checked)
-                                                        }
-                                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                                    />
-                                                </td>
-                                            )}
-                                            <td className="px-4 py-3 text-center text-sm text-gray-900">
-                                                {/* 1부터 시작하는 번호 */}
-                                                {index + 1 + current * pageSize}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center">
-                                                    {question.state === true && (
-                                                        <img src={lock} className="w-4 h-4 mr-2 flex-shrink-0" alt="lock" />
-                                                    )}
-                                                    {/*<a href="https://www.flaticon.com/kr/free-icons/" title="자물쇠 아이콘">자물쇠 아이콘 제작자: Freepik - Flaticon</a> */}
-
-                                                    <Link
-                                                        to={loginState.role === "ADMIN" || loginState.memId === question.memId ?
-                                                            `/question/detail/${question.questionNum}` :
-                                                            question.state ? "#" : `/question/detail/${question.questionNum}`}
-                                                        className={`text-sm font-medium text-gray-900 transition-colors truncate flex-1
-                                                        ${(question.state && loginState.role !== "ADMIN" && loginState.memId !== question.memId) ? "text-gray-400 opacity-50 pointer-events-none" : ""}`
-                                                        }
-                                                    >
-                                                        {question.title}
-                                                    </Link>
-
-
-                                                    {question.answerList && question.answerList.length > 0 ? (
-                                                        <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded whitespace-nowrap flex-shrink-0">
-                                                            답변완료
-                                                        </span>
-                                                    ) : (
-                                                        <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded whitespace-nowrap flex-shrink-0">
-                                                            답변대기
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-
-                                            <td className="px-4 py-3 text-center text-sm text-gray-500">
-                                                {question.memId}
-                                            </td>
-                                            <td className="px-4 py-3 text-center text-sm text-gray-500">
-                                                {formatDate(question.createdAt)}
-                                            </td>
-                                            <td className="px-4 py-3 text-center text-sm text-gray-500">
-                                                {question.view?.toLocaleString() ?? 0}
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200 ">
+                                    {listData.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan={loginState.role === "ADMIN" ? 6 : 5}
+                                                className="px-4 py-12 text-center text-gray-500"
+                                            >
+                                                등록된 문의사항이 없습니다.
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                    ) : (
+                                        listData.map((question, index) => (
+                                            <tr
+                                                key={question.questionNum}
+                                            >
+                                                {loginState.role === "ADMIN" && (
+                                                    <td className="px-4 py-3 text-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedQuestion.includes(question.questionNum)}
+                                                            onChange={(e) =>
+                                                                handleCheckboxChange(question.questionNum, e.target.checked)
+                                                            }
+                                                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                        />
+                                                    </td>
+                                                )}
+                                                <td className="px-4 py-3 text-center text-sm text-gray-900">
+                                                    {/* 1부터 시작하는 번호 */}
+                                                    {index + 1 + current * pageSize}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center">
+                                                        {question.state === true && (
+                                                            <img src={lock} className="w-4 h-4 mr-2 flex-shrink-0" alt="lock" />
+                                                        )}
+                                                        {/*<a href="https://www.flaticon.com/kr/free-icons/" title="자물쇠 아이콘">자물쇠 아이콘 제작자: Freepik - Flaticon</a> */}
+
+                                                        <Link
+                                                            to={loginState.role === "ADMIN" || loginState.memId === question.memId ?
+                                                                `/question/detail/${question.questionNum}` :
+                                                                question.state ? "#" : `/question/detail/${question.questionNum}`}
+                                                            className={`text-sm font-medium text-gray-900 transition-colors truncate flex-1
+                                                            ${(question.state && loginState.role !== "ADMIN" && loginState.memId !== question.memId) ? "text-gray-400 opacity-50 pointer-events-none" : ""}`
+                                                            }
+                                                        >
+                                                            {question.title}
+                                                        </Link>
+
+                                                        {question.answerList && question.answerList.length > 0 ? (
+                                                            <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded whitespace-nowrap flex-shrink-0">
+                                                                답변완료
+                                                            </span>
+                                                        ) : (
+                                                            <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded whitespace-nowrap flex-shrink-0">
+                                                                답변대기
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+
+                                                <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                                    {question.memId}
+                                                </td>
+                                                <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                                    {formatDate(question.createdAt)}
+                                                </td>
+                                                <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                                    {question.view?.toLocaleString() ?? 0}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+
+                {/* 페이지네이션 - PageComponent 사용 */}
+                {pageData.totalPages > 0 && (
+                    <div className="flex justify-center mt-6">
+                        <PageComponent
+                            totalPages={pageData.totalPages}
+                            current={current}
+                            setCurrent={handlePageChange}
+                        />
                     </div>
                 )}
-            </div>
 
-            {/* 페이지네이션 */}
-            {renderPagination()}
-
-            {/* 하단 버튼 */}
-            <div className="mb-8">
-                <ButtonsComponent
-                    isAdmin={loginState.role === "ADMIN"}
-                    selectedQuestion={selectedQuestion}
-                    onDelete={() => {
-                        fetchData();
-                        setSelectedQuestion([]);
-                    }}
-                />
+                {/* 하단 버튼 */}
+                <div className="mb-8">
+                    <ButtonsComponent
+                        isAdmin={loginState.role === "ADMIN"}
+                        selectedQuestion={selectedQuestion}
+                        onDelete={() => {
+                            fetchData();
+                            setSelectedQuestion([]);
+                        }}
+                    />
+                </div>
             </div>
         </div>
     );
