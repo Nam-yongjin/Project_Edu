@@ -7,17 +7,19 @@ import CalendarComponent from "./CalendarComponent";
 import ItemModal from "./itemModal";
 import { useSelector } from "react-redux";
 import defaultImage from '../../assets/default.jpg';
+
 const RentalComponent = () => {
     const isTeacher = useSelector((state) => state.loginState?.role === "TEACHER");
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+    
     // 권한 체크 useEffect
     useEffect(() => {
         if (!isTeacher && !isAdmin) {
             alert("권한이 없습니다.");
             moveToPath("/");
         }
-
     }, []);
+
     const initState = {
         content: [],
         totalPages: 0,
@@ -28,6 +30,7 @@ const RentalComponent = () => {
         { value: "demName", label: "상품명" },
         { value: "companyName", label: "기업명" },
     ];
+
     const [search, setSearch] = useState(); // 검색어
     const [type, setType] = useState("companyName"); // 검색 타입
     const [pageData, setPageData] = useState(initState); // 페이지 데이터
@@ -48,20 +51,24 @@ const RentalComponent = () => {
     const [isExtendModalOpen, setIsExtendModalOpen] = useState(false); // 날짜 연장용 모달창 상태 변수
     const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
     const [disabledExtendDate, setdisabledExtendDate] = useState([]);
+
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
     const maxQty = currentItem?.itemNum || 0;
+
     const [startDate, setStartDate] = useState(() => { // startDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
         return d;
     });
+
     const [endDate, setEndDate] = useState(() => { // endDate 초기값 저장
         const d = new Date();
         d.setDate(d.getDate() + 1);
         return d;
     });
+
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
@@ -70,6 +77,7 @@ const RentalComponent = () => {
             });
         } else {
             getRental(current, sort, sortBy, statusFilter).then((data) => {
+                console.log(data);
                 setListData(data);
                 setPageData(data);
             });
@@ -78,8 +86,9 @@ const RentalComponent = () => {
 
     useEffect(() => {
         fetchData();
+        // 페이지 변경 시 선택 상태 초기화
+        setSelectedItems(new Set());
     }, [current, sort, sortBy, statusFilter]);
-
 
     useEffect(() => {
         if (selectedDate && selectedDate.length > 0) { // selectedDates를 통해 datepicker 날짜 조정
@@ -109,6 +118,9 @@ const RentalComponent = () => {
         }
     };
 
+    // WAIT 상태인 항목들만 필터링
+    const waitItems = listData.content.filter(item => item.state === "WAIT");
+
     // 개별 체크박스 핸들러
     const handleSelectOne = (e, demNum) => {
         const newSet = new Set(selectedItems);
@@ -117,38 +129,60 @@ const RentalComponent = () => {
         } else {
             newSet.delete(demNum);
         }
-
         setSelectedItems(newSet);
     };
 
-    const handleCancelReservation = () => {
-        if (selectedItems.size === 0) {
-            alert("선택된 항목이 없습니다.");
-            return;
+    // 전체 선택/해제 핸들러 수정
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            // WAIT 상태인 항목만 전체 선택
+            const allWaitDemNums = new Set(waitItems.map(item => item.demNum));
+            setSelectedItems(allWaitDemNums);
+        } else {
+            // 전체 해제
+            setSelectedItems(new Set());
         }
+    };
 
-        const invalidItems = !listData.content
-            .filter(item => selectedItems.has(item.demNum))
-            .some(item => item.state === "WAIT"); // 상품번호를 가지고 잇고 wait가 아닌 데이터에 대해 취소불가능
+    // 전체 선택 체크박스 상태 계산 수정
+    const isAllSelected = waitItems.length > 0 && 
+                         waitItems.every(item => selectedItems.has(item.demNum));
+    
+    // 일부 선택 상태 (indeterminate 상태)
+    const isIndeterminate = selectedItems.size > 0 && !isAllSelected;
 
-        if (invalidItems) {
-            alert("예약 취소가 불가능한 상태입니다.");
-            return;
-        }
-        deleteRental(Array.from(selectedItems));
+const handleCancelReservation = () => {
+    if (selectedItems.size === 0) {
+        alert("선택된 항목이 없습니다.");
+        return;
+    }
 
+    // 선택된 항목 중 WAIT 상태인 것만 필터링
+    const selectedItemsData = listData.content.filter(
+        item => selectedItems.has(item.demNum) && item.state.toUpperCase() === "WAIT"
+    );
+
+    if (selectedItemsData.length === 0) {
+        alert("예약 취소가 불가능한 상태입니다. 대기 상태의 항목만 취소할 수 있습니다.");
+        return;
+    }
+
+    if (window.confirm(`선택된 ${selectedItemsData.length}개의 예약을 취소하시겠습니까?`)) {
+        // WAIT 상태인 demNum만 취소
+        deleteRental(selectedItemsData.map(item => item.demNum));
         alert("예약이 취소 되었습니다.");
         window.location.reload();
-    };
+    }
+};
+
+
 
     const handleActionClick = async (demNum, action, date) => {
         // 같은 demNum을 가진 모든 항목을 찾음
-        // reject랑 cancel은 버튼 자체가 존재 하지 않으므로 고려 x
         const items = listData.content.filter((item) => item.demNum === demNum);
         if (items.length === 0) return;
 
         if (action === "예약변경") {
-            // demNum에 해당하는 항목 중 WAIT 상태가 하나라도 있는지 확인
             const hasWait = items.some(item => item.state === "WAIT");
             if (!hasWait) {
                 alert(`대기 상태에서만 예약 변경이 가능합니다.`);
@@ -186,9 +220,7 @@ const RentalComponent = () => {
             alert(`반납 신청 완료`);
             window.location.reload();
         }
-
     };
-
 
     const reservationUpdate = (updatedItemNum) => {
         const loadData = async () => {
@@ -203,13 +235,13 @@ const RentalComponent = () => {
             }
 
             let sortedDates = [...selectedDate]
-                .map(d => new Date(d)) // 문자열일 경우 Date로 변환
-                .sort((a, b) => a.getTime() - b.getTime()); // getTime으로 정렬
-            sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d))); // 데이트 타입이 아닐경우 데이트 타입으로 파싱
+                .map(d => new Date(d))
+                .sort((a, b) => a.getTime() - b.getTime());
+            sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d)));
 
             for (let i = 0; i < sortedDates.length - 1; i++) {
-                const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime(); // 두 날을 뺀 값 (ms)단위
-                const diffDays = diffTime / (1000 * 60 * 60 * 24); // ms단위 이므로 하루 단위로 변경
+                const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime();
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if (diffDays !== 1) {
                     alert('연속된 날짜만 선택 가능합니다!');
@@ -274,24 +306,41 @@ const RentalComponent = () => {
     return (
         <div className="max-w-screen-xl mx-auto my-10">
             <div className="min-blank">
-                <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
-                <div className="py-2">
-                    <SearchComponent
-                        search={search}
-                        setSearch={setSearch}
-                        type={type}
-                        setType={setType}
-                        onSearchClick={onSearchClick}
-                        searchOptions={searchOptions}
-                    />
+                <div className="mx-auto text-center">
+                    <div className="text-3xl font-bold mb-5">실증 물품 등록 관리</div>
+                    <div className="py-2 flex justify-center">
+                        <SearchComponent
+                            search={search}
+                            setSearch={setSearch}
+                            type={type}
+                            setType={setType}
+                            onSearchClick={onSearchClick}
+                            searchOptions={searchOptions}
+                        />
+                    </div>
                 </div>
-                <p className="text-gray-600 my-1 newText-base">
-                    전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
-
-                <div className="overflow-x-auto mt-6">
-                    <table className="w-full">
-                        <thead className="bg-gray-100 text-gray-700 newText-base">
-                            <tr className="newText-base whitespace-nowrap">
+                <p className="text-gray-700 my-3 text-base px-4 py-2 rounded-md inline-block">
+                    전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 대여내역이 있습니다.
+                </p>
+                <div className="overflow-x-auto mt-6 page-shadow">
+                    <table className="w-full min-w-[1000px]">
+                        <thead className="bg-gray-100 text-gray-700 text-base border border-gray-300">
+                            <tr className="text-base whitespace-nowrap">
+                                <th className="w-[5%] px-2 py-3">
+                                    {waitItems.length > 0 && (
+                                        <input
+                                            type="checkbox"
+                                            checked={isAllSelected}
+                                            ref={(input) => {
+                                                if (input) {
+                                                    input.indeterminate = isIndeterminate;
+                                                }
+                                            }}
+                                            onChange={handleSelectAll}
+                                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                    )}
+                                </th>
                                 <th className="w-[8%]">대표 이미지</th>
                                 <th className="w-[8%]">물품명</th>
                                 <th className="w-[10%]">기업명</th>
@@ -318,6 +367,7 @@ const RentalComponent = () => {
                                     <div className="mb-1">신청 상태</div>
                                     <select
                                         value={statusFilter}
+                                        className="input-focus"
                                         onChange={(e) => {
                                             setStatusFilter(e.target.value);
                                             setCurrent(0);
@@ -330,7 +380,6 @@ const RentalComponent = () => {
                                         <option value="EXPIRED">만료</option>
                                     </select>
                                 </th>
-                                {/* 버튼 3개 컬럼 */}
                                 <th className="w-[8%]">반납/연장 신청</th>
                                 <th className="w-[8%]">예약 수정</th>
                             </tr>
@@ -339,8 +388,8 @@ const RentalComponent = () => {
                         <tbody className="text-gray-600">
                             {listData.content.length === 0 ? (
                                 <tr>
-                                    <td colSpan={10} className="text-center">
-                                        <p className="text-gray-500 newText-3xl mt-20">대여 내역이 없습니다.</p>
+                                    <td colSpan={11} className="text-center">
+                                        <p className="text-gray-500 text-3xl mt-20 min-h-[300px]">대여 내역이 없습니다.</p>
                                     </td>
                                 </tr>
                             ) : (
@@ -348,8 +397,23 @@ const RentalComponent = () => {
                                     const mainImage = item.imageList?.find((img) => img.isMain === true);
                                     const memberState = item.state;
                                     return (
-                                        <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
-                                            <td className="py-2 px-2 whitespace-nowrap text-center">
+                                        <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`} className={`hover:bg-gray-50 text-sm text-center whitespace-nowrap <table className="w-full border-collapse border border-gray-300"> ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                                            {/* 체크박스 칸 */}
+                                            <td className="py-2 px-2 text-center">
+                                                {memberState === "WAIT" ? (
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedItems.has(item.demNum)}
+                                                        onChange={(e) => handleSelectOne(e, item.demNum)}
+                                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                                    />
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </td>
+
+                                            {/* 이미지 칸 */}
+                                            <td className="py-2 px-2 whitespace-nowrap text-center ">
                                                 {mainImage ? (
                                                     <img
                                                         onClick={() => moveToPath(`../detail/${item.demNum}`)}
@@ -380,7 +444,7 @@ const RentalComponent = () => {
                                             </td>
 
                                             {/* 진행중 요청 칸 */}
-                                            <td className="newText-base text-blue-600">
+                                            <td className="text-base text-blue-600">
                                                 {Array.isArray(item.reqState) && Array.isArray(item.requestType) ? (
                                                     item.reqState
                                                         .map((state, idx) => ({ state, type: item.requestType[idx] }))
@@ -405,49 +469,51 @@ const RentalComponent = () => {
                                             </td>
 
                                             {/* 버튼 칸 */}
-                                            <td className="my-1 flex flex-col space-y-1 items-center">
-                                                {(() => {
-                                                    const reqStates = Array.isArray(item.reqState) ? item.reqState : [];
-                                                    const hasWaitState = reqStates.some(state => String(state).toUpperCase() === "WAIT");
-                                                    const itemState = String(item.state).toUpperCase();
+                                            <td className="my-1 px-2">
+                                                <div className="flex flex-col space-y-1 items-center">
+                                                    {(() => {
+                                                        const reqStates = Array.isArray(item.reqState) ? item.reqState : [];
+                                                        const hasWaitState = reqStates.some(state => String(state).toUpperCase() === "WAIT");
+                                                        const itemState = String(item.state).toUpperCase();
 
-                                                    return (
-                                                        <>
-                                                            <button
-                                                                disabled={itemState !== "WAIT"}
-                                                                onClick={() => handleActionClick(item.demNum, "예약변경")}
-                                                                className={`px-2 py-1 rounded newText-xs w-full ${itemState === "WAIT"
-                                                                    ? "positive-button"
-                                                                    : "disable-button"
-                                                                    }`}
-                                                            >
-                                                                예약변경
-                                                            </button>
+                                                        return (
+                                                            <>
+                                                                <button
+                                                                    disabled={itemState !== "WAIT"}
+                                                                    onClick={() => handleActionClick(item.demNum, "예약변경")}
+                                                                    className={`px-2 py-1 rounded text-xs w-full ${itemState === "WAIT"
+                                                                        ? "positive-button"
+                                                                        : "disable-button"
+                                                                        }`}
+                                                                >
+                                                                    예약변경
+                                                                </button>
 
-                                                            <button
-                                                                disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                                onClick={() => handleExtendButtonClick(item.demNum, item.endDate)}
-                                                                className={`px-2 py-1 rounded newText-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                    ? "green-button"
-                                                                    : "disable-button"
-                                                                    }`}
-                                                            >
-                                                                대여연장
-                                                            </button>
+                                                                <button
+                                                                    disabled={itemState !== "ACCEPT" || hasWaitState}
+                                                                    onClick={() => handleExtendButtonClick(item.demNum, item.endDate)}
+                                                                    className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                        ? "green-button"
+                                                                        : "disable-button"
+                                                                        }`}
+                                                                >
+                                                                    대여연장
+                                                                </button>
 
-                                                            <button
-                                                                disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                                onClick={() => handleActionClick(item.demNum, "반납")}
-                                                                className={`px-2 py-1 rounded newText-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                    ? "nagative-button"
-                                                                    : "disable-button"
-                                                                    }`}
-                                                            >
-                                                                반납
-                                                            </button>
-                                                        </>
-                                                    );
-                                                })()}
+                                                                <button
+                                                                    disabled={itemState !== "ACCEPT" || hasWaitState}
+                                                                    onClick={() => handleActionClick(item.demNum, "반납")}
+                                                                    className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
+                                                                        ? "nagative-button"
+                                                                        : "disable-button"
+                                                                        }`}
+                                                                >
+                                                                    반납
+                                                                </button>
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -460,7 +526,7 @@ const RentalComponent = () => {
                 {isExtendModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
-                            <h2 className="newText-3xl font-bold mb-1">대여 연장 신청</h2>
+                            <h2 className="text-3xl font-bold mb-1">대여 연장 신청</h2>
                             <label className="block mb-2">연장할 날짜</label>
                             <input
                                 type="date"
@@ -489,7 +555,6 @@ const RentalComponent = () => {
                                 >
                                     확인
                                 </button>
-
                             </div>
                         </div>
                     </div>
@@ -499,16 +564,17 @@ const RentalComponent = () => {
                 <div className="flex justify-end mt-4">
                     <button
                         onClick={handleCancelReservation}
-                        className={"px-4 py-2 rounded normal-button"}
+                        disabled={selectedItems.size === 0}
+                        className={`px-4 py-2 rounded ${selectedItems.size > 0 ? "normal-button" : "disable-button"}`}
                     >
-                        예약 취소
+                        예약 취소 ({selectedItems.size})
                     </button>
                 </div>
 
                 {showModifyModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
-                            <h2 className="newText-3xl font-bold mb-1">예약 날짜 변경</h2>
+                            <h2 className="text-3xl font-bold mb-1">예약 날짜 변경</h2>
                             <CalendarComponent
                                 selectedDate={selectedDate}
                                 setSelectedDate={setSelectedDate}

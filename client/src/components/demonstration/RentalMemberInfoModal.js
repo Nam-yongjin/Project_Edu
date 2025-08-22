@@ -65,19 +65,20 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-7xl mx-auto min-h-[400px] max-h-[90vh] overflow-hidden flex flex-col">
-        <h2 className="text-xl font-bold mb-4">회원 정보</h2>
-        
-        <div className="mb-4 flex w-full max-w-md">
-          <SearchComponent
-            search={search}
-            setSearch={setSearch}
-            type={type}
-            setType={setType}
-            onSearchClick={onSearchClick}
-            searchOptions={searchOptions}
-          />
-        </div>
+        <div className="mx-auto text-center">
+          <h2 className="newText-xl font-bold mb-4">회원 정보</h2>
 
+          <div className="mb-4 flex w-full max-w-md justify-center">
+            <SearchComponent
+              search={search}
+              setSearch={setSearch}
+              type={type}
+              setType={setType}
+              onSearchClick={onSearchClick}
+              searchOptions={searchOptions}
+            />
+          </div>
+        </div>
         <div className="flex-1 overflow-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg">
             <thead className="bg-gray-100 text-gray-700 text-sm sticky top-0">
@@ -95,7 +96,7 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
                       setStatusFilter(e.target.value);
                       setCurrent(0);
                     }}
-                    className="mt-1 text-xs"
+                    className="mt-1 newText-xs input-focus"
                   >
                     <option value="">전체</option>
                     <option value="REJECT">거부</option>
@@ -132,16 +133,16 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
             <tbody className="text-gray-600">
               {filteredMemberInfo.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center p-8">
-                    <p className="text-gray-500 text-xl">신청한 회원이 없습니다.</p>
+                  <td colSpan={9} className="text-center p-8 min-h-[300px]">
+                    <p className="text-gray-500 newText-xl">신청한 회원이 없습니다.</p>
                   </td>
                 </tr>
               ) : (
                 filteredMemberInfo.map((member, idx) => (
-                  <tr key={member.demRevNum || idx} className={`hover:bg-gray-50 text-sm text-center whitespace-nowrap h-[60px] ${member.state === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                  <tr key={member.demRevNum || idx} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap h-[60px] border border-gray-300 ${member.state === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
                     <td className="p-2">{member.memId}</td>
                     <td className="p-2">{member.phone || "-"}</td>
-                    <td title={member.addr+" "+member.addrDetail} className="truncate max-w-[120px] p-2">{member.addr+" "+member.addrDetail || "-"}</td>
+                    <td title={member.addr + " " + member.addrDetail} className="truncate max-w-[120px] p-2">{member.addr + " " + member.addrDetail || "-"}</td>
                     <td title={member.schoolName} className="truncate max-w-[120px] p-2">{member.schoolName || "-"}</td>
                     <td title={member.demName} className="truncate max-w-[120px] p-2">{member.demName || "-"}</td>
                     <td className="p-2">{member.state || "-"}</td>
@@ -164,9 +165,9 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
             />
           </div>
         )}
-        
+
         <div className="mt-4 flex justify-end">
-          <button className="normal-button rounded text-base px-4 py-2" onClick={onClose}>닫기</button>
+          <button className="normal-button rounded newText-base px-4 py-2" onClick={onClose}>닫기</button>
         </div>
       </div>
     </div>
