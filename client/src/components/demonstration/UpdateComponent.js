@@ -159,7 +159,7 @@ const UpdateComponent = ({ demNum }) => {
 
     <div className='max-w-screen-md mx-auto'>
       <div className="page-shadow min-blank my-10 p-10 space-y-6 text-center">
-        <div className="newText-3xl font-bold">실증 물품 수정</div>
+        <div className="newText-3xl font-bold">실증 수정</div>
 
         <div>
           <div className="flex items-start newText-base">

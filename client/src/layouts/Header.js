@@ -101,9 +101,9 @@ const Header = () => {
     );
     const demonstrationMenu = mainMenus.find(menu => menu.name === "실증 지원");
     demonstrationMenu.sub.push(
-      { name: "실증 등록", link: "/demonstration/add" },
-      { name: "실증등록 관리", link: "/demonstration/adminReg" },
-      { name: "실증대여 관리", link: "/demonstration/adminRes" }
+      { name: "실증등록", link: "/demonstration/add" },
+      { name: "실증등록관리", link: "/demonstration/adminReg" },
+      { name: "실증대여관리", link: "/demonstration/adminRes" }
     );
   }
 
