@@ -7,19 +7,20 @@ const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, sear
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center border border-gray-300 rounded w-full max-w-md overflow-hidden"
+      className="flex items-center rounded w-full max-w-md overflow- px-3 h-10"
     >
       <input
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="검색어를 입력하세요"
-        className="flex-1 min-w-0 px-4 py-2 text-sm focus:outline-none"
+        className="flex-1 newText-sm input-focus px-3 h-10 border border-gray-300 rounded-md mr-1"
       />
+
       <select
         value={type}
         onChange={(e) => setType(e.target.value)}
-        className="px-3 py-2 text-sm bg-white focus:outline-none border-l border-gray-300"
+        className="px-3 h-10 newText-sm input-focus bg-white focus:outline-none border border-gray-300 rounded-md mr-1"
         aria-label="검색 옵션 선택"
       >
         {searchOptions.map((opt) => (
@@ -28,13 +29,15 @@ const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, sear
           </option>
         ))}
       </select>
+
       <button
         type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center justify-center border-l border-gray-300"
+        className="positive-button h-10"
         aria-label="검색"
       >
         검색
       </button>
+
     </form>
   );
 };

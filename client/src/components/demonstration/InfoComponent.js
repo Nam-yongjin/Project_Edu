@@ -24,12 +24,14 @@ const DemInfo = () => {
   return (
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
-        <section className="w-full mx-auto my-16 px-8 text-gray-900">
-          <h1 className="newText-3xl font-bold text-gray-900 mb-10 text-center tracking-wide border-b-2 border-indigo-600 pb-3">
-            실증 지원 프로그램
-          </h1>
+        <section className="w-full mx-auto my-16 text-gray-900">
+          <div className="w-full border-b-2 border-indigo-600 pb-3 mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 text-center tracking-wide mb-10">
+              실증 지원 프로그램
+            </h1>
+          </div>
 
-          <p className="newText-base text-center text-gray-700 mb-14 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base text-center text-gray-700 mb-14 max-w-3xl mx-auto leading-relaxed">
             실증 지원 프로그램은 첨단 기술과 교육 현장을 효과적으로 연결하여
             교사들이 최신 물품을 대여해 직접 활용할 수 있도록 지원합니다.
             이를 통해 교육 현장에서 실제적인 기술 경험이 이루어지고,
@@ -42,13 +44,13 @@ const DemInfo = () => {
                 key={i}
                 className="bg-indigo-50 rounded-xl p-6 shadow-md border border-indigo-200 hover:shadow-lg transition-shadow duration-300"
               >
-                <h3 className="newText-xl font-bold mb-4 text-indigo-700">{title}</h3>
+                <h3 className="text-xl font-bold mb-4 text-indigo-700">{title}</h3>
                 <p className="text-indigo-800 whitespace-pre-line">{desc}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-16 text-center text-gray-600 newText-base max-w-3xl mx-auto leading-relaxed">
+          <p className="mt-16 text-center text-gray-600 text-base max-w-3xl mx-auto leading-relaxed">
             이 프로그램은 교육과 기술의 접점을 넓히며,
             미래 인재 양성과 기술 혁신에 기여하는 것을 목표로 합니다.
             기업과 교육자가 협력하여 더 나은 학습 환경과 기술 발전을 함께 만들어가는 길에
