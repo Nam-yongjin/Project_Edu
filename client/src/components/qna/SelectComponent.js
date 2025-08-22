@@ -128,7 +128,7 @@ const SelectComponent = () => {
     };
 
     return (
-        <div className="max-w-screen-xl mx-auto my-10">
+        <div className="max-w-screen-xl mx-auto my-10 px-4">
             <div className="min-blank">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-gray-900">문의사항</h1>
@@ -141,7 +141,7 @@ const SelectComponent = () => {
                 <SearchComponent onSearch={handleSearch} initialValues={searchParams} />
 
                 {/* 질문 테이블 */}
-                <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                     {loading ? (
                         <div className="flex justify-center items-center py-12">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -149,11 +149,11 @@ const SelectComponent = () => {
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full table-fixed">
+                            <table className="w-full min-w-[800px]">
                                 <thead className="bg-gray-50 border-b border-gray-200">
-                                    <tr>
+                                    <tr className="whitespace-nowrap">
                                         {loginState.role === "ADMIN" && (
-                                            <th className="w-12 px-2 py-3 text-center align-middle">
+                                            <th className="w-12 min-w-[48px] px-2 py-3 text-center align-middle">
                                                 <input
                                                     type="checkbox"
                                                     checked={
@@ -165,24 +165,24 @@ const SelectComponent = () => {
                                                 />
                                             </th>
                                         )}
-                                        <th className="w-16 px-2 py-3 text-center text-sm font-medium text-gray-900">
+                                        <th className="w-16 min-w-[64px] px-2 py-3 text-center font-medium text-gray-900">
                                             번호
                                         </th>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-900">
+                                        <th className="min-w-[300px] px-3 py-3 text-left font-medium text-gray-900">
                                             제목
                                         </th>
-                                        <th className="w-28 px-3 py-3 text-center text-sm font-medium text-gray-900">
+                                        <th className="w-28 min-w-[112px] px-3 py-3 text-center font-medium text-gray-900">
                                             작성자
                                         </th>
-                                        <th className="w-36 px-3 py-3 text-center text-sm font-medium text-gray-900">
+                                        <th className="w-36 min-w-[144px] px-3 py-3 text-center font-medium text-gray-900">
                                             작성일
                                         </th>
-                                        <th className="w-24 px-3 py-3 text-center text-sm font-medium text-gray-900">
+                                        <th className="w-24 min-w-[96px] px-3 py-3 text-center font-medium text-gray-900">
                                             조회수
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200 ">
+                                <tbody className="bg-white divide-y divide-gray-200 newText-sm">
                                     {listData.length === 0 ? (
                                         <tr>
                                             <td
@@ -218,38 +218,34 @@ const SelectComponent = () => {
                                                         {question.state === true && (
                                                             <img src={lock} className="w-4 h-4 mr-2 flex-shrink-0" alt="lock" />
                                                         )}
-                                                        {/*<a href="https://www.flaticon.com/kr/free-icons/" title="자물쇠 아이콘">자물쇠 아이콘 제작자: Freepik - Flaticon</a> */}
-
                                                         <Link
                                                             to={loginState.role === "ADMIN" || loginState.memId === question.memId ?
                                                                 `/question/detail/${question.questionNum}` :
                                                                 question.state ? "#" : `/question/detail/${question.questionNum}`}
-                                                            className={`text-sm font-medium text-gray-900 transition-colors truncate flex-1
+                                                            className={`text-sm font-medium text-gray-900 transition-colors flex-1 overflow-hidden text-ellipsis whitespace-nowrap
                                                             ${(question.state && loginState.role !== "ADMIN" && loginState.memId !== question.memId) ? "text-gray-400 opacity-50 pointer-events-none" : ""}`
                                                             }
                                                         >
                                                             {question.title}
                                                         </Link>
-
                                                         {question.answerList && question.answerList.length > 0 ? (
-                                                            <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded whitespace-nowrap flex-shrink-0">
+                                                            <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded whitespace-nowrap flex-shrink-0">
                                                                 답변완료
                                                             </span>
                                                         ) : (
-                                                            <span className="ml-2 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded whitespace-nowrap flex-shrink-0">
+                                                            <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap flex-shrink-0">
                                                                 답변대기
                                                             </span>
                                                         )}
                                                     </div>
                                                 </td>
-
-                                                <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                                <td className="px-4 py-3 text-center text-gray-500">
                                                     {question.memId}
                                                 </td>
-                                                <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                                <td className="px-4 py-3 text-center text-gray-500">
                                                     {formatDate(question.createdAt)}
                                                 </td>
-                                                <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                                <td className="px-4 py-3 text-center text-gray-500">
                                                     {question.view?.toLocaleString() ?? 0}
                                                 </td>
                                             </tr>

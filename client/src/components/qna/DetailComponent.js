@@ -20,9 +20,9 @@ const DetailComponent = ({ questionNum }) => {
   }, [questionNum]);
 
   const handleAnswerSubmit = () => {
-    if(loginState.role!=="ADMIN")
-    {
+    if (loginState.role !== "ADMIN") {
       alert("관리자만 글 작성 가능합니다.");
+      return;
     }
     if (answerContent === "") {
       alert("답변을 입력해주세요.");
@@ -62,8 +62,7 @@ const DetailComponent = ({ questionNum }) => {
       alert("답변이 삭제되었습니다.");
       deleteAnswer(num);
       window.location.reload();
-    }
-    else if (type === "QUESTION") {
+    } else if (type === "QUESTION") {
       alert("질문이 삭제되었습니다.");
       deleteQuestions([num]);
       moveToPath("/question/select");
@@ -74,15 +73,15 @@ const DetailComponent = ({ questionNum }) => {
   if (!listData) return <div className="text-center py-10 text-red-500">질문글을 불러오지 못했습니다.</div>;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 mt-8 mb-16">
-      
+  <div className="max-w-screen-xl mx-auto my-10">
+      <div className="min-blank">
       {/* 질문글 */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-8">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-8 page-shadow">
         <div className="border-b border-gray-200 p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">{listData.title}</h2>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>작성자: {listData.memId}</span>
-            <div className="flex-col gap-4">
+          <h2 className="newText-2xl font-semibold mb-4 text-gray-800">{listData.title}</h2>
+          <div className="flex justify-between items-center newText-base text-gray-600">
+            <span>작성자: <b>{listData.memId}</b></span>
+            <div className="text-right">
               <div>작성일: {new Date(listData.createdAt).toLocaleString()}</div>
               <div>수정일: {new Date(listData.updatedAt).toLocaleString()}</div>
               <div>조회수: {listData.view}</div>
@@ -92,7 +91,7 @@ const DetailComponent = ({ questionNum }) => {
         
         <div className="p-6">
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 min-h-[300px]">
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap newText-base">
               {listData.content}
             </p>
           </div>
@@ -101,13 +100,13 @@ const DetailComponent = ({ questionNum }) => {
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => moveToPath(`../update/${questionNum}`)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                className="positive-button"
               >
                 수정
               </button>
               <button
                 onClick={() => handleDelete("QUESTION", listData.questionNum)}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                className="nagative-button"
               >
                 삭제
               </button>
@@ -118,7 +117,7 @@ const DetailComponent = ({ questionNum }) => {
 
       {/* 답변 목록 */}
       <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">
+        <h3 className="newText-xl font-semibold mb-4 text-gray-800">
           답변 ({listData.answerList ? listData.answerList.length : 0})
         </h3>
         
@@ -135,19 +134,18 @@ const DetailComponent = ({ questionNum }) => {
                       value={editingAnswerContent}
                       onChange={(e) => setEditingAnswerContent(e.target.value)}
                       rows={4}
-                      className="w-full p-3 border border-gray-300 rounded mb-3 whitespace-pre-wrap resize-none"
-                      style={{ whiteSpace: 'pre-wrap' }}
+                      className="w-full p-3 border border-gray-300 rounded mb-3 whitespace-pre-wrap resize-none newText-base"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={handleSaveEdit}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        className="positive-button"
                       >
                         저장
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                        className="normal-button"
                       >
                         취소
                       </button>
@@ -155,10 +153,10 @@ const DetailComponent = ({ questionNum }) => {
                   </div>
                 ) : (
                   <>
-                    <p className="text-gray-700 mb-3 whitespace-pre-wrap leading-relaxed">
+                    <p className="text-gray-700 mb-3 whitespace-pre-wrap leading-relaxed newText-base">
                       {ans.content}
                     </p>
-                    <div className="flex justify-between items-center text-sm text-gray-600">
+                    <div className="flex justify-between items-center newText-sm text-gray-600">
                       <span>답변자: {ans.memId || "관리자"}</span>
                       <div className="flex items-center gap-4">
                         <span>{new Date(ans.createdAt).toLocaleString()}</span>
@@ -166,13 +164,13 @@ const DetailComponent = ({ questionNum }) => {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleEditClick(ans)}
-                              className="px-3 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600 transition-colors"
+                              className="positive-button"
                             >
                               수정
                             </button>
                             <button
                               onClick={() => handleDelete("ANSWER", ans.answerNum)}
-                              className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition-colors"
+                              className="nagative-button"
                             >
                               삭제
                             </button>
@@ -186,7 +184,7 @@ const DetailComponent = ({ questionNum }) => {
             ))
           ) : (
             loginState.role !== "ADMIN" && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center text-gray-500 newText-base">
                 등록된 답변이 없습니다.
               </div>
             )
@@ -196,23 +194,22 @@ const DetailComponent = ({ questionNum }) => {
 
       {/* ADMIN 답변 작성 */}
       {loginState.role === "ADMIN" && (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm page-shadow">
           <div className="border-b border-gray-200 p-4">
-            <h3 className="text-xl font-semibold text-gray-800">답변 작성</h3>
+            <h3 className="newText-xl font-semibold text-gray-800">답변 작성</h3>
           </div>
           <div className="p-6">
             <textarea
               value={answerContent}
               onChange={(e) => setAnswerContent(e.target.value)}
               rows={5}
-              className="w-full p-4 border border-gray-300 rounded mb-4 whitespace-pre-wrap resize-none"
-              style={{ whiteSpace: 'pre-wrap' }}
+              className="w-full p-4 border border-gray-300 rounded mb-4 whitespace-pre-wrap resize-none newText-base"
               placeholder="답변을 입력하세요..."
             />
             <div className="flex justify-end">
               <button
                 onClick={handleAnswerSubmit}
-                className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors font-medium"
+                className="positive-button"
               >
                 답변 등록
               </button>
@@ -220,6 +217,7 @@ const DetailComponent = ({ questionNum }) => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
