@@ -100,21 +100,24 @@ const AdminResComponent = () => {
     <>
       <div className="max-w-screen-xl mx-auto my-10">
         <div className="min-blank">
-          <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
-          <div className="py-2">
-            <SearchComponent
-              search={search} setSearch={setSearch}
-              type={type} setType={setType}
-              onSearchClick={onSearchClick}
-              searchOptions={searchOptions}
-            />
+          <div className="mx-auto text-center">
+            <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
+            <div className="py-2 flex justify-center">
+              <SearchComponent
+                search={search} setSearch={setSearch}
+                type={type} setType={setType}
+                onSearchClick={onSearchClick}
+                searchOptions={searchOptions}
+              />
+            </div>
           </div>
+          <p className="text-gray-700 my-3 newText-base px-4 py-2 rounded-md inline-block">
+            전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 대여내역이 있습니다.
+          </p>
 
-          <div className="overflow-x-auto">
-            <p className="text-gray-600 my-1 newText-base">
-              전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
+          <div className="overflow-x-auto page-shadow">
             <table className="w-full">
-              <thead className="bg-gray-100 text-gray-700 newText-base">
+              <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
                 <tr className="newText-base whitespace-nowrap">
                   <th className="w-[10%]">이미지</th>
                   <th className="w-[5%]">아이디</th>
@@ -127,6 +130,7 @@ const AdminResComponent = () => {
                     <div className="mb-1">신청 상태</div>
                     <select
                       value={statusFilter}
+                      className="input-focus"
                       onChange={(e) => {
                         setStatusFilter(e.target.value);
                         setCurrent(0);
@@ -161,11 +165,11 @@ const AdminResComponent = () => {
                 </tr>
               </thead>
 
-              <tbody className="text-gray-600">
+              <tbody className="text-gray-600 border border-gray-300">
                 {resInfo.content.length === 0 ? (
                   <tr>
                     <td colSpan={13} className="text-center">
-                      <p className="text-gray-500 newText-3xl mt-20">등록된 신청이 없습니다.</p>
+                      <p className="text-gray-500 newText-3xl mt-20 min-h-[300px]">등록된 신청이 없습니다.</p>
                     </td>
                   </tr>
                 ) : (
@@ -173,7 +177,7 @@ const AdminResComponent = () => {
                     const mainImage = member.imageList?.find((img) => img.isMain === true);
                     const memberState = member.state;
                     return (
-                      <tr key={`${member.demRevNum}_${member.startDate}_${member.endDate}_${member.applyAt}_${member.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                      <tr key={`${member.demRevNum}_${member.startDate}_${member.endDate}_${member.applyAt}_${member.state}`} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap border border-gray-300 ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
                         <td className="py-2 px-2 whitespace-nowrap text-center">
                           {mainImage ? (
                             <img
@@ -273,17 +277,17 @@ const AdminResComponent = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
-            <h2 className="newText-3xl font-bold mb-1">신청 내역</h2>
+            <h2 className="newText-3xl font-bold mb-2">신청 내역</h2>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {modalData.map((req, idx) => (
-                <div key={idx} className="border-b pb-2">
+                <div key={idx} className="border border-gray-300 pb-2">
                   <div className="newText-xl font-bold">
                     {req.type === "EXTEND" ? "연장 신청" : "반납 신청"}
                   </div>
                   {req.type === "EXTEND" && (
                     <div className="newText-base text-gray-600">신청 날짜: {req.updateDate || "-"}</div>
                   )}
-                  <div className="newText-sm">상태: {getStateLabel(req.state)}</div>
+                  <div className="newText-sm mt-1">상태: {getStateLabel(req.state)}</div>
                 </div>
               ))}
             </div>

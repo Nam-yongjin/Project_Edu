@@ -106,22 +106,25 @@ const AdminRegComponent = () => {
         <>
             <div className="max-w-screen-xl mx-auto my-10">
                 <div className="min-blank">
-                    <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
-                    <div className="py-2">
-                        <SearchComponent
-                            search={search} // 검색어
-                            setSearch={setSearch} // 검색어 set
-                            type={type} // 검색어 칼럼
-                            setType={setType} // 검색어 칼럼 set
-                            onSearchClick={onSearchClick} // 검색어 클릭 함수
-                            searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
-                        />
+                    <div className="mx-auto text-center">
+                        <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
+                        <div className="py-2 flex justify-center">
+                            <SearchComponent
+                                search={search} // 검색어
+                                setSearch={setSearch} // 검색어 set
+                                type={type} // 검색어 칼럼
+                                setType={setType} // 검색어 칼럼 set
+                                onSearchClick={onSearchClick} // 검색어 클릭 함수
+                                searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
+                            />
+                        </div>
                     </div>
-                    <div className="overflow-x-auto">
-                        <p className="text-gray-600 my-1 newText-base">
-                            전체 {pageData.totalElements}건의 대여내역이 있습니다.</p>
+                    <p className="text-gray-700 my-3 newText-base px-4 py-2 rounded-md inline-block">
+                        전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 등록내역이 있습니다.
+                    </p>
+                    <div className="page-shadow overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gray-100 text-gray-700 newText-base">
+                            <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
                                 <tr className="newText-base whitespace-nowrap">
                                     <th className="w-[8%]">이미지</th>
                                     <th className="w-[8%]">아이디</th>
@@ -135,6 +138,7 @@ const AdminRegComponent = () => {
                                         <div className="mb-1">신청상태</div>
                                         <select
                                             value={statusFilter}
+                                            className="input-focus"
                                             onChange={(e) => {
                                                 setStatusFilter(e.target.value);
                                                 setCurrent(0);
@@ -173,11 +177,11 @@ const AdminRegComponent = () => {
                                 </tr>
                             </thead>
 
-                            <tbody className="text-gray-600">
+                            <tbody className="text-gray-600 border border-gray-300">
                                 {regInfo.content.length === 0 ? (
                                     <tr>
                                         <td colSpan={10} className="text-center">
-                                            <p className="text-gray-500 newText-3xl mt-20">등록된 신청이 없습니다.</p>
+                                            <p className="text-gray-500 newText-3xl mt-20 min-h-[300px]">등록된 신청이 없습니다.</p>
                                         </td>
                                     </tr>
                                 ) : (

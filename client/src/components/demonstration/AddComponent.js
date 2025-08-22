@@ -146,7 +146,7 @@ const AddComponent = () => {
 
         <div>
           <div className="flex items-start newText-base">
-            <label className="text-xl font-semibold w-32">물품명:</label>
+            <label className="newText-xl font-semibold w-32">물품명:</label>
             <input
               type="text"
               placeholder="물품명을 입력해주세요."
@@ -161,7 +161,7 @@ const AddComponent = () => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">제조사:</label>
+            <label className="newText-xl font-semibold w-32">제조사:</label>
             <input
               type="text"
               placeholder="제조사를 입력해주세요."
@@ -176,7 +176,7 @@ const AddComponent = () => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">개수:</label>
+            <label className="newText-xl font-semibold w-32">개수:</label>
             <input
               type="text"
               placeholder="개수를 입력해주세요."
@@ -191,10 +191,10 @@ const AddComponent = () => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">카테고리:</label>
+            <label className="newText-xl font-semibold w-32">카테고리:</label>
             <select
               name="category"
-              className="w-32 border border-black"
+              className="w-40 border border-black input-focus"
               value={dem.category}
               onChange={handleChangeDem}
             >
@@ -211,7 +211,7 @@ const AddComponent = () => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">소개:</label>
+            <label className="newText-xl font-semibold w-32">소개:</label>
             <textarea
               rows={5}
               placeholder="물품소개를 입력해주세요."
@@ -228,9 +228,9 @@ const AddComponent = () => {
         {/* 반납 날짜 */}
         <div>
           <div className="flex items-center">
-            <label className="text-xl font-semibold w-32">반납 날짜:</label>
+            <label className="newText-xl font-semibold w-32">반납 날짜:</label>
             <DatePicker
-              className="flex-1 border border-black"
+              className="flex-1 border border-black input-focus"
               selected={returnDate}
               onChange={handleReturnDateChange}
               dateFormat="yyyy-MM-dd"
@@ -245,14 +245,14 @@ const AddComponent = () => {
         <div>
           {/* 이미지 선택 */}
           <div className="flex items-center">
-            <label className="text-xl font-semibold w-32">이미지:</label>
+            <label className="newText-xl font-semibold w-32">이미지:</label>
             <input
               key={fileInputKey}
               type="file"
               multiple
               accept="image/*"
               onChange={handleFileChange}
-              className="flex-1 border border-black"
+              className="flex-1 border border-black input-focus"
             />
           </div>
           {errors.images && <p className="text-red-600 mt-1 newText-base text-left ml-32">{errors.images}</p>}

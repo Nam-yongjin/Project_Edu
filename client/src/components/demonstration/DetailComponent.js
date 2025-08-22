@@ -185,9 +185,11 @@ const DetailComponent = ({ demNum }) => {
         <>
             <div className="max-w-screen-xl mx-auto my-10">
                 <div className="min-blank">
-                    <div className="newText-3xl font-bold ">실증 물품 대여 예약</div>
+                    <div className="mx-auto text-center">
+                        <div className="newText-3xl font-bold mb-2">실증 물품 대여 예약</div>
+                    </div>
                     <div className="w-full overflow-x-auto">
-                        <div className="flex gap-10 min-w-full border-2 border-black p-2">
+                        <div className="flex gap-10 min-w-full border border-gray-300 p-2">
                             {/* 이미지 영역 */}
                             <div className="w-1/2 min-h-[500px]">
                                 <img
