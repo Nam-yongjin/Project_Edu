@@ -225,7 +225,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	    } else if ("demMfr".equals(type) && !search.isEmpty()) {
 	        currentPage = demonstrationRepository.selectPageDemMfr(
 	                PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search, DemonstrationState.ACCEPT);
-	    } else {
+	    } 
+	    else if("companyName".equals(type)&&!search.isEmpty())
+	    {
+	    	 currentPage = demonstrationRepository.selectPageDemCompanyName(
+		                PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), search, DemonstrationState.ACCEPT);
+	    }
+	    else {
 	        currentPage = demonstrationRepository.selectPageDem(
 	                PageRequest.of(pageCount, 4, Sort.by("demNum").descending()), DemonstrationState.ACCEPT);
 	    }

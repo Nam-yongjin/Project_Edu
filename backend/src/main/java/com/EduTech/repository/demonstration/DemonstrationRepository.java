@@ -18,17 +18,21 @@ import com.EduTech.entity.demonstration.DemonstrationState;
 
 public interface DemonstrationRepository extends JpaRepository<Demonstration, Long> { // 실증 상품 관련 레포지토리
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 목록 페이지) 검색어 없을때,
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(d.demNum, d.demName, d.demMfr, d.itemNum,reg.state) FROM Demonstration d,DemonstrationRegistration reg WHERE d.demNum=reg.demonstration.demNum AND reg.state=:state")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(d.demNum, d.demName, d.demMfr, d.itemNum,reg.state,c.companyName) FROM Demonstration d,DemonstrationRegistration reg,Company c WHERE d.demNum=reg.demonstration.demNum AND reg.state=:state AND reg.member.memId=c.member.memId")
 	Page<DemonstrationPageListDTO> selectPageDem(Pageable pageable,@Param("state")DemonstrationState state);
 	
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 목록 페이지) 상품명 기준,
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(demNum, demName, demMfr, itemNum,reg.state) FROM Demonstration d,DemonstrationRegistration reg WHERE demName LIKE %:search% AND d.demNum=reg.demonstration.demNum AND reg.state=:state")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(demNum, demName, demMfr, itemNum,reg.state,c.companyName) FROM Demonstration d,DemonstrationRegistration reg,Company c WHERE demName LIKE %:search% AND d.demNum=reg.demonstration.demNum AND reg.state=:state AND reg.member.memId=c.member.memId")
 	Page<DemonstrationPageListDTO> selectPageDemName(Pageable pageable, @Param("search") String search,@Param("state")DemonstrationState state);
 
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 목록 페이지) 제조사명 기준
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(demNum, demName, demMfr, itemNum,reg.state) FROM Demonstration d,DemonstrationRegistration reg WHERE demMfr LIKE %:search% AND d.demNum=reg.demonstration.demNum AND reg.state=:state")
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(demNum, demName, demMfr, itemNum,reg.state,c.companyName) FROM Demonstration d,DemonstrationRegistration reg,Company c WHERE demMfr LIKE %:search% AND d.demNum=reg.demonstration.demNum AND reg.state=:state AND reg.member.memId=c.member.memId")
 	Page<DemonstrationPageListDTO> selectPageDemMfr(Pageable pageable, @Param("search") String search,@Param("state")DemonstrationState state);
 
+	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 목록 페이지) 기업명 기준
+		@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(demNum, demName, demMfr, itemNum,reg.state,c.companyName) FROM Demonstration d,DemonstrationRegistration reg,Company c WHERE c.companyName LIKE %:search% AND d.demNum=reg.demonstration.demNum AND reg.state=:state AND reg.member.memId=c.member.memId")
+		Page<DemonstrationPageListDTO> selectPageDemCompanyName(Pageable pageable, @Param("search") String search,@Param("state")DemonstrationState state);
+		
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지)
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationDetailDTO(d.demNum, d.demName, d.demInfo,d.demMfr, d.itemNum,reg.expDate,d.category) FROM Demonstration d, DemonstrationRegistration reg WHERE d.demNum = reg.demonstration.demNum AND d.demNum=:demNum")
 	DemonstrationDetailDTO selectPageDetailDem(@Param("demNum") Long demNum);

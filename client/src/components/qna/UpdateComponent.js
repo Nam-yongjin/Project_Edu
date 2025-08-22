@@ -35,7 +35,7 @@ const UpdateComponent = ({ questionNum }) => {
 
     return (
          <div className="w-full max-w-screen-xl mx-auto px-4 mt-10 sm:px-6 md:px-8 lg:px-12">
-            <h2 className="text-2xl my-4 font-bold">질문 등록</h2>
+            <h2 className="newText-2xl my-4 font-bold">질문 수정</h2>
 
             <div className="flex justify-between items-center mb-4">
                 <input
@@ -43,7 +43,7 @@ const UpdateComponent = ({ questionNum }) => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="글 제목을 입력하세요"
-                    className="w-1/2 border-b border-gray-300 focus:border-blue-500 focus:outline-none text-lg p-1"
+                    className="w-1/2 border-b border-gray-300 focus:border-blue-500 focus:outline-none newText-lg p-1"
                 />
                 <button
                     onClick={() => setIsPrivate(!isPrivate)}
@@ -64,8 +64,8 @@ const UpdateComponent = ({ questionNum }) => {
             <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="글 내용을 입력하세요..."
-                className="w-full min-h-[300px] border border-gray-300 p-2 rounded resize-y"
+                placeholder="글 내용을 입력하세요"
+                className="w-full min-h-[500px] border border-gray-300 p-2 rounded resize-y"
             />
 
             <div className="mt-4 text-right">
@@ -73,7 +73,7 @@ const UpdateComponent = ({ questionNum }) => {
                     onClick={() => {
                         updateQuestion();
                     }}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                    className="positive-button mr-2"
                 >
                     수정하기
                 </button>
@@ -81,7 +81,7 @@ const UpdateComponent = ({ questionNum }) => {
                     onClick={() => {
                         moveToPath("/");
                     }}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition ml-2"
+                    className="nagative-button"
                 >
                     취소하기
                 </button>

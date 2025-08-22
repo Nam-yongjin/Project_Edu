@@ -22,6 +22,7 @@ const ListComponent = () => {
   const searchOptions = [
     { value: "demName", label: "상품명" },
     { value: "demMfr", label: "제조사명" },
+    { value: "companyName", label: "기업명" },
   ];
 
   const fetchData = () => {
@@ -33,7 +34,7 @@ const ListComponent = () => {
 
   useEffect(() => {
     fetchData();
-  }, [current, searchType, search]);
+  }, [current]);
 
   const onSearchClick = () => {
     setCurrent(0);
@@ -82,7 +83,7 @@ const ListComponent = () => {
           <h3 className="newText-lg font-bold text-blue-600 truncate">{item.demName}</h3>
           <p className="newText-sm text-gray-600 truncate">제조사: {item.demMfr}</p>
           <p className="newText-sm text-gray-600 truncate">수량: {item.itemNum}개</p>
-          <p className="newText-sm text-gray-500 line-clamp-3">{item.demInfo}</p>
+          <p className="newText-sm text-gray-600 line-clamp-3">기업명: {item.companyName}</p>
         </div>
 
         {/* 버튼 */}
@@ -113,9 +114,9 @@ const ListComponent = () => {
       <div className="min-blank">
         <div className="mx-auto text-center">
           {/* 제목 + 설명 */}
-          <div className="newText-3xl font-bold">실증 물품 대여 관리</div>
-          <p className="text-gray-600 my-1 newText-base">
-            전체 {listData.totalElements}건의 물품이 있습니다.
+          <div className="newText-3xl font-bold">실증 물품</div>
+          <p className="text-gray-700 my-3 newText-base px-4 py-2 rounded-md inline-block">
+           전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 물품이 있습니다.
           </p>
 
           {/* 검색창도 가운데 */}
@@ -135,7 +136,9 @@ const ListComponent = () => {
         {/* 카드 리스트 */}
         <div className="flex flex-wrap justify-center gap-10 my-5">
           {listData.content && listData.content.length === 0 ? (
-            <p className="text-gray-500 newText-lg mt-20">등록된 상품이 없습니다.</p>
+            <div className="w-full border flex items-center justify-center min-h-[300px]">
+              <p className="text-gray-500 newText-3xl">등록된 상품이 없습니다.</p>
+            </div>
           ) : (
             mainContent
           )}

@@ -51,12 +51,12 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                 {/* 검색 타입, 키워드 */}
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">검색조건:</label>
+                        <label className="newText-sm font-medium text-gray-700">검색조건:</label>
                         <select
                             name="searchType"
                             value={searchForm.searchType}
                             onChange={handleInputChange}
-                            className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="ALL">전체</option>
                             <option value="TITLE">제목</option>
@@ -64,14 +64,14 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                         </select>
                     </div>
 
-                    <div className="flex-1 min-w-0">
+                     <div className="flex-1 min-w-0">
                         <input
                             type="text"
                             name="keyword"
                             value={searchForm.keyword}
                             onChange={handleInputChange}
                             placeholder="검색어를 입력하세요"
-                            className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full input-focus newText-base"
                         />
                     </div>
                 </div>
@@ -80,13 +80,13 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                 {loginState.role === 'ADMIN' ? (
                     <div className="flex flex-wrap items-center gap-4">
                         <div className="flex items-center gap-2">
-                            <label className="text-sm font-medium text-gray-700">기간:</label>
+                            <label className="newText-sm font-medium text-gray-700">기간:</label>
                             <input
                                 type="date"
                                 name="startDate"
                                 value={searchForm.startDate}
                                 onChange={handleInputChange}
-                                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <span className="text-gray-500">~</span>
                             <input
@@ -94,25 +94,25 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                                 name="endDate"
                                 value={searchForm.endDate}
                                 onChange={handleInputChange}
-                                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                     </div>
                 ) : (<></>)}
 
                 {/* 버튼 */}
-                <div className="flex justify-center gap-2">
+                 <div className="flex justify-center gap-2">
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium"
+                        className="dark-button newText-sm"
                     >검색
                     </button>
                     <button
                         type="button"
                         onClick={handleReset}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium"
+                        className="dark-button newText-sm"
                     >초기화
-                    </button>  
+                    </button>
                 </div>
             </form>
         </div>

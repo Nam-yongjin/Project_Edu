@@ -128,10 +128,10 @@ const SelectComponent = () => {
     };
 
     return (
-        <div className="max-w-screen-xl mx-auto my-10 px-4">
+          <div className="max-w-screen-xl mx-auto my-10">
             <div className="min-blank">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">문의사항</h1>
+                    <h1 className="newText-2xl font-bold text-gray-900">문의사항</h1>
                     <p className="text-gray-600 mt-1">
                         전체 {pageData.totalElements}건의 문의사항이 있습니다.
                     </p>
@@ -150,7 +150,7 @@ const SelectComponent = () => {
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[800px]">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                                <thead className="bg-gray-50 border-gray-200 newText-sm">
                                     <tr className="whitespace-nowrap">
                                         {loginState.role === "ADMIN" && (
                                             <th className="w-12 min-w-[48px] px-2 py-3 text-center align-middle">
@@ -165,21 +165,11 @@ const SelectComponent = () => {
                                                 />
                                             </th>
                                         )}
-                                        <th className="w-16 min-w-[64px] px-2 py-3 text-center font-medium text-gray-900">
-                                            번호
-                                        </th>
-                                        <th className="min-w-[300px] px-3 py-3 text-left font-medium text-gray-900">
-                                            제목
-                                        </th>
-                                        <th className="w-28 min-w-[112px] px-3 py-3 text-center font-medium text-gray-900">
-                                            작성자
-                                        </th>
-                                        <th className="w-36 min-w-[144px] px-3 py-3 text-center font-medium text-gray-900">
-                                            작성일
-                                        </th>
-                                        <th className="w-24 min-w-[96px] px-3 py-3 text-center font-medium text-gray-900">
-                                            조회수
-                                        </th>
+                                        <th className="min-w-[50px] px-2 py-3 text-center newText-sm font-medium text-gray-900">번호</th>
+                                        <th className="w-full px-3 py-3 text-left newText-sm font-medium text-gray-900">제목</th>
+                                        <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900">작성자</th>
+                                        <th className="min-w-[150px] px-3 py-3 text-center newText-sm font-medium text-gray-900 ">작성일</th>
+                                        <th className="min-w-[100px] px-3 py-3 text-center newText-sm font-medium text-gray-900 hidden sm:table-cell">조회수</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 newText-sm">
@@ -209,7 +199,7 @@ const SelectComponent = () => {
                                                         />
                                                     </td>
                                                 )}
-                                                <td className="px-4 py-3 text-center text-sm text-gray-900">
+                                                <td className="px-4 py-3 text-center newText-sm text-gray-900">
                                                     {/* 1부터 시작하는 번호 */}
                                                     {index + 1 + current * pageSize}
                                                 </td>
@@ -222,7 +212,7 @@ const SelectComponent = () => {
                                                             to={loginState.role === "ADMIN" || loginState.memId === question.memId ?
                                                                 `/question/detail/${question.questionNum}` :
                                                                 question.state ? "#" : `/question/detail/${question.questionNum}`}
-                                                            className={`text-sm font-medium text-gray-900 transition-colors flex-1 overflow-hidden text-ellipsis whitespace-nowrap
+                                                            className={`newText-sm font-medium text-gray-900 hover:text-blue-600 transition-colors flex-1 overflow-hidden text-ellipsis whitespace-nowrap
                                                             ${(question.state && loginState.role !== "ADMIN" && loginState.memId !== question.memId) ? "text-gray-400 opacity-50 pointer-events-none" : ""}`
                                                             }
                                                         >

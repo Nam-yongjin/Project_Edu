@@ -107,7 +107,7 @@ const AdminRegComponent = () => {
             <div className="max-w-screen-xl mx-auto my-10">
                 <div className="min-blank">
                     <div className="mx-auto text-center">
-                        <div className="newText-3xl font-bold ">실증 물품 등록 관리</div>
+                        <div className="newText-3xl font-bold ">실증 등록 관리</div>
                         <div className="py-2 flex justify-center">
                             <SearchComponent
                                 search={search} // 검색어
