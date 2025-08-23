@@ -21,13 +21,13 @@ public interface DemonstrationRequestRepository extends JpaRepository<Demonstrat
 	// 반납 / 대여 연기 요청에서 상태값을 업데이트하는 쿼리문
 	@Modifying
 	@Transactional
-	@Query("UPDATE DemonstrationRequest SET state=:state WHERE reserve.demRevNum =:demRevNum AND type=:type AND state=:updateState")
-	int updateDemResChangeStateReq(@Param("state") DemonstrationState state, @Param("demRevNum") Long demRevNum,
+	@Query("UPDATE DemonstrationRequest SET state=:state WHERE reserve.demRevNum IN :demRevNum AND type=:type AND state=:updateState")
+	int updateDemResChangeStateReq(@Param("state") DemonstrationState state, @Param("demRevNum") List<Long> demRevNum,
 			@Param("type") RequestType type, @Param("updateState") DemonstrationState updateState);
 
 	// 실증 상품들을 페이지 별로 가져오는 쿼리문 (실증 장비 신청 상세 페이지)
-	@Query("SELECT q FROM DemonstrationRequest q WHERE reserve.demRevNum=:demRevNum AND q.state=:state")
-	DemonstrationRequest selectRequest(@Param("demRevNum") Long demRevNum, @Param("state") DemonstrationState state);
+	@Query("SELECT q FROM DemonstrationRequest q WHERE reserve.demRevNum IN :demRevNum AND q.state=:state")
+	List<DemonstrationRequest> selectRequest(@Param("demRevNum") List<Long> demRevNum, @Param("state") DemonstrationState state);
 
 	// 스케줄러에서 state가 accpet,reject일때 삭제시키는 쿼리문
 	@Modifying

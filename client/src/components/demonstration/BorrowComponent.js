@@ -6,6 +6,7 @@ import useMove from "../../hooks/useMove";
 import RentalMemberInfoModal from "../../components/demonstration/RentalMemberInfoModal";
 import { useSelector } from "react-redux";
 import defaultImage from '../../assets/default.jpg';
+
 const BorrowComponent = () => {
     const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
@@ -21,12 +22,13 @@ const BorrowComponent = () => {
 
     const initState = { totalPages: 0, currentPage: 0 };
     const searchOptions = [
+        { value: "total", label: "전체" },
         { value: "demName", label: "물품명" },
         { value: "demMfr", label: "제조사" },
     ];
 
     const [search, setSearch] = useState("");
-    const [type, setType] = useState("demName");
+    const [type, setType] = useState("total");
     const [sortBy, setSortBy] = useState("regDate");
     const [sort, setSort] = useState("desc");
     const [statusFilter, setStatusFilter] = useState("total");
@@ -36,6 +38,10 @@ const BorrowComponent = () => {
 
     const [selectedDemNum, setSelectedDemNum] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // 체크박스 관련 상태
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [isAllSelected, setIsAllSelected] = useState(false);
 
     const fetchData = () => {
         if (search && search.trim() !== "") {
@@ -55,6 +61,12 @@ const BorrowComponent = () => {
     useEffect(() => {
         fetchData();
     }, [current, sort, sortBy, statusFilter]);
+
+    // 데이터가 변경될 때마다 선택된 항목들을 초기화
+    useEffect(() => {
+        setSelectedItems([]);
+        setIsAllSelected(false);
+    }, [listData]);
 
     const onSearchClick = () => {
         fetchData();
@@ -79,6 +91,43 @@ const BorrowComponent = () => {
         window.location.reload();
     };
 
+    // 전체 선택/해제
+    const handleSelectAll = (checked) => {
+        setIsAllSelected(checked);
+        if (checked) {
+            const waitItems = listData.content
+                .filter(item => item.state === "WAIT")
+                .map(item => item.demNum);
+            setSelectedItems(waitItems);
+        } else {
+            setSelectedItems([]);
+        }
+    };
+
+    // 개별 항목 선택/해제
+    const handleItemSelect = (demNum, checked) => {
+        let newSelectedItems;
+        if (checked) {
+            newSelectedItems = [...selectedItems, demNum];
+        } else {
+            newSelectedItems = selectedItems.filter(item => item !== demNum);
+        }
+        setSelectedItems(newSelectedItems);
+
+        // 전체 선택 체크박스 상태 업데이트
+        const waitItems = listData.content.filter(item => item.state === "WAIT");
+        const allWaitItemsSelected = waitItems.every(item => newSelectedItems.includes(item.demNum));
+        setIsAllSelected(allWaitItemsSelected && waitItems.length > 0);
+    };
+
+    // 선택된 항목들 일괄 삭제
+    const handleCheckedDelete = () => {
+        if (selectedItems.length === 0) return;
+        delDem(selectedItems);
+        alert("정상적으로 삭제되었습니다.");
+         window.location.reload();
+    };
+
     const getStateLabel = (state) => {
         switch (state) {
             case "ACCEPT":
@@ -95,6 +144,9 @@ const BorrowComponent = () => {
                 return state || "-";
         }
     };
+
+    // 대기 상태인 항목들의 개수
+    const waitItemsCount = listData.content.filter(item => item.state === "WAIT").length;
 
     return (
         <div className="max-w-screen-xl mx-auto my-10">
@@ -119,6 +171,16 @@ const BorrowComponent = () => {
                     <table className="w-full">
                         <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
                             <tr className="newText-base whitespace-nowrap">
+                                <th className="w-[5%]">
+                                    {waitItemsCount > 0 && (
+                                        <input
+                                            type="checkbox"
+                                            checked={isAllSelected}
+                                            onChange={(e) => handleSelectAll(e.target.checked)}
+                                            className="w-4 h-4"
+                                        />
+                                    )}
+                                </th>
                                 <th className="w-[8%]">이미지</th>
                                 <th className="w-[12%]">물품명</th>
                                 <th className="w-[12%]">제조사</th>
@@ -170,19 +232,31 @@ const BorrowComponent = () => {
                         <tbody className="text-gray-600 border border-gray-300">
                             {listData.content.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="text-center">
+                                    <td colSpan={9} className="text-center">
                                         <p className="text-gray-500 newText-3xl mt-20 min-h-[300px]">등록한 물품이 없습니다.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 listData.content.map((item) => {
-                                    const mainImage = item.imageList?.find((img) => img.isMain) || item.imageList?.[0]; // CANCEL 상태도 이미지 보이게
+                                    const mainImage = item.imageList?.find((img) => img.isMain) || item.imageList?.[0];
                                     const itemState = item.state;
+                                    const isWaitState = itemState === "WAIT";
+                                    
                                     return (
                                         <tr
                                             key={item.demNum}
-                                            className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap ${itemState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}
+                                            className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap border border-gray-300 ${itemState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}
                                         >
+                                            <td>
+                                                {isWaitState && (
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedItems.includes(item.demNum)}
+                                                        onChange={(e) => handleItemSelect(item.demNum, e.target.checked)}
+                                                        className="w-4 h-4"
+                                                    />
+                                                )}
+                                            </td>
                                             <td>
                                                 {mainImage ? (
                                                     <img
@@ -219,7 +293,6 @@ const BorrowComponent = () => {
                                                     물품 수정
                                                 </button>
 
-
                                                 <button
                                                     disabled={itemState !== "WAIT"}
                                                     className={`block w-full max-w-full mt-1 rounded  ${itemState === "WAIT" ? "nagative-button cursor-pointer" : "disable-button"}`}
@@ -239,7 +312,6 @@ const BorrowComponent = () => {
                                                     회원 정보
                                                 </button>
                                             </td>
-
                                         </tr>
                                     );
                                 })
@@ -248,12 +320,25 @@ const BorrowComponent = () => {
                     </table>
                 </div>
             </div>
-            <div className="flex justify-center my-6">
-                <PageComponent
-                    totalPages={pageData.totalPages}
-                    current={current}
-                    setCurrent={setCurrent}
-                />
+             {/* 우측 하단 예약 취소 버튼 */}
+                <div className="flex justify-end mt-4">
+                    <button
+                        onClick={handleCheckedDelete}
+                        disabled={selectedItems.length === 0}
+                        className={`px-4 py-2 rounded mr-10 ${selectedItems.length > 0 ? "normal-button" : "disable-button"}`}
+                    >
+                        예약 취소 ({selectedItems.length})
+                    </button>
+                </div>
+                
+            <div className="flex justify-between items-center my-6">
+                <div className="flex justify-center flex-1">
+                    <PageComponent
+                        totalPages={pageData.totalPages}
+                        current={current}
+                        setCurrent={setCurrent}
+                    />
+                </div>
             </div>
 
             {isModalOpen && (

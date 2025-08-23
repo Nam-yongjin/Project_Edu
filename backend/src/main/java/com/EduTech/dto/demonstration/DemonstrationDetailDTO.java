@@ -19,11 +19,12 @@ public class DemonstrationDetailDTO {
 	private String demMfr; 
 	private Long itemNum;
 	private LocalDate expDate;
+	private String companyName;
 	private DemonstrationCategory category;
 	private List<DemonstrationImageDTO> imageList;
 	
 	// 실증 장비 신청 상세 페이지용 생성자
-	public DemonstrationDetailDTO(Long demNum, String demName, String demInfo,String demMfr, Long itemNum, LocalDate expDate,DemonstrationCategory category) {
+	public DemonstrationDetailDTO(Long demNum, String demName, String demInfo,String demMfr, Long itemNum, LocalDate expDate,DemonstrationCategory category,String companyName) {
 		this.demNum = demNum;
 		this.demName = demName;
 		this.demInfo = demInfo;
@@ -31,5 +32,6 @@ public class DemonstrationDetailDTO {
 		this.itemNum = itemNum;
 		this.expDate = expDate;
 		this.category=category;
+		this.companyName=companyName;
 	}
 }
