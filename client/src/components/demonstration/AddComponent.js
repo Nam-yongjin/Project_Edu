@@ -273,7 +273,7 @@ const AddComponent = () => {
                   />
                 </div>
                 <img src={img.url} alt="preview" className="w-full h-32 object-cover rounded" />
-                 <p className="newText-sm mt-1">{img.name}</p>
+                 <p className="newText-sm mt-1 truncate w-[120px]" title={img.name}>{img.name}</p>
                 <button type="button" onClick={() => fileDelete(img)}
                   className="newText-base text-red-600 mt-1 hover:text-red-800">
                   삭제

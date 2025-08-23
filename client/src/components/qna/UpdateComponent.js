@@ -68,7 +68,7 @@ const UpdateComponent = ({ questionNum }) => {
                 className="w-full min-h-[500px] border border-gray-300 p-2 rounded resize-y"
             />
 
-            <div className="mt-4 text-right">
+            <div className="my-4 text-right">
                 <button
                     onClick={() => {
                         updateQuestion();

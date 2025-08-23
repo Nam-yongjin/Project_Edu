@@ -11,7 +11,7 @@ import defaultImage from '../../assets/default.jpg';
 const RentalComponent = () => {
     const isTeacher = useSelector((state) => state.loginState?.role === "TEACHER");
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
-    
+
     // 권한 체크 useEffect
     useEffect(() => {
         if (!isTeacher && !isAdmin) {
@@ -27,12 +27,13 @@ const RentalComponent = () => {
     };
 
     const searchOptions = [
+        { value: "total", label: "전체" },
         { value: "demName", label: "상품명" },
         { value: "companyName", label: "기업명" },
     ];
 
     const [search, setSearch] = useState(); // 검색어
-    const [type, setType] = useState("companyName"); // 검색 타입
+    const [type, setType] = useState("total"); // 검색 타입
     const [pageData, setPageData] = useState(initState); // 페이지 데이터
     const [current, setCurrent] = useState(0); // 현재 페이지
     const [listData, setListData] = useState({ content: [] }); // 받아올 content 데이터
@@ -51,7 +52,7 @@ const RentalComponent = () => {
     const [isExtendModalOpen, setIsExtendModalOpen] = useState(false); // 날짜 연장용 모달창 상태 변수
     const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
     const [disabledExtendDate, setdisabledExtendDate] = useState([]);
-
+    const [selectedDemRevNum, setSelectedDemRevNum] = useState(); // demRevNum을 저장할 state 추가
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
@@ -145,35 +146,35 @@ const RentalComponent = () => {
     };
 
     // 전체 선택 체크박스 상태 계산 수정
-    const isAllSelected = waitItems.length > 0 && 
-                         waitItems.every(item => selectedItems.has(item.demNum));
-    
+    const isAllSelected = waitItems.length > 0 &&
+        waitItems.every(item => selectedItems.has(item.demNum));
+
     // 일부 선택 상태 (indeterminate 상태)
     const isIndeterminate = selectedItems.size > 0 && !isAllSelected;
 
-const handleCancelReservation = () => {
-    if (selectedItems.size === 0) {
-        alert("선택된 항목이 없습니다.");
-        return;
-    }
+    const handleCancelReservation = () => {
+        if (selectedItems.size === 0) {
+            alert("선택된 항목이 없습니다.");
+            return;
+        }
 
-    // 선택된 항목 중 WAIT 상태인 것만 필터링
-    const selectedItemsData = listData.content.filter(
-        item => selectedItems.has(item.demNum) && item.state.toUpperCase() === "WAIT"
-    );
+        // 선택된 항목 중 WAIT 상태인 것만 필터링
+        const selectedItemsData = listData.content.filter(
+            item => selectedItems.has(item.demNum) && item.state.toUpperCase() === "WAIT"
+        );
 
-    if (selectedItemsData.length === 0) {
-        alert("예약 취소가 불가능한 상태입니다. 대기 상태의 항목만 취소할 수 있습니다.");
-        return;
-    }
+        if (selectedItemsData.length === 0) {
+            alert("예약 취소가 불가능한 상태입니다. 대기 상태의 항목만 취소할 수 있습니다.");
+            return;
+        }
 
-    if (window.confirm(`선택된 ${selectedItemsData.length}개의 예약을 취소하시겠습니까?`)) {
-        // WAIT 상태인 demNum만 취소
-        deleteRental(selectedItemsData.map(item => item.demNum));
-        alert("예약이 취소 되었습니다.");
-        window.location.reload();
-    }
-};
+        if (window.confirm(`선택된 ${selectedItemsData.length}개의 예약을 취소하시겠습니까?`)) {
+            // WAIT 상태인 demNum만 취소
+            deleteRental(selectedItemsData.map(item => item.demRevNum));
+            alert("예약이 취소 되었습니다.");
+            window.location.reload();
+        }
+    };
 
 
 
@@ -190,7 +191,12 @@ const handleCancelReservation = () => {
             }
 
             try {
+                // WAIT 상태인 항목 찾기
+                const waitItem = items.find(item => item.state === "WAIT");
+
                 setSelectedDemNum(demNum);
+                setSelectedDemRevNum(waitItem.demRevNum); // demRevNum도 함께 저장
+
                 const exceptDate = await getResExceptDate(demNum);
                 setExceptDate(exceptDate);
                 setShowModifyModal(true);
@@ -223,51 +229,56 @@ const handleCancelReservation = () => {
     };
 
     const reservationUpdate = (updatedItemNum) => {
-        const loadData = async () => {
-            if (!selectedDate || selectedDate.length === 0) {
-                alert('날짜를 선택해주세요!');
+    const loadData = async () => {
+        if (!selectedDate || selectedDate.length === 0) {
+            alert('날짜를 선택해주세요!');
+            return;
+        }
+
+        if (selectedDate.length > 90) {
+            alert('최대 90일까지만 선택할 수 있습니다!');
+            return;
+        }
+
+        let sortedDates = [...selectedDate]
+            .map(d => new Date(d))
+            .sort((a, b) => a.getTime() - b.getTime());
+        sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d)));
+
+        for (let i = 0; i < sortedDates.length - 1; i++) {
+            const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime();
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+            if (diffDays !== 1) {
+                alert('연속된 날짜만 선택 가능합니다!');
                 return;
             }
+        }
 
-            if (selectedDate.length > 90) {
-                alert('최대 90일까지만 선택할 수 있습니다!');
-                return;
-            }
+        if (selectedDate.some(date => disabledDates.includes(date))) {
+            alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
+            return;
+        }
 
-            let sortedDates = [...selectedDate]
-                .map(d => new Date(d))
-                .sort((a, b) => a.getTime() - b.getTime());
-            sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d)));
-
-            for (let i = 0; i < sortedDates.length - 1; i++) {
-                const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime();
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-                if (diffDays !== 1) {
-                    alert('연속된 날짜만 선택 가능합니다!');
-                    return;
-                }
-            }
-
-            if (selectedDate.some(date => disabledDates.includes(date))) {
-                alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
-                return;
-            }
-
-            try {
-                await updateRental(
-                    toLocalDateString(startDate), toLocalDateString(endDate), selectedDemNum, updatedItemNum);
-                alert('예약 신청 완료');
-                window.location.reload();
-            } catch (error) {
-                console.error('예약 실패:', error);
-                alert('예약에 실패했습니다.');
-            }
-        };
-
-        loadData();
+        try {
+            // updateRental 함수에 demRevNum 전달 (API 구조에 따라 매개변수 순서나 구조 조정 필요)
+            await updateRental(
+                toLocalDateString(startDate), 
+                toLocalDateString(endDate), 
+                selectedDemNum, 
+                updatedItemNum,
+                selectedDemRevNum // demRevNum 추가
+            );
+            alert('예약 신청 완료');
+            window.location.reload();
+        } catch (error) {
+            console.error('예약 실패:', error);
+            alert('예약에 실패했습니다.');
+        }
     };
 
+    loadData();
+};
     function toLocalDateString(date) {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -307,7 +318,7 @@ const handleCancelReservation = () => {
         <div className="max-w-screen-xl mx-auto my-10">
             <div className="min-blank">
                 <div className="mx-auto text-center">
-                    <div className="text-3xl font-bold mb-5">실증 물품 등록 관리</div>
+                    <div className="text-3xl font-bold mb-5">실증 물품 대여 확인</div>
                     <div className="py-2 flex justify-center">
                         <SearchComponent
                             search={search}

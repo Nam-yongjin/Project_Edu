@@ -88,19 +88,28 @@ public class AdminServiceImpl implements AdminService {
 
 	// 연장 반납 신청 처리하는 기능
 	@Override
-	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
-		System.out.println(demonstrationApprovalReqDTO);
-		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND)&&demonstrationApprovalReqDTO.getState().equals(DemonstrationState.ACCEPT))
-		{
-			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum(),DemonstrationState.WAIT);
-			demonstrationReserveRepository.updateDemResEndDate(request.getReserve().getDemRevNum(),request.getUpdateDate(),DemonstrationState.ACCEPT);
-		}
-		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL)&&demonstrationApprovalReqDTO.getState().equals(DemonstrationState.ACCEPT))
-		{
-			demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED,demonstrationApprovalReqDTO.getDemRevNum());
-		}
-		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType(),DemonstrationState.WAIT);
+	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
+	    List<Long> demRevNums = dto.getDemRevNum(); // 여기를 List<Long>로 받도록 DTO 변경 추천
+	    System.out.println(dto);
+	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT) {
+	    	System.out.println("연장");
+	        // WAIT 상태의 요청들 한 번에 가져옴
+	        List<DemonstrationRequest> requests = demonstrationRequestRepository
+	                .selectRequest(demRevNums, DemonstrationState.WAIT);
+
+	        // endDate를 requests에서 공통 로직으로 뽑아서 배치로 업데이트
+	        LocalDate newEndDate = requests.get(0).getUpdateDate(); 
+	        demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
+	    }
+
+	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
+	    	System.out.println("대여");
+	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
+	    }
+
+	    demonstrationRequestRepository.updateDemResChangeStateReq(dto.getState(), demRevNums, dto.getType(), DemonstrationState.WAIT);
 	}
+
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
 	public void sendMessageForUser(AdminMessageDTO adminMessageDTO) {
