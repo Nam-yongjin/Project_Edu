@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getAuth, signInAnonymously } from "firebase/auth";
-import { app } from "../../firebase/firebase"; // Firebase 설정 파일 경로
+//import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+//import { getAuth, signInAnonymously } from "firebase/auth";
+//import { app } from "../../firebase/firebase"; // Firebase 설정 파일 경로
 import { sendEmail } from "../../api/adminApi";
 import cancel from "../../assets/cancel.png";
 
 const AdminEmailComponent = ({ members }) => {
+  /*
   const [memberList, setMemberList] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -295,7 +296,6 @@ const AdminEmailComponent = ({ members }) => {
   };
 
   // 이메일 전송
-  // 이메일 전송
   const handleSend = async () => {
     if (memberList.length === 0 || !title.trim()) {
       alert("받을 회원과 제목을 모두 입력해주세요.");
@@ -360,15 +360,17 @@ const AdminEmailComponent = ({ members }) => {
 
   const bytesToMB = (bytes) => (bytes / 1024 / 1024).toFixed(2);
   const currentSize = attachFiles.reduce((total, file) => total + file.size, 0);
+*/
 
   return (
+    <>
+    {/* 
     <div className="max-w-5xl mx-auto p-8 bg-white">
       <div className="bg-blue-500 text-white p-4 rounded-t-lg">
         <h2 className="text-xl font-semibold text-center">이메일 발송</h2>
       </div>
 
       <div className="border-x border-b border-gray-200 p-6 rounded-b-lg shadow-sm">
-        {/* 선택된 회원 */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <label className="font-semibold text-lg text-gray-800">받을 회원</label>
@@ -406,7 +408,6 @@ const AdminEmailComponent = ({ members }) => {
           </div>
         </div>
 
-        {/* 제목 */}
         <div className="mb-6">
           <label className="font-semibold text-lg text-gray-800 block mb-2">제목</label>
           <input
@@ -418,7 +419,6 @@ const AdminEmailComponent = ({ members }) => {
           />
         </div>
 
-        {/* 본문 */}
         <div className="mb-6">
           <label className="font-semibold text-lg text-gray-800 block mb-2">본문</label>
           <div className="text-sm text-gray-600 mb-2">
@@ -437,7 +437,6 @@ const AdminEmailComponent = ({ members }) => {
           </div>
         </div>
 
-        {/* 이미지 크기 조절 모달 */}
         {selectedImage && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
@@ -478,7 +477,6 @@ const AdminEmailComponent = ({ members }) => {
           </div>
         )}
 
-        {/* 첨부파일 업로드 */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <label className="font-semibold text-lg text-gray-800">첨부파일</label>
@@ -535,7 +533,6 @@ const AdminEmailComponent = ({ members }) => {
           )}
         </div>
 
-        {/* 전송 버튼 */}
         <div className="text-center pt-4 border-t border-gray-200">
           <button 
             onClick={handleSend} 
@@ -567,6 +564,8 @@ const AdminEmailComponent = ({ members }) => {
         </div>
       </div>
     </div>
+    */}
+    </>
   );
 };
 
