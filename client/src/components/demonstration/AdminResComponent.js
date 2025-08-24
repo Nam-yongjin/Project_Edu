@@ -138,7 +138,6 @@ const AdminResComponent = () => {
   // 일괄 수락 처리 (순차적으로 호출)
   const handleCheckedAccept = async () => {
     if (selectedItems.length === 0) return;
-    if (!window.confirm(`선택된 ${selectedItems.length}개의 항목을 수락하시겠습니까?`)) return;
 
     try {
       for (const item of selectedItems) {
@@ -162,7 +161,6 @@ const AdminResComponent = () => {
   // 일괄 거부 처리 (순차적으로 호출)
   const handleCheckedReject = async () => {
     if (selectedItems.length === 0) return;
-    if (!window.confirm(`선택된 ${selectedItems.length}개의 항목을 거부하시겠습니까?`)) return;
 
     try {
       for (const item of selectedItems) {
@@ -279,7 +277,7 @@ const AdminResComponent = () => {
                     )
                   )}
                   <th className="min-w-[14%]">반납/연장</th>
-                  <th className="w-[10%]">삭제</th>
+                  <th className="min-w-[10%]">삭제</th>
                 </tr>
               </thead>
 
@@ -397,7 +395,7 @@ const AdminResComponent = () => {
                               삭제 하기
                             </button>
                           ) : (
-                            "" // ACCEPT가 아니면 공백
+                            "-" // ACCEPT가 아니면 공백
                           )}
                         </td>
                       </tr>
@@ -453,14 +451,6 @@ const AdminResComponent = () => {
             </div>
             <h2 className="newText-2xl font-bold text-gray-800">신청 내역</h2>
           </div>
-          <button 
-            onClick={closeModal}
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-200"
-          >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
 
         {/* 모달 콘텐츠 */}
