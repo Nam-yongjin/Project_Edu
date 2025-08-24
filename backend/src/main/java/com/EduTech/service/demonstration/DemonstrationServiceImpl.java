@@ -330,6 +330,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	@Override
 	public void demonstrationReservationCancel(List<Long> demRevNum) {
 		// 불러온 아이디와 실증 번호를 통해 신청 번호를 받아온 후,
+		System.out.println(demRevNum);
 		List<DemonstrationReserve> demonstrationReserve = demonstrationReserveRepository.findDemRevNum(demRevNum,
 				DemonstrationState.CANCEL);
 		if (demonstrationReserve == null) {
@@ -338,8 +339,9 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 		Long updateItemNum;
 		for (DemonstrationReserve res : demonstrationReserve) {
+			 String memId = res.getMember().getMemId();
 			// 예약 취소한 갯수+기존의갯수
-			updateItemNum = demonstrationReserveRepository.getBItemNum(res.getDemonstration().getDemNum(), DemonstrationState.CANCEL);
+			updateItemNum = demonstrationReserveRepository.getBItemNum(res.getDemonstration().getDemNum(), DemonstrationState.CANCEL,memId);
 			demonstrationRepository.updateItemNum(updateItemNum,res.getDemonstration().getDemNum());
 		}
 
