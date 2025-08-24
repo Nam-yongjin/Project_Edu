@@ -57,9 +57,9 @@ public interface DemonstrationReserveRepository
 			@Param("state") DemonstrationState state);
 
 	// RES테이블에서 아이디와 상품번호를 받아와 물품 대여한 갯수를 가져오는 쿼리문
-	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.demonstration.demNum =:demNum AND r.state!=:state")
+	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.demonstration.demNum =:demNum AND r.state!=:state AND r.member.memId=:memId")
 	Long getBItemNum(@Param("demNum") Long demNum, 
-			@Param("state") DemonstrationState state);
+			@Param("state") DemonstrationState state,@Param("memId")String memId);
 
 	// 스케줄러를 이용해 state가 cancel인 값 삭제
 	@Modifying

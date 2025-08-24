@@ -14,6 +14,6 @@ public class AdminMessageDTO {
 	private String content; // 메시지 보낼 내용
 	private List<MultipartFile> attachmentFile; // 메시지 보낼 첨부파일 (여기 dto는 db에 저장하지 않으므로 file을 dto에 넣었음)
 	private List<MultipartFile> imageList;
-    private List<String> memberList; 
+    private List<String> memberList;    
     
 }
