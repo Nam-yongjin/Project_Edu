@@ -1,45 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-  <meta charset="UTF-8" />
+	<meta charset="UTF-8" />
 </head>
+
 <body style="margin:0; padding:0; background-color:#f4f4f4;">
-  <div style="
-    max-width:600px; 
-    margin:30px auto; 
-    background-color:#ffffff; 
-    border-radius:8px; 
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
-    font-family: Arial, sans-serif;
-    overflow:hidden;
-  ">
-    
-    <!-- 상단 로고 -->
-    <div style="background-color:#dff5e0; padding:20px; text-align:center;">
-      <a href="http://127.0.0.1:3000/" target="_blank" rel="noopener noreferrer">
-        <img src="cid:logo" alt="로고" style="width:100%; height:auto; max-width:400px;" />
-      </a>
-    </div>
+	<div style="
+max-width:600px;
+margin:30px auto;
+background-color:#ffffff;
+border-radius:8px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+font-family: Arial, sans-serif;
+overflow:hidden;
+">
+		<!-- 상단 로고 -->
+		<div style="background-color:#dff5e0; padding:20px; text-align:center;">
+			<a href="http://127.0.0.1:3000/" target="_blank" rel="noopener noreferrer">
+				<img src="https://firebasestorage.googleapis.com/v0/b/edutech-d6379.firebasestorage.app/o/email-images%2Flogo.png?alt=media&token=29cc2e96-8e7e-405a-a5c1-86dac00dfba3"
+					alt="로고" style="width:100%; height:100px; max-width:400px;" />
+			</a>
+		</div>
 
-    <!-- 인사말 -->
-    <div style="padding:20px; text-align:center; color:#333333;">
-      <p style="font-size:16px; line-height:1.5; margin-bottom:20px;">
-        <span th:utext="${content}"></span>
-      </p>
-    </div>
+		<!-- 본문 -->
+		<div style="padding:20px; color:#333333; line-height:1.6; font-size:14px;">
+			<!-- Quill 내용을 테이블 기반으로 안전하게 렌더링 -->
+			<div th:utext="${#strings.replace(
+  #strings.replace(
+    #strings.replace(
+      #strings.replace(
+        #strings.replace(
+          #strings.replace(content, 
+            '<p class=&quot;ql-align-center&quot;>', 
+            '<table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin: 10px 0;&quot;><tr><td align=&quot;center&quot;>'
+          ),
+          '<p class=&quot;ql-align-left&quot;>', 
+          '<table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin: 10px 0;&quot;><tr><td align=&quot;left&quot;>'
+        ),
+        '<p class=&quot;ql-align-right&quot;>', 
+        '<table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin: 10px 0;&quot;><tr><td align=&quot;right&quot;>'
+      ),
+      '<p style=&quot;text-align: center;&quot;>', 
+      '<table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin: 10px 0;&quot;><tr><td align=&quot;center&quot;>'
+    ),
+    '<p style=&quot;text-align: left;&quot;>', 
+    '<table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin: 10px 0;&quot;><tr><td align=&quot;left&quot;>'
+  ),
+  '<p style=&quot;text-align: right;&quot;>', 
+  '<table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; style=&quot;margin: 10px 0;&quot;><tr><td align=&quot;right&quot;>'
+)}">
+			</div>
+		</div>
 
-    <!-- 본문 배너 이미지 -->
-    <div style="background-color:#dff5e0; text-align:center; padding:0 20px 20px;">
-      <a href="http://127.0.0.1:3000/" target="_blank" rel="noopener noreferrer">
-        <img src="cid:logo" alt="로고" style="width:100%; height:auto; max-width:400px;" />
-      </a>
-    </div>
+		<!-- 본문 배너 이미지 -->
+		<div style="background-color:#dff5e0; text-align:center; padding:0 20px 20px;">
+			<a href="http://127.0.0.1:3000/" target="_blank" rel="noopener noreferrer">
+				<img src="https://firebasestorage.googleapis.com/v0/b/edutech-d6379.firebasestorage.app/o/email-images%2Flogo.png?alt=media&token=29cc2e96-8e7e-405a-a5c1-86dac00dfba3"
+					alt="로고" style="width:100%; height:100px; max-width:400px;" />
+			</a>
+		</div>
 
-    <!-- 푸터 -->
-    <div style="background-color:#f4f4f4; text-align:center; padding:15px; font-size:12px; color:#666666;">
-      이 메일은 발신 전용입니다.<br />
-      ⓒ 2025 My Company. All rights reserved.
-    </div>
-  </div>
+		<!-- 푸터 -->
+		<div style="background-color:#f4f4f4; text-align:center; padding:15px; font-size:12px; color:#666666;">
+			이 메일은 발신 전용입니다.<br />
+			ⓒ 2025 My Company. All rights reserved.
+		</div>
+	</div>
 </body>
+
 </html>
