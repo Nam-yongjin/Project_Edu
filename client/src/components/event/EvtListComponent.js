@@ -59,7 +59,7 @@ const EventListComponent = () => {
   // 상태 라벨/스타일
   const getApplyStatus = (event) => {
     if (event.revState === "APPROVED") return { text: "신청 완료", style: "green-button" };
-    if (event.revState === "CANCEL") return { text: "신청 취소", style: "nagative-button" };
+    if (event.revState === "CANCEL") return { text: "신청 취소", style: "negative-button" };
 
     const now = new Date();
     const start = new Date(event.applyStartPeriod);

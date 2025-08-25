@@ -285,13 +285,13 @@ const AddComponent = () => {
 
         <div className="mt-4 flex justify-end gap-4 pr-2">
           <button
-            className="positive-button hover:positive-button:hover active:positive-button:active"
+            className="positive-button newText-base hover:positive-button:hover active:positive-button:active"
             onClick={addDem}
           >
             물품등록
           </button>
           <button
-            className="normal-button hover:normal-button:hover active:normal-button:active"
+            className="normal-button newText-base hover:normal-button:hover active:normal-button:active"
             onClick={moveToReturn}
           >
             뒤로가기

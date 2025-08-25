@@ -36,7 +36,7 @@ const AddComponent = () => {
           type="text"
           onChange={(e) => setTitle(e.target.value)}
           placeholder="글 제목을 입력하세요"
-          className="w-1/2 border-b border-gray-300 focus:border-blue-500 focus:outline-none newText-lg p-1"
+          className="w-full border-b border-gray-300 focus:border-blue-500 focus:outline-none newText-lg p-1"
         />
         <button
           onClick={() => setIsPrivate(!isPrivate)}
@@ -58,11 +58,11 @@ const AddComponent = () => {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="글 내용을 입력하세요"
-        className="w-full min-h-[500px] border border-gray-300 p-2 rounded resize-y whitespace-pre-wrap"
+        className="newText-base input-focus w-full min-h-[500px] border border-gray-300 p-2 rounded resize-y whitespace-pre-wrap none"
         style={{ whiteSpace: 'pre-wrap' }}
       />
   
-      <div className="my-4 text-right">
+      <div className="newText-base my-4 text-right">
         <button
           onClick={() => {
             addQuestion();
@@ -75,7 +75,7 @@ const AddComponent = () => {
           onClick={() => {
             moveToPath("/");
           }}
-          className="nagative-button"
+          className="negative-button"
         >
           취소하기
         </button>

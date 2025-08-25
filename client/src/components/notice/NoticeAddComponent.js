@@ -252,7 +252,7 @@ const NoticeAddComponent = () => {
                         style={{ minWidth: "60px" }}
                         onClick={handleAdd} >등록</button>
                     <button
-                        className="nagative-button newText-sm"
+                        className="negative-button newText-sm"
                         style={{ minWidth: "60px" }}
                         onClick={handleCancel}>취소</button>
                 </div>

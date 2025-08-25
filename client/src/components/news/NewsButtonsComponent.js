@@ -42,7 +42,7 @@ const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
           {selectedArticles.length > 0 && (
             <button
               onClick={handleDelete}
-              className="nagative-button newText-sm"
+              className="negative-button newText-sm"
             >
               선택 삭제 ({selectedArticles.length})
             </button>
@@ -51,7 +51,6 @@ const NewsButtonsComponent = ({ selectedArticles, onDelete }) => {
           <button
             onClick={handleWrite}
             className="positive-button newText-sm"
-            style={{ minWidth: "70px" }}
           >
             글쓰기
           </button>

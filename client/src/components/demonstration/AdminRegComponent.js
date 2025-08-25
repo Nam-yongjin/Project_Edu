@@ -317,7 +317,7 @@ const AdminRegComponent = () => {
                                                             </button>
 
                                                             <button
-                                                                className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
+                                                                className="inline-block negative-button text-[10px] px-2 py-1 leading-none"
                                                                 onClick={() => handleRental(data.demRegNum, "REJECT")}
                                                             >
                                                                 거절
@@ -348,7 +348,7 @@ const AdminRegComponent = () => {
                                                     <td>
                                                         {data.state === "ACCEPT" ? (
                                                             <button
-                                                                className="nagative-button flex-1"
+                                                                className="negative-button flex-1"
                                                                 onClick={async () => {
                                                                     try {
                                                                         await delDem([data.demNum]); // 배열로 전달
@@ -376,7 +376,7 @@ const AdminRegComponent = () => {
 
                 </div>
                 {/* 우측 하단 일괄 처리 버튼들 */}
-                <div className="flex justify-end mt-5 mr-15">
+                <div className="flex justify-end mt-5 mr-15 newText-base">
                     <button
                         disabled={selectedItems.length === 0}
                         className={`px-4 py-2 rounded mr-2 ${selectedItems.length > 0
@@ -390,7 +390,7 @@ const AdminRegComponent = () => {
                     <button
                         disabled={selectedItems.length === 0}
                         className={`px-4 py-2 rounded ${selectedItems.length > 0
-                            ? "nagative-button"
+                            ? "negative-button"
                             : "disable-button"
                             }`}
                         onClick={handleCheckedReject}

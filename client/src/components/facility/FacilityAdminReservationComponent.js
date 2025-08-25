@@ -312,7 +312,7 @@ export default function AdminFacilityReservations() {
           <button
             disabled={disabled}
             onClick={() => handleReject(r)}
-            className={`nagative-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+            className={`negative-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             거절
           </button>
@@ -329,7 +329,7 @@ export default function AdminFacilityReservations() {
           <button
             disabled={disabled}
             onClick={() => handleAdminCancel(r)}
-            className={`nagative-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+            className={`negative-button newText-base px-3 py-1 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
           >
             강제취소
           </button>

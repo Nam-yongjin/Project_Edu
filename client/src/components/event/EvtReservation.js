@@ -170,7 +170,7 @@ const EvtReservation = () => {
                           disabled={!cancelable}
                           className={`newText-sm rounded ${
                             cancelable
-                              ? "nagative-button"
+                              ? "negative-button"
                               : "normal-button cursor-not-allowed !bg-gray-300 !text-gray-700 !border !border-gray-400"
                           }`}
                           title={getCancelButtonLabel(item)}

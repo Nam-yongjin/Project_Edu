@@ -31,7 +31,7 @@ const ImageTile = React.memo(function ImageTile({
         <button
           type="button"
           onClick={onDelete}
-          className="nagative-button newText-xs px-2 py-0.5 rounded"
+          className="negative-button newText-xs px-2 py-0.5 rounded"
         >
           삭제
         </button>

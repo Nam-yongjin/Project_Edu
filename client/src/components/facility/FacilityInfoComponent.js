@@ -40,7 +40,7 @@ const FacilityInfoComponent = () => {
           {features.map(({ title, desc }, i) => (
             <div
               key={i}
-              className="page-shadow rounded-2xl p-6 border border-orange-200 bg-[#FAF5EF] hover:shadow-lg transition-shadow duration-300"
+              className="shadow-lg rounded-2xl p-6 border border-orange-200 bg-[#FAF5EF] hover:shadow-2xl transition-shadow duration-300"
             >
               <h3 className="newText-xl font-semibold mb-4 text-orange-600">
                 {title}

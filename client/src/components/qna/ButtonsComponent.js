@@ -39,7 +39,7 @@ const ButtonsComponent = ({ selectedQuestion, onDelete }) => {
           {selectedQuestion && selectedQuestion.length > 0 && (
             <button
               onClick={handleDelete}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors newText-sm font-medium mr-1"
+              className="negative-button newText-sm  mr-1"
             >
               선택 삭제 ({selectedQuestion.length})
             </button>
@@ -51,7 +51,7 @@ const ButtonsComponent = ({ selectedQuestion, onDelete }) => {
       )}
     <button
             onClick={() => moveAddPage()}
-            className="px-4 py-2 positive-button rounde transition-colors newText-sm font-medium inline-block"
+            className="positive-button newText-sm "
           >
             글쓰기
           </button>

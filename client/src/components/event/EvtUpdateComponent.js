@@ -5,7 +5,7 @@
 //   - 좌우 여백: min-blank (최상단 div 바로 아래 div 고정)
 //   - 페이지 그림자: page-shadow
 //   - 입력창: input-focus
-//   - 버튼: positive-button / normal-button / nagative-button / green-button
+//   - 버튼: positive-button / normal-button / negative-button / green-button
 // - 레이아웃:
 //   - 최상단 div: max-w-screen-xl mx-auto my-10 (고정)
 //   - 바로 아래 div: min-blank (고정)
@@ -354,7 +354,7 @@ const PreviewImageCard = ({ title, name, url, onDelete }) => (
   <div className="page-shadow border rounded-2xl p-3 bg-white">
     <div className="flex justify-between items-center">
       <p className="newText-sm font-semibold text-blue-600">{title}</p>
-      <button className="newText-sm nagative-button px-2 py-0.5" onClick={onDelete}>
+      <button className="newText-sm negative-button px-2 py-0.5" onClick={onDelete}>
         삭제
       </button>
     </div>

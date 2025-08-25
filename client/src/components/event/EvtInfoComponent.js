@@ -28,7 +28,7 @@ const SoftLabPrograms = () => {
     // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
-        <section className="page-shadow rounded-2xl border bg-white p-8">
+        <section className="rounded-2xl">
           {/* 섹션 제목 */}
           <h1
             className={`newText-3xl font-semibold text-gray-900 mb-10 text-center tracking-wide border-b-2 ${theme.underline} pb-3`}
@@ -47,7 +47,7 @@ const SoftLabPrograms = () => {
             {programs.map(({ title, type, desc }, i) => (
               <div
                 key={i}
-                className={`${theme.cardBg} page-shadow rounded-xl p-6 border ${theme.cardBorder} hover:shadow-md transition-shadow duration-300`}
+                className={`${theme.cardBg} shadow-lg rounded-xl p-6 border ${theme.cardBorder} hover:shadow-2xl transition-shadow duration-300`}
               >
                 <h3 className={`newText-xl font-semibold mb-2 ${theme.title}`}>
                   {title}

@@ -91,7 +91,7 @@ const ListComponent = () => {
         {/* 버튼 */}
         <button
           disabled={item.itemNum === 0}
-          className={`m-4 px-4 py-3 rounded-md text-white font-semibold transition-colors duration-300 ${item.itemNum !== 0
+          className={`newText-base m-4 px-4 py-3 rounded-md text-white font-semibold transition-colors duration-300 ${item.itemNum !== 0
             ? "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
             : "bg-gray-400 cursor-not-allowed"
             }`}
