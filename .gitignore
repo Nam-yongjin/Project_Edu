@@ -188,7 +188,12 @@ __pycache__/
 
 .env
 .env.local
-.env.*.local
+.env.development
+.env.production
+client/.env*
 
+# 백엔드 설정 파일
+*.properties
 application.properties
 application-*.properties
+backend/*.properties
