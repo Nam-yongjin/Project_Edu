@@ -121,9 +121,9 @@ const NoticeMainComponent = () => {
 
                           {/* New 표시 (최근 3일 이내) */}
                           {(() => {
-                            const createdDate = new Date(notice.createdAt);
-                            const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
-                            return daysDiff <= 3 && (
+                            const createdDate = new Date(notice.createdAt); // 공지사항 작성일을 Date 객체로 변환
+                            const daysDiff = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24)); // 현재 날짜 - 작성일 일단위 차이로 계산
+                            return daysDiff <= 3 && ( // 최근 3일 이내면 <span>요소 반환, 아니면 false
                               <span className="ml-2 newText-sm font-bold text-red-500 whitespace-nowrap">
                                 New !
                               </span>
