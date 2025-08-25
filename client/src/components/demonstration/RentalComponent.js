@@ -575,7 +575,7 @@ const RentalComponent = () => {
                     <button
                         onClick={handleCancelReservation}
                         disabled={selectedItems.size === 0}
-                        className={`px-4 py-2 rounded ${selectedItems.size > 0 ? "normal-button" : "disable-button"}`}
+                        className={`px-4 py-2 rounded ${selectedItems.size > 0 ? "negative-button" : "disable-button"}`}
                     >
                         예약 취소 ({selectedItems.size})
                     </button>

@@ -324,7 +324,7 @@ const BorrowComponent = () => {
                     <button
                         onClick={handleCheckedDelete}
                         disabled={selectedItems.length === 0}
-                        className={`px-4 py-2 rounded mr-10 ${selectedItems.length > 0 ? "normal-button" : "disable-button"}`}
+                        className={`px-4 py-2 rounded mr-10 ${selectedItems.length > 0 ? "negative-button" : "disable-button"}`}
                     >
                         등록 취소 ({selectedItems.length})
                     </button>
