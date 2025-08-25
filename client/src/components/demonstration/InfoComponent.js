@@ -24,7 +24,7 @@ const DemInfo = () => {
   return (
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
-        <section className="w-full mx-auto my-16 text-gray-900">
+        <section className="w-full mx-auto text-gray-900">
           <div className="w-full border-b-2 border-indigo-600 pb-3 mb-10">
             <h1 className="text-3xl font-bold text-gray-900 text-center tracking-wide mb-10">
               실증 지원 프로그램
