@@ -1,4 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+// 변경 사항 요약
+// 1) 이미지 영역을 Swiper 슬라이더로 교체(자동재생/페이지네이션/네비게이션 적용)
+// 2) "목록으로" 버튼은 항상 "/facility/list"로 이동하도록 유지
+// 3) 최상단 div의 클래스(max-w-screen-xl mx-auto my-10)와 그 바로 아래 div의 클래스(min-blank)는 고정
+
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   addDays, addMonths, startOfMonth, endOfMonth,
   startOfWeek, endOfWeek, isSameMonth, format,
@@ -15,6 +20,13 @@ import {
   createReservation,
   getReservedBlocks,
 } from "../../api/facilityApi";
+
+// Swiper 슬라이더 관련 import
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
 
 /* ---------- 이미지 URL 유틸 ---------- */
 const PLACEHOLDER = "/placeholder.svg";
@@ -77,10 +89,8 @@ const overlaps = (s1, e1, s2, e2) => s1 < e2 && s2 < e1;
 export default function FacilityDetailContent({ facRevNum }) {
   /* 상세 */
   const [data, setData] = useState(null);
-  const [idx, setIdx] = useState(0);
   const [detailLoading, setDetailLoading] = useState(true);
   const [err, setErr] = useState("");
-  const touchX = useRef(null);
 
   /* 캘린더 & 예약 */
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -108,7 +118,6 @@ export default function FacilityDetailContent({ facRevNum }) {
       .then((d) => {
         if (!mounted) return;
         setData(d);
-        setIdx(0);
       })
       .catch((e) => mounted && setErr(e?.response?.data?.message || e.message || "공간 정보를 불러오지 못했습니다."))
       .finally(() => mounted && setDetailLoading(false));
@@ -171,15 +180,6 @@ export default function FacilityDetailContent({ facRevNum }) {
     const urls = sorted.map(buildImageUrl).filter(Boolean);
     return urls.length ? urls : [PLACEHOLDER];
   }, [data]);
-
-  const n = srcs.length;
-  const onTouchStart = (e) => (touchX.current = e.touches[0].clientX);
-  const onTouchEnd = (e) => {
-    if (touchX.current == null) return;
-    const dx = e.changedTouches[0].clientX - touchX.current;
-    if (Math.abs(dx) > 40) setIdx((p) => (dx > 0 ? (p - 1 + n) % n : (p + 1) % n));
-    touchX.current = null;
-  };
 
   /* 달력 경계(현재월 포함 + 3개월) */
   const monthStart = useMemo(() => startOfMonth(currentMonth), [currentMonth]);
@@ -308,7 +308,9 @@ export default function FacilityDetailContent({ facRevNum }) {
 
   /* 렌더 */
   return (
+    // 최상단 div: max-w-screen-xl mx-auto my-10 고정
     <div className="max-w-screen-xl mx-auto my-10">
+      {/* 바로 아래 div: min-blank 고정 */}
       <div className="min-blank">
         {/* ====== 상단 배너 ====== */}
         <header className="page-shadow rounded-xl overflow-hidden mb-6">
@@ -317,7 +319,11 @@ export default function FacilityDetailContent({ facRevNum }) {
               <h1 className="newText-3xl font-extrabold text-gray-800">공간 상세정보</h1>
               <p className="newText-sm text-gray-500 mt-1">예약 가능 시간과 이용 안내를 확인하고 바로 신청하세요.</p>
             </div>
-            <button className="normal-button newText-sm" onClick={() => navigate(-1)}>
+            {/* 목록으로: 리스트 페이지로 이동 */}
+            <button
+              className="normal-button newText-sm"
+              onClick={() => navigate("/facility/list")}
+            >
               목록으로
             </button>
           </div>
@@ -325,39 +331,31 @@ export default function FacilityDetailContent({ facRevNum }) {
 
         {/* 상단: 이미지 / 정보 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 이미지 카드 */}
-          <div
-            className="page-shadow bg-white rounded-xl overflow-hidden select-none"
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-          >
+          {/* 이미지 카드 - Swiper 슬라이더 적용 */}
+          <div className="page-shadow bg-white rounded-xl overflow-hidden select-none">
             <div className="relative aspect-[4/3] w-full">
-              <img
-                key={srcs[idx]}
-                src={srcs[idx]}
-                alt={`facility-${idx + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
-                draggable={false}
-              />
-              {srcs.length > 1 && (
-                <>
-                  <button
-                    aria-label="이전 이미지"
-                    onClick={() => setIdx((idx - 1 + n) % n)}
-                    className="normal-button newText-base !px-3 !py-1 rounded-full absolute left-3 top-1/2 -translate-y-1/2"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    aria-label="다음 이미지"
-                    onClick={() => setIdx((idx + 1) % n)}
-                    className="normal-button newText-base !px-3 !py-1 rounded-full absolute right-3 top-1/2 -translate-y-1/2"
-                  >
-                    ›
-                  </button>
-                </>
-              )}
+              <Swiper
+                spaceBetween={16}
+                centeredSlides={true}
+                autoplay={{ delay: 3500, disableOnInteraction: false }}
+                pagination={{ clickable: true }}
+                navigation={true}
+                modules={[Autoplay, Pagination, Navigation]}
+                style={{ width: "100%", height: "100%" }}
+                className="w-full h-full"
+              >
+                {srcs.map((src, i) => (
+                  <SwiperSlide key={`${src}-${i}`} className="w-full h-full">
+                    <img
+                      src={src}
+                      alt={`facility-${i + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.src = PLACEHOLDER; }}
+                      draggable={false}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           </div>
 
@@ -616,7 +614,7 @@ function DetailCalendarSection(props) {
             })}
           </div>
 
-        <div className="mt-2 newText-sm text-gray-600">
+          <div className="mt-2 newText-sm text-gray-600">
             선택한 시간: <span className="font-medium text-gray-900">{startKey && durationHrs ? endTimeText : "-"}</span>
           </div>
         </div>
