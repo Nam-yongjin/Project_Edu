@@ -1,3 +1,4 @@
+
 // props 전달값: 전체 페이지, 현재 페이지, 현재 페이지 set함수(현재 페이지는 사용하는 컴포넌트에서 setState로 설정해야함)
 const PageComponent = ({ totalPages, current, setCurrent }) => {
     const currentGroup = Math.floor(current / 10); // 현재 페이지 그룹 (0:0~9 1:10~19)
