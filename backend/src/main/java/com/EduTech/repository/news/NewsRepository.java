@@ -25,5 +25,9 @@ public interface NewsRepository extends JpaRepository<News, Long>, JpaSpecificat
 	@Transactional
     @Query("DELETE FROM News n WHERE n.newsNum IN :newsNums")
     void deleteByNewsNumIn(@Param("newsNums") List<Long> newsNums); //일괄삭제(newsNum값들의 목록)
+	
+	@Modifying
+	@Query("UPDATE News n SET n.viewCount = n.viewCount + 1 WHERE n.newsNum = :newsNum")
+	int increaseViewCount(@Param("newsNum") Long newsNum);
 
 }

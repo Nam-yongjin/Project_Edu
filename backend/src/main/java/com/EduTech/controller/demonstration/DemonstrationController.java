@@ -69,9 +69,10 @@ public class DemonstrationController {
 	@GetMapping("/demList")
 	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") Integer pageCount,
 			@RequestParam(value = "type", defaultValue = "demName") String type,
-			@RequestParam(value = "search", defaultValue = "") String search) {
+			@RequestParam(value = "search", defaultValue = "") String search,
+			@RequestParam(value="sortType",defaultValue="asc")String sortType) {
 		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount, type,
-				search);
+				search,sortType);
 
 		return AllDemList;
 	}
@@ -120,11 +121,10 @@ public class DemonstrationController {
 	}
 
 	// 예약 취소
-	@PreAuthorize("hasRole('TEACHER')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
 	@DeleteMapping("/CancelRes")
-	public ResponseEntity<String> DemResCancel(@RequestBody List<Long> demNum) {
-	    String memId = JWTFilter.getMemId();
-	    demonstrationService.demonstrationReservationCancel(demNum, memId);
+	public ResponseEntity<String> DemResCancel(@RequestBody List<Long> demRevNum) {
+	    demonstrationService.demonstrationReservationCancel(demRevNum);
 	    return ResponseEntity.ok("예약 취소 완료");
 	}
 
@@ -171,10 +171,10 @@ public class DemonstrationController {
 
 	// 실증 번호를 받아 실증 상품을 삭제하는 기능
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
-	@DeleteMapping("/DeleteDem/{demNum}")
-	public ResponseEntity<String> demDelete(@PathVariable("demNum") Long demNum) {
-		String memId = JWTFilter.getMemId();
-		demonstrationService.deleteDemonstration(demNum,memId);
+	@DeleteMapping("/DeleteDem")
+	public ResponseEntity<String> demDelete(@RequestBody List<Long> demNum) {
+		System.out.println(demNum);
+		demonstrationService.deleteDemonstration(demNum);
 		return ResponseEntity.ok("실증 물품 삭제 완료");
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제
 	}

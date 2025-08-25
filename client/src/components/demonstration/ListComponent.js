@@ -18,14 +18,16 @@ const ListComponent = () => {
   const [searchType, setSearchType] = useState("demName");
   const [search, setSearch] = useState("");
   const loginState = useSelector((state) => state.loginState);
-
+  const [sortType, setSortType] = useState("asc");
   const searchOptions = [
     { value: "demName", label: "상품명" },
     { value: "demMfr", label: "제조사명" },
+    { value: "companyName", label: "기업명" },
   ];
 
   const fetchData = () => {
-    getList(current, searchType, search).then((data) => {
+    getList(current, searchType, search, sortType).then((data) => {
+      console.log(data);
       setPageData(data);
       setListData(data);
     });
@@ -33,7 +35,7 @@ const ListComponent = () => {
 
   useEffect(() => {
     fetchData();
-  }, [current, searchType, search]);
+  }, [current]);
 
   const onSearchClick = () => {
     setCurrent(0);
@@ -52,15 +54,20 @@ const ListComponent = () => {
 
       <div
         key={item.demNum}
-        className="bg-white w-1/5 h-[500px] rounded-xl shadow-lg overflow-hidden flex flex-col hover:shadow-2xl transition-shadow duration-300"
+        className="bg-white w-1/6 min-w-[180px] rounded-xl shadow-lg overflow-hidden flex flex-col hover:shadow-2xl transition-shadow duration-300"
       >
         {/* 이미지 */}
         <div
-          className="h-[220px] w-full overflow-hidden cursor-pointer"
+          className="aspect-[4/3] w-full overflow-hidden cursor-pointer"
           onClick={() => {
-            const urlList = item.imageList.map(
-              (img) => `http://localhost:8090/view/${img.imageUrl}`
-            );
+            const urlList = [
+              ...item.imageList
+                .filter(img => img.isMain)           // 메인 이미지만 먼저
+                .map(img => `http://localhost:8090/view/${img.imageUrl}`),
+              ...item.imageList
+                .filter(img => !img.isMain)          // 나머지 이미지
+                .map(img => `http://localhost:8090/view/${img.imageUrl}`)
+            ];
             setSelectedImages(urlList);
             setModalOpen(true);
           }}
@@ -68,16 +75,17 @@ const ListComponent = () => {
           <img
             src={mainImageUrl}
             alt={`equipment-${item.demNum}`}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+
           />
         </div>
 
         {/* 내용 */}
         <div className="p-4 flex flex-col gap-2 flex-1 min-h-[140px]">
-          <h3 className="text-lg font-bold text-blue-600 truncate">{item.demName}</h3>
-          <p className="text-sm text-gray-600 truncate">제조사: {item.demMfr}</p>
-          <p className="text-sm text-gray-600 truncate">수량: {item.itemNum}개</p>
-          <p className="text-xs text-gray-500 line-clamp-3">{item.demInfo}</p>
+          <h3 className="newText-lg font-bold text-blue-600 truncate">{item.demName}</h3>
+          <p className="newText-sm text-gray-600 truncate">제조사: {item.demMfr}</p>
+          <p className="newText-sm text-gray-600 truncate">수량: {item.itemNum}개</p>
+          <p className="newText-sm text-gray-600 line-clamp-3">기업명: {item.companyName}</p>
+          <p className="newText-sm text-gray-600 line-clamp-3">마감일: {item.expDate}</p>
         </div>
 
         {/* 버튼 */}
@@ -106,22 +114,37 @@ const ListComponent = () => {
   return (
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
-        <div className="newText-3xl font-bold ">실증 물품 대여 관리</div>
-        <div className="py-2">
-          <SearchComponent
-            search={search}
-            setSearch={setSearch}
-            type={searchType}
-            setType={setSearchType}
-            onSearchClick={onSearchClick}
-            searchOptions={searchOptions}
-          />
+        <div className="mx-auto text-center">
+          {/* 제목 + 설명 */}
+          <div className="newText-3xl font-bold">실증 물품</div>
+          <p className="text-gray-700 my-3 newText-base px-4 py-2 rounded-md inline-block">
+            전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 물품이 있습니다.
+          </p>
+
+          {/* 검색창도 가운데 */}
+          <div className="py-2 flex justify-center">
+            <SearchComponent
+              search={search}
+              setSearch={setSearch}
+              type={searchType}
+              setType={setSearchType}
+              onSearchClick={onSearchClick}
+              searchOptions={searchOptions}
+              sortType={sortType}
+              setSortType={setSortType}
+              showSort={true}
+            />
+
+          </div>
         </div>
+
 
         {/* 카드 리스트 */}
         <div className="flex flex-wrap justify-center gap-10 my-5">
           {listData.content && listData.content.length === 0 ? (
-            <p className="text-gray-500 newText-lg mt-20">등록된 상품이 없습니다.</p>
+            <div className="w-full border flex items-center justify-center min-h-[300px]">
+              <p className="text-gray-500 newText-3xl">등록된 상품이 없습니다.</p>
+            </div>
           ) : (
             mainContent
           )}

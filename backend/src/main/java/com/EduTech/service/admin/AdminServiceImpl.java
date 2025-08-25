@@ -88,19 +88,28 @@ public class AdminServiceImpl implements AdminService {
 
 	// 연장 반납 신청 처리하는 기능
 	@Override
-	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO demonstrationApprovalReqDTO) {
-		System.out.println(demonstrationApprovalReqDTO);
-		if(demonstrationApprovalReqDTO.getType().equals(RequestType.EXTEND)&&demonstrationApprovalReqDTO.getState().equals(DemonstrationState.ACCEPT))
-		{
-			DemonstrationRequest request=demonstrationRequestRepository.selectRequest(demonstrationApprovalReqDTO.getDemRevNum(),DemonstrationState.WAIT);
-			demonstrationReserveRepository.updateDemResEndDate(request.getReserve().getDemRevNum(),request.getUpdateDate(),DemonstrationState.ACCEPT);
-		}
-		else if(demonstrationApprovalReqDTO.getType().equals(RequestType.RENTAL)&&demonstrationApprovalReqDTO.getState().equals(DemonstrationState.ACCEPT))
-		{
-			demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED,demonstrationApprovalReqDTO.getDemRevNum());
-		}
-		demonstrationRequestRepository.updateDemResChangeStateReq(demonstrationApprovalReqDTO.getState(), demonstrationApprovalReqDTO.getDemRevNum(),demonstrationApprovalReqDTO.getType(),DemonstrationState.WAIT);
+	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
+	    List<Long> demRevNums = dto.getDemRevNum(); // 여기를 List<Long>로 받도록 DTO 변경 추천
+	    System.out.println(dto);
+	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT) {
+	    	System.out.println("연장");
+	        // WAIT 상태의 요청들 한 번에 가져옴
+	        List<DemonstrationRequest> requests = demonstrationRequestRepository
+	                .selectRequest(demRevNums, DemonstrationState.WAIT);
+
+	        // endDate를 requests에서 공통 로직으로 뽑아서 배치로 업데이트
+	        LocalDate newEndDate = requests.get(0).getUpdateDate(); 
+	        demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
+	    }
+
+	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
+	    	System.out.println("대여");
+	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
+	    }
+
+	    demonstrationRequestRepository.updateDemResChangeStateReq(dto.getState(), demRevNums, dto.getType(), DemonstrationState.WAIT);
 	}
+
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override
 	public void sendMessageForUser(AdminMessageDTO adminMessageDTO) {
@@ -233,27 +242,36 @@ public class AdminServiceImpl implements AdminService {
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
 		@Override
 		public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
-			  Integer pageCount = searchDTO.getPageCount();
+			 Integer pageCount = searchDTO.getPageCount();
 			    String type = searchDTO.getType();
 			    String search = searchDTO.getSearch();
 			    String sortBy = searchDTO.getSortBy();
 			    String sort = searchDTO.getSort();
 			    String statusFilter = searchDTO.getStatusFilter();
 
-			    if (pageCount == null || pageCount < 0)
-			        pageCount = 0;
-			    if (!StringUtils.hasText(sortBy))
-			        sortBy = "regDate";
-			    if (!StringUtils.hasText(sort))
-			        sort = "desc";
+			    
+			    if (pageCount == null || pageCount < 0) pageCount = 0;
+			    if (!StringUtils.hasText(sortBy)) sortBy = "regDate";
+			    if (!StringUtils.hasText(sort)) sort = "desc";
 
-			    Pageable pageable = PageRequest.of(pageCount, 10);
+			    // 정렬 방향 결정
+			    Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+			    
+			    Sort sortOrder;
+			    if ("expDate".equalsIgnoreCase(sortBy)) {
+			        sortOrder = Sort.by(direction, "expDate").and(Sort.by(Sort.Direction.DESC, "demRegNum"));
+			    } else {
+			        sortOrder = Sort.by(direction, "regDate").and(Sort.by(Sort.Direction.DESC, "demRegNum"));
+			    }
 
-			    Specification<DemonstrationRegistration>spec = DemonstrationRegistrationSpecs.withSearchAndSortAdmin(type,search,sortBy,sort,statusFilter);
+			    Pageable pageable = PageRequest.of(pageCount, 10, sortOrder);
 
-			    // DemonstrationReserve 페이징 조회
+			    // 검색 조건만 처리하는 Specification 사용
+			    Specification<DemonstrationRegistration> spec = DemonstrationRegistrationSpecs.withSearchAdmin(type, search, statusFilter);
+
+			    // 나머지 코드는 동일...
 			    Page<DemonstrationRegistration> regPage = demonstrationRegistrationRepository.findAll(spec, pageable);
-
+			    
 			    // 관련 demNum 리스트 추출 (중복 제거)
 			    List<Long> demNums = regPage.stream()
 			        .map(reg -> reg.getDemonstration().getDemNum())

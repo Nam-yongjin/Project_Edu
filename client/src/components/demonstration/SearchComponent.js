@@ -1,42 +1,56 @@
-const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, searchOptions }) => {
+const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, searchOptions,  sortType, setSortType,showSort = false  }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearchClick();
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex items-center border border-gray-300 rounded w-full max-w-md overflow-hidden"
+  <form
+    onSubmit={handleSubmit}
+    className="flex items-center rounded w-full max-w-lg px-3 h-10"
+  >
+    <input
+      type="text"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      placeholder="검색어를 입력하세요"
+      className="flex-1 newText-sm input-focus px-3 h-10 border border-gray-300 rounded-md mr-1"
+    />
+
+    <select
+      value={type}
+      onChange={(e) => setType(e.target.value)}
+      className="px-3 h-10 newText-sm input-focus bg-white focus:outline-none border border-gray-300 rounded-md mr-1"
+      aria-label="검색 옵션 선택"
     >
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="검색어를 입력하세요"
-        className="flex-1 min-w-0 px-4 py-2 text-sm focus:outline-none"
-      />
+      {searchOptions.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+
+    {showSort && (
       <select
-        value={type}
-        onChange={(e) => setType(e.target.value)}
-        className="px-3 py-2 text-sm bg-white focus:outline-none border-l border-gray-300"
-        aria-label="검색 옵션 선택"
+        value={sortType}
+        onChange={({ target }) => setSortType(target.value)}
+        className="px-3 h-10 newText-sm input-focus bg-white focus:outline-none border border-gray-300 rounded-md mr-1"
       >
-        {searchOptions.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
+        <option value="asc">빠른순</option>
+        <option value="desc">느린순</option>
       </select>
-      <button
-        type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex items-center justify-center border-l border-gray-300"
-        aria-label="검색"
-      >
-        검색
-      </button>
-    </form>
-  );
+    )}
+
+    <button
+      type="submit"
+      className="positive-button h-10"
+      aria-label="검색"
+    >
+      검색
+    </button>
+  </form>
+);
+
 };
 
 export default SearchComponent;

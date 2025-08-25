@@ -21,6 +21,7 @@ public class DemonstrationRentalListDTO {
 	private LocalDate applyAt;
 	private String companyName;
 	private Long itemNum; 
+	private Long demRevNum;
 	private List<DemonstrationImageDTO> imageList; 
 	private List<RequestType> requestType;
 	private	List<DemonstrationState> reqState;// 반납 / 연장 상태

@@ -73,7 +73,9 @@ const AdminEmailSelectMembersComponent = () => {
 
     return (
         <div className="max-w-screen-xl mx-auto my-10 ">
-            <div className="newText-2xl min-blank font-bold mb-4">발송자 선택</div>
+            <div className="newText-2xl min-blank font-bold mb-4">메일 전송
+                <span className='newText-base ml-2 font-medium text-gray-500'>(회원 선택 후 전송)</span>
+            </div>
 
             {/* 검색 및 정렬 필터 */}
             <div className="min-blank newText-base grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 bg-gray-100 rounded-lg shadow-sm">
@@ -106,7 +108,7 @@ const AdminEmailSelectMembersComponent = () => {
                     onChange={handleSearchChange}
                     className="input-focus"
                 >
-                    <option value="">역할 선택</option>
+                    <option value="">유형 선택</option>
                     <option value="STUDENT">학생</option>
                     <option value="TEACHER">교사</option>
                     <option value="COMPANY">기업</option>
@@ -151,9 +153,9 @@ const AdminEmailSelectMembersComponent = () => {
             </div>
 
             {/* 회원 목록 테이블 */}
-            <div className="page-shadow min-blank overflow-x-auto">
+            <div className="page-shadow min-blank overflow-x-auto max-h-[604px] overflow-y-auto">
                 <table className="newText-sm w-full text-center min-w-[1024px]">
-                    <thead className="bg-gray-200">
+                    <thead className="bg-gray-200 sticky top-0 z-10">
                         <tr>
                             <th scope="col" className="p-4">
                                 <input
@@ -254,7 +256,7 @@ const AdminEmailSelectMembersComponent = () => {
                 }}
                 className="min-blank positive-button newText-base"
             >
-                선택 회원 메시지 보내기
+                선택 회원 메일 보내기
             </button>
         </div>
     );
