@@ -186,14 +186,16 @@ __pycache__/
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,java,react,eclipse,visualstudiocode,gradle
 
+# 환경변수 파일들
 .env
-.env.local
-.env.development
-.env.production
-client/.env*
+.env.*
+client/.env
+client/.env.*
+Project_Edu/client/.env
+Project_Edu/client/.env.*
 
-# 백엔드 설정 파일
-*.properties
+# Spring Boot 설정 파일들
 application.properties
 application-*.properties
-backend/*.properties
+backend/src/main/resources/application.properties
+Project_Edu/backend/src/main/resources/application.properties
