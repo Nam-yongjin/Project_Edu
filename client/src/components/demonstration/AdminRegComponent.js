@@ -22,13 +22,12 @@ const AdminRegComponent = () => {
     };
 
     const searchOptions = [ // search compnent에게 전달할 option의 select 객체
-        { value: "total", label: "전체" },
         { value: "memId", label: "아이디" },
         { value: "demName", label: "물품명" },
         { value: "companyName", label: "기업명" },
     ];
     const [search, setSearch] = useState(""); // 검색 state 변수
-    const [type, setType] = useState("total"); // 검색 칼럼 state 변수 
+    const [type, setType] = useState("memId"); // 검색 칼럼 state 변수 
     const [sortBy, setSortBy] = useState("regDate"); // 정렬 칼럼 state 변수 
     const [sort, setSort] = useState("desc"); // 정렬 방식 
     const { moveToPath } = useMove(); // 다른 페이지로 이동 위한 함수

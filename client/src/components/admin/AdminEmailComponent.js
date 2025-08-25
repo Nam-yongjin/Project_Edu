@@ -42,7 +42,7 @@ const AdminEmailComponent = ({ members }) => {
         font-size: 14px;
       }
       .ql-editor img { 
-        max-width: 100%;
+        max-width: 600px;
         height: auto; 
         display: inline-block; 
         margin: 10px 0;
@@ -169,7 +169,7 @@ const AdminEmailComponent = ({ members }) => {
     const height = parseInt(imageHeight);
     
     if (selectedImage) {
-      if (width > 0 && width <= 800) {
+      if (width > 0 && width <= 600) {
         selectedImage.style.width = width + "px";
       }
       if (height > 0 && height <= 600) {
@@ -232,8 +232,8 @@ const AdminEmailComponent = ({ members }) => {
     const currentSize = attachFiles.reduce((total, file) => total + file.size, 0);
     const newFilesSize = files.reduce((total, file) => total + file.size, 0);
     
-    if (attachFiles.length + files.length > 10) {
-      alert("첨부파일은 최대 10개까지 업로드할 수 있습니다.");
+    if (attachFiles.length + files.length > 8) {
+      alert("첨부파일은 최대 8개까지 업로드할 수 있습니다.");
       if (attachInputRef.current) attachInputRef.current.value = "";
       return;
     }
@@ -393,7 +393,7 @@ const AdminEmailComponent = ({ members }) => {
             <div className="mb-6">
               <label className="newText-lg font-semibold text-gray-800 block mb-2">본문</label>
               <div className="newText-sm text-gray-600 mb-2">
-                💡 이미지를 더블클릭하면 크기를 조절할 수 있습니다
+                💡 이미지를 더블클릭하면 크기를 조절할 수 있습니다 (최대 600px)
               </div>
               <div className="border rounded-lg overflow-hidden">
                 <ReactQuill
@@ -434,7 +434,7 @@ const AdminEmailComponent = ({ members }) => {
                       placeholder="예: 200 (비워두면 자동)"
                     />
                     <div className="newText-xs text-gray-500 mt-1">
-                      너비: 100px ~ 800px, 높이: 100px ~ 600px
+                      너비: 100px ~ 600px, 높이: 100px ~ 600px (이메일 템플릿 최대 너비 600px)
                     </div>
                   </div>
 
@@ -464,7 +464,7 @@ const AdminEmailComponent = ({ members }) => {
               <div className="flex items-center justify-between mb-2">
                 <label className="newText-lg font-semibold text-gray-800">첨부파일</label>
                 <span className="newText-sm text-gray-500">
-                  {attachFiles.length}/10개 | {bytesToMB(currentSize)}/25.00 MB
+                  {attachFiles.length}/8개 | {bytesToMB(currentSize)}/25.00 MB
                 </span>
               </div>
               <input
@@ -476,36 +476,42 @@ const AdminEmailComponent = ({ members }) => {
               />
 
               {attachFiles.length > 0 && (
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="mt-4 grid grid-cols-4 gap-3">
                   {attachFiles.map((file, index) => (
-                    <div key={index} className="relative border rounded-lg p-3 bg-white shadow-sm">
+                    <div key={index} className="relative border rounded-lg p-2 bg-white shadow-sm aspect-square">
                       <button
                         onClick={() => handleRemoveFile(index)}
-                        className="absolute top-2 right-2 p-1 hover:bg-red-100 rounded-full transition-colors"
+                        className="absolute -top-2 -right-2 p-1 bg-red-500 hover:bg-red-600 rounded-full transition-colors z-10"
                       >
-                        <img src={cancel} alt="삭제" className="w-4 h-4" />
+                        <img src={cancel} alt="삭제" className="w-3 h-3 filter brightness-0 invert" />
                       </button>
 
                       {file.type.startsWith("image/") ? (
                         <img
                           src={URL.createObjectURL(file)}
                           alt="미리보기"
-                          className="mb-3 rounded-lg max-h-32 object-cover w-full"
+                          className="w-full h-full object-cover rounded-lg"
+                          style={{
+                            minHeight: '80px',
+                            maxHeight: '120px'
+                          }}
                         />
                       ) : (
-                        <div className="mb-3 flex items-center justify-center bg-gray-100 rounded-lg h-32">
-                          <div className="text-center">
-                            <div className="newText-2xl text-gray-400 mb-2">📄</div>
-                            <span className="text-gray-600 newText-sm">미리보기 없음</span>
-                          </div>
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 rounded-lg">
+                          <div className="newText-2xl text-gray-400 mb-1">📄</div>
+                          <span className="text-gray-600 newText-xs text-center leading-tight break-all px-1">
+                            {file.name.length > 12 ? file.name.substring(0, 12) + '...' : file.name}
+                          </span>
                         </div>
                       )}
                       
-                      <div className="newText-sm text-gray-700 break-all font-medium">
-                        {file.name}
-                      </div>
-                      <div className="newText-xs text-gray-500 mt-1">
-                        {bytesToMB(file.size)} MB
+                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white newText-xs p-1 rounded-b-lg text-center">
+                        <div className="truncate" title={file.name}>
+                          {file.name.length > 10 ? file.name.substring(0, 10) + '...' : file.name}
+                        </div>
+                        <div className="text-gray-300">
+                          {bytesToMB(file.size)} MB
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -516,7 +522,7 @@ const AdminEmailComponent = ({ members }) => {
             <div className="text-center pt-4 border-t">
               <button 
                 onClick={handleSend} 
-                disabled={isUploading || attachFiles.length > 10 || currentSize > 25 * 1024 * 1024}
+                disabled={isUploading || attachFiles.length > 8 || currentSize > 25 * 1024 * 1024}
                 className={`newText-base px-6 py-3 rounded-lg font-semibold transition-colors ${
                   isUploading 
                     ? 'disable-button'

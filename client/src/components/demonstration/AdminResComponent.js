@@ -12,7 +12,7 @@ const AdminResComponent = () => {
   const { moveToPath } = useMove();
 
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("total");
+  const [type, setType] = useState("memId");
   const [sortBy, setSortBy] = useState("applyAt");
   const [sort, setSort] = useState("desc");
   const [resInfo, setResInfo] = useState({ content: [] });
@@ -27,7 +27,6 @@ const AdminResComponent = () => {
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   const searchOptions = [
-    { value: "total", label: "전체" },
     { value: "memId", label: "아이디" },
     { value: "demName", label: "물품명" },
     { value: "schoolName", label: "학교명" },
@@ -234,7 +233,7 @@ const AdminResComponent = () => {
                       />
                     )}
                   </th>
-                  <th className="w-[30%]">이미지</th>
+                  <th className="w-[50%]">이미지</th>
                   <th className="w-[5%]">아이디</th>
                   <th className="w-[10%]">전화번호</th>
                   <th className="w-[14%]">주소</th>
@@ -315,13 +314,13 @@ const AdminResComponent = () => {
                               src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                               alt={member.demName}
                               onClick={() => moveToPath(`../../demonstration/detail/${member.demNum}`)}
-                              className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                              className="w-30 h-30 rounded-md hover:scale-105 transition-transform cursor-pointer"
                             />
                           ) : (
                             <img
                               src={defaultImage}
                               alt="default"
-                              className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                              className="w-30 h-30 rounded-md hover:scale-105 transition-transform cursor-pointer"
                             />
                           )}
                         </td>

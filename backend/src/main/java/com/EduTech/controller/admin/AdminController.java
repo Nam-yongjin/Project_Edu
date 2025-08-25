@@ -118,7 +118,6 @@ public class AdminController {
    public ResponseEntity<List<BannerImage>> getAllBanners() {
       List<BannerImage> banners = adminService.getAllBanners();
       return ResponseEntity.ok(banners);
-      ///
    }
 
    // 배너 삭제

@@ -7,7 +7,7 @@ const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, sear
   return (
   <form
     onSubmit={handleSubmit}
-    className="flex items-center rounded w-full max-w-lg px-3 h-10"
+    className="flex items-center rounded w-full max-w-xl px-3 h-10"
   >
     <input
       type="text"
@@ -36,8 +36,8 @@ const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, sear
         onChange={({ target }) => setSortType(target.value)}
         className="px-3 h-10 newText-sm input-focus bg-white focus:outline-none border border-gray-300 rounded-md mr-1"
       >
-        <option value="asc">빠른순</option>
-        <option value="desc">느린순</option>
+        <option value="asc">종료빠른순</option>
+        <option value="desc">종료느린순</option>
       </select>
     )}
 

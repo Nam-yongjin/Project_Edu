@@ -146,12 +146,12 @@ const UpdateComponent = ({ demNum }) => {
 
     putUpdate(formData)
       .then(() => {
-        alert("물품 수정 완료");
+        alert("실증 수정 완료");
         moveToPath("/");
       })
       .catch(err => {
         console.error(err);
-        alert("물품 수정 실패");
+        alert("실증 수정 실패");
       });
   };
 
@@ -211,7 +211,7 @@ const UpdateComponent = ({ demNum }) => {
             <label className="newText-xl font-semibold w-32">카테고리:</label>
             <select
               name="category"
-              className="w-32 border border-black input-focus"
+              className="w-40 border border-black input-focus"
               value={dem.category}
               onChange={handleChangeDem}
             >
@@ -304,7 +304,7 @@ const UpdateComponent = ({ demNum }) => {
         {/* 버튼 */}
         <div className="mt-4 flex justify-end gap-4 pr-2">
           <button className="positive-button hover:positive-button:hover active:positive-button:active" onClick={update}>
-            물품수정
+            실증수정
           </button>
           <button className="normal-button hover:normal-button:hover active:normal-button:active" onClick={moveToReturn}>
             뒤로가기

@@ -89,12 +89,12 @@ const AddComponent = () => {
 
     postAdd(formData)
       .then(() => {
-        alert("물품 등록 완료");
+        alert("실증 등록 완료");
         moveToPath("/");
       })
       .catch((err) => {
         console.error(err);
-        alert("물품 등록 실패");
+        alert("실증 등록 실패");
       });
   };
 
@@ -288,7 +288,7 @@ const AddComponent = () => {
             className="positive-button newText-base hover:positive-button:hover active:positive-button:active"
             onClick={addDem}
           >
-            물품등록
+            실증등록
           </button>
           <button
             className="normal-button newText-base hover:normal-button:hover active:normal-button:active"
