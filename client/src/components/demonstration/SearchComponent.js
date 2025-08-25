@@ -43,7 +43,7 @@ const SearchComponent = ({ search, setSearch, type, setType, onSearchClick, sear
 
     <button
       type="submit"
-      className="positive-button h-10"
+      className="positive-button newText-base h-10"
       aria-label="검색"
     >
       검색

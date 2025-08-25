@@ -407,7 +407,7 @@ const AdminResComponent = () => {
           </div>
 
           {/* 일괄 처리 버튼 */}
-          <div className="flex justify-end mt-5 mr-15">
+          <div className="flex justify-end mt-5 mr-15 newText-base">
             <button
               disabled={selectedItems.length === 0}
               className={`px-4 py-2 rounded mr-2 ${selectedItems.length > 0

@@ -197,43 +197,43 @@ const DetailComponent = ({ demNum }) => {
                             <div className="w-full lg:w-1/2 max-h-[500px] overflow-y-auto break-words p-6 bg-gray-50 rounded-lg">
                                 {/* 카테고리 */}
                                 <div className="mb-6 pb-4 border-b border-gray-300">
-                                    <span className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full text-lg font-bold">
+                                    <span className="newText-base inline-block bg-blue-600 text-white px-3 py-1 rounded-full text-lg font-bold">
                                         {dem.category}
                                     </span>
                                 </div>
                                 {/* 물품 정보 */}
                                 <div className="space-y-4">
                                     <div className="flex flex-col">
-                                        <span className="text-blue-600 text-lg font-bold mb-1">물품명</span>
-                                        <span className="text-gray-800 text-xl font-semibold">{dem.demName}</span>
+                                        <span className="text-blue-600 newText-lg font-bold mb-1">물품명</span>
+                                        <span className="text-gray-800 newText-xl font-semibold">{dem.demName}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-blue-600 text-lg font-bold mb-1">제조사</span>
-                                        <span className="text-gray-700 text-lg">{dem.demMfr}</span>
+                                        <span className="text-blue-600 newText-lg font-bold mb-1">제조사</span>
+                                        <span className="text-gray-700 newText-lg">{dem.demMfr}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-blue-600 text-lg font-bold mb-1">기업명</span>
-                                        <span className="text-gray-700 text-lg">{dem.companyName}</span>
+                                        <span className="text-blue-600 newText-lg font-bold mb-1">기업명</span>
+                                        <span className="text-gray-700 newText-lg">{dem.companyName}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-blue-600 text-lg font-bold mb-1">마감일</span>
-                                        <span className="text-gray-700 text-lg">{dem.expDate}</span>
+                                        <span className="text-blue-600 newText-lg font-bold mb-1">마감일</span>
+                                        <span className="text-gray-700 newText-lg">{dem.expDate}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-blue-600 text-lg font-bold mb-1">수량</span>
+                                        <span className="text-blue-600 newText-lg font-bold mb-1">수량</span>
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-lg font-bold ${dem.itemNum > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                            <span className={`newText-lg font-bold ${dem.itemNum > 0 ? 'text-green-600' : 'text-red-600'}`}>
                                                 {dem.itemNum}개
                                             </span>
-                                            <span className={`text-sm px-2 py-1 rounded-full ${dem.itemNum > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            <span className={`newText-sm px-2 py-1 rounded-full ${dem.itemNum > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                                 {dem.itemNum > 0 ? '대여 가능' : '대여 불가'}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-blue-600 text-lg font-bold mb-2">물품소개</span>
+                                        <span className="text-blue-600 newText-lg font-bold mb-2">물품소개</span>
                                         <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
-                                            <span className="text-gray-700 leading-relaxed whitespace-pre-wrap">{dem.demInfo}</span>
+                                            <span className="newText-base text-gray-700 leading-relaxed whitespace-pre-wrap">{dem.demInfo}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -272,9 +272,9 @@ const DetailComponent = ({ demNum }) => {
                                 <div className="border border-black p-6 rounded h-[150px] flex flex-col justify-center space-y-4">
                                     <div className="flex items-center gap-4">
                                         <img src={calendar} className="w-8 h-8" alt="calendar" />
-                                        <label className="text-lg font-semibold w-[120px]">예약 시작일:</label>
+                                        <label className="newText-lg font-semibold w-[120px]">예약 시작일:</label>
                                         <DatePicker
-                                            className="border p-2 text-base flex-1 min-w-0 box-border"
+                                            className="border p-2 newText-base flex-1 min-w-0 box-border"
                                             selected={startDate}
                                             onChange={handleStartDateChange}
                                             dateFormat="yyyy-MM-dd"
@@ -288,9 +288,9 @@ const DetailComponent = ({ demNum }) => {
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <img src={calendar} className="w-8 h-8" alt="calendar" />
-                                        <label className="text-lg font-semibold w-[120px]">예약 종료일:</label>
+                                        <label className="newText-lg font-semibold w-[120px]">예약 종료일:</label>
                                         <DatePicker
-                                            className="border p-2 text-base flex-1 min-w-0 box-border"
+                                            className="border p-2 newText-base flex-1 min-w-0 box-border"
                                             selected={endDate}
                                             onChange={handleEndDateChange}
                                             dateFormat="yyyy-MM-dd"
