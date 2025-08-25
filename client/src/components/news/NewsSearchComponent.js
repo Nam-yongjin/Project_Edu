@@ -10,6 +10,45 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
         endDate: initialValues?.endDate || ""
     });
 
+    // 오늘 날짜 구하기 (YYYY-MM-DD 형식)
+    const getTodayString = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    // 날짜 유효성 검사
+    const validateDates = (startDate, endDate) => {
+        const today = getTodayString();
+        const errors = [];
+
+        // 현재 날짜 이후 날짜 선택 제한
+        if (startDate && startDate > today) {
+            errors.push("시작일은 오늘 날짜 이후로 선택할 수 없습니다.");
+        }
+        if (endDate && endDate > today) {
+            errors.push("종료일은 오늘 날짜 이후로 선택할 수 없습니다.");
+        }
+
+        // 시작일이 종료일보다 이후인지 확인
+        if (startDate && endDate && startDate > endDate) {
+            errors.push("시작일은 종료일보다 이후일 수 없습니다.");
+        }
+
+        // 기간 최대 범위 제한 (1년)
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 365) {
+                errors.push("검색 기간은 최대 1년까지만 설정 가능합니다.");
+            }
+        }
+
+        return errors;
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setSearchForm(prev => ({
@@ -18,8 +57,44 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
         }));
     };
 
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+        
+        // 날짜 형식 검증
+        if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            alert("올바른 날짜 형식(YYYY-MM-DD)을 입력해주세요.");
+            return;
+        }
+
+        const newSearchForm = {
+            ...searchForm,
+            [name]: value
+        };
+
+        // 실시간 유효성 검사
+        const errors = validateDates(
+            name === 'startDate' ? value : newSearchForm.startDate,
+            name === 'endDate' ? value : newSearchForm.endDate
+        );
+
+        if (errors.length > 0) {
+            alert(errors.join('\n'));
+            return;
+        }
+
+        setSearchForm(newSearchForm);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // 제출 전 최종 유효성 검사
+        const errors = validateDates(searchForm.startDate, searchForm.endDate);
+        if (errors.length > 0) {
+            alert(errors.join('\n'));
+            return;
+        }
+
         const searchParams = {
             ...initialValues,
             ...searchForm,
@@ -85,18 +160,23 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                                 type="date"
                                 name="startDate"
                                 value={searchForm.startDate}
-                                onChange={handleInputChange}
+                                onChange={handleDateChange}
+                                max={getTodayString()} // 오늘 날짜까지만 선택 가능
                                 className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                title="시작일을 선택하세요 (오늘 날짜까지만 선택 가능)"
                             />
                             <span className="text-gray-500">~</span>
                             <input
                                 type="date"
                                 name="endDate"
                                 value={searchForm.endDate}
-                                onChange={handleInputChange}
+                                onChange={handleDateChange}
+                                max={getTodayString()} // 오늘 날짜까지만 선택 가능
+                                min={searchForm.startDate || undefined} // 시작일 이후만 선택 가능
                                 className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                title="종료일을 선택하세요 (시작일 이후, 오늘 날짜까지만 선택 가능)"
                             />
-                        </div>
+                        </div>               
                     </div>
                 ) : (<></>)}
 
