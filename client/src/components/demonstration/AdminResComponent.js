@@ -224,7 +224,7 @@ const AdminResComponent = () => {
               {/* 테이블 헤더 */}
               <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
                 <tr className="newText-base whitespace-nowrap">
-                  <th className="w-[5%]">
+                  <th className="w-[5%] px-3">
                     {selectableItemsCount > 0 && (
                       <input
                         type="checkbox"
@@ -234,7 +234,7 @@ const AdminResComponent = () => {
                       />
                     )}
                   </th>
-                  <th className="w-[10%]">이미지</th>
+                  <th className="w-[30%]">이미지</th>
                   <th className="w-[5%]">아이디</th>
                   <th className="w-[10%]">전화번호</th>
                   <th className="w-[14%]">주소</th>
@@ -276,8 +276,8 @@ const AdminResComponent = () => {
                       </th>
                     )
                   )}
-                  <th className="min-w-[14%]">반납/연장</th>
-                  <th className="min-w-[10%]">삭제</th>
+                  <th className="min-w-[14%] px-3">반납/연장</th>
+                  <th className="min-w-[10%] px-3">삭제</th>
                 </tr>
               </thead>
 
@@ -305,7 +305,7 @@ const AdminResComponent = () => {
                               type="checkbox"
                               checked={isSelected}
                               onChange={(e) => handleItemSelect(member, e.target.checked)}
-                              className="w-4 h-4"
+                              className="w-4 h-4 px-3"
                             />
                           )}
                         </td>
@@ -349,7 +349,7 @@ const AdminResComponent = () => {
                         <td>{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
                         <td>{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
                         <td>{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
-                        <td>
+                        <td className="px-3">
                           {member.requestDTO && member.requestDTO.length > 0 ? (
                             member.requestDTO.some(req => req.state === "WAIT") ? (
                               <div className="flex flex-col items-center space-y-1">
@@ -382,7 +382,7 @@ const AdminResComponent = () => {
                             )
                           ) : "-"}
                         </td>
-                        <td>
+                        <td className="px-3">
                           {member.state === "ACCEPT" ? (
                             <button
                               className="nagative-button"
@@ -407,7 +407,7 @@ const AdminResComponent = () => {
           </div>
 
           {/* 일괄 처리 버튼 */}
-          <div className="flex justify-end mt-4 mr-15">
+          <div className="flex justify-end mt-5 mr-15">
             <button
               disabled={selectedItems.length === 0}
               className={`px-4 py-2 rounded mr-2 ${selectedItems.length > 0

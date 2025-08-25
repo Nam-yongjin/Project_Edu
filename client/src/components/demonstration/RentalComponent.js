@@ -337,7 +337,7 @@ const RentalComponent = () => {
                     <table className="w-full min-w-[1000px]">
                         <thead className="bg-gray-100 text-gray-700 text-base border border-gray-300">
                             <tr className="text-base whitespace-nowrap">
-                                <th className="w-[5%] px-2 py-3">
+                                <th className="w-[5%] px-3 py-3">
                                     {waitItems.length > 0 && (
                                         <input
                                             type="checkbox"
@@ -572,7 +572,7 @@ const RentalComponent = () => {
                 )}
 
                 {/* 우측 하단 예약 취소 버튼 */}
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end mt-5">
                     <button
                         onClick={handleCancelReservation}
                         disabled={selectedItems.size === 0}
