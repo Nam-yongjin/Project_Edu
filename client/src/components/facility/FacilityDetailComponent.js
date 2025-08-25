@@ -382,7 +382,7 @@ export default function FacilityDetailContent({ facRevNum }) {
                 </button>
                 <button
                   type="button"
-                  className="nagative-button newText-base"
+                  className="negative-button newText-base"
                   onClick={handleDelete}
                 >
                   삭제

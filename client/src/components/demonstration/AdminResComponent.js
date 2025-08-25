@@ -340,7 +340,7 @@ const AdminResComponent = () => {
                                 onClick={() => handleRental(member.demRevNum, "ACCEPT")}
                               >수락</button>
                               <button
-                                className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
+                                className="inline-block negative-button text-[10px] px-2 py-1 leading-none"
                                 onClick={() => handleRental(member.demRevNum, "REJECT")}
                               >거절</button>
                             </div>
@@ -367,7 +367,7 @@ const AdminResComponent = () => {
                                         onClick={() => handleRequest(member.demRevNum, "ACCEPT", req.type)}
                                       >수락</button>
                                       <button
-                                        className="inline-block nagative-button text-[10px] px-2 py-1 leading-none"
+                                        className="inline-block negative-button text-[10px] px-2 py-1 leading-none"
                                         onClick={() => handleRequest(member.demRevNum, "REJECT", req.type)}
                                       >거절</button>
                                     </div>
@@ -385,7 +385,7 @@ const AdminResComponent = () => {
                         <td className="px-3">
                           {member.state === "ACCEPT" ? (
                             <button
-                              className="nagative-button"
+                              className="negative-button"
                               onClick={() => {
                                 deleteRental([member.demRevNum]);
                                 alert("삭제되었습니다.");
@@ -421,7 +421,7 @@ const AdminResComponent = () => {
             <button
               disabled={selectedItems.length === 0}
               className={`px-4 py-2 rounded ${selectedItems.length > 0
-                ? "nagative-button"
+                ? "negative-button"
                 : "disable-button"
                 }`}
               onClick={handleCheckedReject}

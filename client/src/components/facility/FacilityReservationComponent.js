@@ -198,7 +198,7 @@ const FacilityReservationComponent = () => {
                       <button
                         onClick={() => handleCancelReservation(item.reserveId)}
                         disabled={cancelDisabled}
-                        className={`nagative-button newText-base px-3 py-1 rounded ${cancelDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`negative-button newText-base px-3 py-1 rounded ${cancelDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                         title={getCancelButtonLabel(item)}
                       >
                         {getCancelButtonLabel(item)}

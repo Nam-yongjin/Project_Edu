@@ -515,7 +515,7 @@ const RentalComponent = () => {
                                                                     disabled={itemState !== "ACCEPT" || hasWaitState}
                                                                     onClick={() => handleActionClick(item.demNum, "반납")}
                                                                     className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
-                                                                        ? "nagative-button"
+                                                                        ? "negative-button"
                                                                         : "disable-button"
                                                                         }`}
                                                                 >

@@ -434,7 +434,7 @@ const CompanyInfoModifyComponent = () => {
                                 <button className='normal-button' onClick={handleModifyCancle}>수정취소</button>
                             </div>
                             <div>
-                                <button className='nagative-button' onClick={handleMoveLeave}>회원탈퇴</button>
+                                <button className='negative-button' onClick={handleMoveLeave}>회원탈퇴</button>
                             </div>
                         </div>
                         :

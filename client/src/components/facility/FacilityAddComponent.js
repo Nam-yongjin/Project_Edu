@@ -19,7 +19,7 @@ const ImageTile = React.memo(function ImageTile({ src, title, isMain, onSetMain,
     <div className={`rounded-2xl border bg-white p-2 w-[160px] ${isMain ? "ring-2 ring-blue-400" : ""}`}>
       <div className="flex justify-between items-center mb-1">
         <p className="newText-sm font-semibold text-blue-600">{isMain ? "대표" : title}</p>
-        <button type="button" onClick={onDelete} className="nagative-button newText-xs px-2 py-0.5 rounded">
+        <button type="button" onClick={onDelete} className="negative-button newText-xs px-2 py-0.5 rounded">
           삭제
         </button>
       </div>

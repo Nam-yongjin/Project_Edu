@@ -235,7 +235,7 @@ const AdminMembersComponent = () => {
                 </select>
                 <button
                     onClick={handleChangeState}
-                    className="nagative-button"
+                    className="negative-button"
                 >
                     선택 회원 상태 변경
                 </button>

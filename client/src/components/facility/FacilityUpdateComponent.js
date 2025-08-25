@@ -42,7 +42,7 @@ const ThumbTile = React.memo(function ThumbTile({
         <button
           type="button"
           onClick={onToggleDelete}
-          className={`${isExisting ? (marked ? "normal-button" : "nagative-button") : "nagative-button"} newText-xs px-2 py-0.5 rounded`}
+          className={`${isExisting ? (marked ? "normal-button" : "negative-button") : "negative-button"} newText-xs px-2 py-0.5 rounded`}
         >
           {isExisting ? (marked ? "취소" : "삭제") : "삭제"}
         </button>

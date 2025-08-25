@@ -279,7 +279,7 @@ function EvtDetailComponent({ eventNum }) {
                     </button>
                   ) : (
                     <button
-                      className="nagative-button newText-base flex-1"
+                      className="negative-button newText-base flex-1"
                       onClick={handleCancel}
                     >
                       프로그램 취소
