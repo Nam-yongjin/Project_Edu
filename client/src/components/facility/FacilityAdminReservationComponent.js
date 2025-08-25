@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   getAdminReservations,
   updateReservationState,
@@ -7,7 +8,7 @@ import {
 } from "../../api/facilityApi";
 import PageComponent from "../../components/common/PageComponent";
 
-// ==================== 유틸 ====================
+/* ==================== 유틸 ==================== */
 // 2자리 패딩
 const pad2 = (n) => String(n).padStart(2, "0");
 
@@ -43,7 +44,7 @@ const hhmm = (v) => {
 // 이용일이 오늘 이전인가
 const isPastUseDate = (ymd) => {
   if (!ymd) return false;
-  const today = toYmd(new Date()); // 'YYYY-MM-DD'
+  const today = toYmd(new Date());
   return String(ymd) < today;
 };
 
@@ -66,7 +67,7 @@ const chipOf = (state, facDate) => {
   }
 };
 
-// ==================== 기간 빠른 선택 ====================
+/* ==================== 기간 빠른 선택 ==================== */
 const todayRange = () => {
   const t = new Date();
   const ymd = toYmd(t);
@@ -89,7 +90,7 @@ const thisMonthRange = () => {
   return { from: toYmd(first), to: toYmd(last) };
 };
 
-// ==================== PageComponent 브리지 ====================
+/* ==================== PageComponent 브리지 ==================== */
 // PageComponent는 (totalPages, current[0-based], setCurrent[0-based])만 기대함.
 // 상위(AdminFacilityReservations)는 onChange에서 1-based를 기대하므로 여기서 변환 처리.
 function PageBridge({ page, pageSize, totalCount, onChange }) {
@@ -110,9 +111,12 @@ function PageBridge({ page, pageSize, totalCount, onChange }) {
   );
 }
 
-// ==================== 메인 컴포넌트 ====================
+/* ==================== 메인 컴포넌트 ==================== */
 export default function AdminFacilityReservations() {
   const navigate = useNavigate();
+
+  // ✅ 권한
+  const isAdmin = useSelector((s) => s?.loginState?.role === "ADMIN");
 
   // 필터 상태
   const [state, setState] = useState(""); // "", "WAITING", "APPROVED", "REJECTED"
@@ -133,37 +137,13 @@ export default function AdminFacilityReservations() {
   const [sortKey, setSortKey] = useState("reserveAt");
   const [sortDir, setSortDir] = useState("DESC");
 
-  // 정렬
-  const sorted = useMemo(() => {
-    const arr = [...rows];
-    const key = sortKey;
-    arr.sort((a, b) => {
-      let va = a?.[key];
-      let vb = b?.[key];
-      if (key === "reserveAt") {
-        const da = va ? new Date(String(va).replace(" ", "T")).getTime() : 0;
-        const db = vb ? new Date(String(vb).replace(" ", "T")).getTime() : 0;
-        return da - db;
-      }
-      if (key === "facDate") {
-        const da = va ? new Date(`${va}T00:00:00`).getTime() : 0;
-        const db = vb ? new Date(`${vb}T00:00:00`).getTime() : 0;
-        return da - db;
-      }
-      if (typeof va === "number" && typeof vb === "number") return va - vb;
-      return String(va ?? "").localeCompare(String(vb ?? ""));
-    });
-    return sortDir === "DESC" ? arr.reverse() : arr;
-  }, [rows, sortKey, sortDir]);
-
-  // 페이징 적용된 데이터
-  const paged = useMemo(() => {
-    const start = page * pageSize;
-    return sorted.slice(start, start + pageSize);
-  }, [sorted, page, pageSize]);
-
-  const totalCount = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  // ===== 권한 체크: ADMIN이 아니면 접근 불가 =====
+  useEffect(() => {
+    if (isAdmin === false) {
+      alert("권한이 없습니다.");
+      navigate("/facility/list");
+    }
+  }, [isAdmin, navigate]);
 
   // 데이터 로드
   const fetchData = async () => {
@@ -198,11 +178,43 @@ export default function AdminFacilityReservations() {
     }
   };
 
+  // 초기 로드: 관리자일 때만 실행
   useEffect(() => {
-    fetchData();
-    // 의도적으로 초기 1회만 로드
+    if (isAdmin) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isAdmin]);
+
+  // 정렬
+  const sorted = useMemo(() => {
+    const arr = [...rows];
+    const key = sortKey;
+    arr.sort((a, b) => {
+      let va = a?.[key];
+      let vb = b?.[key];
+      if (key === "reserveAt") {
+        const da = va ? new Date(String(va).replace(" ", "T")).getTime() : 0;
+        const db = vb ? new Date(String(vb).replace(" ", "T")).getTime() : 0;
+        return da - db;
+      }
+      if (key === "facDate") {
+        const da = va ? new Date(`${va}T00:00:00`).getTime() : 0;
+        const db = vb ? new Date(`${vb}T00:00:00`).getTime() : 0;
+        return da - db;
+      }
+      if (typeof va === "number" && typeof vb === "number") return va - vb;
+      return String(va ?? "").localeCompare(String(vb ?? ""));
+    });
+    return sortDir === "DESC" ? arr.reverse() : arr;
+  }, [rows, sortKey, sortDir]);
+
+  // 페이징 적용된 데이터
+  const paged = useMemo(() => {
+    const start = page * pageSize;
+    return sorted.slice(start, start + pageSize);
+  }, [sorted, page, pageSize]);
+
+  const totalCount = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   // 빠른 범위 선택
   const quick = {
@@ -328,7 +340,10 @@ export default function AdminFacilityReservations() {
     return <span className="newText-sm text-gray-400">-</span>;
   };
 
-  // ==================== 렌더 ====================
+  // 비관리자라면(리다이렉트 직전) 화면 렌더를 막아 깜빡임 방지
+  if (isAdmin === false) return null;
+
+  /* ==================== 렌더 ==================== */
   return (
     // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-xl mx-auto my-10">

@@ -1,8 +1,3 @@
-// 변경 사항 요약
-// 1) 이미지 영역을 Swiper 슬라이더로 교체(자동재생/페이지네이션/네비게이션 적용)
-// 2) "목록으로" 버튼은 항상 "/facility/list"로 이동하도록 유지
-// 3) 최상단 div의 클래스(max-w-screen-xl mx-auto my-10)와 그 바로 아래 div의 클래스(min-blank)는 고정
-
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   addDays, addMonths, startOfMonth, endOfMonth,
@@ -98,7 +93,8 @@ export default function FacilityDetailContent({ facRevNum }) {
   const [holLoading, setHolLoading] = useState(false);
   const [holError, setHolError] = useState("");
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  // ✅ 기본값: 오늘 날짜 선택
+  const [selectedDate, setSelectedDate] = useState(todayYmd());
   const [startKey, setStartKey] = useState(null);
   const [durationHrs, setDurationHrs] = useState(null);
   const [reservedBlocks, setReservedBlocks] = useState([]);
@@ -426,7 +422,6 @@ export default function FacilityDetailContent({ facRevNum }) {
           reservedBlocks={reservedBlocks}
           submitting={submitting}
           notice={notice}
-          isErrorNotice={isErrorNotice}
         />
       </div>
     </div>
@@ -440,7 +435,6 @@ function DetailCalendarSection(props) {
     selectedDate, handleDayClick, open, close, selectedDateHasHoliday,
     startSlots, startKey, setStartKey, durationHrs, setDurationHrs, maxHrs,
     endTimeText, canReserve, applyReserve, holLoading, holError, submitting,
-    notice, isErrorNotice,
     reservedBlocks,
   } = props;
 
@@ -471,6 +465,17 @@ function DetailCalendarSection(props) {
     }
   }, [startKey, maxHrs, reservedBlocks, startSlots, setDurationHrs]);
 
+  /* 선택된 요일 정보 (헤더/패널 표시에 사용) */
+  const selectedWeekdayIndex = useMemo(() => {
+    if (!selectedDate) return null;
+    return parse(selectedDate, "yyyy-MM-dd", new Date()).getDay(); // 0:일 ~ 6:토
+  }, [selectedDate]);
+
+  const selectedWeekdayFull = useMemo(() => {
+    if (!selectedDate) return "-";
+    return format(parse(selectedDate, "yyyy-MM-dd", new Date()), "EEEE", { locale: ko }); // 예: '월요일'
+  }, [selectedDate]);
+
   return (
     <div className="mt-8 flex items-start gap-6">
       {/* 캘린더 카드 */}
@@ -493,12 +498,27 @@ function DetailCalendarSection(props) {
           </button>
         </div>
 
+        {/* 요일 헤더: 선택 요일 하이라이트 */}
         <div className="grid grid-cols-7 text-center newText-sm font-semibold text-gray-500 mb-2">
-          {["일", "월", "화", "수", "목", "금", "토"].map((d, i) => (
-            <div key={i} className={i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : ""}>{d}요일</div>
-          ))}
+          {["일", "월", "화", "수", "목", "금", "토"].map((d, i) => {
+            const baseColor = i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : "";
+            const isSelectedDow = selectedWeekdayIndex === i;
+            return (
+              <div key={i} className={baseColor}>
+                <span
+                  className={[
+                    "inline-block px-2 py-1 rounded-full",
+                    isSelectedDow ? "bg-blue-100 text-blue-700 ring-2 ring-blue-200" : ""
+                  ].join(" ")}
+                >
+                  {d}요일
+                </span>
+              </div>
+            );
+          })}
         </div>
 
+        {/* 날짜 그리드 */}
         <div className="grid grid-cols-7 gap-[1px] bg-gray-200 rounded-lg overflow-hidden">
           {weeks.flatMap((week, wi) =>
             week.map((d, di) => {
@@ -515,18 +535,30 @@ function DetailCalendarSection(props) {
                   type="button"
                   onClick={() => handleDayClick(d)}
                   className={[
-                    "h-[96px] bg-white text-left p-2 relative focus:outline-none",
-                    "transition",
+                    "h-[96px] bg-white text-left p-2 relative focus:outline-none transition",
                     isDisabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer",
                     isHoliday && "ring-2 ring-red-300",
-                    isSelected && "outline outline-2 outline-blue-400",
+                    // ✅ 선택된 셀 강조: 연한 파랑 배경 + 파랑 테두리
+                    isSelected && "bg-blue-50 outline outline-2 outline-blue-400",
                   ].filter(Boolean).join(" ")}
                   disabled={isDisabled}
                 >
-                  <div className={`absolute top-2 right-2 newText-sm ${di === 0 ? "text-red-500" : di === 6 ? "text-blue-500" : "text-gray-600"}`}>
-                    {format(d, "d")}
+                  {/* 날짜 숫자: 선택 시 파란 동그라미 배지 */}
+                  <div className="absolute top-2 right-2">
+                    <span
+                      className={[
+                        "newText-sm",
+                        di === 0 ? "text-red-500" : di === 6 ? "text-blue-500" : "text-gray-600",
+                        isSelected ? "bg-blue-600 text-white rounded-full w-7 h-7 inline-flex items-center justify-center" : ""
+                      ].join(" ")}
+                      style={isSelected ? { lineHeight: "1.75rem" } : undefined}
+                    >
+                      {format(d, "d")}
+                    </span>
                   </div>
+
                   {isToday(d) && <span className="absolute left-2 top-2 newText-xs text-blue-600">오늘</span>}
+
                   <div className="mt-6 flex flex-col gap-1">
                     {items.map((it, i2) => (
                       <span
@@ -553,6 +585,14 @@ function DetailCalendarSection(props) {
 
         <dl className="mt-3 space-y-2 newText-sm">
           <Row label="예약일" value={selectedDate ?? "-"} />
+          <Row
+            label="요일"
+            value={
+              selectedDate
+                ? format(parse(selectedDate, "yyyy-MM-dd", new Date()), "EEEE", { locale: ko })
+                : "-"
+            }
+          />
           <Row label="예약가능" value={`${open} ~ ${close}`} />
           <Row label="규칙" value="하루 1회, 최대 4시간 연속 사용" />
         </dl>
@@ -626,12 +666,6 @@ function DetailCalendarSection(props) {
         >
           {submitting ? "전송 중..." : "예약 신청하기"}
         </button>
-
-        {notice && (
-          <div className={`mt-3 newText-sm ${isErrorNotice ? "text-red-600" : "text-green-700"}`}>
-            {notice}
-          </div>
-        )}
       </aside>
     </div>
   );

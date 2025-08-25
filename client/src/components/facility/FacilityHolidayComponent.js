@@ -28,7 +28,7 @@ export default function FacilityDetailComponent() {
   const [selectedDate, setSelectedDate] = useState(null); // "yyyy-MM-dd"
   const [selectedReason, setSelectedReason] = useState(HOLIDAY_REASON_OPTIONS[0].code);
 
-  // 전체 공휴일 로드
+  // 전체 휴무일 로드
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -90,7 +90,7 @@ export default function FacilityDetailComponent() {
 
     // 삭제 플로우
     if (hasPublic) {
-      const ok = window.confirm(`${dateStr} 공휴일을 삭제할까요?`);
+      const ok = window.confirm(`${dateStr} 휴무일을 삭제할까요?`);
       if (!ok) return;
       try {
         setSaving(true);
@@ -104,14 +104,14 @@ export default function FacilityDetailComponent() {
         else newMap.delete(dateStr);
         setHolidayMap(newMap);
 
-        setInfo("공휴일을 삭제했습니다.");
+        setInfo("휴무일을 삭제했습니다.");
       } catch (e) {
         console.error(e);
         const status = e?.response?.status;
         const msg =
           status === 404
-            ? "해당 날짜의 공휴일이 없습니다."
-            : e?.response?.data?.message || e.message || "공휴일 삭제에 실패했습니다.";
+            ? "해당 날짜의 휴무일이 없습니다."
+            : e?.response?.data?.message || e.message || "휴무일 삭제에 실패했습니다.";
         setError(msg);
       } finally {
         setSaving(false);
@@ -125,7 +125,7 @@ export default function FacilityDetailComponent() {
     setModalOpen(true);
   };
 
-  // 공휴일 저장
+  // 휴무일 저장
   const submitHoliday = async () => {
     if (!selectedDate) return;
     const reasonObj = HOLIDAY_REASON_OPTIONS.find((o) => o.code === selectedReason);
@@ -142,7 +142,7 @@ export default function FacilityDetailComponent() {
       newMap.set(selectedDate, arr);
       setHolidayMap(newMap);
 
-      setInfo("공휴일이 등록되었습니다.");
+      setInfo("휴무일이 등록되었습니다.");
       setModalOpen(false);
     } catch (e) {
       console.error(e);
@@ -150,7 +150,7 @@ export default function FacilityDetailComponent() {
       const msg =
         status === 409
           ? "이미 등록된 휴무일입니다."
-          : e?.response?.data?.message || e.message || "공휴일 등록에 실패했습니다.";
+          : e?.response?.data?.message || e.message || "휴무일 등록에 실패했습니다.";
       setError(msg);
     } finally {
       setSaving(false);
@@ -259,12 +259,12 @@ export default function FacilityDetailComponent() {
         {info && <div className="mt-2 newText-sm text-green-600">{info}</div>}
         {error && <div className="mt-2 newText-sm text-red-500">{error}</div>}
 
-        {/* 공휴일 등록 모달 */}
+        {/* 휴무일 등록 모달 */}
         {modalOpen && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50" role="dialog" aria-modal="true">
             <div className="w-full max-w-md rounded-2xl bg-white p-5 page-shadow">
               <div className="flex items-center justify-between">
-                <h3 className="newText-xl font-semibold">공휴일 등록</h3>
+                <h3 className="newText-xl font-semibold">휴무일 등록</h3>
                 <button
                   className="normal-button newText-sm px-2 py-1 rounded"
                   onClick={() => setModalOpen(false)}
