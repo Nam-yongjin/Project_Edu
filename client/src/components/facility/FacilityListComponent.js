@@ -55,7 +55,6 @@ const FacilityListComponent = () => {
           keyword: keyword.trim(),
         });
 
-        // axios 래퍼 차이 대응
         const data = res?.data ?? res;
         const content = Array.isArray(data) ? data : data?.content ?? [];
         const tp = Math.max(1, data?.totalPages ?? 1);
@@ -63,7 +62,6 @@ const FacilityListComponent = () => {
         setList(content);
         setTotalPages(tp);
 
-        // 현재 페이지가 총 페이지보다 크면 마지막 페이지로 보정
         if (page > tp) setPage(tp);
       } catch (e) {
         setError(e?.response?.data?.message || e.message || "목록 조회에 실패했습니다.");
@@ -126,7 +124,7 @@ const FacilityListComponent = () => {
         ) : list.length === 0 ? (
           <div className="text-center py-16 newText-base text-gray-500">등록된 공간이 없습니다.</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
             {list.map((item) => (
               <FacilityCard
                 key={item.facRevNum}
@@ -144,7 +142,7 @@ const FacilityListComponent = () => {
             totalPages={Math.max(totalPages, 1)}
             current={page - 1}
             setCurrent={(idx) => setPage(idx + 1)}
-            hideOnSinglePage={false} // PageComponent가 이 prop을 지원하는 경우 단일 페이지도 표시
+            hideOnSinglePage={false}
             blockSize={10}
           />
         </div>
@@ -163,14 +161,14 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
 
   return (
     <div
-      className="page-shadow rounded-2xl bg-white overflow-hidden hover:shadow-lg transition cursor-pointer"
+      className="page-shadow rounded-2xl bg-white overflow-hidden hover:shadow-lg transition cursor-pointer flex flex-col h-full"
       onClick={onCardClick}
     >
       <ImageSlider images={srcs} alt={facName} />
-      <div className="p-4 flex flex-col gap-2">
+      <div className="p-4 flex flex-col flex-1 gap-2">
         <h3 className="newText-lg font-semibold leading-snug line-clamp-2">{facName}</h3>
-        <p className="newText-sm text-gray-600 min-h-[42px]">
-          {facInfo?.length > 90 ? `${facInfo.slice(0, 90)}…` : facInfo || ""}
+        <p className="newText-sm text-gray-600 line-clamp-3 min-h-[60px]">
+          {facInfo || ""}
         </p>
         <p className="newText-sm text-gray-700">(수용인원 : {Number(capacity) || 0}명)</p>
 
@@ -180,7 +178,7 @@ const FacilityCard = ({ item, onCardClick, onApplyClick }) => {
             e.stopPropagation();
             onApplyClick();
           }}
-          className="positive-button mt-2 w-full newText-base"
+          className="positive-button w-full newText-base mt-auto"
         >
           신청하기
         </button>
