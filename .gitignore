@@ -185,3 +185,10 @@ __pycache__/
 *.pyc
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,java,react,eclipse,visualstudiocode,gradle
+
+.env
+.env.local
+.env.*.local
+
+application.properties
+application-*.properties
