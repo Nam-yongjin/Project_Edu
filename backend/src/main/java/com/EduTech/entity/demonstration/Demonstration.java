@@ -37,7 +37,7 @@ public class Demonstration { // 엔티티에 유효성 검사는 db에 데이터
 	@Column(nullable = false)
 	private String demName; // 물품명
 
-	@Column(nullable = false)
+	@Column(nullable = false,length=1000)
 	private String demInfo; // 물품소개
 
 	@Column(nullable = false)

@@ -1,5 +1,6 @@
 package com.EduTech.dto.demonstration;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.EduTech.entity.demonstration.DemonstrationState;
@@ -14,13 +15,17 @@ public class DemonstrationPageListDTO {
 	private String demName;
 	private String demMfr;
 	private Long itemNum;
+	private String companyName;
+	private LocalDate expDate;
 	private DemonstrationState state;
 	private List<DemonstrationImageDTO> imageList;
-	public DemonstrationPageListDTO(Long demNum, String demName, String demMfr, Long itemNum,DemonstrationState state) {
+	public DemonstrationPageListDTO(Long demNum, String demName, String demMfr, Long itemNum,DemonstrationState state,String companyName,LocalDate expDate) {
 	    this.demNum = demNum;
 	    this.demName = demName;
 	    this.demMfr = demMfr;
 	    this.itemNum = itemNum;
 	    this.state=state;
+	    this.companyName=companyName;
+	    this.expDate=expDate;
 }
 }

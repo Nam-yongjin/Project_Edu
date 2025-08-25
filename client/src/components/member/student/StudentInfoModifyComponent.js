@@ -32,7 +32,7 @@ const StudentInfoModifyComponent = () => {
     const [originalEmail, setOriginalEmail] = useState('');
     const [originalPhone, setOriginalPhone] = useState('');
 
-    const fetchCompanyInfo = async () => {
+    const fetchStudentInfo = async () => {
         try {
             const data = await readStudent();
 
@@ -57,7 +57,7 @@ const StudentInfoModifyComponent = () => {
         };
     };
     useEffect(() => {
-        fetchCompanyInfo();
+        fetchStudentInfo();
     }, []);
 
     const phoneNumber = form.phone;
@@ -174,7 +174,7 @@ const StudentInfoModifyComponent = () => {
         setVerifiedPhone(null);
         setModifying(false);
         setErrors({});
-        fetchCompanyInfo();
+        fetchStudentInfo();
         moveToPath('/student/myInfo');
     }
 

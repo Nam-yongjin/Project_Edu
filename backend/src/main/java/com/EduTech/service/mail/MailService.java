@@ -3,7 +3,6 @@ package com.EduTech.service.mail;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.core.io.ByteArrayResource;
@@ -48,7 +47,7 @@ public class MailService {
         public String getContentType() { return contentType; }
     }
 
-    // 비동기로 HTML+첨부파일+이미지 메일 발송
+    // 비동기로 HTML+첨부파일 메일 발송 (Firebase 이미지 처리)
     @Async("mailTaskExecutor")
     public CompletableFuture<Void> sendMimeMessage(AdminMessageDTO adminMessageDTO) {
         try {
@@ -74,47 +73,59 @@ public class MailService {
             }
 
             // 각 수신자별 메일 발송
-            for (String memId : memberList) {
+            for (String email : memberList) {
                 MimeMessage mimeMessage = javaMailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-                helper.setTo(memId);
+                helper.setTo(email);
                 helper.setSubject(adminMessageDTO.getTitle());
 
-                // HTML 본문 + Quill 이미지 CID 처리
+                // HTML 본문 처리 - 이메일 클라이언트 호환성을 위한 강력한 처리
                 Context context = new Context();
-                context.setVariable("memId", memId);
+                context.setVariable("email", email);
+                
                 String contentHtml = adminMessageDTO.getContent().replaceAll("(\r\n|\n|\r)", "<br/>");
-
-                // Quill 이미지 처리
-                List<MultipartFile> images = adminMessageDTO.getImageList();
-                if (images != null) {
-                    for (MultipartFile image : images) {
-                        if (!image.isEmpty()) {
-                            String cid = UUID.randomUUID().toString();
-
-                            // 본문에 모든 src 치환
-                            contentHtml = contentHtml.replaceAll(
-                                "src=[\"']" + image.getOriginalFilename() + "[\"']",
-                                "src='cid:" + cid + "'"
-                            );
-
-                            // 메일에 inline 추가
-                            helper.addInline(cid, new ByteArrayResource(image.getBytes()), image.getContentType());
-                        }
-                    }
-                }
-
+                
+                // 1. 모든 img 태그를 찾아서 테이블로 감싸기 (가장 안전한 방법)
+                contentHtml = contentHtml.replaceAll(
+                    "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*center([^\"]*?)\"([^>]*?)>\\s*(<img[^>]*?)>\\s*</p>",
+                    "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 10px 0;\"><tr><td align=\"center\">$5 style=\"display: block; margin: 0 auto;\"></td></tr></table>"
+                );
+                
+                contentHtml = contentHtml.replaceAll(
+                    "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*left([^\"]*?)\"([^>]*?)>\\s*(<img[^>]*?)>\\s*</p>",
+                    "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 10px 0;\"><tr><td align=\"left\">$5 style=\"display: block;\"></td></tr></table>"
+                );
+                
+                contentHtml = contentHtml.replaceAll(
+                    "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*right([^\"]*?)\"([^>]*?)>\\s*(<img[^>]*?)>\\s*</p>",
+                    "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 10px 0;\"><tr><td align=\"right\">$5 style=\"display: block;\"></td></tr></table>"
+                );
+                
+                // 2. 일반 텍스트 중앙정렬도 테이블로
+                contentHtml = contentHtml.replaceAll(
+                    "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*center([^\"]*?)\"([^>]*?)>",
+                    "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 10px 0;\"><tr><td align=\"center\" style=\"$2$3\">"
+                );
+                
+                contentHtml = contentHtml.replaceAll(
+                    "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*left([^\"]*?)\"([^>]*?)>",
+                    "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 10px 0;\"><tr><td align=\"left\" style=\"$2$3\">"
+                );
+                
+                contentHtml = contentHtml.replaceAll(
+                    "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*right([^\"]*?)\"([^>]*?)>",
+                    "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 10px 0;\"><tr><td align=\"right\" style=\"$2$3\">"
+                );
+                
+                // 3. 닫는 p 태그를 td, tr, table로 변경
+                contentHtml = contentHtml.replaceAll("</p>", "</td></tr></table>");
+                
                 context.setVariable("content", contentHtml);
                 String htmlContent = templateEngine.process("mailTemplate", context);
                 helper.setText(htmlContent, true);
 
-                // 로고 첨부 (선택 사항)
-                File logoFile = new File("C:\\Users\\JA309\\git\\Project_Edu\\backend\\src\\main\\resources\\static\\images\\logo.png");
-                if (logoFile.exists()) {
-                    FileSystemResource res = new FileSystemResource(logoFile);
-                    helper.addInline("logo", res);
-                }
+                // 로고는 Firebase URL로 처리하므로 별도 첨부 불필요
 
                 // 첨부파일 추가
                 for (Attachment att : attachments) {

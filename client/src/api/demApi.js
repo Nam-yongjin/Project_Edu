@@ -33,13 +33,12 @@ export const putUpdate = async (formData) => {
 }
 
 // 실증 상품 리스트 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
-export const getList = async (current,searchType,search) => {
-    console.log(searchType);
-    console.log(search);
+export const getList = async (current,searchType,search,sortType) => {
     const res = await axios.get(`${demonstration}/demList`, {
         params : {pageCount: current,
                 type:searchType,
                 search:search,
+                sortType:sortType
         }
     });
     return res.data;
@@ -117,9 +116,9 @@ export const getRentalSearch=async (search,type,pageCount,sortBy,sort,statusFilt
 }
 
 // 물품 대여 현황 페이지에서 항목 선택 후, 예약 취소 버튼 클릭 시, 상품 삭제
-export const deleteRental = async (demNum) => {
+export const deleteRental = async (demRevNum) => {
   const res = await jwtAxios.delete(`${demonstration}/CancelRes`, {
-    data:demNum,  // 배열을 body에 직접 담아서 보냄
+    data:demRevNum,  // 배열을 body에 직접 담아서 보냄
   });
   return res.data;
 };
@@ -127,12 +126,13 @@ export const deleteRental = async (demNum) => {
 
 
 // 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
-export const updateRental = async (startDate,endDate,demNum,itemNum) => {
+export const updateRental = async (startDate,endDate,demNum,itemNum,demRevNum) => {
   const res = await jwtAxios.put(`${demonstration}/ChangeRes`, {
       startDate: startDate,
         endDate: endDate,
         demNum: demNum,
-        itemNum:itemNum
+        itemNum:itemNum,
+        demRevNum:demRevNum
   });
   return res.data;
 };
@@ -177,10 +177,12 @@ export const getBorrow= async (pageCount, sort, sortBy, statusFilter) => {
 
 // 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청 
 export const delDem = async (demNum) => {
-  const res = await jwtAxios.delete(`${demonstration}/DeleteDem/${demNum}`);
+        console.log(demNum);
+  const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, {
+     data:demNum
+    });
   return res.data;
 };
-
 
 // 실증 등록 물품 페이지에서 해당 물품을 신청한 회원을 보게 해주는 요청(검색어 있음)
 export const getBorrowResInfoSearch  = async (demNum, pageCount, search, type, sortBy, sort,statusFilter) => {

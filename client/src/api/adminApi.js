@@ -101,17 +101,6 @@ export const updateReqState = async (demRevNum, state, type) => {
 };
 
 
-// 관리자 물품 대여 페이지에서 물품 대여 신청에 대해 수락 / 거절을 업데이트 하는 요청
-export const updateRegState = async (startDate, endDate, demNum, itemNum) => {
-    const res = await jwtAxios.put(`${admin}/ChangeRes`, {
-        startDate: startDate,
-        endDate: endDate,
-        demNum: demNum,
-        itemNum: itemNum
-    });
-    return res.data;
-};
-
 // 관리자 물품 대여 관리 페이지에서 회원이 등록한 물품 항목들을 보여주는 요청
 export const getRegAdminSearch = async (pageCount, search, type, sortBy, sort, statusFilter) => {
     const res = await jwtAxios.get(`${admin}/demReg`, {
@@ -140,7 +129,7 @@ export const getRegAdmin = async (pageCount, sort, sortBy, statusFilter) => {
     return res.data;
 };
 
-// 관리자 물품 대여 페이지에서 반납 요청 / 반납 기한 연장에 대해 수락 / 거절을 업데이트 하는 요청
+// 관리자 물품 대여 페이지에서 물품 대여 신청에 대해 수락 / 거절을 업데이트 하는 요청
 export const updateRegstate = async (demRegNum, state) => {
     const res = await jwtAxios.put(`${admin}/RegState`, {
         demRegNum: demRegNum,

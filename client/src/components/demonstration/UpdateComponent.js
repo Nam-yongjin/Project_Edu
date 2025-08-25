@@ -159,11 +159,11 @@ const UpdateComponent = ({ demNum }) => {
 
     <div className='max-w-screen-md mx-auto'>
       <div className="page-shadow min-blank my-10 p-10 space-y-6 text-center">
-        <div className="newText-3xl font-bold">실증 물품 수정</div>
+        <div className="newText-3xl font-bold">실증 수정</div>
 
         <div>
           <div className="flex items-start newText-base">
-            <label className="text-xl font-semibold w-32">물품명:</label>
+            <label className="newText-xl font-semibold w-32">물품명:</label>
             <input
               type="text"
               placeholder="물품명을 입력해주세요."
@@ -178,7 +178,7 @@ const UpdateComponent = ({ demNum }) => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">제조사:</label>
+            <label className="newText-xl font-semibold w-32">제조사:</label>
             <input
               type="text"
               placeholder="제조사를 입력해주세요."
@@ -193,7 +193,7 @@ const UpdateComponent = ({ demNum }) => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">개수:</label>
+            <label className="newText-xl font-semibold w-32">개수:</label>
             <input
               type="text"
               placeholder="개수를 입력해주세요."
@@ -208,10 +208,10 @@ const UpdateComponent = ({ demNum }) => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">카테고리:</label>
+            <label className="newText-xl font-semibold w-32">카테고리:</label>
             <select
               name="category"
-              className="w-32 border border-black"
+              className="w-32 border border-black input-focus"
               value={dem.category}
               onChange={handleChangeDem}
             >
@@ -228,7 +228,7 @@ const UpdateComponent = ({ demNum }) => {
 
         <div>
           <div className="flex items-center newText-base">
-            <label className="text-xl font-semibold w-32">소개:</label>
+            <label className="newText-xl font-semibold w-32">소개:</label>
             <textarea
               rows={5}
               placeholder="물품소개를 입력해주세요."
@@ -245,9 +245,9 @@ const UpdateComponent = ({ demNum }) => {
         {/* 반납 날짜 */}
         <div>
           <div className="flex items-center">
-            <label className="text-xl font-semibold w-32">반납 날짜:</label>
+            <label className="newText-xl font-semibold w-32">반납 날짜:</label>
             <DatePicker
-              className="flex-1 border border-black"
+              className="flex-1 border border-black input-focus"
               selected={returnDate}
               onChange={handleReturnDateChange}
               dateFormat="yyyy-MM-dd"
@@ -262,9 +262,9 @@ const UpdateComponent = ({ demNum }) => {
 
         {/* 이미지 선택 */}
         <div className="flex items-center">
-          <label className="text-xl font-semibold w-32">이미지:</label>
+          <label className="newText-xl font-semibold w-32">이미지:</label>
           <button type="button" onClick={() => document.getElementById("fileInput").click()}
-            className="border p-2 cursor-pointer">
+            className="border p-2 cursor-pointer input-focus">
             파일 선택
           </button>
           <input
@@ -291,7 +291,7 @@ const UpdateComponent = ({ demNum }) => {
                     className="w-4 h-4" />
                 </div>
                 <img src={img.url} alt="preview" className="w-full h-32 object-cover rounded" />
-                <p className="newText-sm mt-1">{img.name}</p>
+                   <p className="newText-sm mt-1 truncate w-[120px]" title={img.name}>{img.name}</p>
                 <button type="button" onClick={() => fileDelete(img)}
                   className="newText-base text-red-600 mt-1 hover:text-red-800">
                   삭제

@@ -18,8 +18,8 @@ public interface DemonstrationReserveRepository
 		extends JpaRepository<DemonstrationReserve, Long>, JpaSpecificationExecutor<DemonstrationReserve> { 
 																											
 	// 아이디와 상품번호를 받아와 현재 상태가 취소가 아닌 res테이블을 가져오는 쿼리문
-	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.member.memId = :memId AND dr.demonstration.demNum IN :demNum AND dr.state!=:state")
-	List<DemonstrationReserve> findDemRevNum(@Param("memId") String memId, @Param("demNum") List<Long> demNum,
+	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.demRevNum IN :demRevNum AND dr.state!=:state")
+	List<DemonstrationReserve> findDemRevNum(@Param("demRevNum") List<Long> demRevNum,
 			@Param("state") DemonstrationState state);
 
 	// 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문
@@ -31,21 +31,21 @@ public interface DemonstrationReserveRepository
 
 	@Modifying // demonstration reserve 테이블 상태값 변경 쿼리문 (아이디와 실증 번호를 받음)
 	@Transactional
-	@Query("UPDATE DemonstrationReserve SET state=:state WHERE member.memId=:memId AND demonstration.demNum IN :demNum")
-	int updateDemResChangeState(@Param("state") DemonstrationState state, @Param("memId") String memId,
-			@Param("demNum") List<Long> demNum);
+	@Query("UPDATE DemonstrationReserve SET state=:state WHERE demRevNum IN :demRevNum")
+	int updateDemResChangeState(@Param("state") DemonstrationState state,
+			@Param("demRevNum") List<Long> demRevNum);
 
 	 // 물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate를 변경하는 쿼리문
 	@Modifying
 	@Transactional
-	@Query("UPDATE DemonstrationReserve SET endDate=:endDate WHERE demRevNum=:demRevNum AND state=:state")
-	int updateDemResEndDate(@Param("demRevNum") Long demRevNum, @Param("endDate") LocalDate endDate,
+	@Query("UPDATE DemonstrationReserve SET endDate=:endDate WHERE demRevNum IN :demRevNum AND state=:state")
+	int updateDemResEndDate(@Param("demRevNum") List<Long> demRevNum, @Param("endDate") LocalDate endDate,
 			@Param("state") DemonstrationState state);
 
 	@Modifying // demonstration reserve 테이블 상태값 변경 쿼리문 (실증 신청 번호를 받음)
 	@Transactional
-	@Query("UPDATE DemonstrationReserve SET state=:state WHERE demRevNum =:demRevNum")
-	int updateDemResChangeStateRev(@Param("state") DemonstrationState state, @Param("demRevNum") Long demRevNum);
+	@Query("UPDATE DemonstrationReserve SET state=:state WHERE demRevNum IN :demRevNum")
+	int updateDemResChangeStateRev(@Param("state") DemonstrationState state, @Param("demRevNum") List<Long> demRevNum);
 
 	// 나중에 회원 탈퇴할때, 실증 신청 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
 	@Query("SELECT COUNT(d) > 0 FROM DemonstrationReserve d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
@@ -57,9 +57,9 @@ public interface DemonstrationReserveRepository
 			@Param("state") DemonstrationState state);
 
 	// RES테이블에서 아이디와 상품번호를 받아와 물품 대여한 갯수를 가져오는 쿼리문
-	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
-	Long getBItemNum(@Param("demNum") Long demNum, @Param("memId") String memId,
-			@Param("state") DemonstrationState state);
+	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.demonstration.demNum =:demNum AND r.state!=:state AND r.member.memId=:memId")
+	Long getBItemNum(@Param("demNum") Long demNum, 
+			@Param("state") DemonstrationState state,@Param("memId")String memId);
 
 	// 스케줄러를 이용해 state가 cancel인 값 삭제
 	@Modifying
@@ -78,8 +78,8 @@ public interface DemonstrationReserveRepository
 			@Param("state") DemonstrationState state);
 
 	// res테이블에서 상품번호를 받아와 해당 상품을 신청한 회원 아이디를 받아오는 쿼리문
-	@Query("SELECT r.member.memId FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.state!=:state")
-	List<String> getResMemId(@Param("demNum") Long demNum, @Param("state") DemonstrationState state);
+	@Query("SELECT r.member.memId FROM DemonstrationReserve r WHERE r.demonstration.demNum IN :demNum AND r.state!=:state")
+	List<String> getResMemId(@Param("demNum") List<Long> demNum, @Param("state") DemonstrationState state);
 
 	// 여러 memId, 여러 demNum에 대해 취소 상태가 아닌 예약 목록 조회
 	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.member.memId IN :memIds AND dr.demonstration.demNum IN :demNums AND dr.state != :state")
@@ -105,5 +105,5 @@ public interface DemonstrationReserveRepository
 	@Modifying
 	@Transactional
 	@Query("UPDATE DemonstrationReserve r SET r.state = :expiredState WHERE r.endDate <= :today AND r.state =:state")
-	int changeResExpiredState(@Param("toady") LocalDate today, @Param("state") DemonstrationState state);
+	int changeResExpiredState(@Param("today") LocalDate today, @Param("state") DemonstrationState state);
 }

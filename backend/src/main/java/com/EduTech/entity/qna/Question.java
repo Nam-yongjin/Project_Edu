@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -37,13 +38,14 @@ public class Question extends BaseEntity{
 	@Column(nullable = false) //제목
 	private String title;
 	
-	@Column(nullable = false) //내용
+	@Lob
+	@Column(columnDefinition = "TEXT",nullable=false) 
 	private String content;
 	 
 	@Column(nullable = false) //공개여부
 	private Boolean state;
 	
-	@Column(nullable = false, updatable = false) //조회수
+	@Column(nullable = false, updatable = false) // 조회수가 오르면 수정일이 변경되는것 방지
 	private Long view;	
 	
 	@ManyToOne //여러 질문글을 하나의 회원이 작성

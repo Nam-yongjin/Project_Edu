@@ -89,7 +89,7 @@ const Header = () => {
         { name: "배너 관리", link: "/admin/banner" },
         { name: "통계 확인", link: "/admin/stats" },
         { name: "휴무일 관리", link: "/facility/holiday" },
-        { name: "메일 보내기", link: "/admin/adminSelectEmail" },
+        { name: "메일 전송", link: "/admin/adminSelectEmail" },
       ],
     });
     const eventMenu = mainMenus.find(menu => menu.name === "프로그램");
@@ -102,8 +102,8 @@ const Header = () => {
     const demonstrationMenu = mainMenus.find(menu => menu.name === "실증 지원");
     demonstrationMenu.sub.push(
       { name: "실증 등록", link: "/demonstration/add" },
-      { name: "실증등록 관리", link: "/demonstration/adminReg" },
-      { name: "실증대여 관리", link: "/demonstration/adminRes" }
+      { name: "실증등록관리", link: "/demonstration/adminReg" },
+      { name: "실증대여관리", link: "/demonstration/adminRes" }
     );
   }
 

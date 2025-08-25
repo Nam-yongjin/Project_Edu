@@ -68,24 +68,16 @@ public class AdminController {
       adminService.approveOrRejectDemReq(demonstrationApprovalReqDTO);
       return ResponseEntity.ok("Req 상태 변경 성공");
    }
-   /*
-   // 관리자가 기본 메시지 보내는 기능
-   @PreAuthorize("hasRole('ADMIN')")
-   @PostMapping("/sendMessage")
-   public ResponseEntity<String> SendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO) {
-      adminService.sendMessageForUser(adminMessageDTO);
-      return ResponseEntity.ok("메시지 전송 성공!");
-   }
-*/
+
    @PreAuthorize("hasRole('ADMIN')")
    @PostMapping("/sendMessage")
    public ResponseEntity<String> sendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO) {
        // 첨부파일 리스트
-	   System.out.println(adminMessageDTO);
+	  System.out.println(adminMessageDTO);
       List<MultipartFile> files = adminMessageDTO.getAttachmentFile();
       String htmlContent = adminMessageDTO.getContent(); // Quill HTML 전체
      adminService.sendMessageForUser(adminMessageDTO);
-
+     
        return ResponseEntity.ok("메시지 전송 성공!");
    }
    
@@ -163,6 +155,7 @@ public class AdminController {
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/demReg")
    public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+	   System.out.println(demonstrationSearchDTO);
       PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = adminService.getAllDemReg(demonstrationSearchDTO);
       return AllDemReg;
    }

@@ -1,5 +1,6 @@
 package com.EduTech.service.qna;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,11 +96,15 @@ public class QuestionServiceImpl implements QuestionService {
 	
 	// 상세 페이지 질문 글 및 답변 조회
 	public QuestionDTO QnAViewDetail(Long questionNum) {
-		questionRepository.updateQuestion(questionNum); // 조회수 +1
-		QuestionDTO dto = modelMapper.map(questionRepository.findById(questionNum), QuestionDTO.class); // 모델 매퍼로 질문 번호를 입력해 dto에 question객체 받아온 후
+		questionRepository.increaseViewCount(questionNum); // 조회수 +1
+		QuestionDTO dto = modelMapper.map(questionRepository.findById(questionNum), QuestionDTO.class); // 모델 매퍼로 질문 번호를
+																										// 입력해 dto에
+																										// question객체
+																										// 받아온 후
 		dto.setAnswerList(answerRepository.selectAnswer(Collections.singletonList(questionNum))); // dto에 답변 받아온 후 리턴
 		return dto;
 		
+
 	}
 	
 	//  질문 글 추가할때 사용하는 기능
@@ -124,7 +129,10 @@ public class QuestionServiceImpl implements QuestionService {
 		        throw new AccessDeniedException("수정 권한이 없습니다.");
 		    }
 
-		questionRepository.updateQuestion(questionUpdateDTO.getTitle(),questionUpdateDTO.getContent(),questionUpdateDTO.getState(),questionUpdateDTO.getQuestionNum());
+		    q.setTitle(questionUpdateDTO.getTitle());
+			q.setContent(questionUpdateDTO.getContent());
+			q.setState(questionUpdateDTO.getState());
+			questionRepository.save(q);
 	}
 	
 	//  질문 글 삭제할때 사용하는 기능
@@ -140,4 +148,6 @@ public class QuestionServiceImpl implements QuestionService {
 		    }
 			questionRepository.deleteAllById(questionNums);
 		}
+		
+		
 }
