@@ -346,7 +346,7 @@ const NoticeUpdateComponent = () => {
                         허용되는 파일 유형: jpg, jpeg, png, pdf, hwp, doc, docx
                     </p>
                 </div>
-
+ 
                 {/* 새 파일 미리보기 */}
                 {notice.newFiles.length > 0 && (
                     <div>
