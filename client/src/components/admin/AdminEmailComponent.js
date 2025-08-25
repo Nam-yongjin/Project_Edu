@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-//import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-//import { getAuth, signInAnonymously } from "firebase/auth";
-//import { app } from "../../firebase/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getAuth, signInAnonymously } from "firebase/auth";
+import { app } from "../../api/emailFirebaseApi";
 import { sendEmail } from "../../api/adminApi";
 import cancel from "../../assets/cancel.png";
 import useMove from "../../hooks/useMove";
 
 const AdminEmailComponent = ({ members }) => {
-  /*
+  
   const [memberList, setMemberList] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -332,10 +332,10 @@ const AdminEmailComponent = ({ members }) => {
 
   const bytesToMB = (bytes) => (bytes / 1024 / 1024).toFixed(2);
   const currentSize = attachFiles.reduce((total, file) => total + file.size, 0);
-*/
+
   return (
     <>
-    {/* 
+
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
         <div className="page-shadow bg-white">
@@ -537,7 +537,7 @@ const AdminEmailComponent = ({ members }) => {
         </div>
       </div>
     </div>
-    */}
+    
     </>
   );
 };
