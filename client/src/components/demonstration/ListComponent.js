@@ -15,7 +15,7 @@ const ListComponent = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const { moveToPath, moveToLogin } = useMove();
-  const [searchType, setSearchType] = useState("demName");
+  const [searchType, setSearchType] = useState("total");
   const [search, setSearch] = useState("");
   const loginState = useSelector((state) => state.loginState);
   const [sortType, setSortType] = useState("asc");

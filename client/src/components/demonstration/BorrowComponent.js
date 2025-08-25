@@ -22,13 +22,12 @@ const BorrowComponent = () => {
 
     const initState = { totalPages: 0, currentPage: 0 };
     const searchOptions = [
-        { value: "total", label: "전체" },
         { value: "demName", label: "물품명" },
         { value: "demMfr", label: "제조사" },
     ];
 
     const [search, setSearch] = useState("");
-    const [type, setType] = useState("total");
+    const [type, setType] = useState("demName");
     const [sortBy, setSortBy] = useState("regDate");
     const [sort, setSort] = useState("desc");
     const [statusFilter, setStatusFilter] = useState("total");

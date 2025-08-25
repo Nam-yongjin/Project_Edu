@@ -27,7 +27,6 @@ const RentalComponent = () => {
     };
 
     const searchOptions = [
-        { value: "total", label: "전체" },
         { value: "demName", label: "상품명" },
         { value: "companyName", label: "기업명" },
     ];
@@ -39,7 +38,7 @@ const RentalComponent = () => {
     const [listData, setListData] = useState({ content: [] }); // 받아올 content 데이터
     const [sortBy, setSortBy] = useState("applyAt"); // 정렬 칼럼명
     const [sort, setSort] = useState("asc"); // 정렬 방식
-    const [statusFilter, setStatusFilter] = useState("total"); // state에 따라 필터링(ex wait,accept)
+    const [statusFilter, setStatusFilter] = useState("demName"); // state에 따라 필터링(ex wait,accept)
     const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
     const [selectedItems, setSelectedItems] = useState(new Set()); // 체크박스 선택 항목(중복 방지를 위해 set사용)
     const [showModifyModal, setShowModifyModal] = useState(false); // 캘린더 모달 변수
