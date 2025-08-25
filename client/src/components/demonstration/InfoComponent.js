@@ -45,11 +45,8 @@ const DemInfo = () => {
                 className="bg-indigo-50 rounded-xl p-6 shadow-lg border border-indigo-200 hover:shadow-2xl transition-shadow duration-300"
               >
                 <h3 className="newText-xl font-bold mb-4 text-indigo-700">{title}</h3>
-<<<<<<< HEAD
                 <p className="newText-base text-indigo-800 whitespace-pre-line">{desc}</p>
-=======
                 <p className="text-indigo-800 whitespace-pre-line">{desc}</p>
->>>>>>> refs/heads/Admin
               </div>
             ))}
           </div>
