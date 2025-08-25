@@ -64,7 +64,7 @@ public class FacilityController {
     ) {
         facilityService.registerFacility(dto, images == null ? List.of() : images);
         return ResponseEntity.ok().build();
-    }
+    } 
     
     // 시설 수정
     @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
