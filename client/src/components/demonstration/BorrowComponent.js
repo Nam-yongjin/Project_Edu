@@ -327,7 +327,7 @@ const BorrowComponent = () => {
                         disabled={selectedItems.length === 0}
                         className={`px-4 py-2 rounded mr-10 ${selectedItems.length > 0 ? "normal-button" : "disable-button"}`}
                     >
-                        예약 취소 ({selectedItems.length})
+                        등록 취소 ({selectedItems.length})
                     </button>
                 </div>
                 

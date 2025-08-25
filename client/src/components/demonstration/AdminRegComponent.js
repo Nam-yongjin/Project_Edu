@@ -189,7 +189,7 @@ const AdminRegComponent = () => {
                         <table className="w-full">
                             <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
                                 <tr className="newText-base whitespace-nowrap">
-                                    <th className="w-[5%]">
+                                    <th className="w-[5%] px-3">
                                         {waitItemsCount > 0 && (
                                             <input
                                                 type="checkbox"
@@ -247,7 +247,7 @@ const AdminRegComponent = () => {
                                             </th>
                                         )
                                     )}
-                                    <th th className="w-[10%]">수정/삭제</th>
+                                    <th th className="w-[10%] px-3">수정/삭제</th>
                                 </tr>
                             </thead>
 
@@ -272,7 +272,7 @@ const AdminRegComponent = () => {
                                                             type="checkbox"
                                                             checked={selectedItems.includes(data.demRegNum)}
                                                             onChange={(e) => handleItemSelect(data.demRegNum, e.target.checked)}
-                                                            className="w-4 h-4"
+                                                            className="w-4 h-4 px-3"
                                                         />
                                                     )}
                                                 </td>
@@ -332,7 +332,7 @@ const AdminRegComponent = () => {
                                                 <td>
                                                     {data.regDate ? new Date(data.regDate).toLocaleDateString() : "-"}
                                                 </td>
-                                                <div className="flex flex-col gap-2">
+                                                <div className="flex flex-col gap-2 px-3">
                                                     <td>
                                                         {data.state === "ACCEPT" ? (
                                                             <button
@@ -376,7 +376,7 @@ const AdminRegComponent = () => {
 
                 </div>
                 {/* 우측 하단 일괄 처리 버튼들 */}
-                <div className="flex justify-end mt-4 mr-15">
+                <div className="flex justify-end mt-5 mr-15">
                     <button
                         disabled={selectedItems.length === 0}
                         className={`px-4 py-2 rounded mr-2 ${selectedItems.length > 0
