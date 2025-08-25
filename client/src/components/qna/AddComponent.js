@@ -75,7 +75,7 @@ const AddComponent = () => {
           onClick={() => {
             moveToPath("/");
           }}
-          className="nagative-button"
+          className="negative-button"
         >
           취소하기
         </button>

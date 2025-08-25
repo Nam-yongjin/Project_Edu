@@ -138,7 +138,7 @@ const DetailComponent = ({ questionNum }) => {
                   </button>
                   <button
                     onClick={() => handleDelete("QUESTION", listData.questionNum)}
-                    className="nagative-button newText-sm"
+                    className="negative-button newText-sm"
                   >
                     삭제하기
                   </button>
@@ -203,7 +203,7 @@ const DetailComponent = ({ questionNum }) => {
                               </button>
                               <button
                                 onClick={() => handleDelete("ANSWER", ans.answerNum)}
-                                className="nagative-button newText-sm"
+                                className="negative-button newText-sm"
                               >
                                 삭제하기
                               </button>

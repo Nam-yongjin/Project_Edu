@@ -385,7 +385,7 @@ const NoticeUpdateComponent = () => {
                         style={{ minWidth: "60px" }}
                         onClick={handleUpdate}>수정</button>
                     <button
-                        className="nagative-button newText-sm"
+                        className="negative-button newText-sm"
                         style={{ minWidth: "60px" }}
                         onClick={handleCancel}>취소</button>
                 </div>

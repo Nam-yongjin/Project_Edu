@@ -261,7 +261,7 @@ const NewsDetailComponent = () => {
                                 </button>
                                 <button
                                     onClick={handleDelete}
-                                    className="nagative-button newText-sm"
+                                    className="negative-button newText-sm"
                                 >
                                     삭제하기
                                 </button>

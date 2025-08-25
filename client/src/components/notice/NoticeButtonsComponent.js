@@ -42,7 +42,7 @@ const NoticeButtonsComponent = ({ selectedNotices, onDelete }) => {
           {selectedNotices.length > 0 && (
             <button
               onClick={handleDelete}
-              className="nagative-button newText-sm"
+              className="negative-button newText-sm"
             >
               선택 삭제 ({selectedNotices.length})
             </button>
