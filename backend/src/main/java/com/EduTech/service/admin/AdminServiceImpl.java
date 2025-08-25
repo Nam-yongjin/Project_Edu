@@ -43,9 +43,11 @@ import com.EduTech.repository.admin.BannerImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationSpecs;
+import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRequestRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveSpecs;
+import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.MemberSpecs;
 import com.EduTech.service.mail.MailService;
@@ -71,15 +73,48 @@ public class AdminServiceImpl implements AdminService {
 	DemonstrationRequestRepository demonstrationRequestRepository;
 	private final FileUtil fileUtil;
 	private final BannerImageRepository bannerImageRepository;
-
+	private final DemonstrationRepository demonstrationRepository;
+	private final DemonstrationTimeRepository demonstrationTimeRepository;
 	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	// String memId = JWTFilter.getMemId(); 나중에 로그인 구현되면 추가
 	
 	@Override
+	@Transactional
 	public void approveOrRejectDemRes(DemonstrationApprovalResDTO demonstrationApprovalResDTO) {
-		demonstrationReserveRepository.updateDemResChangeStateRev(demonstrationApprovalResDTO.getState(), demonstrationApprovalResDTO.getDemRevNum());
+	    // demRevNum 리스트로 예약 정보 조회
+	    List<DemonstrationReserve> demonstrationReserves = demonstrationReserveRepository.findDemRevNums(demonstrationApprovalResDTO.getDemRevNum(),DemonstrationState.WAIT);
+	    
+	    if (demonstrationReserves.isEmpty()) {
+	        System.out.println("예약 정보가 없습니다.");
+	        return;
+	    }
+	    
+	    // 거부 상태인 경우에만 itemNum 업데이트 및 시간 삭제 처리
+	    if (demonstrationApprovalResDTO.getState() == DemonstrationState.REJECT) {
+	        // 각 예약별로 demonstration 테이블의 itemNum 업데이트 (ACCEPT 상태인 것만)
+	        for (DemonstrationReserve reserve : demonstrationReserves) {
+	            if (reserve.getState() == DemonstrationState.WAIT) {
+	                // 현재 예약의 bItemNum을 demonstration 테이블의 itemNum에 더함
+	            	Long itemNum=demonstrationRepository.selectItemNum(reserve.getDemonstration().getDemNum());
+	                demonstrationRepository.updateItemNum(reserve.getBItemNum()+itemNum, reserve.getDemonstration().getDemNum());
+	            }
+	        }
+	        
+	        // 예약 시간 삭제 (ACCEPT 상태인 것만)
+	        for (DemonstrationReserve res : demonstrationReserves) {
+	            if (res.getState() == DemonstrationState.WAIT) {
+	                List<LocalDate> deleteTimeList = new ArrayList<>();
+	                for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
+	                    deleteTimeList.add(date);
+	                }
+	                demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
+	            }
+	        }
+	    }
+	    
+	    // 상태 업데이트
+	    demonstrationReserveRepository.updateDemResChangeStateRev(demonstrationApprovalResDTO.getState(), demonstrationApprovalResDTO.getDemRevNum());
 	}
-
 	// 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	@Override
 	public void approveOrRejectDemReg(DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {

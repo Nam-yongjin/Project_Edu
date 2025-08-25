@@ -233,7 +233,7 @@ const AdminResComponent = () => {
                       />
                     )}
                   </th>
-                  <th className="w-[50%]">이미지</th>
+                  <th className="w-[10%]">이미지</th>
                   <th className="w-[5%]">아이디</th>
                   <th className="w-[10%]">전화번호</th>
                   <th className="w-[14%]">주소</th>

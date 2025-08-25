@@ -107,7 +107,6 @@ const DetailComponent = ({ demNum }) => {
         const formattedStart = toLocalDateString(monthStart);
         const formattedEnd = toLocalDateString(monthEnd);
         const data = await getResDate(formattedStart, formattedEnd, demNum);
-
         if (Array.isArray(data)) {
             const newDates = data.map(item => item.demDate);
             setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));

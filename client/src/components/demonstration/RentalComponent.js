@@ -268,7 +268,7 @@ const RentalComponent = () => {
                 updatedItemNum,
                 selectedDemRevNum // demRevNum 추가
             );
-            alert('예약 신청 완료');
+            alert('예약 변경 완료');
             window.location.reload();
         } catch (error) {
             console.error('예약 실패:', error);

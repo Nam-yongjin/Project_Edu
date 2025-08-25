@@ -58,8 +58,8 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	// 현재 날짜와 만료 날짜를 비고해서 만료날짜가 작거나 같을경우 상태를 만료로 업데이트
     @Modifying
     @Transactional
-    @Query("UPDATE DemonstrationRegistration r SET r.state = :expiredState WHERE r.expDate <= :today AND r.state =:state")
-    int changeRegExpiredState(@Param("today") LocalDate today, @Param("state") DemonstrationState state);
+    @Query("UPDATE DemonstrationRegistration r SET r.state = :expired WHERE r.expDate <= :today AND r.state=:accept")
+    int changeRegExpiredState(@Param("today") LocalDate today, @Param("expired") DemonstrationState expired,@Param("accept") DemonstrationState accept);
 
  
 

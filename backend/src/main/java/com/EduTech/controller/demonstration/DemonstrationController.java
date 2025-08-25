@@ -133,6 +133,7 @@ public class DemonstrationController {
 	@PreAuthorize("hasRole('TEACHER')")
 	@PutMapping("/ChangeRes")
 	public ResponseEntity<String> DemResChange(@RequestBody DemonstrationReservationDTO demonstrationReservationDTO) {
+		System.out.println(demonstrationReservationDTO);
 		String memId = JWTFilter.getMemId();
 		demonstrationService.demonstrationReservationChange(demonstrationReservationDTO, memId);
 		return ResponseEntity.ok("예약 변경 성공");
