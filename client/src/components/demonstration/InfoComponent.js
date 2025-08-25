@@ -42,7 +42,7 @@ const DemInfo = () => {
             {features.map(({ title, desc }, i) => (
               <div
                 key={i}
-                className="bg-indigo-50 rounded-xl p-6 shadow-md border border-indigo-200 hover:shadow-lg transition-shadow duration-300"
+                className="bg-indigo-50 rounded-xl p-6 shadow-lg border border-indigo-200 hover:shadow-2xl transition-shadow duration-300"
               >
                 <h3 className="text-xl font-bold mb-4 text-indigo-700">{title}</h3>
                 <p className="text-indigo-800 whitespace-pre-line">{desc}</p>
