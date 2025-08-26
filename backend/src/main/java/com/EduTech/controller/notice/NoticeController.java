@@ -48,12 +48,17 @@ public class NoticeController {
 
 	// 공지사항 전체 조회(검색, 페이징)
 	@GetMapping("/NoticeList")
+	//@ModelAttribute를 사용하면 쿼리파라미터(Query String)값들이 NoticeSearchDTO 필드에 자동으로 바인딩
+	//@ModelAttribute: 여러 파라미터를 한 DTO에 묶어서 자동 매핑 --> 검색 조건이 많을 때 사용
     public ResponseEntity<Page<NoticeListDTO>> getNoticeList(@ModelAttribute NoticeSearchDTO searchDTO) {
 		System.out.println("공지사항 전체 조회!!");
         return ResponseEntity.ok(noticeService.getNoticeList(searchDTO));
     }
 
     // 공지사항 상세 조회(조회수 증가)
+	//@PathVariable는 경로 변수를 표시하기 위해 매개변수에 사용
+	//경로변수는 중괄호로 둘러쌓인 값 -> 반드시 값을 가져야 함
+	//상세조회, 수정, 삭제에서 리소스 식별자로 사용
 	@GetMapping("/NoticeDetail/{noticeNum}")
 	public ResponseEntity<NoticeDetailDTO> getNoticeDetail(@PathVariable("noticeNum") Long noticeNum) {
     	System.out.println("공지사항 상세 조회!!");
@@ -70,11 +75,14 @@ public class NoticeController {
     // 관리자 전용
 
     // 공지사항 등록
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')") //권한 확인
     @PostMapping("/AddNotice")
     public ResponseEntity<String> createNotice(
-            @RequestPart("dto") NoticeCreateRegisterDTO dto, //프론트에서 dto를 JSON 문자열로 변환해서 FormData에 넣어줘야 함
-            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+    		//파일 업로드 + DTO(JSON)을 한 번에 받으려는 상황
+    		//content-Type는 multipart/form-data가 되고, @RequestPart를 통해 JSON 문자열(dto)와 파일(files)을 각 파트별로 분리해서 받을 수 있음
+    		//프론트에서 FormData 객체를 만들어서 dto를 JSON 문자열로 변환해서 넣고 files 부분은 직접 append 해서 넣어야 함
+            @RequestPart("dto") NoticeCreateRegisterDTO dto, //JSON 문자열을 DTO 객체로 변환
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) { //업로드된 파일들을 MultipartFile 리스트로 변환
     	System.out.println("공지사항 등록!!");
 //    	System.out.println("등록 파일 수: " + dto.getFiles().size());
     	
@@ -125,6 +133,7 @@ public class NoticeController {
     // 공지사항 삭제(일괄)
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/DeleteNotices")
+    //@RequestBody는 JSON만 받을 때 사용
     public ResponseEntity<String> deleteNotices(@RequestBody List<Long> noticeNums) {
     	System.out.println("공지사항 삭제(일괄)!!");
         noticeService.deleteNotices(noticeNums);
