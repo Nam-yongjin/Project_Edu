@@ -562,7 +562,7 @@ const RentalComponent = () => {
                                                         return (
                                                             <>
 
-                                                            {/* 
+                                                                {/* 
                                                                 <button
                                                                     disabled={itemState !== "WAIT"}
                                                                     onClick={() => handleActionClick(item.demNum, "예약변경")}
@@ -613,39 +613,49 @@ const RentalComponent = () => {
                         <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
                             <h2 className="text-3xl font-bold mb-1">대여 연장 신청</h2>
                             <label className="block mb-2">연장할 날짜</label>
-                            <DatePicker
-                                className="border p-2 newText-base flex-1 min-w-0 box-border"
-                                selected={
-                                    extendDate
-                                        ? new Date(extendDate)
-                                        : disabledExtendDate
-                                            ? new Date(disabledExtendDate)
-                                            : new Date()
-                                }
-                                minDate={disabledExtendDate ? new Date(disabledExtendDate) : new Date()}
-                                onChange={(date) => {
-                                    if (date) {
-                                        const strDate = date.toISOString().split("T")[0];
-                                        setExtendDate(strDate);
-                                    } else {
-                                        setExtendDate(null);
+                            <div>
+                                <DatePicker
+                                    className="border p-2 newText-base flex-1 box-border"
+                                    selected={
+                                        extendDate
+                                            ? new Date(extendDate)
+                                            : disabledExtendDate
+                                                ? new Date(disabledExtendDate)
+                                                : new Date()
                                     }
-                                }}
-                                dateFormat="yyyy-MM-dd"
-                                placeholderText="날짜를 선택하세요"
-                                locale={ko}
-                                popperPlacement="bottom-start"
-                                onMonthChange={(date) => {
-                                    const year = date.getFullYear();
-                                    const month = date.getMonth();
-                                    fetchDisabledDates(year, month, selectedDemNum);
-                                }}
-                                excludeDates={disabledDates}
-                            />
+                                    minDate={disabledExtendDate ? new Date(disabledExtendDate) : new Date()}
+                                    onChange={(date) => {
+                                        if (date) {
+                                            const strDate = date.toISOString().split("T")[0];
+                                            setExtendDate(strDate);
+                                        } else {
+                                            setExtendDate(null);
+                                        }
+                                    }}
+                                    dateFormat="yyyy-MM-dd"
+                                    placeholderText="날짜를 선택하세요"
+                                    locale={ko}
+                                    popperPlacement="bottom-start"
+                                    onMonthChange={(date) => {
+                                        const year = date.getFullYear();
+                                        const month = date.getMonth();
+                                        fetchDisabledDates(year, month, selectedDemNum);
+                                    }}
+                                    excludeDates={disabledDates}
+                                />
+                                <style>{`
+                                         .react-datepicker-wrapper,
+                                        .react-datepicker__input-container,
+                                         .react-datepicker__input-container input {
+                                          width: 100% !important;
+                                            margin-bottom: 10px;
+                                            }
+                                `}</style>
+                            </div>
 
                             <div className="flex justify-end gap-2">
                                 <button
-                                    className="px-4 py-2 bg-gray-300 rounded"
+                                    className="px-4 py-2 normal-button"
                                     onClick={() => setIsExtendModalOpen(false)}
                                 >
                                     취소
