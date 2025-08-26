@@ -210,7 +210,7 @@ const AdminRegComponent = () => {
                                         <div className="mb-1">신청상태</div>
                                         <select
                                             value={statusFilter}
-                                            className="input-focus"
+                                            className="input-focus newText-sm"
                                             onChange={(e) => {
                                                 setStatusFilter(e.target.value);
                                                 setCurrent(0);
@@ -281,13 +281,13 @@ const AdminRegComponent = () => {
                                                             src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                             alt={data.demName}
                                                             onClick={() => moveToPath(`../../demonstration/detail/${data.demNum}`)}
-                                                            className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                            className="w-20 h-20 rounded-md cursor-pointer"
                                                         />
                                                     ) : (
                                                         <img
                                                             src={defaultImage}
                                                             alt="default"
-                                                            className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                                                            className="w-20 h-20 rounded-md cursor-pointer"
                                                         />
                                                     )}
                                                 </td>
@@ -331,7 +331,7 @@ const AdminRegComponent = () => {
                                                 <td>
                                                     {data.regDate ? new Date(data.regDate).toLocaleDateString() : "-"}
                                                 </td>
-                                                <div className="flex flex-col gap-2 px-3">
+                                                <div className="flex flex-col gap-2 px-3 ">
                                                     <td>
                                                         {data.state === "ACCEPT" ? (
                                                             <button

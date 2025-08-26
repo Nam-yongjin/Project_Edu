@@ -314,13 +314,13 @@ const AdminResComponent = () => {
                               src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                               alt={member.demName}
                               onClick={() => moveToPath(`../../demonstration/detail/${member.demNum}`)}
-                              className="w-30 h-30 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                              className="w-30 h-30 rounded-md cursor-pointer"
                             />
                           ) : (
                             <img
                               src={defaultImage}
                               alt="default"
-                              className="w-30 h-30 rounded-md hover:scale-105 transition-transform cursor-pointer"
+                              className="w-30 h-30 rounded-md cursor-pointer"
                             />
                           )}
                         </td>
