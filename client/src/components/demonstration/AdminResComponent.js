@@ -234,13 +234,13 @@ return (
                                 </th>
                                 {/* 
                                 <th className="w-[10%]">이미지</th>*/}
-                                <th className="w-[5%]">아이디</th>
-                                <th className="w-[10%]">전화번호</th>
+                                <th className="w-[14%]">아이디</th>
+                                <th className="w-[14%]">전화번호</th>
                                 <th className="w-[14%]">주소</th>
-                                <th className="w-[10%]">학교명</th>
-                                <th className="w-[10%]">물품명</th>
+                                <th className="w-[14%]">학교명</th>
+                                <th className="w-[14%]">물품명</th>
                                 <th className="w-[10%]">신청 갯수</th>
-                                <th className="w-[12%] min-w-[120px]">
+                                <th className="w-[12%]">
                                     <div className="mb-1">신청 상태</div>
                                     <select
                                         value={statusFilter}
@@ -260,7 +260,7 @@ return (
 
                                 {[{ label: "시작일", value: "startDate" }, { label: "마감일", value: "endDate" }, { label: "등록일", value: "applyAt" }].map(
                                     ({ label, value }) => (
-                                        <th key={value} onClick={() => handleSortChange(value)} className="cursor-pointer w-[8%]">
+                                        <th key={value} onClick={() => handleSortChange(value)} className="cursor-pointer w-[8%] px-3">
                                             <div className="flex items-center justify-center space-x-1">
                                                 <span>{label}</span>
                                                 <div className="flex flex-col">
@@ -275,8 +275,8 @@ return (
                                         </th>
                                     )
                                 )}
-                                <th className="w-[14%] min-w-[140px] px-3">반납/연장</th>
-                                <th className="w-[10%] min-w-[140px] px-3">삭제</th>
+                                <th className="w-[10%] px-3 min-w-[100px]">반납/연장</th>
+                                <th className="w-[10%] px-3 min-w-[100px]">삭제</th>
                             </tr>
                         </thead>
 
@@ -354,7 +354,7 @@ return (
                                             <td className="py-2">{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
                                             <td className="py-2">{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
                                             <td className="py-2">{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
-                                            <td className="px-3 py-2 min-w-[140px]">
+                                            <td className="px-3 py-2 max-w-[80px]">
                                                 {member.requestDTO && member.requestDTO.length > 0 ? (
                                                     member.requestDTO.some(req => req.state === "WAIT") ? (
                                                         <div className="flex flex-col items-center space-y-1">
@@ -387,7 +387,7 @@ return (
                                                     )
                                                 ) : "-"}
                                             </td>
-                                            <td className="px-3 py-2">
+                                            <td className="px-3 py-2 max-w-[80px]">
                                                 {member.state === "ACCEPT" ? (
                                                     <button
                                                         className="negative-button"
