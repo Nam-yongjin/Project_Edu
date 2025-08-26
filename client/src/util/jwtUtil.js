@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCookie, setCookie } from "./cookieUtil";
+import { getCookie, setCookie, removeCookie } from "./cookieUtil";
 import { API_SERVER_HOST } from "../api/config";
 
 const jwtAxios = axios.create();
@@ -24,6 +24,14 @@ const beforeRes = async (res) => {
         const member = getCookie("member");
         // accessToken 재발급 요청
         const result = await refreshJWT(member.accessToken, member.refreshToken);
+
+        // null 처리
+        if (result === null) {
+            // 토큰 갱신 실패 - 로그아웃 처리, 로그인 페이지로 리다이렉트
+            removeCookie("member");
+            window.location.href = "/login";
+            return Promise.reject({ response: { data: { error: "REQUIRE_LOGIN" } } });
+        }
 
         member.accessToken = result.accessToken;
         member.refreshToken = result.refreshToken;
