@@ -35,15 +35,42 @@ const DetailComponent = ({ demNum }) => {
         return d;
     });
 
+    // 현재 달의 첫날과 끝날 계산 함수
+    const getCurrentMonthDates = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const monthStart = new Date(year, month, 1);
+        const monthEnd = new Date(year, month + 1, 0);
+        return {
+            formattedStart: toLocalDateString(monthStart),
+            formattedEnd: toLocalDateString(monthEnd)
+        };
+    };
+
     useEffect(() => {
         const loadData = async () => {
+            // 물품 정보 불러오기
             const detailData = await getDetail(demNum);
             setDem(detailData);
             setFileList(detailData);
             const mainImageObj = detailData.imageList.find(img => img.isMain);
             setMainImageUrl(mainImageObj ? `http://localhost:8090/view/${mainImageObj.imageUrl}` : '');
+
+            // 예약 체크
             const reserveData = await getReserveCheck(demNum);
             setReserveCheck(reserveData);
+
+            // 현재 달의 예약 불가 날짜 초기 로드
+            const { formattedStart, formattedEnd } = getCurrentMonthDates();
+            const data = await getResDate(formattedStart, formattedEnd, demNum);
+            if (Array.isArray(data)) {
+                const newDates = data.map(item => {
+                    const [y, m, d] = item.split('-'); // 문자열 "2025-08-26" → 연,월,일
+                    return new Date(y, m - 1, d); // Date 객체 생성 (월은 0부터)
+                });
+                setDisabledDates(newDates); // Date 배열로 상태 저장
+            }
         };
         loadData();
     }, [demNum]);
@@ -55,10 +82,11 @@ const DetailComponent = ({ demNum }) => {
             const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
             setStartDate(minDate);
             setEndDate(maxDate);
+
         }
     }, [selectedDate]);
 
-    const handleStartDateChange = (date) => {
+    const handleStartDateChange = (date) => { // 선택된 startDate부터 endDate까지 모든 날짜를 문자열로 변환
         if (!date) return;
         const newStart = date instanceof Date ? date : new Date(date.replace(/-/g, "/"));
         setStartDate(newStart);
@@ -76,7 +104,7 @@ const DetailComponent = ({ demNum }) => {
         }
     };
 
-    const handleEndDateChange = (date) => {
+    const handleEndDateChange = (date) => { // 사용자가 종료 날짜 선택할 때, start~end 범위를 문자열 배열로 만들어주는 함수
         if (!date) return;
         const newEnd = date instanceof Date ? date : new Date(date.replace(/-/g, "/"));
         setEndDate(newEnd);
@@ -94,7 +122,7 @@ const DetailComponent = ({ demNum }) => {
         }
     };
 
-    function toLocalDateString(date) {
+    function toLocalDateString(date) { // date타입을 문자열로
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
         const d = String(date.getDate()).padStart(2, '0');
@@ -106,12 +134,25 @@ const DetailComponent = ({ demNum }) => {
         const monthEnd = new Date(year, month + 1, 0);
         const formattedStart = toLocalDateString(monthStart);
         const formattedEnd = toLocalDateString(monthEnd);
+
         const data = await getResDate(formattedStart, formattedEnd, demNum);
+
         if (Array.isArray(data)) {
-            const newDates = data.map(item => item.demDate);
-            setDisabledDates(prev => Array.from(new Set([...prev, ...newDates])));
+            // 문자열 배열 → Date 객체 배열로 변환
+            const newDates = data.map(dateStr => {
+                const [y, m, d] = dateStr.split('-');
+                return new Date(y, m - 1, d);
+            });
+
+            // 기존 disabledDates와 합쳐서 중복 제거
+            setDisabledDates(prev => {
+                const allDates = [...prev, ...newDates];
+                const uniqueDates = Array.from(new Map(allDates.map(d => [d.getTime(), d])).values());
+                return uniqueDates;
+            });
         }
     };
+
 
     const reservation = (updatedItemNum) => {
         if (loginState.role !== "TEACHER") {
@@ -140,20 +181,23 @@ const DetailComponent = ({ demNum }) => {
                     return;
                 }
             }
-            if (selectedDate.some(date => disabledDates.includes(date))) {
+            const disabledDateStr = disabledDates.map(d => toLocalDateString(d)); // 날짜 비교를 위해 disableddate를 문자열로
+
+            if (selectedDate.some(date => disabledDateStr.includes(date))) {
                 alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
                 return;
             }
+
             if (reserveCheck) {
                 alert('이미 해당 물품을 예약 하셨습니다.');
                 return;
             }
             try {
-                await postRes(
-                    toLocalDateString(startDate), toLocalDateString(endDate), demNum, updatedItemNum
-                );
+                   await postRes(
+                       toLocalDateString(startDate), toLocalDateString(endDate), demNum, updatedItemNum
+                   ); 
                 alert('예약 신청 완료');
-                moveToPath(`/demonstration/list`);
+                 moveToPath(`/demonstration/list`); 
             } catch (error) {
                 console.error('예약 실패:', error);
                 alert('예약에 실패했습니다.');
@@ -262,6 +306,7 @@ const DetailComponent = ({ demNum }) => {
                                     demNum={demNum}
                                     disabledDates={disabledDates}
                                     setDisabledDates={setDisabledDates}
+                                    onMonthChange={(year, month) => fetchDisabledDates(year, month)}
                                 />
                             </div>
 
@@ -279,10 +324,9 @@ const DetailComponent = ({ demNum }) => {
                                             dateFormat="yyyy-MM-dd"
                                             placeholderText="날짜를 선택하세요"
                                             minDate={new Date()}
-                                            name="startDate"
                                             locale={ko}
                                             onMonthChange={(date) => fetchDisabledDates(date.getFullYear(), date.getMonth())}
-                                            excludeDates={disabledDates.map(d => new Date(d))}
+                                            excludeDates={[...disabledDates, new Date()]} // 여기서 Date 객체로 disabled
                                         />
                                     </div>
                                     <div className="flex items-center gap-4">
@@ -298,7 +342,7 @@ const DetailComponent = ({ demNum }) => {
                                             name="endDate"
                                             locale={ko}
                                             onMonthChange={(date) => fetchDisabledDates(date.getFullYear(), date.getMonth())}
-                                            excludeDates={disabledDates.map(d => new Date(d))}
+                                            excludeDates={[...disabledDates, new Date()]}
                                         />
                                     </div>
                                 </div>
@@ -348,3 +392,4 @@ const DetailComponent = ({ demNum }) => {
 };
 
 export default DetailComponent;
+

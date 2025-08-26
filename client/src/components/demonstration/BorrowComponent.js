@@ -297,7 +297,7 @@ const BorrowComponent = () => {
                                                 <button
                                                     disabled={itemState !== "WAIT"}
                                                     className={`block w-full max-w-full mt-1 rounded  ${itemState === "WAIT" ? "negative-button cursor-pointer" : "disable-button"}`}
-                                                    onClick={() => onDeleteDem(item.demNum)}
+                                                    onClick={() => onDeleteDem([item.demNum])}
                                                 >
                                                     물품 삭제
                                                 </button>

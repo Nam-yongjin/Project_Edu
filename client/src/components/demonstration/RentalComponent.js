@@ -7,7 +7,9 @@ import CalendarComponent from "./CalendarComponent";
 import ItemModal from "./itemModal";
 import { useSelector } from "react-redux";
 import defaultImage from '../../assets/default.jpg';
-
+import { ko } from "date-fns/locale";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 const RentalComponent = () => {
     const isTeacher = useSelector((state) => state.loginState?.role === "TEACHER");
     const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
@@ -27,24 +29,23 @@ const RentalComponent = () => {
     };
 
     const searchOptions = [
-        { value: "demName", label: "상품명" },
+        { value: "demName", label: "물품명" },
         { value: "companyName", label: "기업명" },
     ];
 
     const [search, setSearch] = useState(); // 검색어
-    const [type, setType] = useState("total"); // 검색 타입
+    const [type, setType] = useState("demName"); // 검색 타입
     const [pageData, setPageData] = useState(initState); // 페이지 데이터
     const [current, setCurrent] = useState(0); // 현재 페이지
     const [listData, setListData] = useState({ content: [] }); // 받아올 content 데이터
     const [sortBy, setSortBy] = useState("applyAt"); // 정렬 칼럼명
     const [sort, setSort] = useState("asc"); // 정렬 방식
-    const [statusFilter, setStatusFilter] = useState("demName"); // state에 따라 필터링(ex wait,accept)
+    const [statusFilter, setStatusFilter] = useState(""); // state에 따라 필터링(ex wait,accept)
     const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
     const [selectedItems, setSelectedItems] = useState(new Set()); // 체크박스 선택 항목(중복 방지를 위해 set사용)
     const [showModifyModal, setShowModifyModal] = useState(false); // 캘린더 모달 변수
     const [selectedDemNum, setSelectedDemNum] = useState(); // 캘린더에 넘겨줄 demNum 
     const [selectedDate, setSelectedDate] = useState([]); // 선택된 날짜를 가져오는 변수
-    const [exceptDate, setExceptDate] = useState([]); // 회원이 예약한 물품에 대해 예약날짜를 가져오는 변수
     const [disabledDates, setDisabledDates] = useState([]); // 캘린더에서 disabled할 날짜 배열
     const [showQtyModal, setShowQtyModal] = useState(false); // 아이템 모달
     const [reservationQty, setReservationQty] = useState(1); // 수량 설정
@@ -52,6 +53,7 @@ const RentalComponent = () => {
     const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
     const [disabledExtendDate, setdisabledExtendDate] = useState([]);
     const [selectedDemRevNum, setSelectedDemRevNum] = useState(); // demRevNum을 저장할 state 추가
+    const [isFetchingDisabledDates, setIsFetchingDisabledDates] = useState(false);
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
@@ -72,6 +74,7 @@ const RentalComponent = () => {
     const fetchData = () => {
         if (search && search.trim() !== "") {
             getRentalSearch(search, type, current, sortBy, sort, statusFilter).then((data) => {
+                console.log(data);
                 setListData(data);
                 setPageData(data);
             });
@@ -190,19 +193,23 @@ const RentalComponent = () => {
             }
 
             try {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
                 // WAIT 상태인 항목 찾기
                 const waitItem = items.find(item => item.state === "WAIT");
 
                 setSelectedDemNum(demNum);
                 setSelectedDemRevNum(waitItem.demRevNum); // demRevNum도 함께 저장
-
-                const exceptDate = await getResExceptDate(demNum);
-                setExceptDate(exceptDate);
+                fetchDisabledDates(year, month, demNum)
+                    .finally(() => setIsFetchingDisabledDates(false));
                 setShowModifyModal(true);
             } catch (err) {
                 console.error("예약 정보 조회 실패", err);
             }
         }
+
+
         else if (action === "대여연장") {
             const hasAccept = items.some(item => item.state === "ACCEPT");
             if (!hasAccept) {
@@ -227,57 +234,58 @@ const RentalComponent = () => {
         }
     };
 
-    const reservationUpdate = (updatedItemNum) => {
-    const loadData = async () => {
-        if (!selectedDate || selectedDate.length === 0) {
-            alert('날짜를 선택해주세요!');
-            return;
-        }
-
-        if (selectedDate.length > 90) {
-            alert('최대 90일까지만 선택할 수 있습니다!');
-            return;
-        }
-
-        let sortedDates = [...selectedDate]
-            .map(d => new Date(d))
-            .sort((a, b) => a.getTime() - b.getTime());
-        sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d)));
-
-        for (let i = 0; i < sortedDates.length - 1; i++) {
-            const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime();
-            const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-            if (diffDays !== 1) {
-                alert('연속된 날짜만 선택 가능합니다!');
+    const reservationUpdate = (reservationQty) => {
+        const loadData = async () => {
+            if (!selectedDate || selectedDate.length === 0) {
+                alert('날짜를 선택해주세요!');
                 return;
             }
-        }
 
-        if (selectedDate.some(date => disabledDates.includes(date))) {
-            alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
-            return;
-        }
+            if (selectedDate.length > 90) {
+                alert('최대 90일까지만 선택할 수 있습니다!');
+                return;
+            }
 
-        try {
-            // updateRental 함수에 demRevNum 전달 (API 구조에 따라 매개변수 순서나 구조 조정 필요)
-            await updateRental(
-                toLocalDateString(startDate), 
-                toLocalDateString(endDate), 
-                selectedDemNum, 
-                updatedItemNum,
-                selectedDemRevNum // demRevNum 추가
-            );
-            alert('예약 변경 완료');
-            window.location.reload();
-        } catch (error) {
-            console.error('예약 실패:', error);
-            alert('예약에 실패했습니다.');
-        }
+            let sortedDates = [...selectedDate]
+                .map(d => new Date(d))
+                .sort((a, b) => a.getTime() - b.getTime());
+            sortedDates = sortedDates.map(d => (d instanceof Date ? d : new Date(d)));
+
+            for (let i = 0; i < sortedDates.length - 1; i++) {
+                const diffTime = sortedDates[i + 1].getTime() - sortedDates[i].getTime();
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                if (diffDays !== 1) {
+                    alert('연속된 날짜만 선택 가능합니다!');
+                    return;
+                }
+            }
+
+            if (selectedDate.some(date => disabledDates.includes(date))) {
+                alert('선택한 날짜 중에 예약 중인 날짜가 있습니다.');
+                return;
+            }
+
+            try {
+                // updateRental 함수에 demRevNum 전달 (API 구조에 따라 매개변수 순서나 구조 조정 필요)
+                await updateRental(
+                    toLocalDateString(startDate),
+                    toLocalDateString(endDate),
+                    selectedDemNum,
+                    reservationQty,
+                    selectedDemRevNum // demRevNum 추가
+                );
+
+                alert('예약 변경 완료');
+                window.location.reload();
+            } catch (error) {
+                console.error('예약 실패:', error);
+                alert('예약에 실패했습니다.');
+            }
+        };
+
+        loadData();
     };
-
-    loadData();
-};
     function toLocalDateString(date) {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -285,16 +293,58 @@ const RentalComponent = () => {
         return `${y}-${m}-${d}`;
     }
 
-    const handleExtendButtonClick = (demNum, endDate) => {
-        setdisabledExtendDate(endDate);
+    const handleExtendButtonClick = async (demNum, endDate) => {
         setSelectedDemNum(demNum);
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth(); // 0~11
+
+        try {
+            // 현재 달 기준으로 예약 불가 날짜 fetch
+            await fetchDisabledDates(year, month, demNum);
+        } catch (err) {
+            console.error("예약 불가 날짜 조회 실패", err);
+        }
+
+        // 최소 연장 시작일 세팅
+        setdisabledExtendDate(endDate ? new Date(endDate) : new Date());
+
         setIsExtendModalOpen(true);
     };
 
+
     const handleExtendConfirm = (date) => {
+        if (!date) {
+            alert("날짜를 선택해주세요.");
+            return;
+        }
+
+        const start = new Date(disabledExtendDate);
+        const end = new Date(date);
+
+        if (end < start) {
+            alert("연장 날짜는 현재 종료일 이후여야 합니다.");
+            return;
+        }
+
+        // disabledDates는 Date 객체 배열로 가정
+        const conflict = disabledDates.some(d => d >= start && d <= end);
+        if (conflict) {
+            alert("선택한 기간 중 이미 예약된 날짜가 있습니다.");
+            return;
+        }
+
+        if (end.getTime() === start.getTime()) {
+            alert("같은 날짜로 연장 할 수 없습니다.");
+            return;
+        }
+
+        // 문제 없으면 연장 요청
         handleActionClick(selectedDemNum, "대여연장", date);
         setIsExtendModalOpen(false);
     };
+
 
     const getStateLabel = (state) => {
         switch (state) {
@@ -312,6 +362,28 @@ const RentalComponent = () => {
                 return state || "-";
         }
     };
+
+    const fetchDisabledDates = async (year, month, demNum) => {
+        const monthStart = new Date(year, month, 1);
+        const monthEnd = new Date(year, month + 1, 0);
+        const formattedStart = toLocalDateString(monthStart);
+        const formattedEnd = toLocalDateString(monthEnd);
+        const data = await getResExceptDate(formattedStart, formattedEnd, demNum);
+        if (Array.isArray(data)) {
+            // 문자열 배열 → Date 객체 배열로 변환
+            const newDates = data.map(dateStr => {
+                const [y, m, d] = dateStr.split('-');
+                return new Date(y, m - 1, d);
+            });
+
+            // 기존 disabledDates와 합쳐서 중복 제거
+            setDisabledDates(prev => {
+                const allDates = [...prev, ...newDates];
+                const uniqueDates = Array.from(new Map(allDates.map(d => [d.getTime(), d])).values());
+                return uniqueDates;
+            });
+        }
+    }
 
     return (
         <div className="max-w-screen-xl mx-auto my-10">
@@ -408,7 +480,7 @@ const RentalComponent = () => {
                                     const mainImage = item.imageList?.find((img) => img.isMain === true);
                                     const memberState = item.state;
                                     return (
-                                        <tr key={`${item.demNum}_${item.startDate}_${item.endDate}_${item.applyAt}_${item.state}`} className={`hover:bg-gray-50 text-sm text-center whitespace-nowrap <table className="w-full border-collapse border border-gray-300"> ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                                        <tr key={`${item.demRevNum}`} className={`hover:bg-gray-50 text-sm text-center whitespace-nowrap <table className="w-full border-collapse border border-gray-300"> ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
                                             {/* 체크박스 칸 */}
                                             <td className="py-2 px-2 text-center">
                                                 {memberState === "WAIT" ? (
@@ -489,6 +561,8 @@ const RentalComponent = () => {
 
                                                         return (
                                                             <>
+
+                                                            {/* 
                                                                 <button
                                                                     disabled={itemState !== "WAIT"}
                                                                     onClick={() => handleActionClick(item.demNum, "예약변경")}
@@ -499,10 +573,10 @@ const RentalComponent = () => {
                                                                 >
                                                                     예약변경
                                                                 </button>
-
+                                                                */}
                                                                 <button
                                                                     disabled={itemState !== "ACCEPT" || hasWaitState}
-                                                                    onClick={() => handleExtendButtonClick(item.demNum, item.endDate)}
+                                                                    onClick={() => handleExtendButtonClick(item.demNum, item.endDate, item.demRevNum)}
                                                                     className={`px-2 py-1 rounded text-xs w-full ${itemState === "ACCEPT" && !hasWaitState
                                                                         ? "green-button"
                                                                         : "disable-button"
@@ -539,12 +613,34 @@ const RentalComponent = () => {
                         <div className="bg-white rounded-lg p-6 max-w-md w-full min-blank">
                             <h2 className="text-3xl font-bold mb-1">대여 연장 신청</h2>
                             <label className="block mb-2">연장할 날짜</label>
-                            <input
-                                type="date"
-                                className="border rounded p-2 w-full mb-4"
-                                value={extendDate}
-                                min={disabledExtendDate}
-                                onChange={(e) => setExtendDate(e.target.value)}
+                            <DatePicker
+                                className="border p-2 newText-base flex-1 min-w-0 box-border"
+                                selected={
+                                    extendDate
+                                        ? new Date(extendDate)
+                                        : disabledExtendDate
+                                            ? new Date(disabledExtendDate)
+                                            : new Date()
+                                }
+                                minDate={disabledExtendDate ? new Date(disabledExtendDate) : new Date()}
+                                onChange={(date) => {
+                                    if (date) {
+                                        const strDate = date.toISOString().split("T")[0];
+                                        setExtendDate(strDate);
+                                    } else {
+                                        setExtendDate(null);
+                                    }
+                                }}
+                                dateFormat="yyyy-MM-dd"
+                                placeholderText="날짜를 선택하세요"
+                                locale={ko}
+                                popperPlacement="bottom-start"
+                                onMonthChange={(date) => {
+                                    const year = date.getFullYear();
+                                    const month = date.getMonth();
+                                    fetchDisabledDates(year, month, selectedDemNum);
+                                }}
+                                excludeDates={disabledDates}
                             />
 
                             <div className="flex justify-end gap-2">
@@ -571,6 +667,7 @@ const RentalComponent = () => {
                     </div>
                 )}
 
+
                 {/* 우측 하단 예약 취소 버튼 */}
                 <div className="flex justify-end mt-5">
                     <button
@@ -592,7 +689,7 @@ const RentalComponent = () => {
                                 demNum={selectedDemNum}
                                 disabledDates={disabledDates}
                                 setDisabledDates={setDisabledDates}
-                                exceptDate={exceptDate}
+                                onMonthChange={(year, month) => fetchDisabledDates(year, month, selectedItems.demNum)}
                             />
 
                             <div className="mt-6 flex justify-end gap-3">
@@ -625,12 +722,9 @@ const RentalComponent = () => {
                         value={reservationQty}
                         onChange={(val) => setReservationQty(val)}
                         onConfirm={() => {
-                            const selectedItem = listData.content.find(item => item.demNum === selectedDemNum);
-                            const updatedItemNum = maxQty - reservationQty + (selectedItem?.bitemNum ?? 0);
-                            reservationUpdate(updatedItemNum);
+                            reservationUpdate(reservationQty); // 선택한 수량 그대로 전달
                             setShowQtyModal(false);
                         }}
-                        onClose={() => setShowQtyModal(false)}
                     />
                 )}
 

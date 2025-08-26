@@ -389,7 +389,7 @@ return (
                                                 ) : "-"}
                                             </td>
                                             <td className="px-3 py-2 max-w-[80px]">
-                                                {member.state === "ACCEPT" ? (
+                                                {member.state === "ACCEPT" || member.state === "EXPIRED" ? (
                                                     <button
                                                         className="negative-button"
                                                         onClick={() => {

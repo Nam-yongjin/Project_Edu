@@ -108,7 +108,7 @@ public class AdminServiceImpl implements AdminService {
 	                for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
 	                    deleteTimeList.add(date);
 	                }
-	                demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
+	                demonstrationTimeRepository.deleteTimeDemNum(deleteTimeList,res.getDemonstration().getDemNum());
 	            }
 	        }
 	    }
@@ -122,29 +122,6 @@ public class AdminServiceImpl implements AdminService {
 		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getState(),demonstrationApprovalRegDTO.getDemRegNum());
 	}
 
-	/* 연장 반납 신청 처리하는 기능
-	@Override
-	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
-	    List<Long> demRevNums = dto.getDemRevNum(); // 여기를 List<Long>로 받도록 DTO 변경 추천
-	    System.out.println(dto);
-	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT) {
-	    	System.out.println("연장");
-	        // WAIT 상태의 요청들 한 번에 가져옴
-	        List<DemonstrationRequest> requests = demonstrationRequestRepository
-	                .selectRequest(demRevNums, DemonstrationState.WAIT);
-
-	        // endDate를 requests에서 공통 로직으로 뽑아서 배치로 업데이트
-	        LocalDate newEndDate = requests.get(0).getUpdateDate(); 
-	        demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
-	    }
-
-	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
-	    	System.out.println("대여");
-	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
-	    }
-
-	    demonstrationRequestRepository.updateDemResChangeStateReq(dto.getState(), demRevNums, dto.getType(), DemonstrationState.WAIT);
-	} */
 	
 	// 연장 반납 신청 처리하는 기능
 	@Override
@@ -152,39 +129,40 @@ public class AdminServiceImpl implements AdminService {
 	    List<Long> demRevNums = dto.getDemRevNum();
 	    System.out.println(dto);
 
-	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT) {
-	        System.out.println("연장");
+	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.REJECT) {
+	        System.out.println("연장 거부");
 	        
 	        // WAIT 상태의 요청들 한 번에 가져옴
 	        List<DemonstrationRequest> requests = demonstrationRequestRepository
 	            .selectRequest(demRevNums, DemonstrationState.WAIT);
-
+	        
 	        // ACCEPT 상태의 예약들 가져와서 원래 endDate 확인
 	        List<DemonstrationReserve> reserves = demonstrationReserveRepository
 	            .findDemRevNums(demRevNums, DemonstrationState.ACCEPT);
 
-	        // endDate를 requests에서 공통 로직으로 뽑아서 배치로 업데이트
+	        // 새로운 종료일 계산 (연장 거부이므로 줄어든 종료일)
 	        LocalDate newEndDate = requests.get(0).getUpdateDate();
-	        demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
-
-	        // 각 예약에 대해 DemonstrationTime 추가
+	        
+	        // 각 예약에 대해 기존 종료일과 새로운 종료일 사이의 DemonstrationTime 삭제
 	        for (DemonstrationReserve reserve : reserves) {
 	            LocalDate originalEndDate = reserve.getEndDate();
-
-	            // 원래 종료일 다음날부터 새로운 종료일까지 DemonstrationTime 생성
-	            List<DemonstrationTime> extendDates = new ArrayList<>();
+	            List<LocalDate> datesToDelete = new ArrayList<>();
 	            for (LocalDate date = originalEndDate.plusDays(1); !date.isAfter(newEndDate); date = date.plusDays(1)) {
-	                extendDates.add(DemonstrationTime.builder()
-	                    .demDate(date)
-	                    .demonstration(Demonstration.builder().demNum(reserve.getDemonstration().getDemNum()).build())
-	                    .build());
+	                datesToDelete.add(date);
 	            }
 
-	            if (!extendDates.isEmpty()) {
-	                demonstrationTimeRepository.saveAll(extendDates);
+	            if (!datesToDelete.isEmpty()) {
+	                demonstrationTimeRepository.deleteTimeDemNum(datesToDelete,reserve.getDemonstration().getDemNum());
 	            }
 	        }
 	    }
+	    else if(dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT){
+	        List<DemonstrationRequest> requests = demonstrationRequestRepository
+		            .selectRequest(demRevNums, DemonstrationState.WAIT);
+	        LocalDate newEndDate = requests.get(0).getUpdateDate();
+	    	 demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
+	    }
+	
 
 	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
 	        System.out.println("대여");
@@ -193,6 +171,7 @@ public class AdminServiceImpl implements AdminService {
 
 	    demonstrationRequestRepository.updateDemResChangeStateReq(dto.getState(), demRevNums, dto.getType(), DemonstrationState.WAIT);
 	}
+
 
 	// 관리자가 회원들에게 메시지 보내는 기능
 	@Override

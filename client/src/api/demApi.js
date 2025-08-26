@@ -60,9 +60,9 @@ export const getResDate = async (startDate, endDate, demNum) => {
     return res.data;
 }
 
-export const getResExceptDate = async (demNum) => {
+export const getResExceptDate = async (startDate,endDate,demNum) => {
     const res = await jwtAxios.get(`${demonstration}/demResConExcept`, {
-        params: {demNum }
+        params: {demNum,startDate,endDate }
     });
     return res.data;
 }
@@ -127,6 +127,7 @@ export const deleteRental = async (demRevNum) => {
 
 // 물품 대여 현황 페이지에서 예약 날짜를 업데이트 시키는 요청
 export const updateRental = async (startDate,endDate,demNum,itemNum,demRevNum) => {
+    console.log(itemNum);
   const res = await jwtAxios.put(`${demonstration}/ChangeRes`, {
       startDate: startDate,
         endDate: endDate,

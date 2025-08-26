@@ -37,10 +37,16 @@ public class DemonstrationReserveSpecs {
 
           List<Predicate> predicates = new ArrayList<>();
 
+       // DemonstrationRegistration의 state가 EXPIRED, CANCEL인 경우 제외
+          predicates.add(cb.not(cb.equal(regJoin.get("state"), DemonstrationState.EXPIRED)));
+          predicates.add(cb.not(cb.equal(regJoin.get("state"), DemonstrationState.CANCEL)));
+          
           if (StringUtils.hasText(memId)) {
               predicates.add(cb.equal(root.get("member").get("memId"), memId));
           }
 
+          
+          
           if (StringUtils.hasText(search)) {
               if ("demName".equalsIgnoreCase(type)) {
                   predicates.add(cb.like(cb.lower(demJoin.get("demName")), "%" + search.toLowerCase() + "%"));

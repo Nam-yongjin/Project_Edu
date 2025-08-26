@@ -3,6 +3,7 @@ package com.EduTech.service.demonstration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,7 @@ import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.demonstration.DemonstrationTime;
+import com.EduTech.entity.demonstration.RequestType;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
@@ -70,7 +72,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	private final MemberRepository memberRepository;
 	private final ModelMapper modelMapper;
 
-	// 실증 물품 등록 확인 페이지에서 해당 물품을 대여 신청한 사람들을 불러오는 기능
+	// 실증 물품 대여 조회
 	@Override
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResRental(DemonstrationSearchDTO searchDTO,
 			String memId) {
@@ -120,7 +122,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		return new PageResponseDTO<>(dtoList, resPage.getTotalPages(), resPage.getNumber(), resPage.getTotalElements());
 	}
 
-	// 선생이 빌린 물품 내역 페이지 조회
+	// 교사가 빌린 물품 내역 페이지 조회
 	@Override
 	public PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, DemonstrationSearchDTO searchDTO) {
 		// 페이징 & 정렬 기본값
@@ -189,28 +191,60 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		return new PageResponseDTO<>(dtoList, reservePage.getTotalPages(), reservePage.getNumber(),
 				reservePage.getTotalElements());
 	}
-
-	// 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
-	@Override
-	public void rentalDateChange(DemonstrationResRentalDTO demonstrationResRentalDTO) {
-		// demonstrationRes테이블 endDate 변경
-		demonstrationReserveRepository.updateDemResEndDate(demonstrationResRentalDTO.getDemRevNum(),
-				demonstrationResRentalDTO.getUpdatedEndDate(), DemonstrationState.CANCEL);
-
-		demonstrationTimeRepository.deleteDemTimes(demonstrationResRentalDTO.getOriginStartDate(),
-				demonstrationResRentalDTO.getOriginEndDate());
-
-		List<DemonstrationTime> dates = new ArrayList<>();
-		for (LocalDate date = demonstrationResRentalDTO.getUpdatedStartDate(); !date
-				.isAfter(demonstrationResRentalDTO.getUpdatedEndDate()); date = date.plusDays(1)) {
-			dates.add(DemonstrationTime.builder().demDate(date)
-					.demonstration(Demonstration.builder().demNum(demonstrationResRentalDTO.getDemNum()).build())
-					.build());
+	
+	// 해당 상품의 예약 정보를 가져오는 기능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
+		@Override
+		public List<LocalDate> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
+		    // 시작 날짜와 끝 날짜, 실증 번호를 통해 예약 날짜 리스트를 불러옴(wait와 accept 상태의 경우에만 time테이블에 저장되므로 상태값 안넣어도 됨)
+			System.out.println("------------------------------------");
+			System.out.println(demonstrationTimeReqDTO);
+		    List<DemonstrationTimeResDTO> dateList = demonstrationTimeRepository.findReservedDates(
+		            demonstrationTimeReqDTO.getStartDate(),
+		            demonstrationTimeReqDTO.getEndDate(),
+		            demonstrationTimeReqDTO.getDemNum()
+		    );
+		    System.out.println(dateList);
+		    // DTO 리스트에서 LocalDate만 추출
+		    return dateList.stream()
+		                   .map(DemonstrationTimeResDTO::getDemDate)
+		                   .collect(Collectors.toList());
 		}
 
-		demonstrationTimeRepository.saveAll(dates);
-	}
+		// 현재 회원의 예약 정보를 제외한 상품 예약 정보 가져오기
+		@Override
+		public List<LocalDate> checkReservationStateExcept(DemonstrationTimeReqDTO dto, String memId) {
+		    // 조회할 상태 (대기, 수락)
+		    List<DemonstrationState> states = Arrays.asList(DemonstrationState.ACCEPT, DemonstrationState.WAIT);
 
+		    // 1. 현재 달 범위 내 모든 예약 날짜 가져오기 (모든 회원)
+		    List<DemonstrationTimeResDTO> reservedDates = demonstrationTimeRepository.findReservedDates(
+		            dto.getStartDate(),
+		            dto.getEndDate(),
+		            dto.getDemNum()
+		    );
+		    System.out.println(reservedDates);
+		    // 2. 로그인한 회원의 예약 정보 가져오기
+		    List<DemonstrationTimeReqDTO> memberReservations = demonstrationReserveRepository.getResDate(
+		            dto.getDemNum(),
+		            memId,
+		            states
+		    );
+		    // 로그인 회원 예약 날짜만 추출
+		    List<LocalDate> memberReservedDates = memberReservations.stream()
+		            .flatMap(r -> r.getStartDate().datesUntil(r.getEndDate().plusDays(1)))
+		            .collect(Collectors.toList());
+
+		    // 3. 현재 달 예약 날짜에서 로그인 회원 예약 제외
+		    List<LocalDate> availableDates = reservedDates.stream()
+		            .map(DemonstrationTimeResDTO::getDemDate)
+		            .filter(d -> !memberReservedDates.contains(d))
+		            .collect(Collectors.toList());
+
+		    return availableDates;
+		}
+
+
+	
 	// 실증 장비신청 페이지 (실증 물품 리스트 목록)
 	@Override
 	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount, String type, String search,
@@ -254,27 +288,8 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 				currentPage.getTotalElements());
 	}
 
-	// 해당 상품의 예약 정보를 가져오는 기능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
-	@Override
-	public List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
-		// 시작 날짜와 끝 날짜, 실증 번호를 통해 예약 날짜 리스트를 불러와 리턴
-		List<DemonstrationTimeResDTO> DateList = demonstrationTimeRepository.findReservedDates(
-				demonstrationTimeReqDTO.getStartDate(), demonstrationTimeReqDTO.getEndDate(),
-				demonstrationTimeReqDTO.getDemNum());
-		return DateList;
-	}
+	
 
-	// 현재 회원의 예약 정보를 제외하기 위해 해당 상품의 예약 정보를 가져오는 기능
-	@Override
-	public List<DemonstrationTimeResDTO> checkReservationStateExcept(DemonstrationTimeReqDTO demonstrationTimeReqDTO,
-			String memId) {
-		// 현재 회원의 예약을 제외한 해당 물품의 예약 시작 날짜와 끝 날짜를 받아옴
-		DemonstrationTimeReqDTO dto = demonstrationReserveRepository.getResDate(demonstrationTimeReqDTO.getDemNum(),
-				memId, DemonstrationState.WAIT);
-		List<DemonstrationTimeResDTO> DateList = demonstrationTimeRepository.findReservedDates(dto.getStartDate(),
-				dto.getEndDate(), demonstrationTimeReqDTO.getDemNum());
-		return DateList;
-	}
 
 	// 실증 장비 신청 상세 페이지
 	@Override
@@ -296,10 +311,13 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeReqDTO.setDemNum(demonstrationReservationDTO.getDemNum());
 		demonstrationTimeReqDTO.setStartDate(demonstrationReservationDTO.getStartDate());
 		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
-		List<DemonstrationTimeResDTO> ResState = checkReservationState(demonstrationTimeReqDTO);
+		
+		List<LocalDate> ResState = checkReservationState(demonstrationTimeReqDTO);
+		
 		int result = demonstrationRepository.updateItemNum(demonstrationReservationDTO.getItemNum(),
 				demonstrationReservationDTO.getDemNum());
 		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
+		
 		if (ResState == null || ResState.isEmpty()) {
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
 					.startDate(demonstrationReservationDTO.getStartDate())
@@ -326,89 +344,116 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		}
 	}
 
-	// 물품대여 페이지에서 예약 취소 버튼 클릭 시, 상태값을 cancel로 바꿈 
+	// 물품대여 페이지에서 예약 취소 버튼 클릭 시, 상태값을 cancel로 바꿈 관리자도 포함
 	// 예약 변경시에도 호출
 	@Override
-	public void demonstrationReservationCancel(List<Long> demRevNum) {
-		// 불러온 아이디와 실증 번호를 통해 신청 번호를 받아온 후,
-		System.out.println(demRevNum);
-		List<DemonstrationReserve> demonstrationReserve = demonstrationReserveRepository.findDemRevNum(demRevNum,
-				DemonstrationState.WAIT);
-		if (demonstrationReserve == null) {
-			System.out.println("예약 정보가 없습니다.");
-			return;
-		}
-		Long updateItemNum;
-		for (DemonstrationReserve res : demonstrationReserve) {
-			 String memId = res.getMember().getMemId();
-			// 예약 취소한 갯수+기존의갯수
-			updateItemNum = demonstrationReserveRepository.getBItemNum(res.getDemonstration().getDemNum(), DemonstrationState.WAIT,memId);
-			demonstrationRepository.updateItemNum(updateItemNum,res.getDemonstration().getDemNum());
-		}
-
-		// 신청 번호를 통한 상태 업데이트 (cancel)
-		demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.CANCEL, demRevNum);
-		// demonstartionTime테이블에 있는 예약 정보도 삭제
-
-		for (DemonstrationReserve res : demonstrationReserve) {
-			List<LocalDate> deleteTimeList = new ArrayList<>();
-			for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
-				deleteTimeList.add(date);
-			}
-			// 저장되어 있던 시작 번호와 끝 번호를 가져와
-			// time테이블의 예약 정보도 삭제
-			demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
-		}
-	}
-
-	
-	// 예약 취소 (실증 물품 삭제할때 사용하는 메소드) 실증 물품을 삭제했을때 해당 물품 대여 내역은 잇어야 하니
-	@Override
 	@Transactional
-	public void demonstrationReservationCancels(List<Long> demNums, List<String> memIds) {
-		// 해당 memIds와 demNums 조건에 맞는 예약 목록 조회
-		/*
-		List<DemonstrationState> demonstrationState=new ArrayList<>();
-		demonstrationState.add(DemonstrationState.ACCEPT);
-		demonstrationState.add(DemonstrationState.WAIT);
-		List<DemonstrationReserve> demonstrationReserves = demonstrationReserveRepository.findDemRevNums(memIds,
-				demNums,demonstrationState);
+	public void demonstrationReservationCancel(List<Long> demRevNum) {
+	    System.out.println(demRevNum);
+	    List<DemonstrationState> state=new ArrayList<>();
+	    state.add(DemonstrationState.ACCEPT);
+	    state.add(DemonstrationState.WAIT);
+	    state.add(DemonstrationState.EXPIRED);
+	    List<DemonstrationReserve> demonstrationReserve = demonstrationReserveRepository.findDemRevNum(demRevNum,
+	            state);
+	    if (demonstrationReserve == null) {
+	        System.out.println("예약 정보가 없습니다.");
+	        return;
+	    }
+	    
+	    for (DemonstrationReserve res : demonstrationReserve) {
+	        String memId = res.getMember().getMemId();
+	        Long demNum = res.getDemonstration().getDemNum();
+	        
+	        // 현재 itemNum 가져오기
+	        Long currentItemNum = demonstrationRepository.selectItemNum(demNum);
+	        
+	        // 해당 회원의 ACCEPT, WAIT 상태 예약 수량 가져오기
+	        Long bItemNum = demonstrationReserveRepository.findBitemNum(demNum, memId, 
+	                Arrays.asList(DemonstrationState.ACCEPT, DemonstrationState.WAIT));
+	        
+	        // itemNum 업데이트: 현재 itemNum + 취소할 예약 수량
+	        Long updateItemNum = currentItemNum + res.getBItemNum();
+	        demonstrationRepository.updateItemNum(updateItemNum, demNum);
+	    }
 
-		if (demonstrationReserves.isEmpty()) {
-			System.out.println("예약 정보가 없습니다.");
-			return;
-		}
-
-		// 각 demNum별로 취소된 갯수 + 기존 갯수를 업데이트 
-		for (Long demNum : demNums) {
-			Long updateItemNum = demonstrationReserveRepository.getBItemNumBatch(demNum, memIds,
-					DemonstrationState.ACCEPT);
-			demonstrationRepository.updateItemNum(updateItemNum, demNum);
-		} 
-		*/
-
-		// 상태 업데이트 (cancel) - batch 처리용 메서드
-		demonstrationReserveRepository.updateDemResChangeStateBatch(DemonstrationState.CANCEL, memIds, demNums);
-
-		/*
-		//  예약 시간 삭제
-		for (DemonstrationReserve res : demonstrationReserves) {
-			List<LocalDate> deleteTimeList = new ArrayList<>();
-			for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
-				deleteTimeList.add(date);
-			}
-			demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
-		} */
+	    // 신청 번호를 통한 상태 업데이트 (cancel)
+	    demonstrationReserveRepository.updateDemResChangeState(DemonstrationState.CANCEL, demRevNum);
+	    
+	    // demonstartionTime테이블에 있는 예약 정보도 삭제
+	    for (DemonstrationReserve res : demonstrationReserve) {
+	        List<LocalDate> deleteTimeList = new ArrayList<>();
+	        for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
+	            deleteTimeList.add(date);
+	        }
+	        // 저장되어 있던 시작 번호와 끝 번호를 가져와
+	        // time테이블의 예약 정보도 삭제
+	        demonstrationTimeRepository.deleteTimeDemNum(deleteTimeList,res.getDemonstration().getDemNum());
+	    }
 	}
-	
+
 
 	// 실증 신청 페이지에서 예약 변경하기 클릭 시, 예약 정보 변경
 	@Override
+	@Transactional
 	public void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO, String memId) {
-		// 기존 예약 취소
-		demonstrationReservationCancel(Arrays.asList(demonstrationReservationDTO.getDemRevNum()));
-		// 새로운 예약 추가
-		demonstrationReservation(demonstrationReservationDTO, memId);
+	    System.out.println("예약 변경 시작 - demRevNum: " + demonstrationReservationDTO.getDemRevNum());
+	    
+	    List<DemonstrationState> state = new ArrayList<>();
+	    state.add(DemonstrationState.WAIT);
+	    
+	    // 1. 기존 예약 조회
+	    List<DemonstrationReserve> demonstrationReserve = demonstrationReserveRepository.findDemRevNum(
+	            Arrays.asList(demonstrationReservationDTO.getDemRevNum()), state);
+
+	    if (demonstrationReserve == null || demonstrationReserve.isEmpty()) {
+	        System.out.println("변경할 예약을 찾을 수 없습니다. demRevNum: " + demonstrationReservationDTO.getDemRevNum());
+	        throw new RuntimeException("변경할 예약을 찾을 수 없습니다.");
+	    }
+
+	    DemonstrationReserve res = demonstrationReserve.get(0);
+	    System.out.println("기존 예약 정보:");
+	    System.out.println("- 시작일: " + res.getStartDate());
+	    System.out.println("- 종료일: " + res.getEndDate());
+	    System.out.println("- 수량: " + res.getBItemNum());
+	    System.out.println("- 현재 상태: " + res.getState());
+
+	    try {
+	        // 2. itemNum 복구 (취소할 예약 수량만큼 증가)
+	        Long currentItemNum = demonstrationRepository.selectItemNum(res.getDemonstration().getDemNum());
+	        Long restoredItemNum = currentItemNum + res.getBItemNum();
+	        System.out.println("itemNum 복구: " + currentItemNum + " -> " + restoredItemNum);
+	        
+	        int itemUpdateResult = demonstrationRepository.updateItemNum(restoredItemNum, res.getDemonstration().getDemNum());
+	        System.out.println("itemNum 업데이트 결과: " + itemUpdateResult);
+
+	        // 3. 예약 시간 삭제 (상태 변경 전에 먼저 삭제)
+	        List<LocalDate> deleteTimeList = new ArrayList<>();
+	        for (LocalDate date = res.getStartDate(); !date.isAfter(res.getEndDate()); date = date.plusDays(1)) {
+	            deleteTimeList.add(date);
+	        }
+	        
+	        if (!deleteTimeList.isEmpty()) {
+	            System.out.println("삭제할 시간 목록: " + deleteTimeList);
+	           demonstrationTimeRepository.deleteDemTimeList(deleteTimeList);
+	        }
+
+	        // 4. 예약 상태를 CANCEL로 변경
+	        int stateUpdateResult = demonstrationReserveRepository.updateDemResChangeState(
+	                DemonstrationState.CANCEL,
+	                Arrays.asList(demonstrationReservationDTO.getDemRevNum()));
+	        System.out.println("예약 상태 변경 결과: " + stateUpdateResult);
+
+	        // 5. 기존 예약 메서드 재사용 (프론트엔드와 동일한 로직)
+	        System.out.println("새로운 예약 생성 시작");
+	        demonstrationReservation(demonstrationReservationDTO, memId);
+	        System.out.println("예약 변경 완료");
+
+	    } catch (Exception e) {
+	        System.err.println("예약 변경 중 오류 발생: " + e.getMessage());
+	        e.printStackTrace();
+	        throw new RuntimeException("예약 변경 실패: " + e.getMessage(), e);
+	    }
 	}
 
 	// 실증 상품 등록 페이지에서 실증 상품 등록하는 기능
@@ -514,7 +559,7 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationRegistrationRepository.updateDemRegChangeState(DemonstrationState.CANCEL, demNum);
 		List<String> rentalMemId = new ArrayList<>();
 		rentalMemId = demonstrationReserveRepository.getResMemId(demNum, DemonstrationState.CANCEL);
-		demonstrationReservationCancels(demNum, rentalMemId);
+		//demonstrationReservationCancels(demNum, rentalMemId);
 	}
 
 	// 실증 번호를 받아서 실증 상품의 정보를 받아오는 기능
@@ -540,20 +585,35 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
 	@Override
 	public Boolean checkRes(Long demNum, String memId) {
-		List<DemonstrationState> state=new ArrayList<>();
+		List<DemonstrationState> state = new ArrayList<>();
 		state.add(DemonstrationState.WAIT);
 		state.add(DemonstrationState.EXPIRED);
 		state.add(DemonstrationState.ACCEPT);
-		Boolean bool = demonstrationReserveRepository.checkRes(demNum, memId,state).orElse(false); // 이력에 wait, expired, accept가 하나라도 잇다면, 예약 불가능
-
+		Boolean bool = demonstrationReserveRepository.checkRes(demNum, memId, state).orElse(false); // 이력에 wait,
+																									// expired, accept가
+																									// 하나라도 잇다면, 예약 불가능
 		return bool;
 	}
 
 	// 물품 대여 리스트 페이지에서 연기 신청, 반납 신청 하는 기능
 	@Override
 	public void addRequest(ResRequestDTO resRequestDTO, String memId) {
-		DemonstrationReserve reserve = demonstrationReserveRepository.getRev(resRequestDTO.getDemNum(), memId,
-				DemonstrationState.CANCEL);
+		System.out.println(resRequestDTO);
+		List<DemonstrationState> states = Arrays.asList(DemonstrationState.ACCEPT);
+		DemonstrationReserve reserve=demonstrationReserveRepository.findDemNumMemId(Arrays.asList(resRequestDTO.getDemNum()),memId,states);
+		if(resRequestDTO.getType().equals(RequestType.EXTEND))
+		{
+			List<DemonstrationTime> demonstrationTimeList = new ArrayList<>();
+			for (LocalDate date = reserve.getStartDate(); !date
+					.isAfter(resRequestDTO.getUpdateDate()); date = date.plusDays(1)) {
+				DemonstrationTime demonstrationTime = DemonstrationTime.builder().demDate(date)
+						.demonstration(Demonstration.builder().demNum(resRequestDTO.getDemNum()).build())
+						.build();
+				demonstrationTimeList.add(demonstrationTime);
+			} // 변경 전 날짜로 부터 변경 후 까지의 날짜의 예약 상태 추가
+				// time 리스트를 저장
+			demonstrationTimeRepository.saveAll(demonstrationTimeList);
+		}
 		DemonstrationRequest request = new DemonstrationRequest();
 		request.setApplyAt(LocalDate.now());
 		request.setReserve(reserve);

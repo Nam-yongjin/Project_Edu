@@ -19,11 +19,19 @@ import com.EduTech.entity.demonstration.DemonstrationState;
 public interface DemonstrationReserveRepository
 		extends JpaRepository<DemonstrationReserve, Long>, JpaSpecificationExecutor<DemonstrationReserve> { 
 																											
-	// 아이디와 상품번호를 받아와 현재 상태가 취소가 아닌 res테이블을 가져오는 쿼리문
-	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.demRevNum IN :demRevNum AND dr.state=:state")
+	// 아이디와 상품번호를 받아와 현재 상태에 따른 조회를 하는 쿼리문
+	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.demRevNum IN :demRevNum AND dr.state IN :state")
 	List<DemonstrationReserve> findDemRevNum(@Param("demRevNum") List<Long> demRevNum,
-			@Param("state") DemonstrationState state);
+			@Param("state") List<DemonstrationState> state);
 
+	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.demonstration.demNum IN :demNum AND dr.state IN :state AND dr.member.memId=:memId")
+	DemonstrationReserve findDemNumMemId(@Param("demNum") List<Long> demNum,@Param("memId") String memId,
+			@Param("state") List<DemonstrationState> state);
+	
+	@Query("SELECT dr.bItemNum FROM DemonstrationReserve dr WHERE dr.demonstration.demNum IN :demNum AND dr.member.memId=:memId AND dr.state IN :state")
+	Long findBitemNum(@Param("demNum") Long demNum,
+			@Param("memId") String memId,@Param("state") List<DemonstrationState> state);
+	
 	// 장비 신청 상세페이지에서 날짜 선택후 예약 신청하기 누르면 예약이 변경되는 쿼리문
 	@Modifying
 	@Transactional
@@ -58,10 +66,11 @@ public interface DemonstrationReserveRepository
 	Optional<Boolean> checkRes(@Param("demNum") Long demNum, @Param("memId") String memId,
 			@Param("state") List<DemonstrationState> state);
 
+	/*
 	// RES테이블에서 아이디와 상품번호를 받아와 물품 대여한 갯수를 가져오는 쿼리문
 	@Query("SELECT (r.bItemNum+d.itemNum) FROM DemonstrationReserve r,Demonstration d WHERE d.demNum=r.demonstration.demNum AND r.demonstration.demNum =:demNum AND r.state=:state AND r.member.memId=:memId")
 	Long getBItemNum(@Param("demNum") Long demNum, 
-			@Param("state") DemonstrationState state,@Param("memId")String memId);
+			@Param("state") DemonstrationState state,@Param("memId")String memId); */
 
 	// 스케줄러를 이용해 state가 cancel인 값 삭제
 	@Modifying
@@ -70,13 +79,8 @@ public interface DemonstrationReserveRepository
 	void deleteResCancel(@Param("state") DemonstrationState state);
 
 	// RES테이블에서 아이디와 상품번호를 받아와 예약 시작날짜와 끝날짜를 받아오는 쿼리문
-	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeReqDTO(r.startDate,r.endDate) FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state=:stateWait")
-	DemonstrationTimeReqDTO getResDate(@Param("demNum") Long demNum, @Param("memId") String memId,@Param("stateWait") DemonstrationState wait);
-
-	// res테이블에서 아이디와 상품 번호를 받아와 실증 신청 번호를 받아오는 쿼리문
-	@Query("SELECT r FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.member.memId = :memId AND r.demonstration.demNum IN :demNum AND r.state!=:state")
-	DemonstrationReserve getRev(@Param("demNum") Long demNum, @Param("memId") String memId,
-			@Param("state") DemonstrationState state);
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationTimeReqDTO(r.startDate,r.endDate) FROM DemonstrationReserve r WHERE r.demonstration.demNum=:demNum AND r.member.memId=:memId AND r.state IN :state")
+	List<DemonstrationTimeReqDTO> getResDate(@Param("demNum") Long demNum, @Param("memId") String memId,@Param("state") List<DemonstrationState> state);
 
 	// res테이블에서 상품번호를 받아와 해당 상품을 신청한 회원 아이디를 받아오는 쿼리문
 	@Query("SELECT r.member.memId FROM DemonstrationReserve r WHERE r.demonstration.demNum IN :demNum AND r.state!=:state")

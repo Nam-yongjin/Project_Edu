@@ -1,5 +1,6 @@
 package com.EduTech.service.demonstration;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -9,7 +10,6 @@ import com.EduTech.dto.demonstration.DemonstrationBorrowListDTO;
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationFormResDTO;
-import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
 import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
@@ -27,9 +27,9 @@ public interface DemonstrationService {
 		PageResponseDTO<DemonstrationRentalListDTO> getAllDemRental(String memId, DemonstrationSearchDTO demonstrationSearchDTO); // 회원이 신청한 물품 대여 조회 페이지 조회 기능 (검색도 같이 구현할 것임.)
 		PageResponseDTO<DemonstrationPageListDTO> getAllDemList(Integer pageCount,String type,String search,String sortType); // 실증 장비신청 페이지 (실증 물품 리스트 목록)
 		DemonstrationDetailDTO getDemDetailList(Long demNum); // 실증 장비 신청 상세 페이지
-		List<DemonstrationTimeResDTO> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태를 불러오는 기능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
-		List<DemonstrationTimeResDTO> checkReservationStateExcept(DemonstrationTimeReqDTO demonstrationTimeReqDTO,String memId); // 현재 회원의 예약 정보를 제외한 상품의 예약 정보를 불러오는 기능
-		void rentalDateChange(DemonstrationResRentalDTO demonstrationResRentalDTO); // 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
+		List<LocalDate> checkReservationState(DemonstrationTimeReqDTO demonstrationTimeReqDTO); // 해당 상품이 예약 상태를 불러오는 기능(실증 장비 신청 페이지에서 대여가능 / 예약 마감 표기 할거임)
+		List<LocalDate> checkReservationStateExcept(DemonstrationTimeReqDTO demonstrationTimeReqDTO,String memId); // 현재 회원의 예약 정보를 제외한 상품의 예약 정보를 불러오는 기능
+		//void rentalDateChange(DemonstrationResRentalDTO demonstrationResRentalDTO); // 물품 대여 조회 페이지 연기 신청 및 반납 조기 신청
 		void demonstrationReservation(DemonstrationReservationDTO demonstrationReservationDTO, String memId); // 실증 신청 상세 페이지에서 예약 신청하기 클릭시, 예약 정보 저장
 		void demonstrationReservationCancel(List<Long> demRevNum); // 실증 신청 상세 페이지에서 예약 취소하기 클릭 시, 예약 정보 취소
 		void demonstrationReservationChange(DemonstrationReservationDTO demonstrationReservationDTO,String memId); // 실증 신청 상세 페이지에서 예약 변경하기 클릭 시, 예약 정보 수정
@@ -40,5 +40,5 @@ public interface DemonstrationService {
 		Boolean checkRes(Long demNum,String memId);// 물품 상세정보 페이지에서 현재 회원이 해당 물품에 예약이 되어있을 경우를 나타내는 기능
 		void addRequest(ResRequestDTO resRequestDTO,String memId); // 물품 대여 목록 페이지에서 반납 신청, 연기 신청하는 기능
 		PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow(String memId,DemonstrationSearchDTO demonstrationSearchDTO);
-		void demonstrationReservationCancels(List<Long> demNums, List<String> memIds);
+		//void demonstrationReservationCancels(List<Long> demNums, List<String> memIds);
 }
