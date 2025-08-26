@@ -354,7 +354,8 @@ return (
                                             <td className="py-2">{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
                                             <td className="py-2">{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
                                             <td className="py-2">{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
-                                            <td className="px-3 py-2 max-w-[80px]">
+                                            <td className="px-3 py-2 max-w-[80px]
+                                            ">
                                                 {member.requestDTO && member.requestDTO.length > 0 ? (
                                                     member.requestDTO.some(req => req.state === "WAIT") ? (
                                                         <div className="flex flex-col items-center space-y-1">
