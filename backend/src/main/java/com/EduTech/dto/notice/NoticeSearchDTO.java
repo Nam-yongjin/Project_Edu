@@ -31,5 +31,7 @@ public class NoticeSearchDTO { //검색
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate endDate;
 
-
+//프론트에서 GET /NoticeList?page=1&size=10&keyword=공지...(생략)&startDate=2025-08-01&endDate=2025-08-31 이렇게 요청을 보내면
+// 스프링이 자동으로 매핑해서 searchDTO.getPage(); searchDTO.getSize(); 이렇게 값이 들어옴
+//프론트 axios에서 params 객체를 정의해서 get에 넣으면 axios가 알아서 GET /NoticeList?page=1&size=10&keyword=공지...(생략)&startDate=2025-08-01&endDate=2025-08-31로 변환
 }
