@@ -36,6 +36,7 @@ import com.EduTech.entity.demonstration.DemonstrationRegistration;
 import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
+import com.EduTech.entity.demonstration.DemonstrationTime;
 import com.EduTech.entity.demonstration.RequestType;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
@@ -121,7 +122,7 @@ public class AdminServiceImpl implements AdminService {
 		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getState(),demonstrationApprovalRegDTO.getDemRegNum());
 	}
 
-	// 연장 반납 신청 처리하는 기능
+	/* 연장 반납 신청 처리하는 기능
 	@Override
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
 	    List<Long> demRevNums = dto.getDemRevNum(); // 여기를 List<Long>로 받도록 DTO 변경 추천
@@ -139,6 +140,54 @@ public class AdminServiceImpl implements AdminService {
 
 	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
 	    	System.out.println("대여");
+	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
+	    }
+
+	    demonstrationRequestRepository.updateDemResChangeStateReq(dto.getState(), demRevNums, dto.getType(), DemonstrationState.WAIT);
+	} */
+	
+	// 연장 반납 신청 처리하는 기능
+	@Override
+	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
+	    List<Long> demRevNums = dto.getDemRevNum();
+	    System.out.println(dto);
+
+	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT) {
+	        System.out.println("연장");
+	        
+	        // WAIT 상태의 요청들 한 번에 가져옴
+	        List<DemonstrationRequest> requests = demonstrationRequestRepository
+	            .selectRequest(demRevNums, DemonstrationState.WAIT);
+
+	        // ACCEPT 상태의 예약들 가져와서 원래 endDate 확인
+	        List<DemonstrationReserve> reserves = demonstrationReserveRepository
+	            .findDemRevNums(demRevNums, DemonstrationState.ACCEPT);
+
+	        // endDate를 requests에서 공통 로직으로 뽑아서 배치로 업데이트
+	        LocalDate newEndDate = requests.get(0).getUpdateDate();
+	        demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
+
+	        // 각 예약에 대해 DemonstrationTime 추가
+	        for (DemonstrationReserve reserve : reserves) {
+	            LocalDate originalEndDate = reserve.getEndDate();
+
+	            // 원래 종료일 다음날부터 새로운 종료일까지 DemonstrationTime 생성
+	            List<DemonstrationTime> extendDates = new ArrayList<>();
+	            for (LocalDate date = originalEndDate.plusDays(1); !date.isAfter(newEndDate); date = date.plusDays(1)) {
+	                extendDates.add(DemonstrationTime.builder()
+	                    .demDate(date)
+	                    .demonstration(Demonstration.builder().demNum(reserve.getDemonstration().getDemNum()).build())
+	                    .build());
+	            }
+
+	            if (!extendDates.isEmpty()) {
+	                demonstrationTimeRepository.saveAll(extendDates);
+	            }
+	        }
+	    }
+
+	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
+	        System.out.println("대여");
 	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
 	    }
 

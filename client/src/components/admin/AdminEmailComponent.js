@@ -168,11 +168,29 @@ const AdminEmailComponent = ({ members }) => {
     const width = parseInt(imageWidth);
     const height = parseInt(imageHeight);
     
+    // content가 없을 경우 return
+    if (!content.trim()) {
+      alert("본문 내용이 없습니다.");
+      return;
+    }
+    
+    // 가로: 100px ~ 600px 범위 체크
+    if (width && (width < 100 || width > 600)) {
+      alert("너비는 100px에서 600px 사이의 값을 입력해주세요.");
+      return;
+    }
+    
+    // 세로: 100px ~ 300px 범위 체크 (값이 있을 경우에만)
+    if (height && (height < 100 || height > 300)) {
+      alert("높이는 100px에서 300px 사이의 값을 입력해주세요.");
+      return;
+    }
+    
     if (selectedImage) {
       if (width > 0 && width <= 600) {
         selectedImage.style.width = width + "px";
       }
-      if (height > 0 && height <= 600) {
+      if (height > 0 && height <= 300) {
         selectedImage.style.height = height + "px";
       } else if (!height) {
         selectedImage.style.height = "auto";
@@ -291,6 +309,12 @@ const AdminEmailComponent = ({ members }) => {
     
     if (!title.trim()) {
       alert("제목을 입력해주세요.");
+      return;
+    }
+
+    // content 검증 추가
+    if (!content.trim()) {
+      alert("본문 내용을 입력해주세요.");
       return;
     }
 
@@ -434,7 +458,7 @@ const AdminEmailComponent = ({ members }) => {
                       placeholder="예: 200 (비워두면 자동)"
                     />
                     <div className="newText-xs text-gray-500 mt-1">
-                      너비: 100px ~ 600px, 높이: 100px ~ 600px (이메일 템플릿 최대 너비 600px)
+                      너비: 100px ~ 600px, 높이: 100px ~ 300px (이메일 템플릿 최대 너비 600px)
                     </div>
                   </div>
 

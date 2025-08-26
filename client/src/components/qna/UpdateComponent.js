@@ -79,7 +79,7 @@ const UpdateComponent = ({ questionNum }) => {
                 </button>
                 <button
                     onClick={() => {
-                        moveToPath("/");
+                        moveToPath("../select");
                     }}
                     className="negative-button"
                 >
