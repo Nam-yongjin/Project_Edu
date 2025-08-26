@@ -267,15 +267,14 @@
 }
 
 .disable-button {
-  border-radius: 0.375rem;      /* rounded-md */
-  padding: 0.5rem 1rem;         /* px-4 py-2 */
-  font-weight: 600;              /* font-semibold */
-  font-size: 0.875rem;           /* newText-sm 기준 */
-  line-height: 1.25rem;          /* newText-sm 기준 */
-  color: #6b7280;                /* text-gray-500 */
+  border-radius: 0.375rem;       /* rounded-md */
+  padding: 0.5rem;               /* p-2 */
+  border-width: 1px;             /* border */
+  border-color: #d1d5db;         /* border-gray-300 */
   background-color: #d1d5db;     /* bg-gray-300 */
-  cursor: not-allowed;           /* 금지 표지판 커서 */
-  border: none;
+  color: #6b7280;                /* text-gray-500 */
+  font-weight: 600;              /* font-semibold */
+  cursor: not-allowed;           /* 금지 커서 */
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* font-size, line-height 제거 → 반응형 폰트 적용 */
 }
-

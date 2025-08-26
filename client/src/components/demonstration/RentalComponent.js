@@ -351,7 +351,8 @@ const RentalComponent = () => {
                                         />
                                     )}
                                 </th>
-                                <th className="w-[8%]">대표 이미지</th>
+                                {/*
+                                <th className="w-[8%]">대표 이미지</th> */}
                                 <th className="w-[8%]">물품명</th>
                                 <th className="w-[10%]">기업명</th>
                                 <th className="w-[10%]">신청갯수</th>
@@ -398,7 +399,7 @@ const RentalComponent = () => {
                         <tbody className="text-gray-600">
                             {listData.content.length === 0 ? (
                                 <tr>
-                                    <td colSpan={11} className="text-center">
+                                    <td colSpan={10} className="text-center">
                                         <p className="text-gray-500 text-3xl mt-20 min-h-[300px]">대여 내역이 없습니다.</p>
                                     </td>
                                 </tr>
@@ -422,7 +423,7 @@ const RentalComponent = () => {
                                                 )}
                                             </td>
 
-                                            {/* 이미지 칸 */}
+                                            {/*
                                             <td className="py-2 px-2 whitespace-nowrap text-center ">
                                                 {mainImage ? (
                                                     <img
@@ -439,22 +440,22 @@ const RentalComponent = () => {
                                                     />
                                                 )}
                                             </td>
-
+                                            */}
                                             {/* 기본 정보 */}
-                                            <td title={item.demName} className="truncate max-w-[100px]">{item.demName || "-"}</td>
-                                            <td title={item.companyName} className="truncate max-w-[100px]">{item.companyName || "-"}</td>
-                                            <td>{item.bitemNum || "-"}</td>
-                                            <td>{item.startDate || "-"}</td>
-                                            <td>{item.endDate || "-"}</td>
-                                            <td>{item.applyAt || "-"}</td>
+                                            <td title={item.demName} className="truncate max-w-[100px] py-2">{item.demName || "-"}</td>
+                                            <td title={item.companyName} className="truncate max-w-[100px] py-2">{item.companyName || "-"}</td>
+                                            <td className="py-2">{item.bitemNum || "-"}</td>
+                                            <td className="py-2">{item.startDate || "-"}</td>
+                                            <td className="py-2">{item.endDate || "-"}</td>
+                                            <td className="py-2">{item.applyAt || "-"}</td>
 
                                             {/* 상태 표시 칸 */}
-                                            <td>
+                                            <td className="py-2">
                                                 <div>{getStateLabel(item.state)}</div>
                                             </td>
 
                                             {/* 진행중 요청 칸 */}
-                                            <td className="text-base text-blue-600">
+                                            <td className="text-base text-blue-600 py-2">
                                                 {Array.isArray(item.reqState) && Array.isArray(item.requestType) ? (
                                                     item.reqState
                                                         .map((state, idx) => ({ state, type: item.requestType[idx] }))
@@ -479,7 +480,7 @@ const RentalComponent = () => {
                                             </td>
 
                                             {/* 버튼 칸 */}
-                                            <td className="my-1 px-2">
+                                            <td className="my-1 px-2 py-2">
                                                 <div className="flex flex-col space-y-1 items-center">
                                                     {(() => {
                                                         const reqStates = Array.isArray(item.reqState) ? item.reqState : [];

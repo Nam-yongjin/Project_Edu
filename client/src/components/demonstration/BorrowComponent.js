@@ -180,7 +180,8 @@ const BorrowComponent = () => {
                                         />
                                     )}
                                 </th>
-                                <th className="w-[8%]">이미지</th>
+                                {/* 
+                                <th className="w-[8%]">이미지</th>*/}
                                 <th className="w-[12%]">물품명</th>
                                 <th className="w-[12%]">제조사</th>
                                 <th className="w-[12%]">개수</th>
@@ -256,6 +257,7 @@ const BorrowComponent = () => {
                                                     />
                                                 )}
                                             </td>
+                                            {/* 
                                             <td>
                                                 {mainImage ? (
                                                     <img
@@ -271,7 +273,7 @@ const BorrowComponent = () => {
                                                         className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer ml-3"
                                                     />
                                                 )}
-                                            </td>
+                                            </td>*/}
                                             <td className="truncate max-w-[100px]" title={item.demName}>{item.demName}</td>
                                             <td className="truncate max-w-[100px]" title={item.demMfr}>{item.demMfr}</td>
 

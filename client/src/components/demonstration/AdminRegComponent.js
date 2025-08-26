@@ -164,195 +164,195 @@ const AdminRegComponent = () => {
     // 대기 상태인 항목들의 개수
     const waitItemsCount = regInfo.content.filter(item => item.state === "WAIT").length;
 
-    return (
-        <>
-            <div className="max-w-screen-xl mx-auto my-10">
-                <div className="min-blank">
-                    <div className="mx-auto text-center">
-                        <div className="newText-3xl font-bold ">실증 등록 관리</div>
-                        <div className="py-2 flex justify-center">
-                            <SearchComponent
-                                search={search} // 검색어
-                                setSearch={setSearch} // 검색어 set
-                                type={type} // 검색어 칼럼
-                                setType={setType} // 검색어 칼럼 set
-                                onSearchClick={onSearchClick} // 검색어 클릭 함수
-                                searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
-                            />
-                        </div>
+   return (
+    <>
+        <div className="max-w-screen-xl mx-auto my-10">
+            <div className="min-blank">
+                <div className="mx-auto text-center">
+                    <div className="newText-3xl font-bold ">실증 등록 관리</div>
+                    <div className="py-2 flex justify-center">
+                        <SearchComponent
+                            search={search} // 검색어
+                            setSearch={setSearch} // 검색어 set
+                            type={type} // 검색어 칼럼
+                            setType={setType} // 검색어 칼럼 set
+                            onSearchClick={onSearchClick} // 검색어 클릭 함수
+                            searchOptions={searchOptions} // search compnent에게 전달할 option의 select 객체
+                        />
                     </div>
-                    <p className="text-gray-700 my-3 newText-base px-4 py-2 rounded-md inline-block">
-                        전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 등록내역이 있습니다.
-                    </p>
-                    <div className="page-shadow overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
-                                <tr className="newText-base whitespace-nowrap">
-                                    <th className="w-[5%] px-3">
-                                        {waitItemsCount > 0 && (
-                                            <input
-                                                type="checkbox"
-                                                checked={isAllSelected}
-                                                onChange={(e) => handleSelectAll(e.target.checked)}
-                                                className="w-4 h-4"
-                                            />
-                                        )}
-                                    </th>
-                                    <th className="w-[8%]">이미지</th>
-                                    <th className="w-[8%]">아이디</th>
-                                    <th className="w-[14%]">전화번호</th>
-                                    <th className="w-[14%]">주소</th>
-                                    <th className="w-[10%]">기업명</th>
-                                    <th className="w-[10%]">물품명</th>
-                                    <th className="w-[10%]">물품 갯수</th>
-
-                                    <th className="w-[10%]">
-                                        <div className="mb-1">신청상태</div>
-                                        <select
-                                            value={statusFilter}
-                                            className="input-focus newText-sm"
-                                            onChange={(e) => {
-                                                setStatusFilter(e.target.value);
-                                                setCurrent(0);
-                                            }}
-                                        >
-                                            <option value="">전체</option>
-                                            <option value="REJECT">거부</option>
-                                            <option value="ACCEPT">수락</option>
-                                            <option value="WAIT">대기</option>
-                                            <option value="CANCEL">취소</option>
-                                            <option value="EXPIRED">만료</option>
-                                        </select>
-                                    </th>
-
-                                    {[{ label: "만료일", value: "expDate" }, { label: "등록일", value: "regDate" }].map(
-                                        ({ label, value }) => (
-                                            <th
-                                                key={value}
-                                                onClick={() => handleSortChange(value)}
-                                                className="cursor-pointer w-[8%]"
-                                            >
-                                                <div className="flex items-center justify-center space-x-1">
-                                                    <span>{label}</span>
-                                                    <div className="flex flex-col">
-                                                        <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
-                                                            ▲
-                                                        </span>
-                                                        <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
-                                                            ▼
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </th>
-                                        )
+                </div>
+                <p className="text-gray-700 my-3 newText-base px-4 py-2 rounded-md inline-block">
+                    전체 <span className="font-bold text-blue-600">{pageData.totalElements}</span>건의 등록내역이 있습니다.
+                </p>
+                <div className="page-shadow overflow-x-auto">
+                    <table className="w-full min-w-[1200px]">
+                        <thead className="bg-gray-100 text-gray-700 newText-base border border-gray-300">
+                            <tr className="newText-base whitespace-nowrap">
+                                <th className="w-[5%] px-3">
+                                    {waitItemsCount > 0 && (
+                                        <input
+                                            type="checkbox"
+                                            checked={isAllSelected}
+                                            onChange={(e) => handleSelectAll(e.target.checked)}
+                                            className="w-4 h-4"
+                                        />
                                     )}
-                                    <th th className="w-[10%] px-3">수정/삭제</th>
+                                </th>
+                                {/*
+                                <th className="w-[10%]">이미지</th> */}
+                                <th className="w-[8%]">아이디</th>
+                                <th className="w-[14%]">전화번호</th>
+                                <th className="w-[14%]">주소</th>
+                                <th className="w-[10%]">기업명</th>
+                                <th className="w-[10%]">물품명</th>
+                                <th className="w-[10%]">물품 갯수</th>
+
+                                <th className="w-[12%] min-w-[120px]">
+                                    <div className="mb-1">신청상태</div>
+                                    <select
+                                        value={statusFilter}
+                                        className="input-focus"
+                                        onChange={(e) => {
+                                            setStatusFilter(e.target.value);
+                                            setCurrent(0);
+                                        }}
+                                    >
+                                        <option value="">전체</option>
+                                        <option value="REJECT">거부</option>
+                                        <option value="ACCEPT">수락</option>
+                                        <option value="WAIT">대기</option>
+                                        <option value="CANCEL">취소</option>
+                                        <option value="EXPIRED">만료</option>
+                                    </select>
+                                </th>
+
+                                {[{ label: "만료일", value: "expDate" }, { label: "등록일", value: "regDate" }].map(
+                                    ({ label, value }) => (
+                                        <th
+                                            key={value}
+                                            onClick={() => handleSortChange(value)}
+                                            className="cursor-pointer w-[8%]"
+                                        >
+                                            <div className="flex items-center justify-center space-x-1">
+                                                <span>{label}</span>
+                                                <div className="flex flex-col">
+                                                    <span className={`text-[10px] leading-none ${sortBy === value && sort === "asc" ? "text-black" : "text-gray-300"}`}>
+                                                        ▲
+                                                    </span>
+                                                    <span className={`text-[10px] leading-none ${sortBy === value && sort === "desc" ? "text-black" : "text-gray-300"}`}>
+                                                        ▼
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </th>
+                                    )
+                                )}
+                                <th className="w-[10%] px-3">수정/삭제</th>
+                            </tr>
+                        </thead>
+
+                        <tbody className="text-gray-600">
+                            {regInfo.content.length === 0 ? (
+                                <tr>
+                                    <td colSpan={11} className="text-center">
+                                        <p className="text-gray-500 newText-3xl mt-20 min-h-[300px]">등록된 신청이 없습니다.</p>
+                                    </td>
                                 </tr>
-                            </thead>
+                            ) : (
+                                regInfo.content.map((data) => {
+                                    const mainImage = data.imageList?.find((img) => img.isMain);
+                                    const dataState = data.state;
+                                    const isWaitState = dataState === "WAIT";
 
-                            <tbody className="text-gray-600">
-                                {regInfo.content.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={11} className="text-center">
-                                            <p className="text-gray-500 newText-3xl mt-20 min-h-[300px]">등록된 신청이 없습니다.</p>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    regInfo.content.map((data) => {
-                                        const mainImage = data.imageList?.find((img) => img.isMain);
-                                        const dataState = data.state;
-                                        const isWaitState = dataState === "WAIT";
-
-                                        return (
-                                            <tr key={data.demRegNum} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap border border-gray-300 ${dataState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
-                                                <td>
-                                                    {isWaitState && (
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedItems.includes(data.demRegNum)}
-                                                            onChange={(e) => handleItemSelect(data.demRegNum, e.target.checked)}
-                                                            className="w-4 h-4 px-3"
-                                                        />
-                                                    )}
-                                                </td>
-                                                <td>
+                                    return (
+                                        <tr key={data.demRegNum} className={`h-[100px] hover:bg-gray-50 newText-sm text-center whitespace-nowrap border border-gray-300 ${dataState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
+                                            <td className="py-2">
+                                                {isWaitState && (
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedItems.includes(data.demRegNum)}
+                                                        onChange={(e) => handleItemSelect(data.demRegNum, e.target.checked)}
+                                                        className="w-4 h-4 px-3"
+                                                    />
+                                                )}
+                                            </td>
+                                            {/* 
+                                            <td className="py-2">
+                                                <div className="flex justify-center">
                                                     {mainImage ? (
                                                         <img
                                                             src={`http://localhost:8090/view/${mainImage.imageUrl}`}
                                                             alt={data.demName}
                                                             onClick={() => moveToPath(`../../demonstration/detail/${data.demNum}`)}
-                                                            className="w-20 h-20 rounded-md cursor-pointer"
+                                                            className="w-16 h-16 object-cover rounded-md cursor-pointer flex-shrink-0"
                                                         />
                                                     ) : (
                                                         <img
                                                             src={defaultImage}
                                                             alt="default"
-                                                            className="w-20 h-20 rounded-md cursor-pointer"
+                                                            className="w-16 h-16 object-cover rounded-md cursor-pointer flex-shrink-0"
                                                         />
                                                     )}
-                                                </td>
-                                                <td title={data.memId}>{data.memId}</td>
-                                                <td title={data.title}>{data.phone || "-"}</td>
-                                                <td title={data.addr + " " + data.addrDetail} className="truncate max-w-[100px]" >
-                                                    {data.addr + " " + data.addrDetail || "-"}
-                                                </td>
-                                                <td title={data.companyName} className="truncate max-w-[100px]">
-                                                    {data.companyName || "-"}
-                                                </td>
-                                                <td title={data.demName} className="truncate max-w-[100px]">
-                                                    {data.demName || "-"}
-                                                </td>
-                                                <td>{data.itemNum ?? "-"}</td>
+                                                </div>
+                                            </td>*/}
+                                            <td className="py-2" title={data.memId}>{data.memId}</td>
+                                            <td className="py-2" title={data.title}>{data.phone || "-"}</td>
+                                            <td title={data.addr + " " + data.addrDetail} className="truncate max-w-[100px] py-2" >
+                                                {data.addr + " " + data.addrDetail || "-"}
+                                            </td>
+                                            <td title={data.companyName} className="truncate max-w-[100px] py-2">
+                                                {data.companyName || "-"}
+                                            </td>
+                                            <td title={data.demName} className="truncate max-w-[100px] py-2">
+                                                {data.demName || "-"}
+                                            </td>
+                                            <td className="py-2">{data.itemNum ?? "-"}</td>
 
-                                                <td>
+                                            <td className="py-2 min-w-[120px]">
+                                                <div className="flex flex-col items-center gap-1">
                                                     <div>{getStateLabel(data.state)}</div>
-                                                    {data.state === "WAIT" ? (
-                                                        <div>
+                                                    {data.state === "WAIT" && (
+                                                        <div className="flex gap-1">
                                                             <button
-                                                                className="inline-block green-button text-[10px] px-2 py-1 leading-none mr-1"
+                                                                className="green-button px-2 py-1 text-xs whitespace-nowrap"
                                                                 onClick={() => handleRental(data.demRegNum, "ACCEPT")}
                                                             >
                                                                 수락
                                                             </button>
-
                                                             <button
-                                                                className="inline-block negative-button text-[10px] px-2 py-1 leading-none"
+                                                                className="negative-button px-2 py-1 text-xs whitespace-nowrap"
                                                                 onClick={() => handleRental(data.demRegNum, "REJECT")}
                                                             >
                                                                 거절
                                                             </button>
                                                         </div>
-                                                    ) : <></>}
-                                                </td>
+                                                    )}
+                                                </div>
+                                            </td>
 
-                                                <td>
-                                                    {data.expDate ? new Date(data.expDate).toLocaleDateString() : "-"}
-                                                </td>
-                                                <td>
-                                                    {data.regDate ? new Date(data.regDate).toLocaleDateString() : "-"}
-                                                </td>
-                                                <div className="flex flex-col gap-2 px-3 ">
-                                                    <td>
-                                                        {data.state === "ACCEPT" ? (
+                                            <td className="py-2">
+                                                {data.expDate ? new Date(data.expDate).toLocaleDateString() : "-"}
+                                            </td>
+                                            <td className="py-2">
+                                                {data.regDate ? new Date(data.regDate).toLocaleDateString() : "-"}
+                                            </td>
+                                            <td className="py-2 px-2">
+                                                <div className="flex flex-col gap-1">
+                                                    {data.state === "ACCEPT" && (
+                                                        <>
                                                             <button
-                                                                className="positive-button flex-1"
+                                                                className="positive-button text-xs px-2 py-1"
                                                                 onClick={() => moveToPath(`/demonstration/update/${data.demNum}`)}
                                                             >
                                                                 수정하기
                                                             </button>
-                                                        ) : (
-                                                            ""
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        {data.state === "ACCEPT" ? (
                                                             <button
-                                                                className="negative-button flex-1"
+                                                                className="negative-button text-xs px-2 py-1"
                                                                 onClick={async () => {
                                                                     try {
-                                                                        await delDem([data.demNum]); // 배열로 전달
+                                                                        await delDem([data.demNum]);
                                                                         alert("삭제되었습니다.");
-                                                                        window.location.reload(); // 페이지 새로고침
+                                                                        window.location.reload();
                                                                     } catch (error) {
                                                                         console.error(error);
                                                                         alert("삭제 실패");
@@ -361,15 +361,14 @@ const AdminRegComponent = () => {
                                                             >
                                                                 삭제하기
                                                             </button>
-                                                        ) : (
-                                                            ""
-                                                        )}
-                                                    </td>
-                                            </div>
-                                            </tr>
-                            );
-                                    })
-                                )}
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
                         </tbody>
                     </table>
 
@@ -400,12 +399,12 @@ const AdminRegComponent = () => {
             </div>
         </div >
 
-            <div className="flex justify-between items-center my-6">
-                <div className="flex justify-center flex-1">
-                    <PageComponent totalPages={pageData.totalPages} current={current} setCurrent={setCurrent} />
-                </div>
+        <div className="flex justify-between items-center my-6">
+            <div className="flex justify-center flex-1">
+                <PageComponent totalPages={pageData.totalPages} current={current} setCurrent={setCurrent} />
             </div>
-        </>
-    );
+        </div>
+    </>
+);
 }
 export default AdminRegComponent;
