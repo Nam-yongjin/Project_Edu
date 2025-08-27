@@ -354,7 +354,7 @@ export default function AdminFacilityReservations() {
         </h2>
 
         {/* 필터 박스 */}
-        <div className="page-shadow rounded-2xl border p-4 mb-4 bg-white">
+        <div className="shadow-sm rounded-2xl border p-4 mb-4 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
             <div className="flex flex-col">
               <label className="newText-xs text-gray-600 mb-1">상태</label>
