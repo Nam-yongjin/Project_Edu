@@ -143,16 +143,16 @@ const FacilityReservationComponent = () => {
 
   return (
     // 최상단: 고정 클래스
-    <div className="max-w-screen-xl mx-auto my-10">
+    <div className="max-w-screen-xl mx-auto my-10 ">
       {/* 바로 아래: 좌우 여백 고정 */}
-      <div className="min-blank">
+      <div className="min-blank page-shadow p-8">
         {/* 타이틀 */}
         <h2 className="newText-3xl font-bold mb-6 text-center">공간 예약 내역</h2>
 
         {/* 목록 */}
         <div className="space-y-6">
           {reservations.length === 0 ? (
-            <p className="newText-base text-center text-gray-500">예약 이력이 없습니다.</p>
+            <p className="newText-base text-center text-gray-500 py-10">예약 이력이 없습니다.</p>
           ) : (
             reservations.map((item) => {
               const chip = getStatusChip(item.state);
@@ -217,25 +217,24 @@ const FacilityReservationComponent = () => {
             })
           )}
         </div>
-
-        {/* 요약 및 페이지네이션 */}
-        <div className="mt-6 flex items-center justify-between">
-          <div className="newText-sm text-gray-600">
-            총 <b>{totalElements}</b>건
-            <span className="ml-2 text-gray-400">({page + 1}/{Math.max(1, totalPages)})</span>
-          </div>
+      </div>
+      {/* 요약 및 페이지네이션 */}
+      <div className="mt-6 flex items-center justify-between min-blank">
+        <div className="newText-sm text-gray-600">
+          총 <b>{totalElements}</b>건
+          <span className="ml-2 text-gray-400">({page + 1}/{Math.max(1, totalPages)})</span>
         </div>
+      </div>
 
-        <div className="mt-3 flex justify-center">
-          <PageBridge
-            page={page}
-            totalPages={totalPages}
-            onChange={(next1Based) => {
-              const nextZero = Math.max(0, Math.min(totalPages - 1, next1Based - 1));
-              setPage(nextZero);
-            }}
-          />
-        </div>
+      <div className="mt-3 flex justify-center min-blank">
+        <PageBridge
+          page={page}
+          totalPages={totalPages}
+          onChange={(next1Based) => {
+            const nextZero = Math.max(0, Math.min(totalPages - 1, next1Based - 1));
+            setPage(nextZero);
+          }}
+        />
       </div>
     </div>
   );

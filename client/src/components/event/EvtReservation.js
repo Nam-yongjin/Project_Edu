@@ -150,13 +150,12 @@ const EvtReservation = () => {
                         <p className="text-gray-600">
                           <span className="font-semibold">상태:</span>{" "}
                           <span
-                            className={`inline-block px-2 py-0.5 rounded newText-sm text-white ${
-                              item.revState === "APPROVED"
+                            className={`inline-block px-2 py-0.5 rounded newText-sm text-white ${item.revState === "APPROVED"
                                 ? "bg-green-500"
                                 : item.revState === "CANCEL"
-                                ? "bg-red-500"
-                                : "bg-gray-400"
-                            }`}
+                                  ? "bg-red-500"
+                                  : "bg-gray-400"
+                              }`}
                           >
                             {getStatusLabel(item.revState)}
                           </span>
@@ -168,11 +167,10 @@ const EvtReservation = () => {
                         <button
                           onClick={() => handleCancelReservation(item.evtRevNum)}
                           disabled={!cancelable}
-                          className={`newText-sm rounded ${
-                            cancelable
+                          className={`newText-sm rounded ${cancelable
                               ? "negative-button"
                               : "normal-button cursor-not-allowed !bg-gray-300 !text-gray-700 !border !border-gray-400"
-                          }`}
+                            }`}
                           title={getCancelButtonLabel(item)}
                         >
                           {getCancelButtonLabel(item)}
@@ -192,15 +190,14 @@ const EvtReservation = () => {
             })
           )}
         </div>
-
-        {/* 페이지네이션 (공용 컴포넌트 / 0-based 인덱스) */}
-        <div className="mt-8 flex justify-center">
-          <PageComponent
-            totalPages={totalPages}
-            current={page}
-            setCurrent={setPage}
-          />
-        </div>
+      </div>
+      {/* 페이지네이션 (공용 컴포넌트 / 0-based 인덱스) */}
+      <div className="mt-8 flex justify-center min-blank">
+        <PageComponent
+          totalPages={totalPages}
+          current={page}
+          setCurrent={setPage}
+        />
       </div>
     </div>
   );
