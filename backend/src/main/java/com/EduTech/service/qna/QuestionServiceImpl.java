@@ -43,14 +43,15 @@ public class QuestionServiceImpl implements QuestionService {
 	private final MemberRepository memberRepository; 
 	public PageResponseDTO<QuestionDTO> QnAView(SearchDTO searchDTO) {
 	    // 조건 및 페이지 객체 세팅
-	    Specification<Question> spec = QnASpecs.searchQnA(
-	            searchDTO.getType(),
-	            searchDTO.getSearch(),
-	            searchDTO.getSortBy(),
-	            searchDTO.getSort(),
-	            searchDTO.getStartDate(),
-	            searchDTO.getEndDate()
-	    );
+		Specification<Question> spec = QnASpecs.searchQnA(
+		        searchDTO.getType(),        // searchType (검색 타입: title, memId)
+		        searchDTO.getSearch(),      // search (검색어)
+		        searchDTO.getSortBy(),      // sortBy 
+		        searchDTO.getSort(),        // sort
+		        searchDTO.getStartDate(),   // startDate
+		        searchDTO.getEndDate(),     // endDate
+		        searchDTO.getAnswered()     // answered (답변 상태: wait, ok)
+		    );
 	    Pageable pageable = PageRequest.of(searchDTO.getPageCount(), 10);
 
 	    // 질문 페이지 조회

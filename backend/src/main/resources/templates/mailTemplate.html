@@ -26,6 +26,14 @@ overflow:hidden;
 		<!-- 본문 -->
 		<div style="padding:20px; color:#333333; line-height:1.6; font-size:14px;">
 			<!-- Quill 내용을 테이블 기반으로 안전하게 렌더링 -->
+			<!--#strings.replace(original, target, replacement)
+			original: 원본 문자열
+			target: 바꾸고 싶은 문자열
+			replacement: 새로 넣을 문자열
+			반환값: target이 replacement로 치환된 새로운 문자열-->
+			<!-- 기존 quil에서 적용한 태그를 이메일에 알맞는 테이블 태그로 대체함 
+			#strings.replace는 timeleaf에서 사용하는 객체
+			-->
 			<div th:utext="${#strings.replace(
   #strings.replace(
     #strings.replace(

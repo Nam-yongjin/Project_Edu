@@ -17,5 +17,6 @@ public class SearchDTO {
 	 private Integer pageCount;
 	 private LocalDate startDate;
 	 private LocalDate endDate;
+	 private String answered;
 }
 

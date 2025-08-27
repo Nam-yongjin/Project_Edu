@@ -29,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/question")
 public class QuestionController {
 	private final QuestionService questionService;
+	
+	// 문의 사항 글 조회
 	@GetMapping("/QnAView")
 	public PageResponseDTO<QuestionDTO> QnAView(@ModelAttribute SearchDTO searchDTO)
 	{
@@ -36,6 +38,7 @@ public class QuestionController {
 		return QnAView;
 	}
 	
+	// 문의 사항 상세 글 조회
 	@GetMapping("/QnADetail/{questionNum}")
 	public QuestionDTO QnAViewDetail(@PathVariable("questionNum") Long questionNum)
 	{
@@ -43,6 +46,7 @@ public class QuestionController {
 		return detail;
 	}
 	
+	// 문의 사항 질문 글 추가
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping(value = "/addQuestion")
 	public ResponseEntity<String> addQuestion(@RequestBody QuestionWriteDTO questionWriteDTO)
@@ -52,6 +56,7 @@ public class QuestionController {
 		return ResponseEntity.ok("질문 추가 성공");
 	}
 	
+	// 문의 사항 질문 글 수정
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping("/updateQuestion")
 	public ResponseEntity<String> updateQuestion(@RequestBody QuestionUpdateDTO questionUpdateDTO)
@@ -62,6 +67,7 @@ public class QuestionController {
 		
 	}
 
+	// 문의 사항 질문 글 삭제
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping("/deleteQuestions")
 	public ResponseEntity<String> deleteQuestions(@RequestBody List<Long> questionNums)

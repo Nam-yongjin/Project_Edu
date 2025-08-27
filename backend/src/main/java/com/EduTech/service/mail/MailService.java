@@ -22,8 +22,8 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class MailService {
 
-    private final JavaMailSender javaMailSender;
-    private final TemplateEngine templateEngine;
+    private final JavaMailSender javaMailSender; // 스프링에서 제공하는 메일 발송 객체
+    private final TemplateEngine templateEngine; // Thymeleaf 템플릿 엔진, 메일 HTML 처리용
 
     public MailService(JavaMailSender javaMailSender, TemplateEngine templateEngine) {
         this.javaMailSender = javaMailSender;
@@ -75,7 +75,7 @@ public class MailService {
             // 각 수신자별 메일 발송
             for (String email : memberList) {
                 MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // MimeMessageHelper를 사용하면 HTML + 첨부파일 모두 가능
 
                 helper.setTo(email);
                 helper.setSubject(adminMessageDTO.getTitle());
@@ -84,8 +84,10 @@ public class MailService {
                 Context context = new Context();
                 context.setVariable("email", email);
                 
-                String contentHtml = adminMessageDTO.getContent().replaceAll("(\r\n|\n|\r)", "<br/>");
+                String contentHtml = adminMessageDTO.getContent().replaceAll("(\r\n|\n|\r)", "<br/>"); // \n을 <br/>로 변환 → 줄바꿈 유지s
                 
+                
+                // 이미지와 텍스트 중앙/좌/우 정렬 처리
                 // 1. 모든 img 태그를 찾아서 테이블로 감싸기 (가장 안전한 방법)
                 contentHtml = contentHtml.replaceAll(
                     "<p([^>]*?)style=\"([^\"]*?)text-align:\\s*center([^\"]*?)\"([^>]*?)>\\s*(<img[^>]*?)>\\s*</p>",
@@ -120,8 +122,11 @@ public class MailService {
                 
                 // 3. 닫는 p 태그를 td, tr, table로 변경
                 contentHtml = contentHtml.replaceAll("</p>", "</td></tr></table>");
-                
+              
+                // "content"라는 이름으로 contentHtml(메일 본문 HTML)을 템플릿에 넣음.
                 context.setVariable("content", contentHtml);
+              
+               // "mailTemplate": resources/templates 폴더 안의 mailTemplate.html 파일
                 String htmlContent = templateEngine.process("mailTemplate", context);
                 helper.setText(htmlContent, true);
 
@@ -144,6 +149,6 @@ public class MailService {
             throw new RuntimeException("메일 발송 실패", e);
         }
 
-        return CompletableFuture.completedFuture(null);
+        return CompletableFuture.completedFuture(null); // 비동기 메서드는 종료했으며, 반환값이 없다는 의미
     }
 }

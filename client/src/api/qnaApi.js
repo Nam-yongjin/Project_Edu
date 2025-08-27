@@ -17,14 +17,16 @@ export const questionAdd = async (title, content, state) => {
 };
 
 // 문의 사항 글 목록 불러오기 (검색어 없음)
-export const getSelect = async (pageCount, sortBy, sort, startDate, endDate) => {
+export const getSelect = async (pageCount, sortBy, sort, startDate, endDate, answered) => {
+    console.log(answered);
     const res = await axios.get(`${question}/QnAView`, {
         params: {
             pageCount: pageCount,
             sort: sort,
             sortBy: sortBy,
             startDate: startDate,
-            endDate: endDate
+            endDate: endDate,
+            answered:answered,
         }
     });
     return res.data;
