@@ -242,13 +242,13 @@ public class EventServiceImpl implements EventService {
 
         infoRepository.save(event);
         useRepository.saveAll(uses);
-    }
+    } 
 
     // ─────────────────────────────────────────────────────
     // 4. 행사 조회
     // ─────────────────────────────────────────────────────
 
-    // 행소 조회
+    // 행소 리스트 (완)
     @Override
     public List<EventInfoDTO> getAllEventsWithoutFilter(int page) {
         Pageable pageable = PageRequest.of(page - 1, 8);
@@ -265,7 +265,7 @@ public class EventServiceImpl implements EventService {
         return infoRepository.searchEvents(dto, pageable).map(this::toInfoDTO);
     }
 
-    // 행사 이미지 및 파일 로딩
+    // 행사 상세정보
     @Override
     public EventInfoDTO getEvent(Long eventNum) {
         EventInfo event = infoRepository.findById(eventNum)
@@ -288,7 +288,7 @@ public class EventServiceImpl implements EventService {
     // 5. 사용자 신청/취소/확인
     // ─────────────────────────────────────────────────────
 
-    // 행사 신청
+    // 행사 신청 (완)
     @Override
     public void applyEvent(EventApplyRequestDTO dto) {
         validateApplyConditions(dto);
@@ -307,7 +307,7 @@ public class EventServiceImpl implements EventService {
         event.increaseCurrCapacity();
     }
 
-    // 행사 취소
+    // 행사 예약 취소
     @Override
     public void cancelEvent(Long evtRevNum, String memId) {
         EventUse use = useRepository.findById(evtRevNum)
