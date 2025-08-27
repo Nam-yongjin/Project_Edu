@@ -64,14 +64,14 @@ public class EventController {
     // 관리자용 API
     // ─────────────────────────────────────────────
 
-    // 1. 이달의 배너 (진행 중인 행사)
+    // 1. 이달의 배너 (진행 중인 행사) (완)
     @GetMapping("/banner")
     public ResponseEntity<List<EventInfoDTO>> getbannerEvent() {
         List<EventInfoDTO> events = eventService.getbannerEvent();
         return ResponseEntity.ok(events);
     }
 
-    // 2. 전체 행사 목록 조회 (필터링 없이 전체)
+    // 2. 전체 행사 목록 조회 (필터링 없이 전체)(완)
     @GetMapping("/list")
     public ResponseEntity<Page<EventInfoDTO>> getAllEventsWithoutFilter(
             @RequestParam(name = "page", required = false, defaultValue = "1") int page
@@ -100,13 +100,13 @@ public class EventController {
         return ResponseEntity.ok(result);
     }
 
-    // 4. 행사 상세 조회
+    // 4. 행사 상세 조회 (완)
     @GetMapping("/eventDetail")
     public ResponseEntity<EventInfoDTO> getEvent(@RequestParam("eventNum") Long eventNum) {
         return ResponseEntity.ok(eventService.getEvent(eventNum));
     }
 
-    // 5. 행사 등록
+    // 5. 행사 등록 (완)
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerEvent(
@@ -125,7 +125,7 @@ public class EventController {
         return ResponseEntity.ok("행사 등록 완료");
     }
 
-    // 6. 행사 수정
+    // 6. 행사 수정 (완)
     @PutMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateEvent(
@@ -146,7 +146,7 @@ public class EventController {
         return ResponseEntity.ok("행사 수정이 완료되었습니다.");
     }
 
-    // 7. 행사 삭제 (취소 처리)
+    // 7. 행사 삭제 (취소 처리) (완)
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteEvent(@RequestParam("eventNum") Long eventNum) {
@@ -165,7 +165,7 @@ public class EventController {
     // 사용자 기능
     // ─────────────────────────────────────────────
 
-    // 1. 행사 신청
+    // 1. 행사 신청 (완)
     @PostMapping("/apply")
     public ResponseEntity<Map<String, String>> applyEvent(@RequestBody EventApplyRequestDTO dto) {
         Map<String, String> response = new HashMap<>();
@@ -179,16 +179,16 @@ public class EventController {
         }
     }
 
-    // 2. 신청 여부 확인
-    @GetMapping("/applied")
-    public ResponseEntity<Boolean> isAlreadyApplied(
-            @RequestParam(name = "eventNum") Long eventNum,
-            @RequestParam(name = "memId") String memId
-    ) {
-        return ResponseEntity.ok(eventService.isAlreadyApplied(eventNum, memId));
-    }
+//    // 2. 신청 여부 확인
+//    @GetMapping("/applied")
+//    public ResponseEntity<Boolean> isAlreadyApplied(
+//            @RequestParam(name = "eventNum") Long eventNum,
+//            @RequestParam(name = "memId") String memId
+//    ) {
+//        return ResponseEntity.ok(eventService.isAlreadyApplied(eventNum, memId));
+//    }
 
-    // 3. 사용자 신청 내역 조회 (페이징)
+    // 3. 사용자 신청 내역 조회 (페이징) (완)
     @GetMapping("/reservation")
     public ResponseEntity<Page<EventUseDTO>> getUseListByMemberPaged(
             @AuthenticationPrincipal MemberDTO memberDTO,
@@ -197,7 +197,7 @@ public class EventController {
         return ResponseEntity.ok(eventService.getUseListByMemberPaged(memberDTO.getMemId(), pageable));
     }
 
-    // 4. 사용자 신청 취소
+    // 4. 사용자 신청 취소(완)
     @DeleteMapping("/cancel")
     public ResponseEntity<String> cancelEvent(
             @RequestParam("evtRevNum") Long evtRevNum,
