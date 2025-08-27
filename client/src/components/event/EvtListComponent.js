@@ -13,13 +13,17 @@ const EventListComponent = () => {
   const [page, setPage] = useState(1); // API는 1-based로 유지
   const [totalPages, setTotalPages] = useState(1);
 
-  // 검색/필터 상태
+  // 검색/필터 "입력 값" 상태
   const [keyword, setKeyword] = useState("");
   const [searchType, setSearchType] = useState("eventName");
+
+  // 실제 조회에 사용하는 "적용 값" 상태 (검색 버튼 눌렀을 때만 변경)
+  const [appliedKeyword, setAppliedKeyword] = useState("");
+  const [appliedSearchType, setAppliedSearchType] = useState("eventName");
+
   const [state, setState] = useState("");
   const [category, setCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("DESC");
-  const [searchTrigger, setSearchTrigger] = useState(false);
 
   // 전역
   const navigate = useNavigate();
@@ -27,13 +31,13 @@ const EventListComponent = () => {
   const { moveToLogin } = useMove();
   const loginState = useSelector((s) => s.loginState);
 
-  // 목록 조회
+  // 목록 조회: 입력값(keyword/searchType)이 아니라 "적용값"이 변경될 때만 조회
   useEffect(() => {
     const fetchData = async () => {
       const data = await getSearchList({
         page, // 그대로 1-based 전달
-        searchType,
-        keyword,
+        searchType: appliedSearchType,
+        keyword: appliedKeyword,
         state,
         category,
         sortOrder,
@@ -42,7 +46,7 @@ const EventListComponent = () => {
       setTotalPages(data.totalPages);
     };
     fetchData();
-  }, [page, state, category, sortOrder, searchTrigger, searchType, keyword]);
+  }, [page, state, category, sortOrder, appliedSearchType, appliedKeyword]);
 
   // 날짜 포맷
   const formatDate = (dateStr) => {
@@ -67,7 +71,6 @@ const EventListComponent = () => {
 
     if (now < start) return { text: "신청 시작 전", style: "normal-button" };
     if (now <= end) return { text: "신청 가능", style: "positive-button" };
-    // 종료 상태는 normal-button을 기본으로 하고, 시각적 구분을 위해 약한 회색 톤으로 보강
     return {
       text: "신청 종료",
       style: "normal-button !bg-gray-400 !text-white !border-gray-500 cursor-not-allowed",
@@ -84,23 +87,22 @@ const EventListComponent = () => {
     }
   };
 
-  // 검색 실행
+  // 검색 실행: 입력값을 "적용값"으로 반영 (조회 트리거는 applied* 변경으로 발생)
   const handleSearch = () => {
     setPage(1); // 검색 시 1페이지로
-    setSearchTrigger((p) => !p);
+    setAppliedKeyword(keyword.trim());
+    setAppliedSearchType(searchType);
   };
 
   return (
-    // 최상단 레이아웃: 고정 클래스 사용
     <div className="max-w-screen-xl mx-auto my-10">
-      {/* 좌우 여백: 고정 클래스 사용 (헤더/콘텐츠 모두 포함) */}
       <div className="min-blank">
         {/* 헤더 */}
         <div className="text-center mb-8">
           <h1 className="newText-3xl font-bold">프로그램 신청</h1>
         </div>
 
-        {/* 카테고리 필터 (유지) */}
+        {/* 카테고리 필터 */}
         <div className="flex gap-2 mb-6 justify-center">
           {[
             { label: "전체", value: "" },
@@ -130,12 +132,12 @@ const EventListComponent = () => {
           })}
         </div>
 
-        {/* 검색/정렬 필터 (유지) */}
+        {/* 검색/정렬 필터 */}
         <div className="flex flex-wrap gap-2 mb-8 items-center justify-center">
           <select
             className="input-focus newText-base p-2 rounded"
             value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
+            onChange={(e) => setSearchType(e.target.value)} // 입력값만 변경
           >
             <option className="newText-base" value="eventName">프로그램명</option>
             <option className="newText-base" value="eventInfo">내용</option>
@@ -147,9 +149,9 @@ const EventListComponent = () => {
             placeholder="검색어를 입력하세요"
             className="input-focus newText-base p-2 rounded w-60"
             value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+            onChange={(e) => setKeyword(e.target.value)} // 입력값만 변경
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleSearch();
+              if (e.key === "Enter") handleSearch(); // Enter로도 검색 실행
             }}
           />
 
@@ -201,15 +203,13 @@ const EventListComponent = () => {
             return (
               <div
                 key={event.eventNum}
-                className="group shadow-lg rounded-lg p-4 hover:shadow-2xl transition cursor-pointer bg-white flex flex-col h-full" // ★ 추가
+                className="group shadow-lg rounded-lg p-4 hover:shadow-2xl transition cursor-pointer bg-white flex flex-col h-full"
                 onClick={() => handleCardClick(event.eventNum)}
               >
-                {/* 카테고리 배지 */}
                 <div className="newText-sm bg-blue-100 text-blue-700 w-fit inline-flex px-3 py-1 rounded-full mb-2 whitespace-nowrap self-start">
                   {categoryLabel}
                 </div>
 
-                {/* 대표 이미지 또는 플레이스홀더 */}
                 <div className="w-full h-40 rounded mb-2 overflow-hidden">
                   {event.mainImagePath && /\.(jpg|jpeg|png|gif|webp)$/i.test(event.mainImagePath) ? (
                     <img
@@ -218,14 +218,12 @@ const EventListComponent = () => {
                       className="w-full h-full object-cover transition-transform duration-300 ease-out transform-gpu group-hover:scale-[1.1]"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center newText-sm text-gray-500
-                                    transition-transform duration-300 ease-out transform-gpu group-hover:scale-[1.03]">
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center newText-sm text-gray-500 transition-transform duration-300 ease-out transform-gpu group-hover:scale-[1.03]">
                       이미지 없음
                     </div>
                   )}
                 </div>
 
-                {/* 본문을 flex-1로 묶어 아래 버튼 간격 고정 */}
                 <div className="flex-1">
                   <h3 className="newText-lg font-semibold mb-1 line-clamp-2">
                     {event.eventName}
@@ -238,10 +236,7 @@ const EventListComponent = () => {
                   </p>
                 </div>
 
-                {/* 상태 표시 (버튼 위 여백 고정) */}
-                <div
-                  className={`newText-sm text-center w-full px-3 py-2 rounded font-semibold mt-4 ${status.style}`} // ★ mt-4 추가
-                >
+                <div className={`newText-sm text-center w-full px-3 py-2 rounded font-semibold mt-4 ${status.style}`}>
                   {status.text}
                 </div>
               </div>
@@ -252,9 +247,9 @@ const EventListComponent = () => {
         {/* 페이지네이션 (공용 컴포넌트 사용: 0-based) */}
         <div className="mt-6 flex justify-center">
           <PageComponent
-            totalPages={totalPages}                 // 총 페이지 수 (정수)
-            current={page - 1}                      // 0-based로 변환
-            setCurrent={(idx) => setPage(idx + 1)}  // 1-based로 환산하여 set
+            totalPages={totalPages}
+            current={page - 1}
+            setCurrent={(idx) => setPage(idx + 1)}
           />
         </div>
       </div>
