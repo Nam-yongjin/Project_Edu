@@ -21,8 +21,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>{
 	@Query("UPDATE Answer SET content=:content, updatedAt=:updatedAt WHERE answerNum=:answerNum")
 	void updateAnswer(@Param("content") String content, @Param("answerNum") Long answerNum,@Param("updatedAt") LocalDateTime updatedAt);	
 	
-	// 답변 글 조회하는 쿼리문
-	@Query("SELECT new com.EduTech.dto.qna.AnswerDTO(a.createdAt, a.content, a.answerNum,a.updatedAt,a.question.questionNum) FROM Answer a WHERE a.question.questionNum IN :questionNum")
+	@Query("SELECT new com.EduTech.dto.qna.AnswerDTO(a.createdAt, a.content, a.answerNum, a.updatedAt, a.question.questionNum, a.member.memId) FROM Answer a WHERE a.question.questionNum IN :questionNum")
 	List<AnswerDTO> selectAnswer(@Param("questionNum") List<Long> questionNum);
 	
 	

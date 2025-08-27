@@ -7,7 +7,8 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
         keyword: initialValues?.keyword || "",
         searchType: initialValues?.searchType || "ALL",
         startDate: initialValues?.startDate || "",
-        endDate: initialValues?.endDate || ""
+        endDate: initialValues?.endDate || "",
+        answered: initialValues?.answered || "ALL"  // 새로 추가
     });
 
     const handleInputChange = (e) => {
@@ -45,6 +46,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
         onSearch(searchParams);
     };
 
+
     return (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -63,8 +65,20 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                             <option value="memId">작성자</option>
                         </select>
                     </div>
-
-                     <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                        <label className="newText-sm font-medium text-gray-700">답변상태:</label>
+                        <select
+                            name="answered"
+                            value={searchForm.answered}
+                            onChange={handleInputChange}
+                            className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="ALL">전체</option>
+                            <option value="ok">답변완료</option>
+                            <option value="wait">답변대기</option>
+                        </select>
+                    </div>
+                    <div className="flex-1 min-w-0">
                         <input
                             type="text"
                             name="keyword"
@@ -101,7 +115,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                 ) : (<></>)}
 
                 {/* 버튼 */}
-                 <div className="flex justify-center gap-2">
+                <div className="flex justify-center gap-2">
                     <button
                         type="submit"
                         className="dark-button newText-sm"

@@ -26,6 +26,7 @@ const SelectComponent = () => {
         endDate: "",
         sortBy: "createdAt",
         sortDirection: "DESC",
+        answered:""
     });
 
     const loginState = useSelector((state) => state.loginState); // 로그인 상태 확인
@@ -39,7 +40,7 @@ const SelectComponent = () => {
     const fetchData = (params = searchParams) => {
         console.log(params);
         setLoading(true);
-        if (params.keyword && params.keyword.trim() !== "") {
+        if (params.keyword && params.keyword.trim() !== "") { // 검색어가 있을 경우,
             getSelectSearch(
                 params.keyword,
                 params.searchType,
@@ -48,6 +49,7 @@ const SelectComponent = () => {
                 params.sortDirection,
                 params.startDate,
                 params.endDate,
+                params.answered,
             )
                 .then((data) => {
                     setListData(data.content);
@@ -55,9 +57,9 @@ const SelectComponent = () => {
                     setLoading(false);
                 })
                 .catch(() => setLoading(false));
-        } else {
+        } else { // 검색어가 없을 경우
             getSelect(params.page, params.sortDirection, params.sortBy, params.startDate,
-                params.endDate)
+                params.endDate,params.answered)
                 .then((data) => {
                     console.log(data);
                     setListData(data.content);

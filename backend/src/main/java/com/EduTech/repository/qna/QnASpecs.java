@@ -8,60 +8,75 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import com.EduTech.entity.qna.Answer;
 import com.EduTech.entity.qna.Question;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 
 public class QnASpecs {
-	public static Specification<Question> searchQnA(String type, String search, String sortBy, String sort,
-			LocalDate startDate, LocalDate endDate) {
+    public static Specification<Question> searchQnA(String searchType, String search, String sortBy, String sort,
+            LocalDate startDate, LocalDate endDate, String answered) {
 
-		return (root, query, cb) -> {
+        return (root, query, cb) -> {
 
-			// 중복 제거를 위해 distinct 설정 (fetch join 없으면 join만 있어도 중복 가능)
-			query.distinct(true);
+            // 중복 제거를 위해 distinct 설정
+            query.distinct(true);
 
-			List<Predicate> predicates = new ArrayList<>();
+            // Question -> Answer 조인 (Question 엔티티의 answer 필드 사용)
+            Join<Question, Answer> answerJoin = root.join("answer", JoinType.LEFT);
+            List<Predicate> predicates = new ArrayList<>();
 
-			if (startDate != null && endDate != null) {
-			    predicates.add(cb.between(
-			        root.get("createdAt"),
-			        startDate.atStartOfDay(),
-			        endDate.atTime(LocalTime.MAX)
-			    ));
-			}
+            // 날짜 필터링
+            if (startDate != null && endDate != null) {
+                predicates.add(cb.between(
+                    root.get("createdAt"),
+                    startDate.atStartOfDay(),
+                    endDate.atTime(LocalTime.MAX)
+                ));
+            }
 
-			if (StringUtils.hasText(search)) {
-				if ("title".equalsIgnoreCase(type)) {
-					predicates.add(cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%"));
-				}
-				if ("memId".equalsIgnoreCase(type)) {
-					predicates
-							.add(cb.like(cb.lower(root.get("member").get("memId")), "%" + search.toLowerCase() + "%"));
-				}
-			}
+            // 답변 상태 필터링 (answered 매개변수 사용)
+            if("wait".equals(answered)) {
+                // 답변이 없는 질문만 (answerJoin이 null인 경우)
+                predicates.add(cb.isNull(answerJoin.get("answerNum")));
+            } else if("ok".equals(answered)) {
+                // 답변이 있는 질문만 (answerJoin이 null이 아닌 경우)
+                predicates.add(cb.isNotNull(answerJoin.get("answerNum")));
+            }
 
-			Path<?> sortPath;
-			switch (sortBy.toLowerCase()) {
-			case "view":
-				sortPath = root.get("view");
-				break;
-			case "updatedAt":
-				sortPath = root.get("updatedAt");
-				break;
-			default:
-				sortPath = root.get("createdAt");
-				break;
-			}
+            // 검색어 필터링 (searchType 매개변수 사용)
+            if (StringUtils.hasText(search)) {
+                if ("title".equalsIgnoreCase(searchType)) {
+                    predicates.add(cb.like(cb.lower(root.get("title")), "%" + search.toLowerCase() + "%"));
+                } else if ("memId".equalsIgnoreCase(searchType)) {
+                    predicates.add(cb.like(cb.lower(root.get("member").get("memId")), "%" + search.toLowerCase() + "%"));
+                }
+            }
 
-			if ("desc".equalsIgnoreCase(sort)) {
-				query.orderBy(cb.desc(sortPath));
-			} else {
-				query.orderBy(cb.asc(sortPath));
-			}
+            // 정렬 처리
+            Path<?> sortPath;
+            switch (sortBy != null ? sortBy.toLowerCase() : "createdat") {
+                case "view":
+                    sortPath = root.get("view");
+                    break;
+                case "updatedAt":
+                    sortPath = root.get("updatedAt");
+                    break;
+                default:
+                    sortPath = root.get("createdAt");
+                    break;
+            }
 
-			return cb.and(predicates.toArray(new Predicate[0]));
-		};
-	}
+            if ("desc".equalsIgnoreCase(sort)) {
+                query.orderBy(cb.desc(sortPath));
+            } else {
+                query.orderBy(cb.asc(sortPath));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }
