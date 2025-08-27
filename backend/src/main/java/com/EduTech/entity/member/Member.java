@@ -58,8 +58,8 @@ public class Member extends BaseEntity{
 	@Enumerated(EnumType.STRING)
 	private MemberRole role;
 	
-	@Column(unique=true)
-	private String social;
+	@Enumerated(EnumType.STRING)
+	private MemberSocial social;
 	
 	// 회원 삭제시 연결된 추가정보 자동 삭제
 	@ToString.Exclude

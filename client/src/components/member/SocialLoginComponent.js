@@ -18,7 +18,6 @@ const SocialLoginComponent = () => {
                 </div>
                 <div className="m-3">
                     <Link to={naverLink}><img className="w-[32px] h-[32px] active:bg-gray-200" src={naverLogo} /></Link>
-                    {/* <a href="https://www.flaticon.com/kr/free-icons/-" title="카카오 톡 아이콘">카카오 톡 아이콘 제작자: Fathema Khanom - Flaticon</a> */}
                 </div>
             </div>
         </div>

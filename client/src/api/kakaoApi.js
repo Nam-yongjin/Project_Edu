@@ -32,6 +32,12 @@ export const getAccessToken = async (authCode) => {
 };
 
 export const getMemberWithAccessToken = async (accessToken) => {
-    const res = await axios.get(`${host}/login/kakao?accessToken=${accessToken}`);
-    return res.data;
+    try {
+        const res = await axios.get(`${host}/login/kakao?accessToken=${accessToken}`);
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data || "알 수 없는 오류가 발생했습니다.";
+        alert(message);
+        return null;
+    }
 };

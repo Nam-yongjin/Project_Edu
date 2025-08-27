@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
+import com.EduTech.entity.member.MemberSocial;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
@@ -54,8 +55,8 @@ public interface MemberRepository extends JpaRepository<Member, String>, JpaSpec
 	@Query(value = "DELETE FROM member WHERE state = 'LEAVE' AND updated_at <= DATE_SUB(NOW(), INTERVAL 7 DAY)", nativeQuery = true)
 	void deleteMembersAfterOneWeekLeave();
 
-	// 다른 회원의 이메일과 소셜 이메일이 중복되는지 확인
-	Optional<Member> findByEmail(String Email);
+	// 소셜계정 정보
+	Optional<Member> findByEmailAndSocial(String email, MemberSocial social);
 
 	// 관리자가 멤버 상태 수정하는 쿼리문
 	@Modifying

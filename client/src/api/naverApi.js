@@ -20,8 +20,14 @@ export const getNaverLoginLink = () => {
 
 // 백엔드로 code,state 넘겨서 JWT 발급까지 처리
 export const getMemberWithNaverCode = async (code, state) => {
-    const res = await axios.get(`${host}/login/naver`, {
-        params: { code, state }
-    });
-    return res.data;
+    try {
+        const res = await axios.get(`${host}/login/naver`, {
+            params: { code, state }
+        });
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data || "알 수 없는 오류가 발생했습니다.";
+        alert(message);
+        return null;
+    }
 };

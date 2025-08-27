@@ -41,11 +41,11 @@ import com.EduTech.dto.member.StudentRegisterDTO;
 import com.EduTech.dto.member.TeacherDetailDTO;
 import com.EduTech.dto.member.TeacherModifyDTO;
 import com.EduTech.dto.member.TeacherRegisterDTO;
-import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.member.Company;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberGender;
 import com.EduTech.entity.member.MemberRole;
+import com.EduTech.entity.member.MemberSocial;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.entity.member.Student;
 import com.EduTech.entity.member.Teacher;
@@ -171,7 +171,7 @@ public class MemberServiceImpl implements MemberService {
 	public boolean checkEmail(String email) {
 		return memberRepository.existsByEmail(email);
 	}
-	
+
 	// 휴대폰번호 중복 체크
 	@Override
 	@Transactional
@@ -352,7 +352,7 @@ public class MemberServiceImpl implements MemberService {
 		boolean demonstrationStateRes = demonstrationReserveRespository.existsAcceptedReserveByMemId(memId);
 		boolean eventUsing = eventUseRepository.existsApprovedReservationByMemId(memId);
 		boolean facilityRes = facilityReserveRepository.existsApprovedReservationByMemId(memId);
-		
+
 		// 관리자 계정은 탈퇴불가
 		if (member.getRole().equals("ADMIN")) {
 			throw new IllegalStateException("관리자는 탈퇴할 수 없습니다.");
@@ -375,14 +375,14 @@ public class MemberServiceImpl implements MemberService {
 		if (demonstrationStateRes) {
 			throw new IllegalStateException("실증 신청 중인 회원은 탈퇴할 수 없습니다.");
 		}
-		
+
 		if (eventUsing) {
 			throw new IllegalStateException("행사 신청 완료한 회원은 탈퇴할 수 없습니다.");
-		}	
-		
+		}
+
 		if (facilityRes) {
 			throw new IllegalStateException("공간 예약 완료한 회원은 탈퇴할 수 없습니다.");
-		}	
+		}
 
 		member.setState(MemberState.LEAVE);
 		memberRepository.save(member);
@@ -421,7 +421,13 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public MemberDTO getKakaoMember(String accessToken) {
 		KakaoDTO kakaoDTO = getInfoFromKakaoAccessToken(accessToken);
-		Optional<Member> result = memberRepository.findByEmail(kakaoDTO.getEmail());
+		Optional<Member> result = memberRepository.findByEmailAndSocial(kakaoDTO.getEmail(), MemberSocial.KAKAO);
+
+		String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone());
+
+		if (normalizedPhone != null && memberRepository.existsByPhone(normalizedPhone)) {
+			throw new IllegalStateException("이미 등록된 휴대폰 번호입니다.");
+		}
 
 		Member member;
 
@@ -514,7 +520,7 @@ public class MemberServiceImpl implements MemberService {
 
 		return Member.builder().memId(kakaoDTO.getEmail()).pw(encodedPassword).name(kakaoDTO.getName())
 				.email(kakaoDTO.getEmail()).birthDate(kakaoDTO.getBirthDate()).gender(kakaoDTO.getGender())
-				.phone(normalizedPhone).state(MemberState.NORMAL).role(MemberRole.USER).social(kakaoDTO.getEmail())
+				.phone(normalizedPhone).state(MemberState.NORMAL).role(MemberRole.USER).social(MemberSocial.KAKAO)
 				.build();
 	}
 
@@ -583,13 +589,17 @@ public class MemberServiceImpl implements MemberService {
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		String normalizedPhone = normalizePhoneNumber(naverDTO.getPhone()); // 전화번호 유효성
 
-		Optional<Member> result = memberRepository.findByEmail(naverDTO.getEmail());
+		if (normalizedPhone != null && memberRepository.existsByPhone(normalizedPhone)) {
+			throw new IllegalStateException("이미 등록된 휴대폰 번호입니다.");
+		}
+
+		Optional<Member> result = memberRepository.findByEmailAndSocial(naverDTO.getEmail(), MemberSocial.NAVER);
 
 		Member member = result.orElseGet(() -> {
 			Member newMember = Member.builder().memId(naverDTO.getEmail()).pw(encodedPassword)
 					.email(naverDTO.getEmail()).name(naverDTO.getName()).gender(naverDTO.getGender())
 					.birthDate(naverDTO.getBirthDate()).phone(normalizedPhone).state(MemberState.NORMAL)
-					.role(MemberRole.USER).social(naverDTO.getEmail()).build();
+					.role(MemberRole.USER).social(MemberSocial.NAVER).build();
 			return memberRepository.save(newMember);
 		});
 		return entityToDTO(member);

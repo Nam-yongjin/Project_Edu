@@ -27,7 +27,7 @@ const KakaoRedirectPage = () => {
                 alert("카카오 계정으로 로그인 되었습니다.");
                 moveToPath("/");
             })
-            .catch((err) => {
+            .catch((error) => {
                 alert("카카오 로그인 실패.");
                 moveToPath("/login");
             });
