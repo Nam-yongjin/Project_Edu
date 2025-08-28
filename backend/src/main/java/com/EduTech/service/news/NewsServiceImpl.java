@@ -235,7 +235,7 @@ public class NewsServiceImpl implements NewsService {
 		}
 	}
 
-	// Content-Type 체크 (HEAD 요청)
+	// Content-Type 체크 Http 통신에서 GET 요청 대신 HEAD 요청 사용 -> 본문 없이 헤더 정보만 받아옴
 	private boolean hasImageContentType(String url) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
@@ -243,8 +243,9 @@ public class NewsServiceImpl implements NewsService {
 			conn.setConnectTimeout(3000);
 			conn.setReadTimeout(3000);
 			conn.connect();
-
+			// Content-Type 필드 값 확인 -> 웹서버가 보내는 데이터의 유형을 알려줌
 			String contentType = conn.getContentType();
+			// Content-Type 값이 "image/"로 시작하는지 확인 -> 모든 MIME 타입은 이미지로 간주하고 true 반환
 			return contentType != null && contentType.startsWith("image/");
 		} catch (Exception e) {
 			return false;
