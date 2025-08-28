@@ -34,6 +34,7 @@ public class QuestionController {
 	@GetMapping("/QnAView")
 	public PageResponseDTO<QuestionDTO> QnAView(@ModelAttribute SearchDTO searchDTO)
 	{
+		System.out.println(searchDTO);
 		PageResponseDTO<QuestionDTO> QnAView=questionService.QnAView(searchDTO);
 		return QnAView;
 	}

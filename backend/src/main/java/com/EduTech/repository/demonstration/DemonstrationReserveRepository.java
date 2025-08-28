@@ -86,7 +86,7 @@ public interface DemonstrationReserveRepository
 	@Query("SELECT r.member.memId FROM DemonstrationReserve r WHERE r.demonstration.demNum IN :demNum AND r.state!=:state")
 	List<String> getResMemId(@Param("demNum") List<Long> demNum, @Param("state") DemonstrationState state);
 
-	// 여러 memId, 여러 demNum에 대해 취소 상태가 아닌 예약 목록 조회
+	// 여러 demRevNum에 대해 
 	@Query("SELECT dr FROM DemonstrationReserve dr WHERE dr.demRevNum IN :demRevNums AND dr.state =:state")
 	List<DemonstrationReserve> findDemRevNums(@Param("demRevNums") List<Long> demRevNums, @Param("state") DemonstrationState state);
 

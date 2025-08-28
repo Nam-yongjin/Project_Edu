@@ -58,19 +58,9 @@ public class QnASpecs {
 
             // 정렬 처리
             Path<?> sortPath;
-            switch (sortBy != null ? sortBy.toLowerCase() : "createdat") {
-                case "view":
-                    sortPath = root.get("view");
-                    break;
-                case "updatedAt":
-                    sortPath = root.get("updatedAt");
-                    break;
-                default:
-                    sortPath = root.get("createdAt");
-                    break;
-            }
+            sortPath=root.get("createdAt");
 
-            if ("desc".equalsIgnoreCase(sort)) {
+            if ("desc".equalsIgnoreCase(sortBy)) {
                 query.orderBy(cb.desc(sortPath));
             } else {
                 query.orderBy(cb.asc(sortPath));
