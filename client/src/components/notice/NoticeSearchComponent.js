@@ -163,9 +163,10 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                 </div>
 
                 {/* 고정글 필터와 기간 검색 */}
-                {loginState.role === 'ADMIN' ? (
                     <div className="flex flex-wrap items-center gap-4">
+                        {loginState.role === 'ADMIN' ? (
                         <div className="flex items-center gap-2">
+                            
                             <label className="newText-sm font-medium text-gray-700">고정글:</label>
                             <select
                                 name="pinnedFilter"
@@ -178,6 +179,7 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                                 <option value="normal">일반글</option>
                             </select>
                         </div>
+                        ) : (<></>)}
 
                         <div className="flex items-center gap-2">
                             <label className="newText-sm font-medium text-gray-700">기간:</label>
@@ -203,7 +205,6 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                             />
                         </div>
                     </div>
-                ) : (<></>)}
 
                 {/* 버튼 */}
                 <div className="flex justify-center gap-2">
