@@ -75,10 +75,20 @@ const NewsUpdateComponent = () => {
 
     const getByteLength = (str) => new Blob([str]).size;
 
-    // URL 유효성 검사
+    // URL 유효성 검사(http/https만 허용, host에 '.' 포함)
     const isValidUrl = (string) => {
         try {
-            new URL(string);
+            const url = new URL(string);
+            // 프로토콜 확인
+            if (!(url.protocol === "http:" || url.protocol === "https:")) {
+                return false;
+            }
+
+            // host 확인(도메인 형태여야 함)
+            if (!url.host || !url.host.includes(".")) {
+                return false;
+            }
+
             return true;
         } catch (_) {
             return false;
@@ -88,11 +98,8 @@ const NewsUpdateComponent = () => {
     // 이미지 URL 유효성 검사
     const isValidImageUrl = (url) => {
         if (!isValidUrl(url)) return false;
-        const imageExtensions = ['.jpg', '.jpeg', '.png'];
-        const urlLower = url.toLowerCase();
-        return imageExtensions.some(ext => urlLower.includes(ext)) ||
-            urlLower.includes('image') ||
-            urlLower.includes('img');
+        const imageExtensions = /\.(jpg|jpeg|png)$/i;
+        return imageExtensions.test(new URL(url).pathname);
     };
 
     const validateForm = () => {
