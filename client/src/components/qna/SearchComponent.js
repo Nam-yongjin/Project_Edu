@@ -19,6 +19,46 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
         }));
     };
 
+// 오늘 날짜 구하기 (YYYY-MM-DD 형식)
+    const getTodayString = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    // 날짜 유효성 검사
+    const validateDates = (startDate, endDate) => {
+        const today = getTodayString();
+        const errors = [];
+
+        // 현재 날짜 이후 날짜 선택 제한
+        if (startDate && startDate > today) {
+            errors.push("시작일은 오늘 날짜 이후로 선택할 수 없습니다.");
+        }
+        if (endDate && endDate > today) {
+            errors.push("종료일은 오늘 날짜 이후로 선택할 수 없습니다.");
+        }
+
+        // 시작일이 종료일보다 이후인지 확인
+        if (startDate && endDate && startDate > endDate) {
+            errors.push("시작일은 종료일보다 이후일 수 없습니다.");
+        }
+
+        // 기간 최대 범위 제한 (1년)
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 365) {
+                errors.push("검색 기간은 최대 1년까지만 설정 가능합니다.");
+            }
+        }
+
+        return errors;
+    };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const searchParams = {
@@ -90,26 +130,30 @@ const NoticeSearchComponent = ({ onSearch, initialValues }) => {
                     </div>
                 </div>
 
-                {/* 고정글 필터와 기간 검색 */}
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-2">
+                     <div className="flex items-center gap-2">
                             <label className="newText-sm font-medium text-gray-700">기간:</label>
                             <input
                                 type="date"
                                 name="startDate"
+                                 max={getTodayString()}
                                 value={searchForm.startDate}
                                 onChange={handleInputChange}
-                                className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  title="시작일을 선택하세요 (오늘 날짜까지만 선택 가능)"
+                              className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+
                             <span className="text-gray-500">~</span>
                             <input
                                 type="date"
                                 name="endDate"
                                 value={searchForm.endDate}
+                                 max={getTodayString()} // 오늘 날짜까지만 선택 가능
+                                min={searchForm.startDate || undefined} // 시작일 이후만 선택 가능
                                 onChange={handleInputChange}
+                                  title="종료일을 선택하세요 (시작일 이후, 오늘 날짜까지만 선택 가능)"
                                 className="border border-gray-300 rounded px-3 py-1.5 newText-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                
                             />
-                        </div>
                     </div>
               
 

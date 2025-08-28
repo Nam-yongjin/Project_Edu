@@ -143,7 +143,7 @@ const SelectComponent = () => {
                 <SearchComponent onSearch={handleSearch} initialValues={searchParams} />
 
                 {/* 질문 테이블 */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="bg-white border-gray-200 rounded-lg overflow-hidden page-shadow border">
                     {loading ? (
                         <div className="flex justify-center items-center py-12">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -188,7 +188,8 @@ const SelectComponent = () => {
                                         listData.map((question, index) => (
                                             <tr
                                                 key={question.questionNum}
-                                            >
+                                                className="hover:bg-gray-50">
+                                            
                                                 {loginState.role === "ADMIN" && (
                                                     <td className="px-4 py-3 text-center">
                                                         <input
