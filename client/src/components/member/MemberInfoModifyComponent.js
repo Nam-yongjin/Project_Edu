@@ -18,7 +18,7 @@ const initState = {
     addrDetail: '',
     checkSms: false,
     checkEmail: false,
-    role: 'MEMBER',
+    role: 'USER',
     social: ''
 };
 
@@ -49,9 +49,12 @@ const MemberInfoModifyComponent = () => {
             setForm(prev => ({
                 ...prev,
                 ...data,
-                pw: '',
-                gender: translatedGender
+                pw: data.social ? 'SOCIAL' : '',
+                gender: translatedGender,
+                role: data.role === "ADMIN" ? "ADMIN" : "USER"
             }));
+            setOriginalEmail(data.email);
+            setOriginalPhone(data.phone);
         } catch (error) {
             console.error("회원 정보 조회 실패:", error);
         };
@@ -86,13 +89,15 @@ const MemberInfoModifyComponent = () => {
     const validate = () => {
         const errs = {};
 
-        if (!/^[A-Za-z0-9!@#$.]{6,16}$/.test(form.pw)) {
-            errs.pw = '🚫 비밀번호는 6~16자, 영문/숫자, 특수문자(!@#$.)만 사용 가능합니다.';
-        };
+        if (!form.social) {
+            if (!/^[A-Za-z0-9!@#$.]{6,16}$/.test(form.pw)) {
+                errs.pw = '🚫 비밀번호는 6~16자, 영문/숫자, 특수문자(!@#$.)만 사용 가능합니다.';
+            };
 
-        if (form.pw !== form.pwCheck) {
-            errs.pwCheck = '🚫 비밀번호가 일치하지 않습니다.';
-        };
+            if (form.pw !== form.pwCheck) {
+                errs.pwCheck = '🚫 비밀번호가 일치하지 않습니다.';
+            };
+        }
 
         if (!/^[가-힣]{1,6}$/.test(form.name)) {
             errs.name = '🚫 이름은 한글 6자 이하여야 합니다.';
@@ -131,7 +136,7 @@ const MemberInfoModifyComponent = () => {
             }
         }
 
-        if (form.phone !== originalPhone) {
+        if (verifiedPhone && verifiedPhone !== originalPhone) {
             let isDuplicated = false;
             try {
                 isDuplicated = await checkPhone({ phone: form.phone });
@@ -148,7 +153,7 @@ const MemberInfoModifyComponent = () => {
 
         const { memId, pwCheck, birthDate, gender, role, ...dataToSubmit } = {
             ...form,
-            phone: verifiedPhone
+            phone: verifiedPhone,
         };
 
         modifyMember(dataToSubmit)
@@ -178,7 +183,7 @@ const MemberInfoModifyComponent = () => {
         if (window.confirm("정말 탈퇴하시겠습니까?")) {
             try {
                 await leaveMember();
-                alert("탈퇴 처리 되었습니다.");
+                alert("탈퇴 처리 되었습니다. 일주일뒤 재가입 가능합니다.");
                 setForm({ ...initState });
                 setVerifiedPhone(null);
                 setModifying(false);
@@ -212,7 +217,7 @@ const MemberInfoModifyComponent = () => {
                             name="memId"
                             value={form.memId}
                             disabled={true}
-                            className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
+                            className={`flex-1 input-focus ${modifying ? "cursor-not-allowed" : ""}`} />
                     </div>
                 </div>
                 {modifying && !form.social ?
@@ -307,7 +312,7 @@ const MemberInfoModifyComponent = () => {
                             type="date"
                             value={form.birthDate}
                             disabled={true}
-                            className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
+                            className={`flex-1 input-focus ${modifying ? "cursor-not-allowed" : ""}`} />
                     </div>
                 </div>
 
@@ -318,7 +323,7 @@ const MemberInfoModifyComponent = () => {
                             name="gender"
                             value={form.gender}
                             disabled={true}
-                            className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
+                            className={`flex-1 input-focus ${modifying ? "cursor-not-allowed" : ""}`} />
                     </div>
                 </div>
 
@@ -329,7 +334,7 @@ const MemberInfoModifyComponent = () => {
                             <input
                                 name="addr"
                                 placeholder="주소"
-                                value={form.addr}
+                                value={form.addr ?? ''}
                                 readOnly
                                 className="flex-1 w-full bg-gray-100 input-focus"
                             />

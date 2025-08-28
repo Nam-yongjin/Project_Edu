@@ -140,7 +140,7 @@ const CompanyInfoModifyComponent = () => {
             }
         }
 
-        if (form.phone !== originalPhone) {
+        if (verifiedPhone && verifiedPhone !== originalPhone) {
             let isDuplicated = false;
             try {
                 isDuplicated = await checkPhone({ phone: form.phone });
@@ -338,7 +338,7 @@ const CompanyInfoModifyComponent = () => {
                             <input
                                 name="addr"
                                 placeholder="주소"
-                                value={form.addr}
+                                value={form.addr ?? ''}
                                 readOnly
                                 className="flex-1 w-full bg-gray-100 input-focus"
                             />

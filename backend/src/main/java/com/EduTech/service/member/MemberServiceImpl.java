@@ -267,7 +267,16 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void modifyMemberInfo(String memId, MemberModifyDTO memberModifyDTO) {
 		Member member = memberRepository.findById(memId).orElseThrow();
-		member.setPw(passwordEncoder.encode(memberModifyDTO.getPw()));
+		// 소셜계정이 아닐경우에만 비밀번호 변경
+		if (member.getSocial() == null) {
+			member.setPw(passwordEncoder.encode(memberModifyDTO.getPw()));
+		}
+		// 전달받은 전화번호가 기존 전화번호와 다를 경우에만 중복 검사
+	    if (!member.getPhone().equals(memberModifyDTO.getPhone())) {
+	        if (memberRepository.existsByPhone(memberModifyDTO.getPhone())) {
+	            throw new IllegalArgumentException("이미 등록된 휴대폰 번호입니다.");
+	        }
+	    }
 		member.setName(memberModifyDTO.getName());
 		member.setEmail(memberModifyDTO.getEmail());
 		member.setPhone(memberModifyDTO.getPhone());
@@ -422,12 +431,8 @@ public class MemberServiceImpl implements MemberService {
 	public MemberDTO getKakaoMember(String accessToken) {
 		KakaoDTO kakaoDTO = getInfoFromKakaoAccessToken(accessToken);
 		Optional<Member> result = memberRepository.findByEmailAndSocial(kakaoDTO.getEmail(), MemberSocial.KAKAO);
-
+		
 		String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone());
-
-		if (normalizedPhone != null && memberRepository.existsByPhone(normalizedPhone)) {
-			throw new IllegalStateException("이미 등록된 휴대폰 번호입니다.");
-		}
 
 		Member member;
 
@@ -435,6 +440,9 @@ public class MemberServiceImpl implements MemberService {
 			member = result.get();
 		} else { // 자동 회원가입
 			member = makeKakaoMember(kakaoDTO);
+			if (normalizedPhone != null && memberRepository.existsByPhone(normalizedPhone)) {
+				throw new IllegalStateException("이미 등록된 휴대폰 번호입니다.");
+			}
 			memberRepository.save(member);
 		}
 		MemberDTO memberDTO = entityToDTO(member);
@@ -589,19 +597,33 @@ public class MemberServiceImpl implements MemberService {
 		String encodedPassword = passwordEncoder.encode(rawPassword);
 		String normalizedPhone = normalizePhoneNumber(naverDTO.getPhone()); // 전화번호 유효성
 
-		if (normalizedPhone != null && memberRepository.existsByPhone(normalizedPhone)) {
-			throw new IllegalStateException("이미 등록된 휴대폰 번호입니다.");
-		}
-
 		Optional<Member> result = memberRepository.findByEmailAndSocial(naverDTO.getEmail(), MemberSocial.NAVER);
 
-		Member member = result.orElseGet(() -> {
-			Member newMember = Member.builder().memId(naverDTO.getEmail()).pw(encodedPassword)
-					.email(naverDTO.getEmail()).name(naverDTO.getName()).gender(naverDTO.getGender())
-					.birthDate(naverDTO.getBirthDate()).phone(normalizedPhone).state(MemberState.NORMAL)
-					.role(MemberRole.USER).social(MemberSocial.NAVER).build();
-			return memberRepository.save(newMember);
-		});
-		return entityToDTO(member);
+		Member member;
+	    
+	    if (result.isPresent()) {
+	        // 기존 회원 로그인 - 전화번호 중복 체크 불필요
+	        member = result.get();
+	    } else {
+	        // 신규 회원가입 시에만 전화번호 중복 체크
+	        if (normalizedPhone != null && memberRepository.existsByPhone(normalizedPhone)) {
+	            throw new IllegalStateException("이미 등록된 휴대폰 번호입니다.");
+	        }
+	        member = Member.builder()
+	                .memId(naverDTO.getEmail())
+	                .pw(encodedPassword)
+	                .email(naverDTO.getEmail())
+	                .name(naverDTO.getName())
+	                .gender(naverDTO.getGender())
+	                .birthDate(naverDTO.getBirthDate())
+	                .phone(normalizedPhone)
+	                .state(MemberState.NORMAL)
+	                .role(MemberRole.USER)
+	                .social(MemberSocial.NAVER)
+	                .build();
+	        member = memberRepository.save(member);
+	    }
+	    
+	    return entityToDTO(member);
 	}
 }

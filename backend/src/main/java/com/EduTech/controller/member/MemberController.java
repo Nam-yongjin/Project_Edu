@@ -90,7 +90,7 @@ public class MemberController {
 
 	// 일반회원 상세정보
 	@GetMapping("/member/myInfo")
-	@PreAuthorize("isAuthenticated()") // role 불러오기위한 인증된 사용자 접근
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	public ResponseEntity<MemberDetailDTO> memberInfo() {
 		String memId = JWTFilter.getMemId();
 		return ResponseEntity.ok(memberService.readMemberInfo(memId));
@@ -122,7 +122,7 @@ public class MemberController {
 
 	// 일반회원 정보수정
 	@PutMapping("/member/modify")
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	public ResponseEntity<String> modifyMember(@RequestBody @Valid MemberModifyDTO memberModifyDTO) {
 		String memId = JWTFilter.getMemId();
 		memberService.modifyMemberInfo(memId, memberModifyDTO);
