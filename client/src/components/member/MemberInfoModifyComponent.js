@@ -215,7 +215,7 @@ const MemberInfoModifyComponent = () => {
                             className={`flex-1 input-focus ${modifying? "cursor-not-allowed":""}`} />
                     </div>
                 </div>
-                {modifying ?
+                {modifying && !form.social ?
                     <div>
                         <div className="newText-base flex items-center">
                             <label className="w-36 text-left font-medium">새 비밀번호<span className='text-red-600' hidden={!modifying}> *</span></label>
@@ -231,7 +231,7 @@ const MemberInfoModifyComponent = () => {
                     </div>
                     :
                     <></>}
-                {modifying ?
+                {modifying && !form.social ?
                     <div>
                         <div className="newText-base flex items-center">
                             <label className="w-36 text-left font-medium">새 비밀번호 확인<span className='text-red-600' hidden={!modifying}> *</span></label>
