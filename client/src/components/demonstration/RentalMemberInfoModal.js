@@ -57,6 +57,24 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
     fetchData();
   };
 
+
+    const getStateLabel = (state) => {
+        switch (state) {
+            case "ACCEPT":
+                return "수락";
+            case "REJECT":
+                return "거부";
+            case "WAIT":
+                return "대기";
+            case "CANCEL":
+                return "취소";
+            case "EXPIRED":
+                return "만료"
+            default:
+                return state || "-";
+        }
+    };
+
   // 상태 필터링
   const filteredMemberInfo = statusFilter
     ? memberInfo.content.filter((m) => m.state === statusFilter)
@@ -145,7 +163,7 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
                     <td title={member.addr + " " + member.addrDetail} className="truncate max-w-[120px] p-2">{member.addr + " " + member.addrDetail || "-"}</td>
                     <td title={member.schoolName} className="truncate max-w-[120px] p-2">{member.schoolName || "-"}</td>
                     <td title={member.demName} className="truncate max-w-[120px] p-2">{member.demName || "-"}</td>
-                    <td className="p-2">{member.state || "-"}</td>
+                    <td className="p-2">{getStateLabel(member.state) || "-"}</td>
                     <td className="p-2">{member.startDate ? new Date(member.startDate).toLocaleDateString() : "-"}</td>
                     <td className="p-2">{member.endDate ? new Date(member.endDate).toLocaleDateString() : "-"}</td>
                     <td className="p-2">{member.applyAt ? new Date(member.applyAt).toLocaleDateString() : "-"}</td>
