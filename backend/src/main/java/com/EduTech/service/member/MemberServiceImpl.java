@@ -574,7 +574,7 @@ public class MemberServiceImpl implements MemberService {
 			birthDate = null;
 		}
 
-		MemberGender gender = genderStr != null && genderStr.equalsIgnoreCase("male") ? MemberGender.MALE
+		MemberGender gender = genderStr != null && genderStr.equalsIgnoreCase("M") ? MemberGender.MALE
 				: MemberGender.FEMALE;
 
 		NaverDTO naver = NaverDTO.builder().email(email).name(name).gender(gender).birthDate(birthDate)
