@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class AnswerController {
 	private final AnswerService answerService;
 	
+	// 답변 글 추가
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/addAnswer")
 	public ResponseEntity<String> addAnswer(@RequestBody AnswerWriteDTO answerWriteDTO)
@@ -33,6 +34,7 @@ public class AnswerController {
 		return ResponseEntity.ok("답변 추가 성공");
 	}
 	
+	// 답변 글 수정
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/updateAnswer")
 	public ResponseEntity<String> updateAnswer(@RequestBody AnswerUpdateDTO answerUpdateDTO)
@@ -42,6 +44,7 @@ public class AnswerController {
 		return ResponseEntity.ok("답변 수정 성공");
 	}
 	
+	// 답변 글 삭제
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/deleteAnswer/{answerNum}")
 	public ResponseEntity<String> deleteAnswer(@PathVariable("answerNum") Long answerNum) {
