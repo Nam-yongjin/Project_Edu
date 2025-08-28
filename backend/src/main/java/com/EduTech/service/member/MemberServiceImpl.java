@@ -293,6 +293,12 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void modifyStudentInfo(String memId, StudentModifyDTO studentModifyDTO) {
 		Member member = memberRepository.findById(memId).orElseThrow();
+		// 전달받은 전화번호가 기존 전화번호와 다를 경우에만 중복 검사
+	    if (!member.getPhone().equals(studentModifyDTO.getPhone())) {
+	        if (memberRepository.existsByPhone(studentModifyDTO.getPhone())) {
+	            throw new IllegalArgumentException("이미 등록된 휴대폰 번호입니다.");
+	        }
+	    }
 		member.setPw(passwordEncoder.encode(studentModifyDTO.getPw()));
 		member.setName(studentModifyDTO.getName());
 		member.setEmail(studentModifyDTO.getEmail());
@@ -314,6 +320,12 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void modifyTeacherInfo(String memId, TeacherModifyDTO teacherModifyDTO) {
 		Member member = memberRepository.findById(memId).orElseThrow();
+		// 전달받은 전화번호가 기존 전화번호와 다를 경우에만 중복 검사
+	    if (!member.getPhone().equals(teacherModifyDTO.getPhone())) {
+	        if (memberRepository.existsByPhone(teacherModifyDTO.getPhone())) {
+	            throw new IllegalArgumentException("이미 등록된 휴대폰 번호입니다.");
+	        }
+	    }
 		member.setPw(passwordEncoder.encode(teacherModifyDTO.getPw()));
 		member.setName(teacherModifyDTO.getName());
 		member.setEmail(teacherModifyDTO.getEmail());
@@ -335,6 +347,12 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	public void modifyCompanyInfo(String memId, CompanyModifyDTO companyModifyDTO) {
 		Member member = memberRepository.findById(memId).orElseThrow();
+		// 전달받은 전화번호가 기존 전화번호와 다를 경우에만 중복 검사
+	    if (!member.getPhone().equals(companyModifyDTO.getPhone())) {
+	        if (memberRepository.existsByPhone(companyModifyDTO.getPhone())) {
+	            throw new IllegalArgumentException("이미 등록된 휴대폰 번호입니다.");
+	        }
+	    }
 		member.setPw(passwordEncoder.encode(companyModifyDTO.getPw()));
 		member.setName(companyModifyDTO.getName());
 		member.setEmail(companyModifyDTO.getEmail());
