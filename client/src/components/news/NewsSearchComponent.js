@@ -152,7 +152,6 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                 </div>
 
                 {/* 기간 검색 */}
-                {loginState.role === 'ADMIN' ? (
                     <div className="flex flex-wrap items-center gap-4">
                         <div className="flex items-center gap-2">
                             <label className="newText-sm font-medium text-gray-700">기간:</label>
@@ -178,7 +177,6 @@ const NewsSearchComponent = ({ onSearch, initialValues }) => {
                             />
                         </div>               
                     </div>
-                ) : (<></>)}
 
                 {/* 버튼 */}
                 <div className="flex justify-center gap-2">
