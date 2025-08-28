@@ -499,6 +499,7 @@ public class AdminServiceImpl implements AdminService {
 		    return new PageResponseDTO<>(dtoPage);
 		}
 		
+		// 이메일 보낼 회원 받아오는 기능 (기존에서 페이지 네이션 x, 이메일 발송여부가 true인 회원들만 조회)
 		public List<AdminMemberViewResDTO> getMembersByIds( AdminMemberViewReqDTO adminMemberViewReqDTO) {
 			String sortField = adminMemberViewReqDTO.getSortField() != null ? adminMemberViewReqDTO.getSortField()
 			        : "createdAt";

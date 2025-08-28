@@ -185,6 +185,7 @@ const RentalComponent = () => {
         const items = listData.content.filter((item) => item.demNum === demNum);
         if (items.length === 0) return;
 
+        /*
         if (action === "예약변경") {
             const hasWait = items.some(item => item.state === "WAIT");
             if (!hasWait) {
@@ -207,7 +208,7 @@ const RentalComponent = () => {
             } catch (err) {
                 console.error("예약 정보 조회 실패", err);
             }
-        }
+        } */
 
 
         else if (action === "대여연장") {
@@ -234,6 +235,7 @@ const RentalComponent = () => {
         }
     };
 
+    
     const reservationUpdate = (reservationQty) => {
         const loadData = async () => {
             if (!selectedDate || selectedDate.length === 0) {
@@ -286,6 +288,7 @@ const RentalComponent = () => {
 
         loadData();
     };
+    
     function toLocalDateString(date) {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -306,7 +309,7 @@ const RentalComponent = () => {
         } catch (err) {
             console.error("예약 불가 날짜 조회 실패", err);
         }
-
+        
         // 최소 연장 시작일 세팅
         setdisabledExtendDate(endDate ? new Date(endDate) : new Date());
 
@@ -315,6 +318,7 @@ const RentalComponent = () => {
 
 
     const handleExtendConfirm = (date) => {
+        
         if (!date) {
             alert("날짜를 선택해주세요.");
             return;
@@ -369,6 +373,7 @@ const RentalComponent = () => {
         const formattedStart = toLocalDateString(monthStart);
         const formattedEnd = toLocalDateString(monthEnd);
         const data = await getResExceptDate(formattedStart, formattedEnd, demNum);
+        console.log(data);
         if (Array.isArray(data)) {
             // 문자열 배열 → Date 객체 배열로 변환
             const newDates = data.map(dateStr => {
