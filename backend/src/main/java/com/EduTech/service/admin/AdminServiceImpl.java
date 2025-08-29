@@ -116,6 +116,8 @@ public class AdminServiceImpl implements AdminService {
 	    // 상태 업데이트
 	    demonstrationReserveRepository.updateDemResChangeStateRev(demonstrationApprovalResDTO.getState(), demonstrationApprovalResDTO.getDemRevNum());
 	}
+	
+	
 	// 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	@Override
 	public void approveOrRejectDemReg(DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {
@@ -128,20 +130,22 @@ public class AdminServiceImpl implements AdminService {
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
 	    List<Long> demRevNums = dto.getDemRevNum();
 	    System.out.println(dto);
-
+	    
+	    List<DemonstrationRequest> requests = demonstrationRequestRepository
+	            .selectRequest(demRevNums, DemonstrationState.WAIT);
+	    
+        LocalDate newEndDate = requests.get(0).getUpdateDate();
+        
+	    // 연장을 거부햇을 경우,
 	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.REJECT) {
 	        System.out.println("연장 거부");
 	        
 	        // WAIT 상태의 요청들 한 번에 가져옴
-	        List<DemonstrationRequest> requests = demonstrationRequestRepository
-	            .selectRequest(demRevNums, DemonstrationState.WAIT);
+	        
 	        
 	        // ACCEPT 상태의 예약들 가져와서 원래 endDate 확인
 	        List<DemonstrationReserve> reserves = demonstrationReserveRepository
 	            .findDemRevNums(demRevNums, DemonstrationState.ACCEPT);
-
-	        // 새로운 종료일 계산 (연장 거부이므로 줄어든 종료일)
-	        LocalDate newEndDate = requests.get(0).getUpdateDate();
 	        
 	        // 각 예약에 대해 기존 종료일과 새로운 종료일 사이의 DemonstrationTime 삭제
 	        for (DemonstrationReserve reserve : reserves) {
@@ -156,15 +160,14 @@ public class AdminServiceImpl implements AdminService {
 	            }
 	        }
 	    }
+	    // 연장을 수락했을 경우,
 	    else if(dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT){
-	        List<DemonstrationRequest> requests = demonstrationRequestRepository
-		            .selectRequest(demRevNums, DemonstrationState.WAIT);
-	        LocalDate newEndDate = requests.get(0).getUpdateDate();
 	    	 demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
 	    }
 	
 
-	    if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
+	    // 반납 신청을 수락했을 경우,
+	    else if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
 	        System.out.println("대여");
 	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
 	    }

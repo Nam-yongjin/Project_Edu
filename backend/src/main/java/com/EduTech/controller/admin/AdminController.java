@@ -43,6 +43,7 @@ public class AdminController {
    private final AdminService adminService;
    private final FileUtil fileUtil;
 
+   // 교사 물품 대여 신청 수락 / 거절 상태값 업데이트 기능
    @PreAuthorize("hasRole('ADMIN')")
    @PutMapping("/ResState")
    public ResponseEntity<String> DemResStateChange(
@@ -60,7 +61,7 @@ public class AdminController {
       return ResponseEntity.ok("Reg 상태 변경 성공");
    }
    
-   // 실증 신청 승인 / 거부 여부 받아와서 상태값 업데이트 기능
+   // 물품 대여 반납, 거절 상태값 업데이트 기능
    @PreAuthorize("hasRole('ADMIN')")
    @PutMapping("/ReqState")
    public ResponseEntity<String> DemReqStateChange(
