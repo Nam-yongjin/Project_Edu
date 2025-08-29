@@ -93,10 +93,10 @@ const Header = () => {
       ],
     });
     const eventMenu = mainMenus.find(menu => menu.name === "프로그램");
-    eventMenu.sub.push({ name: "프로그램 추가", link: "/event/add" });
+    eventMenu.sub.push({ name: "프로그램 등록", link: "/event/add" });
     const facilityMenu = mainMenus.find(menu => menu.name === "공간 운영");
     facilityMenu.sub.push(
-      { name: "공간 추가", link: "/facility/add" },
+      { name: "공간 등록", link: "/facility/add" },
       { name: "공간대여 관리", link: "/facility/adminreservations" },
     );
     const demonstrationMenu = mainMenus.find(menu => menu.name === "실증 지원");
