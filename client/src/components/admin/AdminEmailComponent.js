@@ -344,7 +344,7 @@ const AdminEmailComponent = ({ members }) => {
       await sendEmail(formData);
       
       alert("이메일이 성공적으로 전송되었습니다!");
-      moveToPath("../");
+      moveToPath("/admin/adminSelectEmail");
       
     } catch (error) {
       console.error("이메일 전송 실패:", error);
