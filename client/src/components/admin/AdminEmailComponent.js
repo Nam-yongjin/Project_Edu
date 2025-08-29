@@ -363,7 +363,7 @@ const AdminEmailComponent = ({ members }) => {
     <div className="max-w-screen-xl mx-auto my-10">
       <div className="min-blank">
         <div className="page-shadow bg-white">
-          <div className="bg-gray-100 p-4 rounded-t-lg border-b">
+          <div className=" p-4 rounded-t-lg border-b">
             <h2 className="newText-2xl font-semibold text-center text-gray-800">메일 전송</h2>
           </div>
 
@@ -543,7 +543,7 @@ const AdminEmailComponent = ({ members }) => {
               )}
             </div>
 
-            <div className="text-center pt-4 border-t">
+            <div className="text-center pt-4 ">
               <button 
                 onClick={handleSend} 
                 disabled={isUploading || attachFiles.length > 8 || currentSize > 25 * 1024 * 1024}
