@@ -82,14 +82,14 @@ public class Scheduler {
 
 	// 매주 일요일 마다 res테이블의 상태가 CANCEL 및 REJECT 인 상태의 행 제거
 	@Scheduled(cron = "0 0 0 * * 0", zone = "Asia/Seoul")
-	public void deleteResCancelState() {
+	public void deleteRes() {
 		resRepository.deleteResCancel(DemonstrationState.CANCEL);
 		resRepository.deleteResCancel(DemonstrationState.REJECT);
 	}
 
 	// 매주 일요일 마다 reg테이블의 상태가 CANCEL,REJECT,EXPIRED 인 물품번호를 가진 dem테이블의 행 제거
 	@Scheduled(cron = "0 0 0 * * 0", zone = "Asia/Seoul")
-	public void deleteDemCancelState() {
+	public void deleteDem() {
 		List<Long> demNums = regRepository.selectRegDemNums(DemonstrationState.CANCEL);
 		demNums.addAll(regRepository.selectRegDemNums(DemonstrationState.REJECT));
 		demNums.addAll(regRepository.selectRegDemNums(DemonstrationState.EXPIRED));
@@ -97,29 +97,25 @@ public class Scheduler {
 			return;
 
 		for (Long demNum : demNums) {
-			demRepository.findById(demNum).ifPresent(demo -> {
-				demRepository.delete(demo); // 영속성 컨텍스트 거쳐서 cascade 삭제됨
+			demRepository.findById(demNum).ifPresent(demo -> { // ifPresent: 값이 있으면 실행, null이면 실행 x
 				List<DemonstrationImageDTO> deleteImageList = demonstrationImageRepository.selectDemImageIn(List.of(demNum));
 				List<String> filePaths = new ArrayList<>();
 				for (DemonstrationImageDTO dto : deleteImageList) {
 					String path = dto.getImageUrl();
-					String s_path = "s_" + dto.getImageUrl();
 					filePaths.add(path);
-					filePaths.add(s_path);
 				}
 
 				// 폴더에서 이미지 삭제
 				fileUtil.deleteFiles(filePaths);
 
-				// 기존 상품 이미지 삭제 후,
-				demonstrationImageRepository.deleteDemNumImage(List.of(demNum));
+				demRepository.delete(demo); // 영속성 컨텍스트 거쳐서 cascade 삭제됨
 			});
 		}
 	}
 
 	// 매주 일요일 마다 반납 / 대여 요청 완료한 행을 지움
 	@Scheduled(cron = "0 0 0 * * 0", zone = "Asia/Seoul")
-	public void deleteReqCancelState() {
+	public void deleteReq() {
 		reqRepository.deleteReq(DemonstrationState.ACCEPT);
 		reqRepository.deleteReq(DemonstrationState.REJECT);
 	}

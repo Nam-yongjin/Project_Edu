@@ -76,9 +76,7 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
     };
 
   // 상태 필터링
-  const filteredMemberInfo = statusFilter
-    ? memberInfo.content.filter((m) => m.state === statusFilter)
-    : memberInfo.content;
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -149,14 +147,14 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
             </thead>
 
             <tbody className="text-gray-600">
-              {filteredMemberInfo.length === 0 ? (
+              {memberInfo.content.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center p-8 min-h-[300px]">
                     <p className="text-gray-500 newText-xl">신청한 회원이 없습니다.</p>
                   </td>
                 </tr>
               ) : (
-                filteredMemberInfo.map((member, idx) => (
+                memberInfo.content.map((member, idx) => (
                   <tr key={member.demRevNum || idx} className={`hover:bg-gray-50 newText-sm text-center whitespace-nowrap h-[60px] border border-gray-300 ${member.state === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
                     <td className="p-2">{member.memId}</td>
                     <td className="p-2">{member.phone || "-"}</td>
@@ -174,7 +172,7 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
           </table>
         </div>
 
-        {filteredMemberInfo.length > 0 && (
+        {memberInfo.content.length > 0 && (
           <div className="flex justify-center mt-4">
             <PageComponent
               totalPages={pageData.totalPages}

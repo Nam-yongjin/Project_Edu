@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
+import com.EduTech.dto.demonstration.ResRequestDTO;
 import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationState;
 import com.EduTech.entity.demonstration.RequestType;
@@ -34,4 +34,6 @@ public interface DemonstrationRequestRepository extends JpaRepository<Demonstrat
 	@Transactional
 	@Query("DELETE FROM DemonstrationRequest WHERE state=:state")
 	void deleteReq(@Param("state") DemonstrationState state);
+	
+
 }

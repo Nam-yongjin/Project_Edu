@@ -147,8 +147,9 @@ public class AdminController {
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/demRes")
    public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
-
+	   System.out.println(demonstrationSearchDTO);
       PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = adminService.getAllDemRes(demonstrationSearchDTO);
+      System.out.println(AllDemRes.getContent());
       return AllDemRes;
    }
 

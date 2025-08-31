@@ -13,31 +13,39 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DemonstrationListReserveDTO { // 실증 교사 신청 조회하는 dto (백->프론트)
+public class DemonstrationListReserveDTO { // 관리자 물품 대여 조회
 
 	private Long demRevNum; // demonstration_reserve 테이블의 기본키
-	private LocalDate applyAt; 
+	private LocalDate applyAt;
 	private LocalDate startDate;
 	private LocalDate endDate;
-	private DemonstrationState state = DemonstrationState.WAIT; // 디폴트 값을 WAIT로 저장 (현재 상태: 대기, 수락, 거부)
+	private DemonstrationState state;
 	private String memId; // 회원 아이디
 	private String schoolName; // 학교 이름
 	private String demName;
-	private String addr; 
+	private String addr;
 	private String addrDetail;
-	private String phone; 
+	private String phone;
 	private Long bItemNum;
-	private List<ResRequestDTO> requestDTO;
 	private Long demNum;
-	private List<DemonstrationImageDTO> imageList=new ArrayList<>(); 
-	
+	private List<ResRequestDTO> requestDTO;
 
-	public DemonstrationListReserveDTO(Long demRevNum, LocalDate applyAt, DemonstrationState state, String memId, String schoolName)
-	{
-		this.demRevNum=demRevNum;
-		this.applyAt=applyAt;
-		this.state=state;
-		this.memId=memId;
-		this.schoolName=schoolName;
+	// private List<DemonstrationImageDTO> imageList=new ArrayList<>();
+	public DemonstrationListReserveDTO(Long demRevNum, LocalDate applyAt, LocalDate startDate, LocalDate endDate,
+			DemonstrationState state, String memId, String schoolName, String demName, String addr, String addrDetail,
+			String phone, Long bItemNum, Long demNum) {
+		this.demRevNum = demRevNum;
+		this.applyAt = applyAt;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.state = state;
+		this.memId = memId;
+		this.schoolName = schoolName;
+		this.demName = demName;
+		this.addr = addr;
+		this.addrDetail = addrDetail;
+		this.phone = phone;
+		this.bItemNum = bItemNum;
+		this.demNum = demNum;
 	}
 }

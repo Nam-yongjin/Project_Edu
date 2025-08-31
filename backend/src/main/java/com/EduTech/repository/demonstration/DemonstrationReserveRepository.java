@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,6 +14,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.dto.admin.ExpiredUserDTO;
+import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
+import com.EduTech.dto.demonstration.DemonstrationRentalListDTO;
 import com.EduTech.dto.demonstration.DemonstrationTimeReqDTO;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
@@ -45,6 +49,12 @@ public interface DemonstrationReserveRepository
 	int updateDemResChangeState(@Param("state") DemonstrationState state,
 			@Param("demRevNum") List<Long> demRevNum);
 
+	@Modifying // demonstration reserve 테이블 상태값 변경 쿼리문 (아이디와 실증 번호를 받음)
+	@Transactional
+	@Query("UPDATE DemonstrationReserve SET state=:state WHERE demonstration.demNum IN :demNum")
+	int updateDemResChangeStateToDemNum(@Param("state") DemonstrationState state,
+			@Param("demNum") List<Long> demNum);
+	
 	 // 물품 대여 조회 페이지에서 연기 신청, 반납 조기 신청 버튼 클릭 시, endDate를 변경하는 쿼리문
 	@Modifying
 	@Transactional
@@ -116,5 +126,100 @@ public interface DemonstrationReserveRepository
 	       "FROM DemonstrationReserve dr JOIN dr.member m " +
 	       "WHERE dr.state = :state")
 	List<ExpiredUserDTO> findExpiredInfo(@Param("state") DemonstrationState state);
+	
+	
+	// 해당 물품을 신청한 교사 목록 조회
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListReserveDTO(" +
+		       "dr.demRevNum, dr.applyAt, dr.startDate, dr.endDate, dr.state, " +
+		       "m.memId, t.schoolName, d.demName, m.addr, m.addrDetail, m.phone, " +
+		       "dr.bItemNum, d.demNum) " +
+		       "FROM DemonstrationReserve dr " +
+		       "JOIN dr.member m " +
+		       "LEFT JOIN m.teacher t " +
+		       "JOIN dr.demonstration d " +
+		       "WHERE (:search IS NULL OR :search = '' OR :type IS NULL OR :type = '' OR " +
+		       "      (:type = 'demName' AND d.demName LIKE %:search%) OR " +
+		       "      (:type = 'memId' AND m.memId LIKE %:search%) OR " +
+		       "      (:type = 'schoolName' AND t.schoolName LIKE %:search%)) " +
+		       "AND (:statusFilter IS NULL OR dr.state = :statusFilter) " +
+		       "AND (:demNum IS NULL OR d.demNum = :demNum) " +
+		       "ORDER BY " +
+		       "CASE WHEN :sortBy = 'applyAt' AND :sort = 'desc' THEN dr.applyAt END DESC, " +
+		       "CASE WHEN :sortBy = 'applyAt' AND :sort = 'asc' THEN dr.applyAt END ASC, " +
+		       "CASE WHEN :sortBy = 'startDate' AND :sort = 'desc' THEN dr.startDate END DESC, " +
+		       "CASE WHEN :sortBy = 'startDate' AND :sort = 'asc' THEN dr.startDate END ASC, " +
+		       "CASE WHEN :sortBy = 'endDate' AND :sort = 'desc' THEN dr.endDate END DESC, " +
+		       "CASE WHEN :sortBy = 'endDate' AND :sort = 'asc' THEN dr.endDate END ASC")
+		Page<DemonstrationListReserveDTO> getRentalToDemNum(
+		    @Param("type") String type,
+		    @Param("search") String search,
+		    @Param("statusFilter") DemonstrationState statusFilter,
+		    @Param("demNum") Long demNum,
+		    @Param("sortBy") String sortBy,
+		    @Param("sort") String sort,
+		    Pageable pageable);
 
+	// 현재 로그인한 회원의 대여 목록 조회
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationRentalListDTO(" +
+	       "d.demNum, d.demName, dr.bItemNum, dr.startDate, dr.endDate, dr.applyAt, " +
+	       "dg.member.company.companyName, d.itemNum, dr.demRevNum, dr.state) " +
+	       "FROM DemonstrationReserve dr " +
+	       "LEFT JOIN dr.demonstration d " +
+	       "LEFT JOIN d.demonstrationRegistration dg " + 
+	       "LEFT JOIN dr.member m " +                  
+	       "WHERE (:search IS NULL OR :search = '' OR :type IS NULL OR :type = '' " +
+	       "       OR (:type = 'demName' AND d.demName LIKE %:search%) " +
+	       "       OR (:type = 'companyName' AND dg.member.company.companyName LIKE %:search%)) " +
+	       "AND (:statusFilter IS NULL OR dr.state = :statusFilter) " +
+	       "AND (:memId IS NULL OR m.memId = :memId) "+
+	       "ORDER BY " +
+	       "CASE WHEN :sortBy = 'applyAt' AND :sort = 'desc' THEN dr.applyAt END DESC, " +
+	       "CASE WHEN :sortBy = 'applyAt' AND :sort = 'asc' THEN dr.applyAt END ASC, " +
+	       "CASE WHEN :sortBy = 'startDate' AND :sort = 'desc' THEN dr.startDate END DESC, " +
+	       "CASE WHEN :sortBy = 'startDate' AND :sort = 'asc' THEN dr.startDate END ASC, " +
+	       "CASE WHEN :sortBy = 'endDate' AND :sort = 'desc' THEN dr.endDate END DESC, " +
+	       "CASE WHEN :sortBy = 'endDate' AND :sort = 'asc' THEN dr.endDate END ASC")
+	Page<DemonstrationRentalListDTO> getRentalToMemId(
+	    @Param("memId") String memId,
+	    @Param("type") String type,
+	    @Param("search") String search,
+	    @Param("statusFilter") DemonstrationState statusFilter,
+	    @Param("demNum") Long demNum,
+	    @Param("sortBy") String sortBy,
+	    @Param("sort") String sort,
+	    Pageable pageable);
+
+
+	
+	
+	// 관리자 페이지 물품 대여 목록 조회
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListReserveDTO(" +
+	       "dr.demRevNum, dr.applyAt, dr.startDate, dr.endDate, dr.state, " +
+	       "dr.member.memId, dr.member.teacher.schoolName, d.demName, " +
+	       "dr.member.addr, dr.member.addrDetail, dr.member.phone, " +
+	       "dr.bItemNum, d.demNum) " +
+	       "FROM DemonstrationReserve dr " +
+	       "LEFT JOIN dr.demonstration d " +
+	       "LEFT JOIN dr.member m " +
+	       "LEFT JOIN m.teacher s " +
+	       "WHERE (:search IS NULL OR :search = '' OR :type IS NULL OR :type = '' " +
+	       "       OR (:type = 'demName' AND d.demName LIKE %:search%) " +
+	       "       OR (:type = 'schoolName' AND dr.member.teacher.schoolName LIKE %:search%) " +
+	       "       OR (:type = 'memId' AND dr.member.memId LIKE %:search%)) " +
+	       "AND (:statusFilter IS NULL OR dr.state = :statusFilter) " +
+	       "ORDER BY " +
+	       "CASE WHEN :sortBy = 'applyAt' AND :sort = 'desc' THEN dr.applyAt END DESC, " +
+	       "CASE WHEN :sortBy = 'applyAt' AND :sort = 'asc' THEN dr.applyAt END ASC, " +
+	       "CASE WHEN :sortBy = 'startDate' AND :sort = 'desc' THEN dr.startDate END DESC, " +
+	       "CASE WHEN :sortBy = 'startDate' AND :sort = 'asc' THEN dr.startDate END ASC, " +
+	       "CASE WHEN :sortBy = 'endDate' AND :sort = 'desc' THEN dr.endDate END DESC, " +
+	       "CASE WHEN :sortBy = 'endDate' AND :sort = 'asc' THEN dr.endDate END ASC")
+	Page<DemonstrationListReserveDTO> getRentalAdmin(
+	    @Param("type") String type,
+	    @Param("search") String search,
+	    @Param("statusFilter") DemonstrationState statusFilter,
+	    @Param("sortBy") String sortBy,
+	    @Param("sort") String sort,
+	    Pageable pageable
+	);
 }

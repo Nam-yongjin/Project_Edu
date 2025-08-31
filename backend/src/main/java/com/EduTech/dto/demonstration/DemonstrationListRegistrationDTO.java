@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DemonstrationListRegistrationDTO { // 기업 실증 조회에 사용하는 dto (백->프톤트)
+public class DemonstrationListRegistrationDTO { // 관리자 실증 신청 내역 조회
 
 	private Long demRegNum; // demonstration_registration의 기본키
 	private Long demNum;
@@ -27,18 +27,7 @@ public class DemonstrationListRegistrationDTO { // 기업 실증 조회에 사�
 	private String addrDetail;
 	private String phone; 
 	private Long itemNum;
-	private List<DemonstrationImageDTO> imageList=new ArrayList<>(); 
-	
-	public DemonstrationListRegistrationDTO(Long demRegNum, LocalDate regDate, LocalDate expDate,
-			DemonstrationState state, String memId, String companyName) {
-		this.demRegNum = demRegNum;
-		this.regDate = regDate;
-		this.expDate = expDate;
-		this.state = state;
-		this.memId = memId;
-		this.companyName = companyName;
-	}
-	
+	//private List<DemonstrationImageDTO> imageList=new ArrayList<>(); 
 	
 
 }

@@ -20,15 +20,6 @@ public class DemonstrationBorrowListDTO {
 	private LocalDate expDate;
 	private LocalDate regDate;
 	private DemonstrationState state;
-	private List<DemonstrationImageDTO> imageList; 
+	//private List<DemonstrationImageDTO> imageList; 
 	// 물품 대여 조회 페이지용 생성자
-	public DemonstrationBorrowListDTO(Long demNum, String demName, Long itemNum, String demMfr, LocalDate expDate,LocalDate regDate,DemonstrationState state) {
-			this.demNum=demNum;
-			this.demName=demName;
-			this.itemNum=itemNum;
-			this.demMfr=demMfr;
-			this.expDate=expDate;
-			this.regDate=regDate;
-			this.state=state;
-	}
 }

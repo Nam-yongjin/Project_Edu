@@ -249,7 +249,6 @@ const AdminEmailSelectMembersComponent = () => {
                         alert("회원을 선택해 주세요");
                         return;
                     }
-                    // ✅ 아이디, 이름, 이메일까지 같이 넘김
                     navigate("/admin/adminEmail", {
                         state: { selectedMembers },
                     });

@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.EduTech.dto.demonstration.DemonstrationDetailDTO;
+import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationPageListDTO;
 import com.EduTech.entity.demonstration.Demonstration;
 import com.EduTech.entity.demonstration.DemonstrationCategory;
@@ -72,4 +73,36 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 	@Transactional
 	@Query("DELETE FROM Demonstration WHERE demNum IN:demNum")
 	void deleteDems(@Param("demNum") List<Long> demNum);
+	
+	
+	// 물품 리스트 조회
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationPageListDTO(" +
+			"d.demNum, d.demName, d.demMfr, d.itemNum, dr.state, c.companyName, dr.expDate) " +
+			"FROM Demonstration d " +
+			"LEFT JOIN d.demonstrationRegistration dr " +
+			"LEFT JOIN dr.member m " +
+			"LEFT JOIN m.company c " +
+			"WHERE (" +
+			   "(:search IS NULL OR :search = '' OR :type IS NULL OR :type = '') " +
+			   "OR " +
+			   "(:type = 'demName' AND d.demName LIKE %:search%) " +
+			   "OR " +
+			   "(:type = 'demMfr' AND d.demMfr LIKE %:search%) " +
+			   "OR " +
+			   "(:type = 'companyName' AND c.companyName LIKE %:search%)" +
+			") " +
+			"AND (:statusFilter IS NULL OR dr.state = :statusFilter) " +
+			"ORDER BY " +
+			"CASE WHEN :sortBy = 'expDate' AND :sort = 'desc' THEN dr.expDate END DESC, " +
+			"CASE WHEN :sortBy = 'expDate' AND :sort = 'asc' THEN dr.expDate END ASC")
+			Page<DemonstrationPageListDTO> getDemList(
+			   @Param("type") String type,
+			   @Param("search") String search,
+			   @Param("sortBy") String sortBy,
+			   @Param("sort") String sort,
+			   @Param("statusFilter") DemonstrationState statusFilter,
+			   Pageable pageable
+			);
+
+
 }

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,11 +12,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.EduTech.dto.demonstration.DemonstrationBorrowListDTO;
+import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.entity.demonstration.DemonstrationRegistration;
 import com.EduTech.entity.demonstration.DemonstrationState;
 
 //실증 물품 등록 관련 레포지토리
-public interface DemonstrationRegistrationRepository extends JpaRepository<DemonstrationRegistration, Long>, JpaSpecificationExecutor<DemonstrationRegistration> {
+public interface DemonstrationRegistrationRepository
+		extends JpaRepository<DemonstrationRegistration, Long>, JpaSpecificationExecutor<DemonstrationRegistration> {
 	// 실증 기업 신청 페이지에서 반납 날짜를 불러오는 쿼리문
 	@Query("SELECT reg.expDate FROM DemonstrationRegistration reg WHERE reg.demonstration.demNum=:demNum")
 	LocalDate selectDemRegExpDate(@Param("demNum") Long demNum);
@@ -34,7 +36,7 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Modifying
 	@Transactional
 	@Query("UPDATE DemonstrationRegistration SET state=:state WHERE demonstration.demNum IN :demNum")
-	int updateDemRegChangeState(@Param("state") DemonstrationState state,@Param("demNum") List<Long> demNum);
+	int updateDemRegChangeState(@Param("state") DemonstrationState state, @Param("demNum") List<Long> demNum);
 
 	// demRegNum을 받아 상태 업데이트하는 쿼리문
 	@Modifying
@@ -46,7 +48,8 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 	@Modifying
 	@Transactional
 	@Query("UPDATE DemonstrationRegistration SET expDate=:expDate WHERE member.memId=:memId AND demonstration.demNum=:demNum")
-	int updateDemRegChangeExpDate(@Param("expDate") LocalDate expDate, @Param("demNum") Long demNum,@Param("memId") String memId);
+	int updateDemRegChangeExpDate(@Param("expDate") LocalDate expDate, @Param("demNum") Long demNum,
+			@Param("memId") String memId);
 
 	// 나중에 회원 탈퇴할때, 실증 등록 중인 상태이면 회원 탈퇴 못하도록 구현하기 위한 쿼리문
 	@Query("SELECT COUNT(d) > 0 FROM DemonstrationRegistration d WHERE d.member.memId = :memId AND d.state = 'ACCEPT'")
@@ -54,13 +57,63 @@ public interface DemonstrationRegistrationRepository extends JpaRepository<Demon
 
 	// demonstrationRegistrationRepository
 	List<DemonstrationRegistration> findByDemonstration_DemNumIn(List<Long> demNums);
-	
-	// 현재 날짜와 만료 날짜를 비고해서 만료날짜가 작거나 같을경우 상태를 만료로 업데이트
-    @Modifying
-    @Transactional
-    @Query("UPDATE DemonstrationRegistration r SET r.state = :expired WHERE r.expDate <= :today AND r.state=:accept")
-    int changeRegExpiredState(@Param("today") LocalDate today, @Param("expired") DemonstrationState expired,@Param("accept") DemonstrationState accept);
 
- 
+	// 현재 날짜와 만료 날짜를 비고해서 만료날짜가 작거나 같을경우 상태를 만료로 업데이트
+	@Modifying
+	@Transactional
+	@Query("UPDATE DemonstrationRegistration r SET r.state = :expired WHERE r.expDate <= :today AND r.state=:accept")
+	int changeRegExpiredState(@Param("today") LocalDate today, @Param("expired") DemonstrationState expired,
+			@Param("accept") DemonstrationState accept);
+
+	// 현재 로그인한 회원이 신청한 실증 신청 내역 조회
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationBorrowListDTO(" +
+	           "d.demNum, d.demName, d.itemNum, d.demMfr, dg.expDate, dg.regDate, dg.state) " +
+	           "FROM DemonstrationRegistration dg " +
+	           "JOIN dg.demonstration d " +
+	           "WHERE (:search IS NULL OR :search = '' OR :type IS NULL OR :type = '' " +
+	           "       OR (:type = 'demName' AND d.demName LIKE %:search%) " +
+	           "       OR (:type = 'demMfr' AND d.demMfr LIKE %:search%)) " +
+	           "AND (:statusFilter IS NULL OR dg.state = :statusFilter) " +
+	           "AND (:memId IS NULL OR dg.member.memId = :memId) " +
+	           "ORDER BY " +
+	           "CASE WHEN :sortBy = 'regDate' AND :sort = 'desc' THEN dg.regDate END DESC, " +
+	           "CASE WHEN :sortBy = 'regDate' AND :sort = 'asc' THEN dg.regDate END ASC, " +
+	           "CASE WHEN :sortBy = 'expDate' AND :sort = 'desc' THEN dg.expDate END DESC, " +
+	           "CASE WHEN :sortBy = 'expDate' AND :sort = 'asc' THEN dg.expDate END ASC")
+	    Page<DemonstrationBorrowListDTO> getBorrowListByMemId(
+	        @Param("memId") String memId,
+	        @Param("type") String type,
+	        @Param("search") String search,
+	        @Param("statusFilter") DemonstrationState statusFilter,
+	        @Param("sortBy") String sortBy,
+	        @Param("sort") String sort,
+	        Pageable pageable
+	    );
+	
+	
+	// 관리자용 실증 신청 내역 조회
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO(" +
+	       "dg.demRegNum, d.demNum, dg.regDate, dg.expDate, dg.state,dg.member.memId," +
+	       "dg.member.company.companyName, d.demName, dg.member.addr, dg.member.addrDetail, dg.member.phone, d.itemNum) " +
+	       "FROM DemonstrationRegistration dg " +
+	       "JOIN dg.demonstration d " +
+	       "WHERE (:search IS NULL OR :search = '' OR :type IS NULL OR :type = '' " +
+	       "       OR (:type = 'demName' AND d.demName LIKE %:search%) " +
+	       "       OR (:type = 'demMfr' AND d.demMfr LIKE %:search%) " +
+	       "       OR (:type = 'companyName' AND dg.member.company.companyName LIKE %:search%)) " +
+	       "AND (:statusFilter IS NULL OR dg.state = :statusFilter) " +
+	       "ORDER BY " +
+	       "CASE WHEN :sortBy = 'regDate' AND :sort = 'desc' THEN dg.regDate END DESC, " +
+	       "CASE WHEN :sortBy = 'regDate' AND :sort = 'asc' THEN dg.regDate END ASC, " +
+	       "CASE WHEN :sortBy = 'expDate' AND :sort = 'desc' THEN dg.expDate END DESC, " +
+	       "CASE WHEN :sortBy = 'expDate' AND :sort = 'asc' THEN dg.expDate END ASC")
+	Page<DemonstrationListRegistrationDTO> getBorrowAdmin(
+	    @Param("type") String type,
+	    @Param("search") String search,
+	    @Param("statusFilter") DemonstrationState statusFilter,
+	    @Param("sortBy") String sortBy,
+	    @Param("sort") String sort,
+	    Pageable pageable
+	);
 
 }

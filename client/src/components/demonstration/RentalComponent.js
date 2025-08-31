@@ -53,7 +53,6 @@ const RentalComponent = () => {
     const [extendDate, setExtendDate] = useState("");  // 모달용 날짜 상태 변수명 변경
     const [disabledExtendDate, setdisabledExtendDate] = useState([]);
     const [selectedDemRevNum, setSelectedDemRevNum] = useState(); // demRevNum을 저장할 state 추가
-    const [isFetchingDisabledDates, setIsFetchingDisabledDates] = useState(false);
     const currentItem = listData.content?.find(
         (item) => item.demNum === selectedDemNum && item.state === "WAIT"
     );
@@ -269,7 +268,6 @@ const RentalComponent = () => {
             }
 
             try {
-                // updateRental 함수에 demRevNum 전달 (API 구조에 따라 매개변수 순서나 구조 조정 필요)
                 await updateRental(
                     toLocalDateString(startDate),
                     toLocalDateString(endDate),

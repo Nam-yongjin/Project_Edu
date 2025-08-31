@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.EduTech.dto.Page.PageResponseDTO;
@@ -25,29 +25,23 @@ import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
-import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
 import com.EduTech.dto.demonstration.ResRequestDTO;
 import com.EduTech.entity.admin.BannerImage;
-import com.EduTech.entity.demonstration.Demonstration;
-import com.EduTech.entity.demonstration.DemonstrationRegistration;
 import com.EduTech.entity.demonstration.DemonstrationRequest;
 import com.EduTech.entity.demonstration.DemonstrationReserve;
 import com.EduTech.entity.demonstration.DemonstrationState;
-import com.EduTech.entity.demonstration.DemonstrationTime;
 import com.EduTech.entity.demonstration.RequestType;
 import com.EduTech.entity.member.Member;
 import com.EduTech.entity.member.MemberState;
 import com.EduTech.repository.admin.BannerImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationImageRepository;
 import com.EduTech.repository.demonstration.DemonstrationRegistrationRepository;
-import com.EduTech.repository.demonstration.DemonstrationRegistrationSpecs;
 import com.EduTech.repository.demonstration.DemonstrationRepository;
 import com.EduTech.repository.demonstration.DemonstrationRequestRepository;
 import com.EduTech.repository.demonstration.DemonstrationReserveRepository;
-import com.EduTech.repository.demonstration.DemonstrationReserveSpecs;
 import com.EduTech.repository.demonstration.DemonstrationTimeRepository;
 import com.EduTech.repository.member.MemberRepository;
 import com.EduTech.repository.member.MemberSpecs;
@@ -308,199 +302,85 @@ public class AdminServiceImpl implements AdminService {
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
 		@Override
 		public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
-			 Integer pageCount = searchDTO.getPageCount();
-			    String type = searchDTO.getType();
-			    String search = searchDTO.getSearch();
-			    String sortBy = searchDTO.getSortBy();
-			    String sort = searchDTO.getSort();
-			    String statusFilter = searchDTO.getStatusFilter();
+			DemonstrationState statusEnum = null;
+			if (searchDTO.getStatusFilter() != null && !searchDTO.getStatusFilter().isEmpty()) {
+				try {
+					statusEnum = DemonstrationState.valueOf(searchDTO.getStatusFilter());
+				} catch (IllegalArgumentException e) {
+					// 잘못된 enum 값이면 null로 처리
+					statusEnum = null;
+				}
+			}
 
-			    
-			    if (pageCount == null || pageCount < 0) pageCount = 0;
-			    if (!StringUtils.hasText(sortBy)) sortBy = "regDate";
-			    if (!StringUtils.hasText(sort)) sort = "desc";
+			// 페이징 & 정렬 기본값 설정
+			int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0 ? searchDTO.getPageCount()
+					: 0;
+			String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty() ? searchDTO.getSortBy()
+					: "regDate";
+			String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty() ? searchDTO.getSort() : "desc";
 
-			    // 정렬 방향 결정
-			    Sort.Direction direction = "asc".equalsIgnoreCase(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
-			    
-			    Sort sortOrder;
-			    if ("expDate".equalsIgnoreCase(sortBy)) {
-			        sortOrder = Sort.by(direction, "expDate").and(Sort.by(Sort.Direction.DESC, "demRegNum"));
-			    } else {
-			        sortOrder = Sort.by(direction, "regDate").and(Sort.by(Sort.Direction.DESC, "demRegNum"));
-			    }
+			Pageable pageable = PageRequest.of(pageCount, 10);
 
-			    Pageable pageable = PageRequest.of(pageCount, 10, sortOrder);
+			// 쿼리에서 바로 DTO로 매핑하여 가져오기
+			Page<DemonstrationListRegistrationDTO> regPage = demonstrationRegistrationRepository.getBorrowAdmin(searchDTO.getType(), searchDTO.getSearch(), statusEnum, sortBy, sort, pageable);
 
-			    // 검색 조건만 처리하는 Specification 사용
-			    Specification<DemonstrationRegistration> spec = DemonstrationRegistrationSpecs.withSearchAdmin(type, search, statusFilter);
-
-			    // 나머지 코드는 동일...
-			    Page<DemonstrationRegistration> regPage = demonstrationRegistrationRepository.findAll(spec, pageable);
-			    
-			    // 관련 demNum 리스트 추출 (중복 제거)
-			    List<Long> demNums = regPage.stream()
-			        .map(reg -> reg.getDemonstration().getDemNum())
-			        .distinct()
-			        .toList();
-
-			    // 이미지 리스트 일괄 조회 (demNum 기준)
-			    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
-			    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
-			        .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
-
-			    // reserves에서 member.memId 리스트 추출 (중복 제거)
-			    List<String> memIds = regPage.stream()
-			        .map(reg -> reg.getMember().getMemId())
-			        .distinct()
-			        .toList();
-
-			    // memberRepository에서 memId 리스트로 Member 리스트 조회
-			    List<Member> members = memberRepository.findByMemIdIn(memIds);
-			    Map<String, Member> memIdToMember = members.stream()
-			        .collect(Collectors.toMap(Member::getMemId, m -> m));
-
-			    // DTO 매핑
-			    Page<DemonstrationListRegistrationDTO> dtoPage = regPage.map(reg -> {
-			        Demonstration dem = reg.getDemonstration();
-
-			        DemonstrationListRegistrationDTO dto = new DemonstrationListRegistrationDTO();
-
-			        dto.setDemRegNum(reg.getDemRegNum());
-			        dto.setRegDate(reg.getRegDate());
-			        dto.setExpDate(reg.getExpDate());
-			        dto.setState(reg.getState());
-			        dto.setMemId(reg.getMember().getMemId());
-			      
-			        // Member 정보 가져오기
-			        Member member = memIdToMember.get(reg.getMember().getMemId());
-			        if (member != null) {
-			            if (member.getCompany() != null) {
-			                dto.setCompanyName(member.getCompany().getCompanyName());
-			            }
-			            dto.setAddr(member.getAddr());
-			            dto.setAddrDetail(member.getAddrDetail());
-			            dto.setPhone(member.getPhone());
-			        }
-
-			        if (dem != null) {
-			            dto.setDemName(dem.getDemName());
-			            dto.setItemNum(dem.getItemNum());
-			            dto.setDemNum(dem.getDemNum());
-			            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
-			        }
-
-			        return dto;
-			    });
-
-			    return new PageResponseDTO<>(dtoPage);
+			return new PageResponseDTO<>(regPage);
 			}
 		
 		
 		// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
+		@Override
 		public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO) {
 
-		    Integer pageCount = searchDTO.getPageCount();
-		    String type = searchDTO.getType();
-		    String search = searchDTO.getSearch();
-		    String sortBy = searchDTO.getSortBy();
-		    String sort = searchDTO.getSort();
-		    String statusFilter = searchDTO.getStatusFilter();
+		    DemonstrationState statusEnum = null;
+		    if (searchDTO.getStatusFilter() != null && !searchDTO.getStatusFilter().isEmpty()) {
+		        try {
+		            statusEnum = DemonstrationState.valueOf(searchDTO.getStatusFilter());
+		        } catch (IllegalArgumentException e) {
+		            // 잘못된 enum 값이면 null로 처리
+		            statusEnum = null;
+		        }
+		    }
 
-		    if (pageCount == null || pageCount < 0)
-		        pageCount = 0;
-		    if (!StringUtils.hasText(sortBy))
-		        sortBy = "applyAt";
-		    if (!StringUtils.hasText(sort))
-		        sort = "desc";
+		    // 페이징 & 정렬 기본값 설정
+		    int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0 ? searchDTO.getPageCount() : 0;
+		    String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty() ? searchDTO.getSortBy() : "applyAt";
+		    String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty() ? searchDTO.getSort() : "desc";
 
 		    Pageable pageable = PageRequest.of(pageCount, 10);
 
-		    Specification<DemonstrationReserve> spec = DemonstrationReserveSpecs.withResSearchAndSortAdmin(
-		        type,
-		        search,
-		        sortBy,
-		        sort,
-		        statusFilter
-		    );
+		    // 쿼리에서 바로 DTO로 매핑하여 가져오기
+		    Page<DemonstrationListReserveDTO> resPage = demonstrationReserveRepository.getRentalAdmin(
+		            searchDTO.getType(), searchDTO.getSearch(), statusEnum, sortBy, sort, pageable);
 
-		    // DemonstrationReserve 페이징 조회
-		    Page<DemonstrationReserve> resPage = demonstrationReserveRepository.findAll(spec, pageable);
+		    // resPage에서 demRevNum 리스트 추출
+		    List<Long> demRevNums = resPage.getContent().stream()
+		            .map(DemonstrationListReserveDTO::getDemRevNum)
+		            .distinct()
+		            .toList();
 
-		    // 관련 demNum 리스트 추출 (중복 제거)
-		    List<Long> demNums = resPage.stream()
-		        .map(res -> res.getDemonstration().getDemNum())
-		        .distinct()
-		        .toList();
-
-		    // 이미지 리스트 일괄 조회 (demNum 기준)
-		    List<DemonstrationImageDTO> images = demonstrationImageRepository.selectDemImageIn(demNums);
-		    Map<Long, List<DemonstrationImageDTO>> demNumToImages = images.stream()
-		        .collect(Collectors.groupingBy(DemonstrationImageDTO::getDemNum));
-
-		    // 요청 상태 리스트 일괄 조회 (demRevNum 기준)
-		    List<Long> demRevNums = resPage.stream()
-		        .map(DemonstrationReserve::getDemRevNum)
-		        .distinct()
-		        .toList();
-
+		    // 전체 Request 데이터 조회
 		    List<DemonstrationRequest> requests = demonstrationRequestRepository.findStateByDemRevNumIn(demRevNums);
 
-		    // reserves에서 member.memId 리스트 추출 (중복 제거)
-		    List<String> memIds = resPage.stream()
-		        .map(reserve -> reserve.getMember().getMemId())
-		        .distinct()
-		        .toList();
+		    // 각 DTO에 request 정보 설정
+		    List<DemonstrationListReserveDTO> updatedContent = resPage.getContent().stream()
+		            .map(dto -> {
+		                // demRevNum에 해당하는 모든 요청들을 리스트로 찾아서 DTO에 세팅
+		                List<ResRequestDTO> relatedRequests = requests.stream()
+		                    .filter(r -> r.getReserve().getDemRevNum().equals(dto.getDemRevNum()))
+		                    .map(r -> new ResRequestDTO(r.getType(), r.getState(), r.getUpdateDate()))
+		                    .collect(Collectors.toList());
+		                dto.setRequestDTO(relatedRequests);
+		                return dto;
+		            })
+		            .toList();
 
-		    // memberRepository에서 memId 리스트로 Member 리스트 조회
-		    List<Member> members = memberRepository.findByMemIdIn(memIds);
-		    Map<String, Member> memIdToMember = members.stream()
-		        .collect(Collectors.toMap(Member::getMemId, m -> m));
+		    // 기존 페이지 정보로 새로운 Page 객체 생성
+		    Page<DemonstrationListReserveDTO> finalPage = new PageImpl<>(updatedContent, pageable, resPage.getTotalElements());
 
-		    // DTO 매핑
-		    Page<DemonstrationListReserveDTO> dtoPage = resPage.map(res -> {
-		        Demonstration dem = res.getDemonstration();
-
-		        DemonstrationListReserveDTO dto = new DemonstrationListReserveDTO();
-
-		        dto.setDemRevNum(res.getDemRevNum());
-		        dto.setApplyAt(res.getApplyAt());
-		        dto.setStartDate(res.getStartDate());
-		        dto.setEndDate(res.getEndDate());
-		        dto.setState(res.getState());
-		        dto.setMemId(res.getMember().getMemId());
-		        dto.setBItemNum(res.getBItemNum());
-		        dto.setDemNum(dem.getDemNum());
-
-		        // Member 정보 가져오기
-		        Member member = memIdToMember.get(res.getMember().getMemId());
-		        if (member != null) {
-		            if (member.getTeacher() != null) {
-		                dto.setSchoolName(member.getTeacher().getSchoolName());
-		            }
-		            dto.setAddr(member.getAddr());
-		            dto.setAddrDetail(member.getAddrDetail());
-		            dto.setPhone(member.getPhone());
-		        }
-
-		        if (dem != null) {
-		            dto.setDemName(dem.getDemName());
-		            dto.setImageList(demNumToImages.getOrDefault(dem.getDemNum(), List.of()));
-		        }
-
-		        // demRevNum에 해당하는 모든 요청들을 리스트로 찾아서 DTO에 세팅
-		        List<ResRequestDTO> relatedRequests = requests.stream()
-		            .filter(r -> r.getReserve().getDemRevNum().equals(res.getDemRevNum()))
-		            .map(r -> new ResRequestDTO(r.getType(), r.getState(),r.getUpdateDate()))
-		            .collect(Collectors.toList());
-
-		        dto.setRequestDTO(relatedRequests);
-
-		        return dto;
-		    });
-
-		    return new PageResponseDTO<>(dtoPage);
+		    return new PageResponseDTO<>(finalPage);
 		}
+		
 		
 		// 이메일 보낼 회원 받아오는 기능 (기존에서 페이지 네이션 x, 이메일 발송여부가 true인 회원들만 조회)
 		public List<AdminMemberViewResDTO> getMembersByIds( AdminMemberViewReqDTO adminMemberViewReqDTO) {

@@ -98,11 +98,8 @@ public class QuestionServiceImpl implements QuestionService {
 	// 상세 페이지 질문 글 및 답변 조회
 	public QuestionDTO QnAViewDetail(Long questionNum) {
 		questionRepository.increaseViewCount(questionNum); // 조회수 +1
-		QuestionDTO dto = modelMapper.map(questionRepository.findById(questionNum), QuestionDTO.class); // 모델 매퍼로 질문 번호를
-																										// 입력해 dto에
-																										// question객체
-																										// 받아온 후
-		dto.setAnswerList(answerRepository.selectAnswer(Collections.singletonList(questionNum))); // dto에 답변 받아온 후 리턴
+		QuestionDTO dto = modelMapper.map(questionRepository.findById(questionNum), QuestionDTO.class); 
+		dto.setAnswerList(answerRepository.selectAnswer(Collections.singletonList(questionNum)));
 		return dto;
 		
 

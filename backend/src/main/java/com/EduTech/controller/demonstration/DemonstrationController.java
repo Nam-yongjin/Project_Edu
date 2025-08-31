@@ -48,6 +48,7 @@ public class DemonstrationController {
 	@GetMapping("/borrowRes")
 	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResBorrowPage(
 			@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		System.out.println(demonstrationSearchDTO);
 		String memId = JWTFilter.getMemId();
 		PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = demonstrationService.getAllDemResRental(demonstrationSearchDTO,memId);
 		return AllDemRes;
@@ -57,6 +58,7 @@ public class DemonstrationController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@GetMapping("/getBorrow") 
 	public PageResponseDTO<DemonstrationBorrowListDTO> getBorrow(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		System.out.println(demonstrationSearchDTO);
 		String memId = JWTFilter.getMemId();
 		PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow = demonstrationService.AllgetBorrow(memId,demonstrationSearchDTO);
 		return AllgetBorrow;
@@ -76,12 +78,8 @@ public class DemonstrationController {
 
 	// 실증 물품 리스트 조회
 	@GetMapping("/demList")
-	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@RequestParam("pageCount") Integer pageCount,
-			@RequestParam(value = "type", defaultValue = "demName") String type,
-			@RequestParam(value = "search", defaultValue = "") String search,
-			@RequestParam(value="sortType",defaultValue="asc")String sortType) {
-		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(pageCount, type,
-				search,sortType);
+	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(demonstrationSearchDTO);
 
 		return AllDemList;
 	}
@@ -109,16 +107,6 @@ public class DemonstrationController {
 				.checkReservationStateExcept(demonstrationTimeReqDTO, memId);
 		return checkResList;
 	}
-
-	/*
-	// 관리자가 신청을 받아서 반납 신청 및 반납일 연기
-	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("/RentalDate")
-	public ResponseEntity<String> DemRentalDateChange(
-			@RequestBody DemonstrationResRentalDTO demonstrationResRentalDTO) {
-		demonstrationService.rentalDateChange(demonstrationResRentalDTO);
-		return ResponseEntity.ok("Rental 날짜 변경 성공");
-	} */
 
 	// 물품 대여 예약
 	@PreAuthorize("hasRole('TEACHER')")
