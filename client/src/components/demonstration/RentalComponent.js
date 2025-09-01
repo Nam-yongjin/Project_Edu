@@ -84,6 +84,7 @@ const RentalComponent = () => {
                 setPageData(data);
             });
         }
+        
     };
 
     useEffect(() => {
@@ -295,26 +296,22 @@ const RentalComponent = () => {
     }
 
     const handleExtendButtonClick = async (demNum, endDate) => {
-        setSelectedDemNum(demNum);
+    setSelectedDemNum(demNum);
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth(); // 0~11
+    const baseDate = endDate ? new Date(endDate) : new Date(); 
+    const year = baseDate.getFullYear();
+    const month = baseDate.getMonth(); 
 
-        try {
-            // 현재 달 기준으로 예약 불가 날짜 fetch
-            await fetchDisabledDates(year, month, demNum);
-        } catch (err) {
-            console.error("예약 불가 날짜 조회 실패", err);
-        }
-        
-        // 최소 연장 시작일 세팅
-        setdisabledExtendDate(endDate ? new Date(endDate) : new Date());
+    try {
+        await fetchDisabledDates(year, month, demNum);
+    } catch (err) {
+        console.error("예약 불가 날짜 조회 실패", err);
+    }
 
-        setIsExtendModalOpen(true);
-    };
-
-
+    // 최소 연장 시작일 세팅
+    setdisabledExtendDate(baseDate);
+    setIsExtendModalOpen(true);
+};
     const handleExtendConfirm = (date) => {
         
         if (!date) {

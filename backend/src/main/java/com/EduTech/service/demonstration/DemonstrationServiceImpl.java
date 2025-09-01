@@ -187,7 +187,6 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 실증 장비신청 페이지 (실증 물품 리스트 목록)
 	@Override
 	public PageResponseDTO<DemonstrationPageListDTO> getAllDemList(DemonstrationSearchDTO searchDTO) {
-		System.out.println(searchDTO);
 		int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0
 	            ? searchDTO.getPageCount()
 	            : 0;

@@ -33,12 +33,12 @@ export const putUpdate = async (formData) => {
 }
 
 // 실증 상품 리스트 페이지에서 상품 정보 리스트를 얻어오기 위한 요청
-export const getList = async (current,searchType,search,sortType) => {
+export const getList = async (current,searchType,search,sortBy) => {
     const res = await axios.get(`${demonstration}/demList`, {
         params : {pageCount: current,
                 type:searchType,
                 search:search,
-                sortType:sortType
+                sortBy:sortBy
         }
     });
     return res.data;
@@ -61,6 +61,9 @@ export const getResDate = async (startDate, endDate, demNum) => {
 }
 
 export const getResExceptDate = async (startDate,endDate,demNum) => {
+    console.log(startDate)
+    console.log(endDate)
+    console.log(demNum)
     const res = await jwtAxios.get(`${demonstration}/demResConExcept`, {
         params: {demNum,startDate,endDate }
     });

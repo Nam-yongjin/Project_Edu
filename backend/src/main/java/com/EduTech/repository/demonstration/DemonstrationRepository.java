@@ -93,8 +93,8 @@ public interface DemonstrationRepository extends JpaRepository<Demonstration, Lo
 			") " +
 			"AND (:statusFilter IS NULL OR dr.state = :statusFilter) " +
 			"ORDER BY " +
-			"CASE WHEN :sortBy = 'expDate' AND :sort = 'desc' THEN dr.expDate END DESC, " +
-			"CASE WHEN :sortBy = 'expDate' AND :sort = 'asc' THEN dr.expDate END ASC")
+			"CASE WHEN :sort = 'expDate' AND :sortBy = 'desc' THEN dr.expDate END DESC, " +
+			"CASE WHEN :sort = 'expDate' AND :sortBy = 'asc' THEN dr.expDate END ASC")
 			Page<DemonstrationPageListDTO> getDemList(
 			   @Param("type") String type,
 			   @Param("search") String search,

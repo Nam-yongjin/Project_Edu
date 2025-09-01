@@ -18,7 +18,7 @@ const ListComponent = () => {
   const [searchType, setSearchType] = useState("demName");
   const [search, setSearch] = useState("");
   const loginState = useSelector((state) => state.loginState);
-  const [sortType, setSortType] = useState("asc");
+  const [sortType, setSortType] = useState("desc");
   const searchOptions = [
     { value: "demName", label: "상품명" },
     { value: "demMfr", label: "제조사명" },
