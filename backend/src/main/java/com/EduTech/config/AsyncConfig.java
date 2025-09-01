@@ -20,5 +20,4 @@ public class AsyncConfig {
         executor.initialize(); // 스레드 풀 초기화 (excuter생성)
         return executor;
     }
-
 }
