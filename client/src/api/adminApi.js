@@ -140,7 +140,7 @@ export const updateRegstate = async (demRegNum, state) => {
 
 
 // FastAPI 통계 API 호출
-// 방문자 카운트
+// 방문자 수 카운트
 export const recordVisitor = async () => {
     const res = await axios.get(`http://127.0.0.1:8000/api/recordVisit`);
     return res.data;

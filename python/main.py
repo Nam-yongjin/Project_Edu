@@ -10,7 +10,6 @@ from demonstration import demonstration_registration_stats, demonstration_reserv
 
 app = FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,14 +25,14 @@ async def record_visit(request: Request):
 
     # DB에 기록
     try:
-        ip = request.client.host
+        ip = request.client.host # 사용자 IP 기록
 
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO visit (ip_address, visited_at)
             VALUES (%s, %s)
-        """, (ip, datetime.now()))
+        """, (ip, datetime.now())) # IP, 방문시간 저장
         conn.commit()
         return
     except Exception as e:

@@ -33,7 +33,7 @@ const MainPage = () => {
                 });
         };
         fetchBanners();
-        recordVisitor();    // 방문자 카운트
+        recordVisitor();    // 방문자 수 카운트
     }, []);
 
     return (

@@ -2,7 +2,6 @@ from database import get_connection
 import pandas as pd
 from datetime import date
 
-
 def visitors():
     conn = get_connection()
     df = pd.read_sql("""
@@ -20,7 +19,7 @@ def visitors():
     daily_visitors = int(today_row["count"].values[0]) if not today_row.empty else 0
     
     return {
-        "total_visitors": total_visitors,
-        "daily_visitors": daily_visitors,
+        "total_visitors": total_visitors, # 총 방문자 수
+        "daily_visitors": daily_visitors, # 일일 방문자 수
         "trend": df.to_dict(orient="records") # JSON 형태로 변환
     }

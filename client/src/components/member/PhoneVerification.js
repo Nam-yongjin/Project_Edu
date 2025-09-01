@@ -69,7 +69,7 @@ const PhoneVerification = ({ onVerified, initialPhone }) => {
         try {
             const confirmationResult = await signInWithPhoneNumber(auth, e164Phone, appVerifier);
             window.confirmationResult = confirmationResult;
-            setStep(1);
+            setStep(1);     // 인증번호 입력창
             setCooldown(120);
             alert('인증번호가 전송되었습니다.');
         } catch (error) {
