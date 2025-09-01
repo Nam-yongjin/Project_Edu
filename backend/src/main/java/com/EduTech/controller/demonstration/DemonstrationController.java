@@ -79,6 +79,7 @@ public class DemonstrationController {
 	// 실증 물품 리스트 조회
 	@GetMapping("/demList")
 	public PageResponseDTO<DemonstrationPageListDTO> getAllDemListPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
+		System.out.println(demonstrationSearchDTO);
 		PageResponseDTO<DemonstrationPageListDTO> AllDemList = demonstrationService.getAllDemList(demonstrationSearchDTO);
 
 		return AllDemList;

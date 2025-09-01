@@ -193,10 +193,10 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	            : 0;
 	    String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty()
 	            ? searchDTO.getSortBy()
-	            : "expDate";
+	            : "desc";
 	    String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty()
 	            ? searchDTO.getSort()
-	            : "desc";
+	            : "expDate";
 
 	    Pageable pageable = PageRequest.of(pageCount, 4);
 
@@ -253,14 +253,12 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 		demonstrationTimeReqDTO.setEndDate(demonstrationReservationDTO.getEndDate());
 		Long beforeItemNum = demonstrationRepository.selectItemNum(demonstrationReservationDTO.getDemNum());
 		List<LocalDate> ResState = checkReservationState(demonstrationTimeReqDTO);
-
-		int result = demonstrationRepository.updateItemNum(demonstrationReservationDTO.getItemNum(),
-				demonstrationReservationDTO.getDemNum()); // 상품을 현재 재고량으로 업데이트
 		Member member = memberRepository.findById(memId).orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다"));
 
 		// 전달한 예약일에 예약이 없다면,
 		if (ResState == null || ResState.isEmpty()) {
-			
+			int result = demonstrationRepository.updateItemNum(demonstrationReservationDTO.getItemNum(),
+					demonstrationReservationDTO.getDemNum()); // 상품을 현재 재고량으로 업데이트
 			DemonstrationReserve demonstrationReserve = DemonstrationReserve.builder().applyAt(LocalDate.now())
 					.startDate(demonstrationReservationDTO.getStartDate())
 					.endDate(demonstrationReservationDTO.getEndDate()).state(DemonstrationState.WAIT)
@@ -495,7 +493,6 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 실증 번호를 받아서 실증 상품을 삭제하는 기능
 	@Override
 	public void deleteDemonstration(List<Long> demNum) {
-		System.out.println(demNum);
 		demonstrationRegistrationRepository.updateDemRegChangeState(DemonstrationState.CANCEL, demNum);
 		demonstrationReserveRepository.updateDemResChangeStateToDemNum(DemonstrationState.CANCEL, demNum);
 	}
@@ -536,7 +533,6 @@ public class DemonstrationServiceImpl implements DemonstrationService {
 	// 물품 대여 리스트 페이지에서 연기 신청, 반납 신청 하는 기능
 	@Override
 	public void addRequest(ResRequestDTO resRequestDTO, String memId) {
-		System.out.println(resRequestDTO);
 		List<DemonstrationState> states = Arrays.asList(DemonstrationState.ACCEPT);
 		DemonstrationReserve reserve = demonstrationReserveRepository
 				.findDemNumMemId(Arrays.asList(resRequestDTO.getDemNum()), memId, states);

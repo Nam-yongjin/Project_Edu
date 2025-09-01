@@ -131,12 +131,7 @@ public class AdminServiceImpl implements AdminService {
         LocalDate newEndDate = requests.get(0).getUpdateDate();
         
 	    // 연장을 거부햇을 경우,
-	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.REJECT) {
-	        System.out.println("연장 거부");
-	        
-	        // WAIT 상태의 요청들 한 번에 가져옴
-	        
-	        
+	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.REJECT) {		        
 	        // ACCEPT 상태의 예약들 가져와서 원래 endDate 확인
 	        List<DemonstrationReserve> reserves = demonstrationReserveRepository
 	            .findDemRevNums(demRevNums, DemonstrationState.ACCEPT);
@@ -159,10 +154,8 @@ public class AdminServiceImpl implements AdminService {
 	    	 demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
 	    }
 	
-
 	    // 반납 신청을 수락했을 경우,
 	    else if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
-	        System.out.println("대여");
 	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
 	    }
 
