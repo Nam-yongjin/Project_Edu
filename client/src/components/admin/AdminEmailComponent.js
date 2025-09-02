@@ -10,17 +10,17 @@ import useMove from "../../hooks/useMove";
 
 const AdminEmailComponent = ({ members }) => {
   
-  const [memberList, setMemberList] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [attachFiles, setAttachFiles] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageWidth, setImageWidth] = useState("");
-  const [imageHeight, setImageHeight] = useState("");
-  const { moveToPath } = useMove();
-  const quillRef = useRef(null);
-  const attachInputRef = useRef(null);
+  const [memberList, setMemberList] = useState([]); // 받아올 회원 리스트
+  const [title, setTitle] = useState(""); // 제목
+  const [content, setContent] = useState(""); // quil 내용
+  const [attachFiles, setAttachFiles] = useState([]); // 첨부파일
+  const [isUploading, setIsUploading] = useState(false); // 업로드 여부
+  const [selectedImage, setSelectedImage] = useState(null); // 이미지 더블 클릭 했을때 selectedImage에 등록, 리사이즈 가능
+  const [imageWidth, setImageWidth] = useState(""); // 이미지 길이
+  const [imageHeight, setImageHeight] = useState(""); // 이미지 높이
+  const { moveToPath } = useMove(); // 이동 변수
+  const quillRef = useRef(null); // quil 접근 변수
+  const attachInputRef = useRef(null); // 첨부파일 접근 변수
 
   // Firebase 초기화
   const storage = getStorage(app);
@@ -32,6 +32,7 @@ const AdminEmailComponent = ({ members }) => {
 
     // Quill 스타일 설정
     const style = document.createElement("style");
+   // 외부 라이브러리는 tailwind가 먹히지 않아 직접 스타일을 넣어줌
     style.innerHTML = `
       .ql-editor { 
         min-height: 400px; 
@@ -77,9 +78,9 @@ const AdminEmailComponent = ({ members }) => {
   // Firebase에 이미지 업로드
   const uploadImageToFirebase = async (file, fileName) => {
     try {
-      const imageRef = ref(storage, `email-images/${Date.now()}_${fileName}`);
-      const snapshot = await uploadBytes(imageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
+      const imageRef = ref(storage, `email-images/${Date.now()}_${fileName}`); // 이미지 경로
+      const snapshot = await uploadBytes(imageRef, file); // 파이어베이스에 이미지 업로드
+      const downloadURL = await getDownloadURL(snapshot.ref); // content에 업로드한 이미지 경로 변경하기 위해 url을 받아옴
       return downloadURL;
     } catch (error) {
       console.error("이미지 업로드 실패:", error);
@@ -87,48 +88,55 @@ const AdminEmailComponent = ({ members }) => {
     }
   };
 
-  // Base64를 Blob으로 변환
+  // Base64를 Blob으로 변환(quil은 자동으로 이미지 업로드 시, base64파일로 변환함,
+  // 즉, 파이어 베이스에 업로드 위해 blob 파일로 변환함)
   const base64ToBlob = (base64Data) => {
+    // 1. "data:image/png;base64,실제데이터" 분리
     const arr = base64Data.split(',');
+    // 2. MIME 타입 추출: "image/png"
     const mime = arr[0].match(/:(.*?);/)[1];
+    // 3. Base64 문자열을 바이너리 문자열로 디코딩
     const bstr = atob(arr[1]);
+    // 4. 바이너리 문자열을 바이트 배열로 변환
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
     while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
+      u8arr[n] = bstr.charCodeAt(n); // 각 문자를 바이트로
     }
+    // 5. Blob 객체 생성
     return new Blob([u8arr], { type: mime });
   };
 
   // Quill 이미지 업로드 핸들러
   const imageHandler = () => {
     const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.click();
+    input.type = "file"; // 파일 타임
+    input.accept = "image/*"; // 이미지만 업로드 가능
+    input.click(); // 파일 선택창 띄움
 
     input.onchange = () => {
       const file = input.files?.[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = () => { // 이미지 변환이 끝나면 실행
         const quill = quillRef.current.getEditor();
-        const range = quill.getSelection(true);
-        quill.insertEmbed(range.index, "image", reader.result);
-        quill.setSelection(range.index + 1);
-        setTimeout(() => setupImageResizing(quill), 100);
+        const range = quill.getSelection(true); // 현재 커서 위치
+        quill.insertEmbed(range.index, "image", reader.result); // quil에 이미지 삽입
+        quill.setSelection(range.index + 1); // 다음 커서로 이동
+        setTimeout(() => setupImageResizing(quill), 100); // 이미지 태그 삽입 시간 부여
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // quil은 base64만 지원하므로 해당 타입으로 변환
     };
   };
 
   // 이미지 크기 조절 설정
   const setupImageResizing = (quill) => {
-    const images = quill.root.querySelectorAll("img");
+    const images = quill.root.querySelectorAll("img"); // quil에 업로드된 이미지 불러옴
     
     images.forEach((img) => {
-      if (img.dataset.resizeSetup) return;
+      if (img.dataset.resizeSetup) return; // 내가 원하는 커스텀 데이터를 자유롭게 붙였다가 꺼내 쓸 수 있는 기능
+                                            // 여기선 해당 이미지에 이미 전처리를 했을 경우, 전처리 하지않기 위해 사용한다.
       img.dataset.resizeSetup = "true";
 
       if (!img.style.width) {
@@ -136,9 +144,10 @@ const AdminEmailComponent = ({ members }) => {
       }
       img.style.display = "inline-block";
 
+      // 더블 클릭 이벤트 리스너 설정
       img.addEventListener("dblclick", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); // 이벤트 실행 시, 브라우저가 다른 행동을 하지 않도록 막음
+        e.stopPropagation(); // 이벤트가 다른 곳으로 전파되지 않게 막는 역할
         
         const currentWidth = parseInt(img.style.width) || 300;
         const currentHeight = parseInt(img.style.height) || '';
@@ -147,6 +156,7 @@ const AdminEmailComponent = ({ members }) => {
         setSelectedImage(img);
       });
 
+      // 일반 클릭 이벤트 리스너 설정
       img.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -157,7 +167,7 @@ const AdminEmailComponent = ({ members }) => {
     });
 
     quill.root.addEventListener("click", (e) => {
-      if (!e.target.closest("img")) {
+      if (!e.target.closest("img")) { // 이미지가 아닌 다른 곳을 선택 했을 경우. 선택 상태를 해제
         quill.root.querySelectorAll("img").forEach(i => i.classList.remove("selected"));
       }
     });
@@ -207,17 +217,18 @@ const AdminEmailComponent = ({ members }) => {
     
     const quill = quillRef.current.getEditor();
     const handleTextChange = () => {
-      setTimeout(() => setupImageResizing(quill), 50);
+      setTimeout(() => setupImageResizing(quill), 50); // 내용이 바뀔때마다 실행
     };
 
     quill.on("text-change", handleTextChange);
     setupImageResizing(quill);
 
-    return () => {
+    return () => { // 다른 페이지 이동시 이벤트 리스너 제거
       quill.off("text-change", handleTextChange);
     };
   }, []);
 
+  // 메뉴 선택창
   const modules = useMemo(
     () => ({
       toolbar: {
@@ -238,6 +249,7 @@ const AdminEmailComponent = ({ members }) => {
     []
   );
 
+  // Quill이 실제 적용할 수 있는 스타일/포맷을 지정하는 배열
   const formats = [
     "header", "bold", "italic", "underline", "strike",
     "color", "background", "list", "bullet", "link", "image", "align",
@@ -246,7 +258,8 @@ const AdminEmailComponent = ({ members }) => {
   // 첨부파일 업로드
   const handleAttachFiles = (e) => {
     const files = Array.from(e.target.files);
-    const maxSize = 25 * 1024 * 1024;
+    const maxSize = 25 * 1024 * 1024; // 25mb 설정
+    // array.reduce((누적값, 현재값) 배열의 값을 합해서 리턴하는 함수
     const currentSize = attachFiles.reduce((total, file) => total + file.size, 0);
     const newFilesSize = files.reduce((total, file) => total + file.size, 0);
     
@@ -265,17 +278,19 @@ const AdminEmailComponent = ({ members }) => {
     setAttachFiles((prev) => [...prev, ...files]);
   };
 
+  // 파일 제거
   const handleRemoveFile = (index) => {
     setAttachFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // 회원 제거
   const handleRemoveMember = (memId) => {
     setMemberList((prev) => prev.filter((m) => m.memId !== memId));
   };
 
   // Base64 이미지를 Firebase URL로 변환
   const convertImagesToFirebaseUrls = async (htmlContent) => {
-    const parser = new DOMParser();
+    const parser = new DOMParser(); // img 태그를 찾기위해 parser를 사용해 html로 파싱
     const doc = parser.parseFromString(htmlContent, 'text/html');
     const images = doc.querySelectorAll('img');
     
@@ -284,11 +299,11 @@ const AdminEmailComponent = ({ members }) => {
     for (let img of images) {
       const src = img.getAttribute('src');
       
-      if (src && src.startsWith('data:image/')) {
+      if (src && src.startsWith('data:image/')) { // base64방식의 이미지를 찾음
         try {
-          const blob = base64ToBlob(src);
+          const blob = base64ToBlob(src); 
           const fileName = `quill_image_${Date.now()}.png`;
-          const firebaseUrl = await uploadImageToFirebase(blob, fileName);
+          const firebaseUrl = await uploadImageToFirebase(blob, fileName); // 파일 업로드
           updatedContent = updatedContent.replace(src, firebaseUrl);
         } catch (error) {
           console.error('이미지 업로드 실패:', error);
@@ -296,7 +311,7 @@ const AdminEmailComponent = ({ members }) => {
         }
       }
     }
-    
+
     return updatedContent;
   };
 
@@ -328,7 +343,7 @@ const AdminEmailComponent = ({ members }) => {
       }
 
       let finalContent = content;
-      if (content.includes('data:image/')) {
+      if (content.includes('data:image/')) { // base64가 존재한다면,
         finalContent = await convertImagesToFirebaseUrls(content);
       }
 
@@ -458,7 +473,7 @@ const AdminEmailComponent = ({ members }) => {
                       placeholder="예: 200 (비워두면 자동)"
                     />
                     <div className="newText-xs text-gray-500 mt-1">
-                      너비: 100px ~ 600px, 높이: 100px ~ 300px (이메일 템플릿 최대 너비 600px)
+                      너비: 100px ~ 600px, 높이: 100px ~ 300px
                     </div>
                   </div>
 

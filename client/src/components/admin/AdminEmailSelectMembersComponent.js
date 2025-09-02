@@ -3,11 +3,11 @@ import { getEmailMembers } from "../../api/adminApi";
 import { useNavigate } from "react-router-dom";
 
 const AdminEmailSelectMembersComponent = () => {
-    const [members, setMembers] = useState([]);
-    const [selectedMembers, setSelectedMembers] = useState([]);
+    const [members, setMembers] = useState([]); // 회원 멤버 
+    const [selectedMembers, setSelectedMembers] = useState([]); // 선택된 멤버
     const navigate = useNavigate();
 
-    const [searchParams, setSearchParams] = useState({
+    const [searchParams, setSearchParams] = useState({ // 검색어 설정
         memId: "",
         name: "",
         email: "",
@@ -15,8 +15,8 @@ const AdminEmailSelectMembersComponent = () => {
         role: "",
         state: "",
     });
-    const [sortField, setSortField] = useState("createdAt");
-    const [sortDirection, setSortDirection] = useState("DESC");
+    const [sortField, setSortField] = useState("createdAt"); // 정렬 필드
+    const [sortDirection, setSortDirection] = useState("DESC"); // 정렬 타입
 
     // 회원 목록 불러오기
     const loadMembers = () => {
@@ -40,7 +40,7 @@ const AdminEmailSelectMembersComponent = () => {
     const handleCheckboxChange = (member) => {
         setSelectedMembers((prev) => {
             const exists = prev.some((m) => m.memId === member.memId);
-            return exists
+            return exists // 존재 하지 않는다면 기존 값 사용, 아니면 기존값에 더함
                 ? prev.filter((m) => m.memId !== member.memId)
                 : [...prev, member];
         });
