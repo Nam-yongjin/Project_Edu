@@ -12,7 +12,7 @@ const UpdateComponent = ({ demNum }) => {
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
   const { moveToPath, moveToReturn } = useMove();
 
-  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", category: "" };
+    const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "",mainImageIndex:null }; // dem초기 설정값
   const [dem, setDem] = useState({ ...initState });
   const [returnDate, setReturnDate] = useState(new Date());
   const [images, setImages] = useState([]);
@@ -135,19 +135,25 @@ const UpdateComponent = ({ demNum }) => {
     const formData = new FormData();
     const mainImageIndex = images.findIndex((img) => img.isMain === 1);
 
-    const demCopy = {
+    /*const demCopy = {
       ...dem,
       expDate: formatDate(selectedDate),
       mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
-    };
+    }; */
+    console.log(mainImageIndex);
+        setDem(prev => ({
+  ...prev,  // 이전 값 모두 유지
+  expDate: formatDate(selectedDate), // 새 값으로 덮어쓰기
+  mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
+    }));
 
-    formData.append("demonstrationFormDTO", new Blob([JSON.stringify(demCopy)], { type: "application/json" }));
+    formData.append("demonstrationFormDTO", new Blob([JSON.stringify(dem)], { type: "application/json" }));
     images.forEach(img => formData.append("imageList", img.file));
 
     putUpdate(formData)
       .then(() => {
         alert("실증 수정 완료");
-        moveToPath("/");
+     //   moveToPath("/");
       })
       .catch(err => {
         console.error(err);
