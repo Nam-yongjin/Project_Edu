@@ -7,15 +7,16 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 
 const AddComponent = () => {
-  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "" };
-  const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
-  const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
-  const [images, setImages] = useState([]);
-  const [dem, setDem] = useState({ ...initState });
-  const [returnDate, setReturnDate] = useState(new Date());
-  const { moveToPath, moveToReturn } = useMove();
-  const [errors, setErrors] = useState({});
-  const [fileInputKey, setFileInputKey] = useState(Date.now());
+  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "",mainImageIndex:null }; // dem초기 설정값
+  const isCompany = useSelector((state) => state.loginState?.role === "COMPANY"); // 기업 여부
+  const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN"); // 관리자 여부
+  const [images, setImages] = useState([]); // 이미지
+  const [dem, setDem] = useState({ ...initState }); // 보낼 상품 정보
+  const [returnDate, setReturnDate] = useState(new Date()); // 만료 일자
+  const { moveToPath, moveToReturn } = useMove(); // 이동 변수
+  const [errors, setErrors] = useState({}); // input창 예외 처리를 위한 error 객체
+  const [fileInputKey, setFileInputKey] = useState(Date.now()); // 파일 입력란 리마운트 위한 변수
+
   // 권한 체크
   useEffect(() => {
     if (!isCompany && !isAdmin) {
@@ -25,6 +26,7 @@ const AddComponent = () => {
   }, [isCompany, isAdmin]);
 
   // 날짜를 yyyy-MM-dd 문자열로 변환하는 함수
+  // 백에서 localdate로 받아야 하니 형식을 맞춤
   const formatDate = (date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -32,6 +34,7 @@ const AddComponent = () => {
     return `${y}-${m}-${d}`;
   };
 
+  // 실증 등록
   const addDem = () => {
     if (dem.demName.length > 100) {
     alert("물품명은 100자 이내여야 합니다.");
@@ -46,7 +49,7 @@ const AddComponent = () => {
     return;
   }
   
-    const newErrors = {};
+    const newErrors = {}; // 에러 메시지를 담는 객체
     if (!dem.demName.trim()) newErrors.demName = "물품명은 필수입니다.";
     if (!dem.demMfr.trim()) newErrors.demMfr = "제조사는 필수입니다.";
     if (!dem.demInfo.trim()) newErrors.demInfo = "물품 설명은 필수입니다.";
@@ -67,22 +70,30 @@ const AddComponent = () => {
       newErrors.expDate = "반납 날짜는 오늘 이후여야 합니다.";
     }
 
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    setErrors(newErrors); // error state변수에 추가한 error메시지 객체 set
+
+    if (Object.keys(newErrors).length > 0) return; // error메시지가 있을 경우, 리턴
 
     const formData = new FormData();
-    const mainImageIndex = images.findIndex((img) => img.isMain === 1);
-
+    const mainImageIndex = images.findIndex((img) => img.isMain === 1); // 메인 이미지 여부 확인
+/*
     const demCopy = {
       ...dem,
       expDate: formatDate(selectedDate),
       mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
-    };
+    }; */
+
+    setDem(prev => ({
+  ...prev,  // 이전 값 모두 유지
+  expDate: formatDate(selectedDate), // 새 값으로 덮어쓰기
+  mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
+    }));
 
     formData.append(
       "demonstrationFormDTO",
-      new Blob([JSON.stringify(demCopy)], { type: "application/json" })
+      new Blob([JSON.stringify(dem)], { type: "application/json" })
     );
+
     images.forEach((img) => {
       formData.append("imageList", img.file);
     });
