@@ -25,12 +25,13 @@ const LoginComponent = () => {
             moveToPath('/');
         }).catch(error => {
             alert("로그인에 실패했습니다.",error);
-            const nextFailCount = failCount + 1;
+            const nextFailCount = failCount + 1; // 로그인 실패 횟수
             setFailCount(nextFailCount);
             removeCookie("member");
         });
     };
 
+    // Enter눌러도 로그인버튼 클릭
     const handleKeyDown = (e) => {
         if (e.key === "Enter") handleClickLogin();
     };
@@ -42,6 +43,7 @@ const LoginComponent = () => {
         };
     }, [failCount]);
 
+    // 로그인 재시도 쿨다운
     useEffect(() => {
         if (cooldown <= 0) {
             return setFailCount(0);
