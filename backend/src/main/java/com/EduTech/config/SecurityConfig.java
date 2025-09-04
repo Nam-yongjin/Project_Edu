@@ -50,10 +50,18 @@ public class SecurityConfig {
         );
 		
 		// API 서버로 로그인
+        // UsernamePasswordAuthenticationFilter가 /api/login 요청을 가로챔
+        // username, password 파라미터를 꺼내 UsernamePasswordAuthenticationToken 객체를 생성
+        // 토큰을 AuthenticationManager에 전달 → 내부적으로 AuthenticationProvider(보통 DaoAuthenticationProvider) 실행
+        // 이때 UserDetailsService.loadUserByUsername(username) 호출 -> MemberDTO을 반환
+        // DaoAuthenticationProvider가 반환된 MemberDTO.getPassword() 와 요청에서 넘어온 password를 PasswordEncoder.matches()로 비교.
+        // 성공 시: SecurityContextHolder에 Authentication 저장
+        // AuthenticationSuccessHandler 실행 → 여기서 LoginSuccessHandler 실행
+        // 실패 시: AuthenticationFailureHandler 실행 → 여기서 LoginFailHandler 실행
         http.formLogin(config -> {
-            config.loginProcessingUrl("/api/login");
-            config.successHandler(new LoginSuccessHandler());
-            config.failureHandler(new LoginFailHandler());
+            config.loginProcessingUrl("/api/login"); // /api/login으로 들어오는 요청만 가로채서 인증 처리
+            config.successHandler(new LoginSuccessHandler()); // 로그인 성공시
+            config.failureHandler(new LoginFailHandler());	// 로그인 실패시
         });
         
         // JWT 체크

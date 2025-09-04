@@ -9,8 +9,9 @@ import org.springframework.security.core.userdetails.User;
 
 import lombok.Data;
 
+// User: Spring Security가 기본 제공하는 UserDetails 구현체, 인증된 사용자 정보 담는 객체이므로 MemberDTO에서만 사용
 @Data
-public class MemberDTO extends User { // User은 인증된 사용자 정보 담는 객체이므로 MemberDTO에서만 사용
+public class MemberDTO extends User {
 
 	// 인증 및 권한에 필요한 최소한의 정보
 	private String memId;
@@ -32,7 +33,8 @@ public class MemberDTO extends User { // User은 인증된 사용자 정보 담�
 		this.role = role;
 	}
 	
-	// JWT 등을 쓸 때 사용자의 정보를 Map으로 추출
+	// JWT Claim 변환
+	// JWT 안에 사용자 고유 정보(memId, role, state)를 담아서, 이후 인증 없이도 유저 정보를 식별 가능
 	public Map<String, Object> getClaims() {
 		Map<String, Object> dataMap = new HashMap<>();
 		dataMap.put("memId", memId);

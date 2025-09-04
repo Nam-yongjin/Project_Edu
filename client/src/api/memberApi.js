@@ -17,6 +17,11 @@ export const loginPost = async (loginParam) => {
         }
     };
 
+    // 백엔드에서 formLogin()을 쓰면 Spring Security가 내부적으로 폼 기반 인증 필터를 등록
+    // 클라이언트가 /api/login으로 POST 요청을 보내면 UsernamePasswordAuthenticationFilter가 가로챔
+    // 이 필터는 요청을 application/x-www-form-urlencoded 방식으로 파싱해서 
+    // username 파라미터 값, password 파라미터 값을 꺼내 사용
+    // 이렇게 보내야 Security가 처리
     const form = new FormData();
 
     form.append('username', loginParam.memId);
@@ -24,6 +29,7 @@ export const loginPost = async (loginParam) => {
 
     const res = await axios.post(`${host}/login`, form, header);
 
+    // 전달 받은 토큰 반환
     return res.data;
 };
 

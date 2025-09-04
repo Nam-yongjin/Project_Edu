@@ -12,9 +12,11 @@ import com.EduTech.repository.member.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
+// UserDetailsService: Spring Security가 제공하는 인터페이스, 사용자 이름(username)으로 사용자 정보를 가져오는 역할
+// 로그인 시 AuthenticationManager → UserDetailsService.loadUserByUsername() 호출
 @Service
 @RequiredArgsConstructor
-public class MemberDetailService implements UserDetailsService{
+public class MemberDetailService implements UserDetailsService{ 
 
     private final MemberRepository memberRepository;
     

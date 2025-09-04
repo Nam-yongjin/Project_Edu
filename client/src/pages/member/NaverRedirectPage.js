@@ -20,7 +20,7 @@ const NaverRedirectPage = () => {
         }
 
         dispatch(loginSocialAsync({
-            provider: 'naver',
+            provider: 'naver',  // 소결 로그인 종류 구분
             code: authCode,
             state: stateFromURL
         }))

@@ -15,7 +15,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class LoginSuccessHandler implements AuthenticationSuccessHandler { // 인증 성공시 콜백
 
 	// 로그인 성공 시 자동으로 호출되는 메서드
 	@Override
@@ -24,12 +24,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		MemberDTO memberDTO = (MemberDTO) authentication.getPrincipal();
 		Map<String, Object> claims = memberDTO.getClaims();
 
-		String accessToken = JWTProvider.generateToken(claims, 10);
-		String refreshToken = JWTProvider.generateToken(claims, 60 * 24);
+		String accessToken = JWTProvider.generateToken(claims, 10);	// accessToken 유효시간 10분
+		String refreshToken = JWTProvider.generateToken(claims, 60 * 24); // refreshToken 유효시간 1일
 		
 		claims.put("accessToken", accessToken);
         claims.put("refreshToken", refreshToken);
 
+        // JSON 형태로 반환
         Gson gson = new Gson();
         String jsonStr = gson.toJson(claims);
         response.setContentType("application/json");
