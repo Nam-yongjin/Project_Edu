@@ -25,6 +25,12 @@ public class RootConfig {
     @Bean
     public ModelMapper getMapper() {
         ModelMapper modelMapper = new ModelMapper();
+        
+        // setFieldMatchingEnabled를 true로 설정하게 되면 필드 이름이 동일한 경우에만 매핑을 수행
+        // setFieldAccessLevel에서 AccessLevel.Private로 설정해주면 ModelMapper에서 private 필드에도 접근이 가능하도록 설정
+        // setMatchingStrategy에서 LOOSE로 설정하면 느슨한 매칭으로, 이름이 약간 다르더라도 유사하면 매핑
+        // setAmbiguityIgnored를 true로 설정하게 되면 매핑할 때 여러 후보가 있어서 애매모호(ambiguity)할 경우 예외 발생하는 것을 무시하고 지나감
+        // setSkipNullEnabled를 true로 설정하게 되면 매핑할 때 null 값인 필드는 매핑하지 않고 건너뜀
         modelMapper.getConfiguration()
             .setFieldMatchingEnabled(true)
             .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)

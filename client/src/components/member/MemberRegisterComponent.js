@@ -47,6 +47,7 @@ const MemberRegisterComponent = () => {
         }));
     };
 
+    // 유효성 검사
     const validate = () => {
         const errs = {};
 
@@ -85,6 +86,7 @@ const MemberRegisterComponent = () => {
         return errs;
     };
 
+    // 회원가입
     const handleSubmit = async (e) => {
         e.preventDefault();
 

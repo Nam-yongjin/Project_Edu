@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JWTFilter extends OncePerRequestFilter {
 
-   // JWT를 검증하고, 인증 정보를 SecurityContext에 등록
+   // 모든 요청에서 토큰 검증
    @Override
    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
          throws ServletException, IOException {
@@ -33,8 +33,10 @@ public class JWTFilter extends OncePerRequestFilter {
 
          String accessToken = authHeader.substring(7);
 
+         // 토큰 검증
          Map<String, Object> claims = JWTProvider.validateToken(accessToken);
 
+         // 검증 성공시 사용자 정보를 SecurityContext에 등록
          String memId = (String) claims.get("memId");
          String email = (String) claims.get("email");
          String state = (String) claims.get("state");
@@ -48,7 +50,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
          filterChain.doFilter(request, response);
 
-      } catch (Exception e) {
+      } catch (Exception e) {	// 토큰 검증 실패 응답
          String json = new Gson().toJson(Map.of("error", "ERROR_ACCESS_TOKEN", "message", e.getMessage()));
          response.setContentType("application/json;charset=UTF-8");
          response.getWriter().println(json);
