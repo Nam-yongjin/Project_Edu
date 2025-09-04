@@ -19,7 +19,7 @@ const KakaoRedirectPage = () => {
         }
 
         dispatch(loginSocialAsync({
-            provider: 'kakao', // 소결 로그인 종류 구분
+            provider: 'kakao', // 소셜 로그인 종류 구분
             code: authCode,
         }))
             .unwrap()
