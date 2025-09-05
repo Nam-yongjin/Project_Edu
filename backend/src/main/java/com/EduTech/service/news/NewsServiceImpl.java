@@ -144,11 +144,7 @@ public class NewsServiceImpl implements NewsService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<NewsListDTO> getNewsList(NewsSearchDTO searchDto) {
-		// 정렬 설정
-//        Sort sort = Sort.by(
-//                Sort.Direction.fromString(searchDto.getSortDirection()),
-//                searchDto.getSortBy()
-//        );
+		
 		// 정렬 설정
 		Sort sort = Sort.by(Sort.Order.desc("createdAt") // 최신순으로 정렬
 		);
@@ -172,7 +168,8 @@ public class NewsServiceImpl implements NewsService {
 
 		newsRepository.increaseViewCount(newsNum);
 //        news.increaseViewCount();
-//        newsRepository.save(news);
+//        newsRepository.save(news); 
+// 기존에는 save()를 사용해서 조회 -> 증가 -> 저장 3단계를 사용했었는데 조회수가 덮어지는 문제 발생해서 DB에서 바로 처리하는 벌크연산(@Modifying, @Query)으로 변경함
 	}
 
 // 헬퍼메소드
