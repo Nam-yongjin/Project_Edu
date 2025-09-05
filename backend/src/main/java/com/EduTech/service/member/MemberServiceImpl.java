@@ -447,6 +447,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	@Transactional
 	public MemberDTO getKakaoMember(String accessToken) {
+		// 카카오계정 정보 불러오기
 		KakaoDTO kakaoDTO = getInfoFromKakaoAccessToken(accessToken);
 		Optional<Member> result = memberRepository.findByEmailAndSocial(kakaoDTO.getEmail(), MemberSocial.KAKAO);
 		
@@ -467,6 +468,25 @@ public class MemberServiceImpl implements MemberService {
 
 		return memberDTO;
 	}
+	
+	private Member makeKakaoMember(KakaoDTO kakaoDTO) {
+		String rawPassword = generateRandomPassword(); // 랜덤 비밀번호
+		String encodedPassword = passwordEncoder.encode(rawPassword);
+		String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone()); // 전화번호 유효성
+
+		return Member.builder()
+				.memId(kakaoDTO.getEmail())
+				.pw(encodedPassword)
+				.name(kakaoDTO.getName())
+				.email(kakaoDTO.getEmail())
+				.birthDate(kakaoDTO.getBirthDate())
+				.gender(kakaoDTO.getGender())
+				.phone(normalizedPhone)
+				.state(MemberState.NORMAL)
+				.role(MemberRole.USER)
+				.social(MemberSocial.KAKAO)
+				.build();
+	}
 
 	private KakaoDTO getInfoFromKakaoAccessToken(String accessToken) {
 		String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
@@ -482,6 +502,7 @@ public class MemberServiceImpl implements MemberService {
 		ResponseEntity<LinkedHashMap> response = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity,
 				LinkedHashMap.class);
 
+		// 카카오계정의 데이터 조회
 		LinkedHashMap<String, Object> body = response.getBody();
 		LinkedHashMap<String, Object> kakaoAccount = (LinkedHashMap<String, Object>) body.get("kakao_account");
 
@@ -539,17 +560,6 @@ public class MemberServiceImpl implements MemberService {
 		return normalized;
 	}
 
-	private Member makeKakaoMember(KakaoDTO kakaoDTO) {
-		String rawPassword = generateRandomPassword(); // 랜덤 비밀번호
-		String encodedPassword = passwordEncoder.encode(rawPassword);
-		String normalizedPhone = normalizePhoneNumber(kakaoDTO.getPhone()); // 전화번호 유효성
-
-		return Member.builder().memId(kakaoDTO.getEmail()).pw(encodedPassword).name(kakaoDTO.getName())
-				.email(kakaoDTO.getEmail()).birthDate(kakaoDTO.getBirthDate()).gender(kakaoDTO.getGender())
-				.phone(normalizedPhone).state(MemberState.NORMAL).role(MemberRole.USER).social(MemberSocial.KAKAO)
-				.build();
-	}
-
 	// 네이버 로그인 (code: 인가코드, state: CSRF 공격 방지 문자열)
 	@Override
 	public MemberDTO getNaverMember(String code, String state) {
@@ -577,6 +587,7 @@ public class MemberServiceImpl implements MemberService {
 		ResponseEntity<Map> profRes = rest.exchange("https://openapi.naver.com/v1/nid/me", HttpMethod.GET, profReq,
 				Map.class);
 
+		// 네이버계정의 데이터 조회
 		Map<String, Object> naverAccount = (Map<String, Object>) profRes.getBody().get("response");
 		String email = (String) naverAccount.get("email");
 		String name = (String) naverAccount.get("name");

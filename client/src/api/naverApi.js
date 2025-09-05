@@ -6,7 +6,7 @@ const REDIRECT_URI = "http://127.0.0.1:3000/login/naver";
 const AUTH_CODE_PATH = "https://nid.naver.com/oauth2.0/authorize";
 const host = `${API_SERVER_HOST}/api`;
 
-// 네이버 인가 코드 받기 URL (SocialLoginComponent 사용)
+// 네이버 인증 URL 반환 (네이버 로그인)
 export const getNaverLoginLink = () => {
     const state = Date.now().toString(36);  // CSRF 방지용
     const params = new URLSearchParams({

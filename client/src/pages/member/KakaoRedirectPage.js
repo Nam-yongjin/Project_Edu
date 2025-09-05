@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import useMove from "../../hooks/useMove";
 import { loginSocialAsync } from "../../slices/loginSlice";
 
-// 인가 코드의 페이지 처리
+// 인가 코드의 페이지(OAuth 콜백) 처리
 const KakaoRedirectPage = () => {
     const [searchParams] = useSearchParams();
     const authCode = searchParams.get("code");

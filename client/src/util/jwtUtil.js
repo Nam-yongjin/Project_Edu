@@ -2,6 +2,7 @@ import axios from "axios";
 import { getCookie, setCookie, removeCookie } from "./cookieUtil";
 import { API_SERVER_HOST } from "../api/config";
 
+// 로그인 상태에서의 요청은 axios가 아닌 jwtAxios로
 const jwtAxios = axios.create();
 
 // 요청 전 실행
@@ -22,10 +23,10 @@ const beforeRes = async (res) => {
     const data = res.data;
     if (data && data?.error === "ERROR_ACCESS_TOKEN") {
         const member = getCookie("member");
-        // accessToken 재발급 요청
+        // accessToken 재발급 요청(refreshToken 유효)
         const result = await refreshJWT(member.accessToken, member.refreshToken);
 
-        // null 처리
+        // null 처리(refreshToken 만료)
         if (result === null) {
             // 토큰 갱신 실패 - 로그아웃 처리, 로그인 페이지로 리다이렉트
             removeCookie("member");
@@ -46,8 +47,7 @@ const beforeRes = async (res) => {
     return res;
 };
 
-// 현재 accessToken과 refreshToken을 사용하여 서버에서 새 토큰 발급
-// accessToken의 유효기간이 지낫을 경우 서버 호출
+// accessToken과 refreshToken을 사용하여 서버에서 새 토큰 발급(accessToken 만료)
 const refreshJWT = async (accessToken, refreshToken) => {
     const header = {
         headers: {

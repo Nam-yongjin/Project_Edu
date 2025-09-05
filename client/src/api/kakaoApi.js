@@ -7,6 +7,7 @@ const AUTH_CODE_PATH = `https://kauth.kakao.com/oauth/authorize`;
 const ACCESS_TOKEN_URL = `https://kauth.kakao.com/oauth/token`;
 const host = `${API_SERVER_HOST}/api`;
 
+// 카카오 인증 URL 반환(카카오로그인)
 export const getKakaoLoginLink = () => {
     const kakaoURL = `${AUTH_CODE_PATH}?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     return kakaoURL;
