@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class DemonstrationSearchDTO {
-	private String search;
-	private String type;
-	 private String sortBy;
-	 private String sort;
-	 private Integer pageCount;
-	 private String statusFilter;
-	 private Long demNum;
+	private String search; // 검색어
+	private String type; // 검색 칼럼명
+	 private String sortBy; // 정렬 칼럼명
+	 private String sort; // 정렬 방식
+	 private Integer pageCount; // 페이지 번호
+	 private String statusFilter; // 상태값
+	 private Long demNum; // 상품 번호
 }

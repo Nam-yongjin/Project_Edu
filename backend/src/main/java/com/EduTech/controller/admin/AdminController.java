@@ -70,6 +70,7 @@ public class AdminController {
       return ResponseEntity.ok("Req 상태 변경 성공");
    }
 
+   // 다수 메시지 전송 기능
    @PreAuthorize("hasRole('ADMIN')")
    @PostMapping("/sendMessage")
    public ResponseEntity<String> sendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO) {
@@ -144,9 +145,7 @@ public class AdminController {
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/demRes")
    public PageResponseDTO<DemonstrationListReserveDTO> getAllDemResPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
-	   System.out.println(demonstrationSearchDTO);
       PageResponseDTO<DemonstrationListReserveDTO> AllDemRes = adminService.getAllDemRes(demonstrationSearchDTO);
-      System.out.println(AllDemRes.getContent());
       return AllDemRes;
    }
 
@@ -154,7 +153,6 @@ public class AdminController {
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/demReg")
    public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemRegPage(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
-	   System.out.println(demonstrationSearchDTO);
       PageResponseDTO<DemonstrationListRegistrationDTO> AllDemReg = adminService.getAllDemReg(demonstrationSearchDTO);
       return AllDemReg;
    }
@@ -162,8 +160,7 @@ public class AdminController {
    // 이메일 보낼 회원 정보 받아오는 기능
    @PreAuthorize("hasRole('ADMIN')")
    @GetMapping("/emailMembers")
-   public List<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewReqDTO) {
-	   System.out.println(adminMemberViewReqDTO);
+   public List<AdminMemberViewResDTO> adminViewMembers(AdminMemberViewReqDTO adminMemberViewReqDTO) {;
        // selectedIds를 이용해 DB에서 회원 정보 조회
        List<AdminMemberViewResDTO> members = adminService.getMembersByIds(adminMemberViewReqDTO);
 

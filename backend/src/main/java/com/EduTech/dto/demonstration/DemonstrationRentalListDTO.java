@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DemonstrationRentalListDTO {
-	private Long demNum;
-	private String demName;
-	private Long bItemNum;
-	private LocalDate startDate;
-	private LocalDate endDate;
-	private LocalDate applyAt;
-	private String companyName;
-	private Long itemNum;
-	private Long demRevNum;
-	// private List<DemonstrationImageDTO> imageList;
-	private List<RequestType> requestType;
+	private Long demNum; // 상품 번호
+	private String demName; // 상품 이름
+	private Long bItemNum; // 대여 갯수
+	private LocalDate startDate; // 대여 시작 날짜
+	private LocalDate endDate; // 대여 끝 날짜
+	private LocalDate applyAt; // 신청 일자
+	private String companyName; // 회사명
+	private Long itemNum; // 재고량
+	private Long demRevNum; // 대여 번호
+	private DemonstrationImageDTO mainImage; // 메인 이미지
+	private List<RequestType> requestType; // 요청 타입 리스트
 	private List<DemonstrationState> reqState;// 반납 / 연장 상태
 	private DemonstrationState state; // 물품 대여 상태
 

@@ -12,41 +12,28 @@ import ItemModal from "./itemModal";
 import { useSelector } from "react-redux";
 
 const DetailComponent = ({ demNum }) => {
-    const [disabledDates, setDisabledDates] = useState([]);
-    const [dem, setDem] = useState([]);
-    const [fileList, setFileList] = useState({ imageList: [] });
-    const [mainImageUrl, setMainImageUrl] = useState();
-    const [modalOpen, setModalOpen] = useState(false);
-    const [selectedImages, setSelectedImages] = useState([]);
-    const { moveToPath } = useMove();
-    const [showQtyModal, setShowQtyModal] = useState(false);
-    const [reservationQty, setReservationQty] = useState(1);
-    const [reserveCheck, setReserveCheck] = useState(false);
-    const [selectedDate, setSelectedDate] = useState([]);
-    const loginState = useSelector((state) => state.loginState);
-    const [startDate, setStartDate] = useState(() => {
+    const [disabledDates, setDisabledDates] = useState([]); // 예약 불가 날짜(Date 객체 배열)
+    const [dem, setDem] = useState([]); // 물품 상세 정보
+    const [fileList, setFileList] = useState({ imageList: [] }); // 이미지 리스트
+    const [mainImageUrl, setMainImageUrl] = useState(); // 메인 이미지 URL
+    const [modalOpen, setModalOpen] = useState(false); // 이미지 슬라이더 모달 열림 여부
+    const [selectedImages, setSelectedImages] = useState([]); // 모달에서 보여줄 이미지 리스트
+    const { moveToPath } = useMove(); // 페이지 이동 커스텀 훅
+    const [showQtyModal, setShowQtyModal] = useState(false); // 수량 선택 모달 열림 여부
+    const [reservationQty, setReservationQty] = useState(1); // 선택한 예약 수량
+    const [reserveCheck, setReserveCheck] = useState(false); // 이미 예약했는지 여부
+    const [selectedDate, setSelectedDate] = useState([]); // 선택된 예약 날짜 문자열 배열
+    const loginState = useSelector((state) => state.loginState); // 로그인 상태 정보
+    const [startDate, setStartDate] = useState(() => { // 예약 시작일(Date)
         const d = new Date();
         d.setDate(d.getDate() + 1);
         return d;
     });
-    const [endDate, setEndDate] = useState(() => {
+    const [endDate, setEndDate] = useState(() => { // 예약 종료일(Date)
         const d = new Date();
         d.setDate(d.getDate() + 1);
         return d;
     });
-
-    // 현재 달의 첫날과 끝날 계산 함수
-    const getCurrentMonthDates = () => {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        const monthStart = new Date(year, month, 1);
-        const monthEnd = new Date(year, month + 1, 0);
-        return {
-            formattedStart: toLocalDateString(monthStart),
-            formattedEnd: toLocalDateString(monthEnd)
-        };
-    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -57,23 +44,18 @@ const DetailComponent = ({ demNum }) => {
             const mainImageObj = detailData.imageList.find(img => img.isMain);
             setMainImageUrl(mainImageObj ? `http://localhost:8090/view/${mainImageObj.imageUrl}` : '');
 
-            // 예약 체크
+            // 예약중인 회원에 대해 예약 여부 체크
             const reserveData = await getReserveCheck(demNum);
             setReserveCheck(reserveData);
 
-            // 현재 달의 예약 불가 날짜 초기 로드
-            const { formattedStart, formattedEnd } = getCurrentMonthDates();
-            const data = await getResDate(formattedStart, formattedEnd, demNum);
-            if (Array.isArray(data)) {
-                const newDates = data.map(item => {
-                    const [y, m, d] = item.split('-'); // 문자열 "2025-08-26" → 연,월,일
-                    return new Date(y, m - 1, d); // Date 객체 생성 (월은 0부터)
-                });
-                setDisabledDates(newDates); // Date 배열로 상태 저장
-            }
+            // 이번 달과 다음 달 disabledDates 초기 로드
+            const now = new Date();
+            await fetchDisabledDates(now.getFullYear(), now.getMonth());      // 이번 달
+            await fetchDisabledDates(now.getFullYear(), now.getMonth() + 1);  // 다음 달
         };
         loadData();
     }, [demNum]);
+
 
     useEffect(() => {
         if (selectedDate && selectedDate.length > 0) {
@@ -154,6 +136,7 @@ const DetailComponent = ({ demNum }) => {
     };
 
 
+    // 예약 기능
     const reservation = (updatedItemNum) => {
         if (loginState.role !== "TEACHER") {
             alert("교사만 예약 가능합니다.");
@@ -193,11 +176,11 @@ const DetailComponent = ({ demNum }) => {
                 return;
             }
             try {
-                   await postRes(
-                       toLocalDateString(startDate), toLocalDateString(endDate), demNum, updatedItemNum
-                   ); 
+                await postRes(
+                    toLocalDateString(startDate), toLocalDateString(endDate), demNum, updatedItemNum
+                );
                 alert('예약 신청 완료');
-                 moveToPath(`/demonstration/list`); 
+                moveToPath(`/demonstration/list`);
             } catch (error) {
                 console.error('예약 실패:', error);
                 alert('예약에 실패했습니다.');
@@ -296,7 +279,6 @@ const DetailComponent = ({ demNum }) => {
                             </div>
                         </div>
 
-                        {/* 🔥 반응형 적용 */}
                         <div className="flex flex-col lg:flex-row gap-x-10 mt-6">
                             {/* 캘린더 */}
                             <div className="flex-1 w-full">
@@ -363,12 +345,7 @@ const DetailComponent = ({ demNum }) => {
                                         value={reservationQty}
                                         onChange={(val) => setReservationQty(val)}
                                         onConfirm={() => {
-                                            setShowQtyModal(false);
-                                            setDem(prev => {
-                                                const updatedDem = { ...prev, itemNum: prev.itemNum - reservationQty };
-                                                reservation(updatedDem.itemNum);
-                                                return updatedDem;
-                                            });
+                                            reservation(reservationQty);
                                         }}
                                         onClose={() => setShowQtyModal(false)}
                                     />

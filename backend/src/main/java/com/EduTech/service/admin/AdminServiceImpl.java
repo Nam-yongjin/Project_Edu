@@ -25,6 +25,7 @@ import com.EduTech.dto.admin.AdminMessageDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalRegDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalReqDTO;
 import com.EduTech.dto.demonstration.DemonstrationApprovalResDTO;
+import com.EduTech.dto.demonstration.DemonstrationImageDTO;
 import com.EduTech.dto.demonstration.DemonstrationListRegistrationDTO;
 import com.EduTech.dto.demonstration.DemonstrationListReserveDTO;
 import com.EduTech.dto.demonstration.DemonstrationSearchDTO;
@@ -70,18 +71,30 @@ public class AdminServiceImpl implements AdminService {
 	private final BannerImageRepository bannerImageRepository;
 	private final DemonstrationRepository demonstrationRepository;
 	private final DemonstrationTimeRepository demonstrationTimeRepository;
-	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
-	// String memId = JWTFilter.getMemId(); 나중에 로그인 구현되면 추가
 	
+	
+	// 실증 교사 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	@Override
 	@Transactional
 	public void approveOrRejectDemRes(DemonstrationApprovalResDTO demonstrationApprovalResDTO) {
+		
+		  if (demonstrationApprovalResDTO.getDemRevNum() == null || demonstrationApprovalResDTO.getDemRevNum().isEmpty()) {
+		        throw new RuntimeException("선택된 대여번호가 없습니다.");
+		    }
+
+		    if (demonstrationApprovalResDTO.getState() == null) {
+		        throw new RuntimeException("상태값이 지정되지 않았습니다.");
+		    }
+
+		    if (!List.of(DemonstrationState.ACCEPT, DemonstrationState.REJECT)
+		            .contains(demonstrationApprovalResDTO.getState())) {
+		        throw new RuntimeException("잘못된 상태값입니다.");
+		    }
+		    
 	    // demRevNum 리스트로 예약 정보 조회
 	    List<DemonstrationReserve> demonstrationReserves = demonstrationReserveRepository.findDemRevNums(demonstrationApprovalResDTO.getDemRevNum(),DemonstrationState.WAIT);
-	    
 	    if (demonstrationReserves.isEmpty()) {
-	        System.out.println("예약 정보가 없습니다.");
-	        return;
+	        throw new RuntimeException("대기 상태의 예약 정보가 없습니다.");
 	    }
 	    
 	    // 거부 상태인 경우에만 itemNum 업데이트 및 시간 삭제 처리
@@ -115,27 +128,66 @@ public class AdminServiceImpl implements AdminService {
 	// 실증 기업 신청 조회에서 승인 / 거부 여부 받아와서 상태값 업데이트 기능
 	@Override
 	public void approveOrRejectDemReg(DemonstrationApprovalRegDTO demonstrationApprovalRegDTO) {
+		   if (demonstrationApprovalRegDTO.getDemRegNum() == null || demonstrationApprovalRegDTO.getDemRegNum().isEmpty()) {
+		        throw new RuntimeException("선택된 등록번호가 없습니다.");
+		    }
+
+		    if (demonstrationApprovalRegDTO.getState() == null) {
+		        throw new RuntimeException("상태값이 지정되지 않았습니다.");
+		    }
+
+		    if (!List.of(DemonstrationState.ACCEPT, DemonstrationState.REJECT)
+		            .contains(demonstrationApprovalRegDTO.getState())) {
+		        throw new RuntimeException("잘못된 상태값입니다.");
+		    }
+		   // 상태값 업데이트
 		demonstrationRegistrationRepository.updateDemRegChangeStateReg(demonstrationApprovalRegDTO.getState(),demonstrationApprovalRegDTO.getDemRegNum());
 	}
 
 	
 	// 연장 반납 신청 처리하는 기능
 	@Override
+	@Transactional
 	public void approveOrRejectDemReq(DemonstrationApprovalReqDTO dto) {
-	    List<Long> demRevNums = dto.getDemRevNum();
-	    System.out.println(dto);
 	    
+	    if (dto.getDemRevNum() == null || dto.getDemRevNum().isEmpty()) {
+	        throw new RuntimeException("선택된 대여번호가 없습니다.");
+	    }
+	    
+	    if (dto.getState() == null) {
+	        throw new RuntimeException("상태값이 지정되지 않았습니다.");
+	    }
+	    
+	    if (dto.getType() == null) {
+	        throw new RuntimeException("요청 타입이 지정되지 않았습니다.");
+	    }
+	    
+	    if (!List.of(DemonstrationState.ACCEPT, DemonstrationState.REJECT)
+	            .contains(dto.getState())) {
+	        throw new RuntimeException("잘못된 상태값입니다.");
+	    }
+
+	    List<Long> demRevNums = dto.getDemRevNum();
+
 	    List<DemonstrationRequest> requests = demonstrationRequestRepository
 	            .selectRequest(demRevNums, DemonstrationState.WAIT);
 	    
-        LocalDate newEndDate = requests.get(0).getUpdateDate();
-        
-	    // 연장을 거부햇을 경우,
-	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.REJECT) {		        
+	    if (requests.isEmpty()) {
+	        throw new RuntimeException("대기 상태의 예약 정보가 없습니다.");
+	    }
+
+	    LocalDate newEndDate = requests.get(0).getUpdateDate();
+
+	    // 연장을 거부했을 경우,
+	    if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.REJECT) {
 	        // ACCEPT 상태의 예약들 가져와서 원래 endDate 확인
 	        List<DemonstrationReserve> reserves = demonstrationReserveRepository
-	            .findDemRevNums(demRevNums, DemonstrationState.ACCEPT);
+	                .findDemRevNums(demRevNums, DemonstrationState.ACCEPT);
 	        
+	        if (reserves.isEmpty()) {
+	            throw new RuntimeException("수락 상태의 예약 정보가 없습니다.");
+	        }
+
 	        // 각 예약에 대해 기존 종료일과 새로운 종료일 사이의 DemonstrationTime 삭제
 	        for (DemonstrationReserve reserve : reserves) {
 	            LocalDate originalEndDate = reserve.getEndDate();
@@ -145,15 +197,14 @@ public class AdminServiceImpl implements AdminService {
 	            }
 
 	            if (!datesToDelete.isEmpty()) {
-	                demonstrationTimeRepository.deleteTimeDemNum(datesToDelete,reserve.getDemonstration().getDemNum());
+	                demonstrationTimeRepository.deleteTimeDemNum(datesToDelete, reserve.getDemonstration().getDemNum());
 	            }
 	        }
 	    }
 	    // 연장을 수락했을 경우,
-	    else if(dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT){
-	    	 demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
+	    else if (dto.getType() == RequestType.EXTEND && dto.getState() == DemonstrationState.ACCEPT) {
+	        demonstrationReserveRepository.updateDemResEndDate(demRevNums, newEndDate, DemonstrationState.ACCEPT);
 	    }
-	
 	    // 반납 신청을 수락했을 경우,
 	    else if (dto.getType() == RequestType.RENTAL && dto.getState() == DemonstrationState.ACCEPT) {
 	        demonstrationReserveRepository.updateDemResChangeStateRev(DemonstrationState.EXPIRED, demRevNums);
@@ -293,86 +344,123 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	// 실증 기업 신청목록 조회 기능 (검색도 같이 구현할 것임.) - 관리자용
-		@Override
-		public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
-			DemonstrationState statusEnum = null;
-			if (searchDTO.getStatusFilter() != null && !searchDTO.getStatusFilter().isEmpty()) {
-				try {
-					statusEnum = DemonstrationState.valueOf(searchDTO.getStatusFilter());
-				} catch (IllegalArgumentException e) {
-					// 잘못된 enum 값이면 null로 처리
-					statusEnum = null;
-				}
-			}
+	@Override
+	public PageResponseDTO<DemonstrationListRegistrationDTO> getAllDemReg(DemonstrationSearchDTO searchDTO) {
+	    DemonstrationState statusEnum = null;
+	    if (searchDTO.getStatusFilter() != null && !searchDTO.getStatusFilter().isEmpty()) {
+	        try {
+	            statusEnum = DemonstrationState.valueOf(searchDTO.getStatusFilter());
+	        } catch (IllegalArgumentException e) {
+	            // 잘못된 enum 값이면 null로 처리
+	            statusEnum = null;
+	        }
+	    }
 
-			// 페이징 & 정렬 기본값 설정
-			int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0 ? searchDTO.getPageCount()
-					: 0;
-			String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty() ? searchDTO.getSortBy()
-					: "regDate";
-			String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty() ? searchDTO.getSort() : "desc";
+	    // 페이징 & 정렬 기본값 설정
+	    int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0 ? searchDTO.getPageCount() : 0;
+	    String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty() ? searchDTO.getSortBy() : "regDate";
+	    String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty() ? searchDTO.getSort() : "desc";
 
-			Pageable pageable = PageRequest.of(pageCount, 10);
+	    Pageable pageable = PageRequest.of(pageCount, 10);
 
-			// 쿼리에서 바로 DTO로 매핑하여 가져오기
-			Page<DemonstrationListRegistrationDTO> regPage = demonstrationRegistrationRepository.getBorrowAdmin(searchDTO.getType(), searchDTO.getSearch(), statusEnum, sortBy, sort, pageable);
+	    // 쿼리에서 바로 DTO로 매핑하여 가져오기
+	    Page<DemonstrationListRegistrationDTO> regPage = demonstrationRegistrationRepository.getBorrowAdmin(searchDTO.getType(), searchDTO.getSearch(), statusEnum, sortBy, sort, pageable);
 
-			return new PageResponseDTO<>(regPage);
-			}
+	    // 각 DTO에 메인 이미지 매핑
+	    List<DemonstrationListRegistrationDTO> contentWithImages = regPage.getContent().stream()
+	            .map(dto -> {
+	                Long demNum = dto.getDemNum();
+	                if (demNum != null) {
+	                    try {
+	                        DemonstrationImageDTO mainImage = demonstrationImageRepository.selectDemImageMain(demNum);
+	                        dto.setMainImage(mainImage); // 바로 설정
+	                    } catch (Exception e) {
+	                        dto.setMainImage(null); // 예외 발생 시 null
+	                    }
+	                } else {
+	                    dto.setMainImage(null); // demNum이 null이면 null
+	                }
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
+
+	    // 새로운 Page 객체 생성
+	    Page<DemonstrationListRegistrationDTO> pageWithImages = new PageImpl<>(
+	            contentWithImages,
+	            regPage.getPageable(),
+	            regPage.getTotalElements()
+	    );
+
+	    return new PageResponseDTO<>(pageWithImages);
+	}
 		
 		
-		// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
-		@Override
-		public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO) {
+	// 실증 교사 신청목록 조회 기능 (검색도 같이 구현할 것임.) -관리자용
+	@Override
+	public PageResponseDTO<DemonstrationListReserveDTO> getAllDemRes(DemonstrationSearchDTO searchDTO) {
 
-		    DemonstrationState statusEnum = null;
-		    if (searchDTO.getStatusFilter() != null && !searchDTO.getStatusFilter().isEmpty()) {
-		        try {
-		            statusEnum = DemonstrationState.valueOf(searchDTO.getStatusFilter());
-		        } catch (IllegalArgumentException e) {
-		            // 잘못된 enum 값이면 null로 처리
-		            statusEnum = null;
-		        }
-		    }
+	    DemonstrationState statusEnum = null;
+	    if (searchDTO.getStatusFilter() != null && !searchDTO.getStatusFilter().isEmpty()) {
+	        try {
+	            statusEnum = DemonstrationState.valueOf(searchDTO.getStatusFilter());
+	        } catch (IllegalArgumentException e) {
+	            // 잘못된 enum 값이면 null로 처리
+	            statusEnum = null;
+	        }
+	    }
 
-		    // 페이징 & 정렬 기본값 설정
-		    int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0 ? searchDTO.getPageCount() : 0;
-		    String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty() ? searchDTO.getSortBy() : "applyAt";
-		    String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty() ? searchDTO.getSort() : "desc";
+	    // 페이징 & 정렬 기본값 설정
+	    int pageCount = searchDTO.getPageCount() != null && searchDTO.getPageCount() >= 0 ? searchDTO.getPageCount() : 0;
+	    String sortBy = searchDTO.getSortBy() != null && !searchDTO.getSortBy().isEmpty() ? searchDTO.getSortBy() : "applyAt";
+	    String sort = searchDTO.getSort() != null && !searchDTO.getSort().isEmpty() ? searchDTO.getSort() : "desc";
 
-		    Pageable pageable = PageRequest.of(pageCount, 10);
+	    Pageable pageable = PageRequest.of(pageCount, 10);
 
-		    // 쿼리에서 바로 DTO로 매핑하여 가져오기
-		    Page<DemonstrationListReserveDTO> resPage = demonstrationReserveRepository.getRentalAdmin(
-		            searchDTO.getType(), searchDTO.getSearch(), statusEnum, sortBy, sort, pageable);
+	    // 쿼리에서 바로 DTO로 매핑하여 가져오기
+	    Page<DemonstrationListReserveDTO> resPage = demonstrationReserveRepository.getRentalAdmin(
+	            searchDTO.getType(), searchDTO.getSearch(), statusEnum, sortBy, sort, pageable);
 
-		    // resPage에서 demRevNum 리스트 추출
-		    List<Long> demRevNums = resPage.getContent().stream()
-		            .map(DemonstrationListReserveDTO::getDemRevNum)
-		            .distinct()
-		            .toList();
+	    // resPage에서 demRevNum 리스트 추출
+	    List<Long> demRevNums = resPage.getContent().stream()
+	            .map(DemonstrationListReserveDTO::getDemRevNum)
+	            .distinct()
+	            .collect(Collectors.toList());
 
-		    // 전체 Request 데이터 조회
-		    List<DemonstrationRequest> requests = demonstrationRequestRepository.findStateByDemRevNumIn(demRevNums);
+	    // 전체 Request 데이터 조회
+	    List<DemonstrationRequest> requests = demonstrationRequestRepository.findStateByDemRevNumIn(demRevNums);
 
-		    // 각 DTO에 request 정보 설정
-		    List<DemonstrationListReserveDTO> updatedContent = resPage.getContent().stream()
-		            .map(dto -> {
-		                // demRevNum에 해당하는 모든 요청들을 리스트로 찾아서 DTO에 세팅
-		                List<ResRequestDTO> relatedRequests = requests.stream()
-		                    .filter(r -> r.getReserve().getDemRevNum().equals(dto.getDemRevNum()))
-		                    .map(r -> new ResRequestDTO(r.getType(), r.getState(), r.getUpdateDate()))
-		                    .collect(Collectors.toList());
-		                dto.setRequestDTO(relatedRequests);
-		                return dto;
-		            })
-		            .toList();
+	    // 각 DTO에 request 정보와 메인 이미지 설정
+	    List<DemonstrationListReserveDTO> updatedContent = resPage.getContent().stream()
+	            .map(dto -> {
+	                // demRevNum에 해당하는 모든 요청들을 리스트로 찾아서 DTO에 세팅
+	                List<ResRequestDTO> relatedRequests = requests.stream()
+	                        .filter(r -> r.getReserve().getDemRevNum().equals(dto.getDemRevNum()))
+	                        .map(r -> new ResRequestDTO(r.getType(), r.getState(), r.getUpdateDate()))
+	                        .collect(Collectors.toList());
+	                dto.setRequestDTO(relatedRequests);
+	                
+	                // 메인 이미지 설정
+	                Long demNum = dto.getDemNum();
+	                if (demNum != null) {
+	                    try {
+	                        DemonstrationImageDTO mainImage = demonstrationImageRepository.selectDemImageMain(demNum);
+	                        dto.setMainImage(mainImage);
+	                    } catch (Exception e) {
+	                        dto.setMainImage(null);
+	                    }
+	                } else {
+	                    dto.setMainImage(null);
+	                }
+	                
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
 
-		    // 기존 페이지 정보로 새로운 Page 객체 생성
-		    Page<DemonstrationListReserveDTO> finalPage = new PageImpl<>(updatedContent, pageable, resPage.getTotalElements());
+	    // 기존 페이지 정보로 새로운 Page 객체 생성
+	    Page<DemonstrationListReserveDTO> finalPage = new PageImpl<>(updatedContent, pageable, resPage.getTotalElements());
 
-		    return new PageResponseDTO<>(finalPage);
-		}
+	    return new PageResponseDTO<>(finalPage);
+	}
 		
 		
 		// 이메일 보낼 회원 받아오는 기능 (기존에서 페이지 네이션 x, 이메일 발송여부가 true인 회원들만 조회)

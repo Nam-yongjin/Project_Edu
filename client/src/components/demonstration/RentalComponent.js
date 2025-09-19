@@ -179,63 +179,74 @@ const RentalComponent = () => {
     };
 
 
-
-    const handleActionClick = async (demNum, action, date) => {
-        // 같은 demNum을 가진 모든 항목을 찾음
-        const items = listData.content.filter((item) => item.demNum === demNum);
-        if (items.length === 0) return;
-
-        /*
-        if (action === "예약변경") {
-            const hasWait = items.some(item => item.state === "WAIT");
-            if (!hasWait) {
-                alert(`대기 상태에서만 예약 변경이 가능합니다.`);
-                return;
-            }
-
-            try {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = today.getMonth();
-                // WAIT 상태인 항목 찾기
-                const waitItem = items.find(item => item.state === "WAIT");
-
-                setSelectedDemNum(demNum);
-                setSelectedDemRevNum(waitItem.demRevNum); // demRevNum도 함께 저장
-                fetchDisabledDates(year, month, demNum)
-                    .finally(() => setIsFetchingDisabledDates(false));
-                setShowModifyModal(true);
-            } catch (err) {
-                console.error("예약 정보 조회 실패", err);
-            }
-        } */
-
-
-        else if (action === "대여연장") {
-            const hasAccept = items.some(item => item.state === "ACCEPT");
-            if (!hasAccept) {
-                alert(`승인 상태에서만 대여 연장 신청이 가능합니다.`);
-                return;
-            }
-            const type = "EXTEND";
-            addRequest(demNum, type, date);
-            alert(`연장 신청 완료`);
-            window.location.reload();
-        }
-        else if (action === "반납") {
-            const hasAccept = items.some(item => item.state === "ACCEPT");
-            if (!hasAccept) {
-                alert(`승인 상태에서만 반납 신청이 가능합니다.`);
-                return;
-            }
-            const type = "RENTAL";
-            addRequest(demNum, type);
-            alert(`반납 신청 완료`);
-            window.location.reload();
-        }
-    };
+// 예약 변경, 반납, 예약 변경 리스너
+const handleActionClick = async (demNum, action, date) => {
+    // 같은 demNum을 가진 모든 항목을 찾음
+    const items = listData.content.filter((item) => item.demNum === demNum);
+    if (items.length === 0) return;
 
     
+    if (action === "예약변경") {
+        const hasWait = items.some(item => item.state === "WAIT");
+        if (!hasWait) {
+            alert(`대기 상태에서만 예약 변경이 가능합니다.`);
+            return;
+        }
+
+        try {
+            // WAIT 상태인 항목 찾기
+            const waitItem = items.find(item => item.state === "WAIT");
+            
+            setSelectedDemNum(demNum);
+            setSelectedDemRevNum(waitItem.demRevNum); // demRevNum도 함께 저장
+            
+            // disabledDates 초기화 후 새로 가져오기
+            setDisabledDates([]); // 먼저 초기화
+            
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            
+            // fetchDisabledDates를 호출하되, 모달은 fetchDisabledDates 완료 후 띄우기
+            fetchDisabledDates(year, month, demNum)
+                .then(() => {
+                    setShowModifyModal(true);
+                })
+                .catch((err) => {
+                    console.error("예약 정보 조회 실패", err);
+                    setShowModifyModal(true); // 실패해도 모달은 띄우기
+                });
+                
+        } catch (err) {
+            console.error("예약 정보 조회 실패", err);
+        }
+    } 
+
+    else if (action === "대여연장") {
+        const hasAccept = items.some(item => item.state === "ACCEPT");
+        if (!hasAccept) {
+            alert(`승인 상태에서만 대여 연장 신청이 가능합니다.`);
+            return;
+        }
+        const type = "EXTEND";
+        addRequest(demNum, type, date);
+        alert(`연장 신청 완료`);
+        window.location.reload();
+    }
+    else if (action === "반납") {
+        const hasAccept = items.some(item => item.state === "ACCEPT");
+        if (!hasAccept) {
+            alert(`승인 상태에서만 반납 신청이 가능합니다.`);
+            return;
+        }
+        const type = "RENTAL";
+        addRequest(demNum, type);
+        alert(`반납 신청 완료`);
+        window.location.reload();
+    }
+};
+
+    // 예약 변경 함수
     const reservationUpdate = (reservationQty) => {
         const loadData = async () => {
             if (!selectedDate || selectedDate.length === 0) {
@@ -288,6 +299,7 @@ const RentalComponent = () => {
         loadData();
     };
     
+    // 날짜 형식 변환 함수
     function toLocalDateString(date) {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -295,6 +307,7 @@ const RentalComponent = () => {
         return `${y}-${m}-${d}`;
     }
 
+    // 연장 버튼 클릭 시 처리: 최소 연장 시작일 설정 후 연장 모달 오픈
     const handleExtendButtonClick = async (demNum, endDate) => {
     setSelectedDemNum(demNum);
 
@@ -312,6 +325,8 @@ const RentalComponent = () => {
     setdisabledExtendDate(baseDate);
     setIsExtendModalOpen(true);
 };
+
+    // 연장 날짜 선택 확인: 유효성 체크 후 연장 요청 처리
     const handleExtendConfirm = (date) => {
         
         if (!date) {
@@ -362,6 +377,7 @@ const RentalComponent = () => {
         }
     };
 
+    // 예약 불가 날짜 설정 함수
     const fetchDisabledDates = async (year, month, demNum) => {
         const monthStart = new Date(year, month, 1);
         const monthEnd = new Date(year, month + 1, 0);
@@ -423,8 +439,8 @@ const RentalComponent = () => {
                                         />
                                     )}
                                 </th>
-                                {/*
-                                <th className="w-[8%]">대표 이미지</th> */}
+                                
+                                <th className="w-[8%]">대표 이미지</th> 
                                 <th className="w-[8%]">물품명</th>
                                 <th className="w-[10%]">기업명</th>
                                 <th className="w-[10%]">신청갯수</th>
@@ -477,7 +493,6 @@ const RentalComponent = () => {
                                 </tr>
                             ) : (
                                 listData.content.map((item) => {
-                                    const mainImage = item.imageList?.find((img) => img.isMain === true);
                                     const memberState = item.state;
                                     return (
                                         <tr key={`${item.demRevNum}`} className={`hover:bg-gray-50 text-sm text-center whitespace-nowrap <table className="w-full border-collapse border border-gray-300"> ${memberState === "CANCEL" ? "bg-gray-100 text-gray-400" : "hover:bg-gray-50"}`}>
@@ -495,12 +510,12 @@ const RentalComponent = () => {
                                                 )}
                                             </td>
 
-                                            {/*
+                                            
                                             <td className="py-2 px-2 whitespace-nowrap text-center ">
-                                                {mainImage ? (
+                                                {item.mainImage ? (
                                                     <img
                                                         onClick={() => moveToPath(`../detail/${item.demNum}`)}
-                                                        src={`http://localhost:8090/view/${mainImage.imageUrl}`}
+                                                        src={`http://localhost:8090/view/${item.mainImage.imageUrl}`}
                                                         alt={item.demName}
                                                         className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer"
                                                     />
@@ -512,7 +527,7 @@ const RentalComponent = () => {
                                                     />
                                                 )}
                                             </td>
-                                            */}
+                                            
                                             {/* 기본 정보 */}
                                             <td title={item.demName} className="truncate max-w-[100px] py-2">{item.demName || "-"}</td>
                                             <td title={item.companyName} className="truncate max-w-[100px] py-2">{item.companyName || "-"}</td>
@@ -562,7 +577,7 @@ const RentalComponent = () => {
                                                         return (
                                                             <>
 
-                                                                {/* 
+                                                                
                                                                 <button
                                                                     disabled={itemState !== "WAIT"}
                                                                     onClick={() => handleActionClick(item.demNum, "예약변경")}
@@ -573,7 +588,7 @@ const RentalComponent = () => {
                                                                 >
                                                                     예약변경
                                                                 </button>
-                                                                */}
+                                                                
                                                                 <button
                                                                     disabled={itemState !== "ACCEPT" || hasWaitState}
                                                                     onClick={() => handleExtendButtonClick(item.demNum, item.endDate, item.demRevNum)}
@@ -699,7 +714,7 @@ const RentalComponent = () => {
                                 demNum={selectedDemNum}
                                 disabledDates={disabledDates}
                                 setDisabledDates={setDisabledDates}
-                                onMonthChange={(year, month) => fetchDisabledDates(year, month, selectedItems.demNum)}
+                                onMonthChange={(year, month) => fetchDisabledDates(year, month, selectedDemNum)}
                             />
 
                             <div className="mt-6 flex justify-end gap-3">
@@ -733,8 +748,8 @@ const RentalComponent = () => {
                         onChange={(val) => setReservationQty(val)}
                         onConfirm={() => {
                             reservationUpdate(reservationQty); // 선택한 수량 그대로 전달
-                            setShowQtyModal(false);
                         }}
+                          onClose={() => setShowQtyModal(false)}
                     />
                 )}
 

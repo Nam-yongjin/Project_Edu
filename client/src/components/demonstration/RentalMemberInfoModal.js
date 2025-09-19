@@ -4,27 +4,31 @@ import PageComponent from "../common/PageComponent";
 import SearchComponent from "../../components/demonstration/SearchComponent";
 
 const RentalMemberInfoModal = ({ demNum, onClose }) => {
+  // 초기 페이지 상태
   const initState = {
     content: [],
     totalPages: 0,
     currentPage: 0,
   };
 
-  const [search, setSearch] = useState("");
-  const [type, setType] = useState("memId");
-  const searchOptions = [
+  // 검색 관련 상태
+  const [search, setSearch] = useState(""); // 검색어
+  const [type, setType] = useState("memId"); // 검색 타입
+  const searchOptions = [ // 검색 옵션
     { value: "memId", label: "아이디" },
     { value: "demName", label: "상품명" },
     { value: "schoolName", label: "학교명" },
   ];
 
-  const [sortBy, setSortBy] = useState("applyAt");
-  const [sort, setSort] = useState("desc");
+  // 정렬 관련 상태
+  const [sortBy, setSortBy] = useState("applyAt"); // 정렬 기준 컬럼
+  const [sort, setSort] = useState("desc"); // 정렬 방식 asc/desc
 
-  const [memberInfo, setMemberInfo] = useState({ content: [] });
-  const [current, setCurrent] = useState(0);
-  const [pageData, setPageData] = useState(initState);
-  const [statusFilter, setStatusFilter] = useState("");
+  // 멤버 정보 및 페이지 상태
+  const [memberInfo, setMemberInfo] = useState({ content: [] }); // 회원 정보 데이터
+  const [current, setCurrent] = useState(0); // 현재 페이지
+  const [pageData, setPageData] = useState(initState); // 페이지 관련 데이터
+  const [statusFilter, setStatusFilter] = useState(""); // 신청 상태 필터
 
   useEffect(() => {
     fetchData(current, search, type, sortBy, sort);
@@ -44,6 +48,7 @@ const RentalMemberInfoModal = ({ demNum, onClose }) => {
     }
   };
 
+  // 정렬 상태 설정
   const handleSortChange = (column) => {
     if (sortBy === column) {
       setSort((prev) => (prev === "asc" ? "desc" : "asc"));

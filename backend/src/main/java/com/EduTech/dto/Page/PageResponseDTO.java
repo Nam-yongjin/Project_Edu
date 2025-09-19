@@ -20,7 +20,7 @@ public class PageResponseDTO <T>{
 	        this.content = page.getContent(); // 페이지 요소
 	        this.totalPages = page.getTotalPages(); // 전체 페이지
 	        this.currentPage = page.getNumber(); // 현제 페이지
-	        this.totalElements=page.getTotalElements();
+	        this.totalElements=page.getTotalElements(); // 전체 요소 갯수
 	    }
 	    
 	 

@@ -1,6 +1,5 @@
 const ItemModal = ({ maxQty, value, onChange, onConfirm, onClose }) => {
-    // maxQty는 남아있는 재고 수량 (ex: dem.itemNum)
-    const maxAllowed = Math.min(maxQty, 30);  // 재고 수량 vs 최대 대여 가능 수량 중 작은 값
+    const maxAllowed = Math.min(maxQty, 30);  // 빌릴 수 있는 최대 허용치
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

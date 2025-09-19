@@ -8,22 +8,23 @@ import SearchComponent from "../demonstration/SearchComponent";
 import { useSelector } from "react-redux";
 
 const ListComponent = () => {
-  const initState = { content: [], totalPages: 0, currentPage: 0 };
-  const [pageData, setPageData] = useState(initState);
-  const [current, setCurrent] = useState(0);
-  const [listData, setListData] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedImages, setSelectedImages] = useState([]);
-  const { moveToPath, moveToLogin } = useMove();
-  const [searchType, setSearchType] = useState("demName");
-  const [search, setSearch] = useState("");
-  const loginState = useSelector((state) => state.loginState);
-  const [sortType, setSortType] = useState("desc");
-  const searchOptions = [
-    { value: "demName", label: "상품명" },
-    { value: "demMfr", label: "제조사명" },
-    { value: "companyName", label: "기업명" },
-  ];
+const initState = { content: [], totalPages: 0, currentPage: 0 }; // 초기 페이지 데이터 구조
+const [pageData, setPageData] = useState(initState); // 현재 페이지 데이터
+const [current, setCurrent] = useState(0); // 현재 페이지 번호
+const [listData, setListData] = useState([]); // 실제 리스트 데이터
+const [modalOpen, setModalOpen] = useState(false); // 이미지 모달 열림 여부
+const [selectedImages, setSelectedImages] = useState([]); // 모달에서 보여줄 이미지 리스트
+const { moveToPath, moveToLogin } = useMove(); // 페이지 이동 훅
+const [searchType, setSearchType] = useState("demName"); // 검색 기준
+const [search, setSearch] = useState(""); // 검색어
+const loginState = useSelector((state) => state.loginState); // 로그인 상태 정보
+const [sortType, setSortType] = useState("desc"); // 정렬 방식
+const searchOptions = [ // 검색 옵션 목록
+  { value: "demName", label: "상품명" },
+  { value: "demMfr", label: "제조사명" },
+  { value: "companyName", label: "기업명" },
+];
+
 
   const fetchData = () => {
     getList(current, searchType, search, sortType).then((data) => {

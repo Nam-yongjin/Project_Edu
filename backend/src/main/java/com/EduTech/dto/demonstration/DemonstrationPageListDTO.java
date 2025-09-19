@@ -11,14 +11,14 @@ import lombok.Data;
 public class DemonstrationPageListDTO {
 	// 실증 장비 신청 목록 페이지용 dto (백->프론트)
 
-	private Long demNum;
-	private String demName;
-	private String demMfr;
-	private Long itemNum;
-	private String companyName;
-	private LocalDate expDate;
-	private DemonstrationState state;
-	private List<DemonstrationImageDTO> imageList;
+	private Long demNum; // 상품 번호
+	private String demName; // 상품 이름
+	private String demMfr; // 상품 제조사
+	private Long itemNum; // 재고량
+	private String companyName; // 회사명
+	private LocalDate expDate; // 반납 날짜
+	private DemonstrationState state; // 상태값
+	private List<DemonstrationImageDTO> imageList; // 이미지 리스트
 	public DemonstrationPageListDTO(Long demNum, String demName, String demMfr, Long itemNum,DemonstrationState state,String companyName,LocalDate expDate) {
 	    this.demNum = demNum;
 	    this.demName = demName;

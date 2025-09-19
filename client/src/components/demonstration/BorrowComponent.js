@@ -8,39 +8,36 @@ import { useSelector } from "react-redux";
 import defaultImage from '../../assets/default.jpg';
 
 const BorrowComponent = () => {
-    const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
-    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
+    const isCompany = useSelector((state) => state.loginState?.role === "COMPANY"); // 현재 로그인 사용자가 회사 계정 여부
+    const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN"); // 현재 로그인 사용자가 관리자 여부
 
-    const { moveToPath } = useMove();
+    const { moveToPath } = useMove(); // 페이지 이동 커스텀 훅
 
-    useEffect(() => {
-        if (!isCompany && !isAdmin) {
-            alert("권한이 없습니다.");
-            moveToPath("/");
-        }
-    }, []);
-
-    const initState = { totalPages: 0, currentPage: 0 };
+    const initState = { totalPages: 0, currentPage: 0 }; // 페이지네이션 초기값
     const searchOptions = [
         { value: "demName", label: "물품명" },
         { value: "demMfr", label: "제조사" },
-    ];
+    ]; // 검색 옵션
 
-    const [search, setSearch] = useState("");
-    const [type, setType] = useState("demName");
-    const [sortBy, setSortBy] = useState("regDate");
-    const [sort, setSort] = useState("desc");
-    const [statusFilter, setStatusFilter] = useState("total");
-    const [listData, setListData] = useState({ content: [] });
-    const [pageData, setPageData] = useState(initState);
-    const [current, setCurrent] = useState(0);
+    const [search, setSearch] = useState(""); // 검색어
+    const [type, setType] = useState("demName"); // 검색 타입 (물품명/제조사)
+    const [sortBy, setSortBy] = useState("regDate"); // 정렬 기준
+    const [sort, setSort] = useState("desc"); // 정렬 방향 (asc/desc)
+    const [statusFilter, setStatusFilter] = useState("total"); // 상태 필터 (WAIT, ACCEPT 등)
+    const [listData, setListData] = useState({ content: [] }); // 서버에서 받아온 물품 리스트
+    const [pageData, setPageData] = useState(initState); // 페이지네이션 데이터
+    const [current, setCurrent] = useState(0); // 현재 페이지
 
-    const [selectedDemNum, setSelectedDemNum] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedDemNum, setSelectedDemNum] = useState(null); // 모달에서 보여줄 선택된 물품 번호
+    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 여부
 
     // 체크박스 관련 상태
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [isAllSelected, setIsAllSelected] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]); // 체크된 항목 리스트 (demNum)
+    const [isAllSelected, setIsAllSelected] = useState(false); // 전체 선택 여부
+
+    // 대기 상태인 항목 개수
+    const waitItemsCount = listData.content.filter(item => item.state === "WAIT").length;
+
 
     const fetchData = () => {
         if (search && search.trim() !== "") {
@@ -50,13 +47,14 @@ const BorrowComponent = () => {
             });
         } else {
             getBorrow(current, sort, sortBy, statusFilter).then((data) => {
-                console.log(data);
+
                 setListData(data);
                 setPageData(data);
             });
         }
     };
 
+    // 값 변경 시마다 데이터 초기화
     useEffect(() => {
         fetchData();
     }, [current, sort, sortBy, statusFilter]);
@@ -78,16 +76,6 @@ const BorrowComponent = () => {
             setSort("asc");
         }
         setCurrent(0);
-    };
-
-    const onDeleteDem = (demNum) => {
-        if (demNum === null) {
-            alert("물품 번호가 없습니다");
-            return;
-        }
-        delDem(demNum);
-        alert("물품이 삭제되었습니다.");
-        window.location.reload();
     };
 
     // 전체 선택/해제
@@ -122,10 +110,16 @@ const BorrowComponent = () => {
     // 선택된 항목들 일괄 삭제
     const handleCheckedDelete = () => {
         if (selectedItems.length === 0) return;
+        if (!window.confirm("선택된 항목들을 정말 삭제하시겠습니까?")) {
+            return; // 취소 누르면 종료
+        }
         delDem(selectedItems);
         alert("정상적으로 삭제되었습니다.");
-         window.location.reload();
+
+        // 새로고침
+        window.location.reload();
     };
+
 
     const getStateLabel = (state) => {
         switch (state) {
@@ -143,9 +137,6 @@ const BorrowComponent = () => {
                 return state || "-";
         }
     };
-
-    // 대기 상태인 항목들의 개수
-    const waitItemsCount = listData.content.filter(item => item.state === "WAIT").length;
 
     return (
         <div className="max-w-screen-xl mx-auto my-10">
@@ -180,8 +171,8 @@ const BorrowComponent = () => {
                                         />
                                     )}
                                 </th>
-                                {/* 
-                                <th className="w-[8%]">이미지</th>*/}
+
+                                <th className="w-[8%]">이미지</th>
                                 <th className="w-[12%]">물품명</th>
                                 <th className="w-[12%]">제조사</th>
                                 <th className="w-[12%]">개수</th>
@@ -238,10 +229,9 @@ const BorrowComponent = () => {
                                 </tr>
                             ) : (
                                 listData.content.map((item) => {
-                                    const mainImage = item.imageList?.find((img) => img.isMain) || item.imageList?.[0];
                                     const itemState = item.state;
                                     const isWaitState = itemState === "WAIT";
-                                    
+
                                     return (
                                         <tr
                                             key={item.demNum}
@@ -257,11 +247,11 @@ const BorrowComponent = () => {
                                                     />
                                                 )}
                                             </td>
-                                            {/* 
+
                                             <td>
-                                                {mainImage ? (
+                                                {item.mainImage ? (
                                                     <img
-                                                        src={`http://localhost:8090/view/${mainImage.imageUrl}`}
+                                                        src={`http://localhost:8090/view/${item.mainImage.imageUrl}`}
                                                         alt={item.demName}
                                                         onClick={() => moveToPath(`../detail/${item.demNum}`)}
                                                         className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer ml-3"
@@ -273,7 +263,7 @@ const BorrowComponent = () => {
                                                         className="w-20 h-20 rounded-md hover:scale-105 transition-transform cursor-pointer ml-3"
                                                     />
                                                 )}
-                                            </td>*/}
+                                            </td>
                                             <td className="truncate max-w-[100px]" title={item.demName}>{item.demName}</td>
                                             <td className="truncate max-w-[100px]" title={item.demMfr}>{item.demMfr}</td>
 
@@ -296,11 +286,19 @@ const BorrowComponent = () => {
 
                                                 <button
                                                     disabled={itemState !== "WAIT"}
-                                                    className={`block w-full max-w-full mt-1 rounded  ${itemState === "WAIT" ? "negative-button cursor-pointer" : "disable-button"}`}
-                                                    onClick={() => onDeleteDem([item.demNum])}
+                                                    className={`block w-full max-w-full mt-1 rounded ${itemState === "WAIT" ? "negative-button cursor-pointer" : "disable-button"
+                                                        }`}
+                                                    onClick={() => {
+                                                        if (window.confirm("정말로 삭제하시겠습니까?")) {
+                                                            delDem([item.demNum]);
+                                                            alert("정상적으로 삭제되었습니다.");
+                                                            window.location.reload();
+                                                        }
+                                                    }}
                                                 >
                                                     물품 삭제
                                                 </button>
+
 
                                                 <button
                                                     disabled={itemState === "REJECT" || itemState === "EXPIRED" || itemState === "CANCEL"}
@@ -321,17 +319,17 @@ const BorrowComponent = () => {
                     </table>
                 </div>
             </div>
-             {/* 우측 하단 예약 취소 버튼 */}
-                <div className="flex justify-end mt-4">
-                    <button
-                        onClick={handleCheckedDelete}
-                        disabled={selectedItems.length === 0}
-                        className={`px-4 py-2 rounded mr-10 ${selectedItems.length > 0 ? "negative-button" : "disable-button"}`}
-                    >
-                        등록 취소 ({selectedItems.length})
-                    </button>
-                </div>
-                
+            {/* 우측 하단 예약 취소 버튼 */}
+            <div className="flex justify-end mt-4">
+                <button
+                    onClick={handleCheckedDelete}
+                    disabled={selectedItems.length === 0}
+                    className={`px-4 py-2 rounded mr-10 ${selectedItems.length > 0 ? "negative-button" : "disable-button"}`}
+                >
+                    등록 취소 ({selectedItems.length})
+                </button>
+            </div>
+
             <div className="flex justify-between items-center my-6">
                 <div className="flex justify-center flex-1">
                     <PageComponent

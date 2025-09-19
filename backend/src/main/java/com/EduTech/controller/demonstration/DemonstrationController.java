@@ -58,7 +58,6 @@ public class DemonstrationController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@GetMapping("/getBorrow") 
 	public PageResponseDTO<DemonstrationBorrowListDTO> getBorrow(@ModelAttribute DemonstrationSearchDTO demonstrationSearchDTO) {
-		System.out.println(demonstrationSearchDTO);
 		String memId = JWTFilter.getMemId();
 		PageResponseDTO<DemonstrationBorrowListDTO> AllgetBorrow = demonstrationService.AllgetBorrow(memId,demonstrationSearchDTO);
 		return AllgetBorrow;
@@ -95,13 +94,13 @@ public class DemonstrationController {
 	@GetMapping("/demResCon")
 	public List<LocalDate> checkReservationStateList(DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
 		List<LocalDate> checkResList = demonstrationService.checkReservationState(demonstrationTimeReqDTO);
-		System.out.println(checkResList);
 		return checkResList;
 	}
 
 	// 현재 회원을 제외한 예약 날짜 확인
 	@GetMapping("/demResConExcept")
 	public List<LocalDate> checkReservationStateExcept(DemonstrationTimeReqDTO demonstrationTimeReqDTO) {
+		System.out.println(demonstrationTimeReqDTO);
 		String memId = JWTFilter.getMemId();
 		List<LocalDate> checkResList = demonstrationService
 				.checkReservationStateExcept(demonstrationTimeReqDTO, memId);
@@ -154,7 +153,13 @@ public class DemonstrationController {
 			@RequestPart("demonstrationFormDTO") @Valid DemonstrationFormReqDTO demonstrationFormDTO,
 			@RequestPart("imageList") List<MultipartFile> imageList) {
 		String memId = JWTFilter.getMemId();
+		if(memId!=null)
+		{
 		demonstrationService.addDemonstration(demonstrationFormDTO, imageList, memId);
+		}
+		else {
+			System.out.println("로그인 되지 않은 상태입니다.");
+		}
 
 		return ResponseEntity.ok("실증 물품 등록 완료");
 	}
@@ -174,7 +179,6 @@ public class DemonstrationController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
 	@DeleteMapping("/DeleteDem")
 	public ResponseEntity<String> demDelete(@RequestBody List<Long> demNum) {
-		System.out.println(demNum);
 		demonstrationService.deleteDemonstration(demNum);
 		return ResponseEntity.ok("실증 물품 삭제 완료");
 		// 삭제 시 실증 물품의 기본키를 외래키로 가지고 잇던 튜플 삭제

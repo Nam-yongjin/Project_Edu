@@ -16,21 +16,20 @@ import lombok.NoArgsConstructor;
 public class DemonstrationListReserveDTO { // 관리자 물품 대여 조회
 
 	private Long demRevNum; // demonstration_reserve 테이블의 기본키
-	private LocalDate applyAt;
-	private LocalDate startDate;
-	private LocalDate endDate;
-	private DemonstrationState state;
+	private LocalDate applyAt; // 신청 날짜
+	private LocalDate startDate; // 대여 시작 날찌
+	private LocalDate endDate; // 대여 끝 날찌
+	private DemonstrationState state; // 상태값 
 	private String memId; // 회원 아이디
 	private String schoolName; // 학교 이름
-	private String demName;
-	private String addr;
-	private String addrDetail;
-	private String phone;
-	private Long bItemNum;
-	private Long demNum;
-	private List<ResRequestDTO> requestDTO;
-
-	// private List<DemonstrationImageDTO> imageList=new ArrayList<>();
+	private String demName; // 상품 이름
+	private String addr; // 주소
+	private String addrDetail; // 상세 주소
+	private String phone; // 핸드폰 번호
+	private Long bItemNum; // 대여 갯수
+	private Long demNum; // 상품 번호
+	private List<ResRequestDTO> requestDTO; // 요청 리스트
+	private DemonstrationImageDTO mainImage; // 메인 이미지
 	public DemonstrationListReserveDTO(Long demRevNum, LocalDate applyAt, LocalDate startDate, LocalDate endDate,
 			DemonstrationState state, String memId, String schoolName, String demName, String addr, String addrDetail,
 			String phone, Long bItemNum, Long demNum) {

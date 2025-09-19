@@ -7,6 +7,7 @@ import 'swiper/css/pagination';
 const ImageSliderModal = ({ open, onClose, imageList }) => {
     if (!open) return null;
 
+    // 모달창 제외 클릭시, 모달창 닫음
     const handleBackgroundClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();
@@ -38,7 +39,7 @@ const ImageSliderModal = ({ open, onClose, imageList }) => {
                             }}
                         >
                             {imageList.map((url, idx) => (
-                                <SwiperSlide key={idx} className="flex justify-center items-center bg-gray-100">
+                                <SwiperSlide key={idx} className="flex justify-center items-center bg-gray-100 mt-[80px]">
                                     <img
                                         src={url}
                                         alt={`preview-${idx}`}

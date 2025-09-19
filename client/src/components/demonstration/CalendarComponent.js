@@ -15,14 +15,17 @@ const CalendarComponent = ({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // 현재 달력에 표시된 연도/월 상태
   const [calendarDate, setCalendarDate] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth()
   });
+
+  // 이미 로드한 월 정보를 저장하여 중복 API 호출 방지
   const loadedMonths = useRef(new Set());
 
+  // 달력 연도/월이 변경될 때 예약 불가 날짜 로드
   useEffect(() => {
-    console.log(disabledDates);
     const loadData = async () => {
       const key = `${calendarDate.year}-${String(calendarDate.month + 1).padStart(2, '0')}`;
       if (loadedMonths.current.has(key)) return;
@@ -48,6 +51,7 @@ const CalendarComponent = ({
     loadData();
   }, [calendarDate]);
 
+  // 특정 연도/월의 시작일과 마지막일 계산
   function getMonthDates(year, month) {
     const monthStart = new Date(year, month, 1);
     const monthEnd = new Date(year, month + 1, 0);
@@ -57,11 +61,13 @@ const CalendarComponent = ({
     };
   }
 
+  // 날짜가 예약 불가인지 확인
   const isDateDisabled = (date) => {
     date.setHours(0, 0, 0, 0);
     return disabledDates.some(d => d.getTime() === date.getTime()) || date <= today;
   };
 
+  // 달력에서 일요일/토요일/평일 텍스트 색상 결정
   const getDayClass = (date) => {
     const day = date.getDay();
     if (day === 0) return 'text-red-600';
@@ -69,6 +75,7 @@ const CalendarComponent = ({
     return 'text-black';
   };
 
+  // Date 객체를 yyyy-mm-dd 형식 문자열로 변환
   const toLocalDateString = (date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -76,6 +83,7 @@ const CalendarComponent = ({
     return `${y}-${m}-${d}`;
   }
 
+  // 특정 날짜 예약 처리 (선택/해제)
   const handleReserve = (date) => {
     if (isDateDisabled(date)) return;
 
@@ -88,6 +96,7 @@ const CalendarComponent = ({
     }
   };
 
+  // 날짜가 현재 선택된 상태인지 확인
   const isSelected = (date) => {
     if (isDateDisabled(date)) return false;
     const dateStr = toLocalDateString(date);
@@ -121,6 +130,7 @@ const CalendarComponent = ({
       `}</style>
 
       <Calendar
+        // 달력의 연도/월이 변경될 때 상태 갱신 및 외부 onMonthChange 호출
         onActiveStartDateChange={({ activeStartDate, view }) => {
           if (view === 'month') {
             setCalendarDate({
@@ -130,6 +140,7 @@ const CalendarComponent = ({
             if (onMonthChange) onMonthChange(activeStartDate.getFullYear(), activeStartDate.getMonth());
           }
         }}
+        // 선택된 날짜는 스타일 적용
         tileClassName={({ date, view }) => {
           if (view === 'month') {
             return isSelected(date) ? 'selected-tile' : '';
@@ -139,6 +150,7 @@ const CalendarComponent = ({
         value={null}
         formatDay={(locale, date) => date.getDate()}
         tileDisabled={({ date }) => isDateDisabled(date)}
+        // 날짜 타일 내용 (예약 버튼 또는 예약불가 표시)
         tileContent={({ date, view }) => {
           if (view !== 'month') return null;
           const disabled = isDateDisabled(date);

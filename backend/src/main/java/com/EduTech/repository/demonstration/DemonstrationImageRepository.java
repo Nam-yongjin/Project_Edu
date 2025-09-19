@@ -19,6 +19,10 @@ public interface DemonstrationImageRepository extends JpaRepository<Demonstratio
 	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demonstration.demNum,di.isMain) FROM DemonstrationImage di WHERE di.demonstration.demNum IN :demNum")
 	List<DemonstrationImageDTO> selectDemImageIn(@Param("demNum") List<Long> demNum);
 
+	// 해당 실증 번호를 가진 메인 이미지를 받음.
+	@Query("SELECT new com.EduTech.dto.demonstration.DemonstrationImageDTO(di.imageName, di.imageUrl,di.demonstration.demNum,di.isMain) FROM DemonstrationImage di WHERE di.demonstration.demNum =:demNum AND di.isMain=TRUE")
+	DemonstrationImageDTO selectDemImageMain(@Param("demNum") Long demNum);
+		
 	// 실증 상품 번호를 받아서 해당하는 이미지를 전부 삭제하는 쿼리문
 	@Modifying
 	@Transactional

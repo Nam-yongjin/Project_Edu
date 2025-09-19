@@ -26,20 +26,20 @@ public class DemonstrationRequest { // res 반납 요청 및 기한 연장을 �
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long requestId;
+	private Long requestId; // 요청 번호
 
 	@ManyToOne
 	@JoinColumn(name = "demRevNum")
-	private DemonstrationReserve reserve;
+	private DemonstrationReserve reserve; // 대여 정보
 
 	@Enumerated(EnumType.STRING)
-	private DemonstrationState state;
+	private DemonstrationState state; // 상태값
 
 	@Enumerated(EnumType.STRING)
-	private RequestType type;
-
-	private LocalDate applyAt;
+	private RequestType type; // 반납 / 연장 여부
+ 
+	private LocalDate applyAt; // 신청일
 	
-	private LocalDate updateDate;
+	private LocalDate updateDate; // 변경 날짜
 
 }

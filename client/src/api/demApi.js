@@ -61,9 +61,6 @@ export const getResDate = async (startDate, endDate, demNum) => {
 }
 
 export const getResExceptDate = async (startDate,endDate,demNum) => {
-    console.log(startDate)
-    console.log(endDate)
-    console.log(demNum)
     const res = await jwtAxios.get(`${demonstration}/demResConExcept`, {
         params: {demNum,startDate,endDate }
     });
@@ -181,7 +178,6 @@ export const getBorrow= async (pageCount, sort, sortBy, statusFilter) => {
 
 // 실증 상품 목록 페이지에서 실증 상품 삭제하기 위한 요청 
 export const delDem = async (demNum) => {
-        console.log(demNum);
   const res = await jwtAxios.delete(`${demonstration}/DeleteDem`, {
      data:demNum
     });

@@ -8,17 +8,24 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 
 const UpdateComponent = ({ demNum }) => {
-  const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
-  const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
-  const { moveToPath, moveToReturn } = useMove();
+  // 사용자 권한 확인
+const isCompany = useSelector((state) => state.loginState?.role === "COMPANY");
+const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN");
 
-    const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "",mainImageIndex:null }; // dem초기 설정값
-  const [dem, setDem] = useState({ ...initState });
-  const [returnDate, setReturnDate] = useState(new Date());
-  const [images, setImages] = useState([]);
-  const [fileInputKey, setFileInputKey] = useState(Date.now());
-  const [errors, setErrors] = useState({});
-  const serverHost = "http://localhost:8090/";
+// 페이지 이동 훅
+const { moveToPath, moveToReturn } = useMove();
+
+// 실증 초기값
+const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "", mainImageIndex: null };
+
+// 상태 관리
+const [dem, setDem] = useState({ ...initState }); // 실증 데이터
+const [returnDate, setReturnDate] = useState(new Date()); // 반납 날짜
+const [images, setImages] = useState([]); // 이미지 리스트
+const [fileInputKey, setFileInputKey] = useState(Date.now()); // 파일 input 리셋용 key
+const [errors, setErrors] = useState({}); // 유효성 오류
+
+const serverHost = "http://localhost:8090/"; // 서버 호스트 주소
   useEffect(() => {
     if (!isCompany && !isAdmin) {
       alert("권한이 없습니다.");
@@ -68,22 +75,43 @@ const UpdateComponent = ({ demNum }) => {
     return `${y}-${m}-${d}`;
   };
 
-  const handleFileChange = (e) => {
+ const handleFileChange = (e) => {
+    const fileError = { error: [] };
+    const ALLOWED_FILE_TYPES = ["jpg", "jpeg", "png"];
+    const MAX_FILE_SIZE = 100 * 1024 * 1024;
     const files = Array.from(e.target.files);
     if (files.length > 8) {
       alert("이미지는 최대 8개까지만 업로드할 수 있습니다.");
       e.target.value = "";
       return;
     }
+    files.forEach(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!ALLOWED_FILE_TYPES.includes(ext)) {
+        fileError.error.push("jpg, jpeg, png 파일의 확장자만 업로드 가능합니다.");
+        fileError.error.push(file.name);
+        return;
+      } else if (file.size > MAX_FILE_SIZE) {
+        fileError.error.push("최대 100MB까지의 파일만 업로드 가능합니다.");
+        fileError.error.push(file.name);
+        return;
+      }
+    });
 
-    const filePreviews = files.map((file, index) => ({
-      file,
-      url: URL.createObjectURL(file),
-      name: file.name,
-      isMain: index === 0
-    }));
-
-    setImages(filePreviews);
+    if (fileError.error.length === 0) {
+      const filePreviews = files.map((file, index) => ({
+        file,
+        url: URL.createObjectURL(file),
+        name: file.name,
+        isMain: index === 0
+      }));
+      setImages(filePreviews);
+    }
+    else {
+      alert(fileError.error[0] + " 파일이름 : " + fileError.error[1]);
+      setFileInputKey(Date.now());
+      setImages([]);
+    }
   };
 
   const fileDelete = (imgToDelete) => {
@@ -135,25 +163,19 @@ const UpdateComponent = ({ demNum }) => {
     const formData = new FormData();
     const mainImageIndex = images.findIndex((img) => img.isMain === 1);
 
-    /*const demCopy = {
+    const demCopy = {
       ...dem,
       expDate: formatDate(selectedDate),
       mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
-    }; */
-    console.log(mainImageIndex);
-        setDem(prev => ({
-  ...prev,  // 이전 값 모두 유지
-  expDate: formatDate(selectedDate), // 새 값으로 덮어쓰기
-  mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
-    }));
+    }; 
 
-    formData.append("demonstrationFormDTO", new Blob([JSON.stringify(dem)], { type: "application/json" }));
+    formData.append("demonstrationFormDTO", new Blob([JSON.stringify(demCopy)], { type: "application/json" }));
     images.forEach(img => formData.append("imageList", img.file));
 
     putUpdate(formData)
       .then(() => {
         alert("실증 수정 완료");
-     //   moveToPath("/");
+        moveToPath("/");
       })
       .catch(err => {
         console.error(err);
@@ -200,15 +222,18 @@ const UpdateComponent = ({ demNum }) => {
         <div>
           <div className="flex items-center newText-base">
             <label className="newText-xl font-semibold w-32">개수:</label>
-            <input
-              type="text"
+                <input
+              type="number"
               placeholder="개수를 입력해주세요."
               className="flex-1 input-focus"
               name="itemNum"
               value={dem.itemNum}
               onChange={handleChangeDem}
+              min={0}          
+              step={1}         
             />
           </div>
+         
           {errors.itemNum && <p className="text-red-600 mt-1 newText-base text-left ml-32">{errors.itemNum}</p>}
         </div>
 

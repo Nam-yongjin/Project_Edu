@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 
 const AddComponent = () => {
-  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "",mainImageIndex:null }; // dem초기 설정값
+  const initState = { demName: "", demMfr: "", itemNum: 0, demInfo: "", expDate: new Date(), category: "", mainImageIndex: 0 }; // dem초기 설정값
   const isCompany = useSelector((state) => state.loginState?.role === "COMPANY"); // 기업 여부
   const isAdmin = useSelector((state) => state.loginState?.role === "ADMIN"); // 관리자 여부
   const [images, setImages] = useState([]); // 이미지
@@ -37,18 +37,18 @@ const AddComponent = () => {
   // 실증 등록
   const addDem = () => {
     if (dem.demName.length > 100) {
-    alert("물품명은 100자 이내여야 합니다.");
-    return;
-  }
-  if (dem.demInfo.length > 1000) {
-    alert("물품 소개는 1000자 이내여야 합니다.");
-    return;
-  }
-  if (dem.demMfr.length > 200) {
-    alert("제조사는 200자 이내여야 합니다.");
-    return;
-  }
-  
+      alert("물품명은 100자 이내여야 합니다.");
+      return;
+    }
+    if (dem.demInfo.length > 1000) {
+      alert("물품 소개는 1000자 이내여야 합니다.");
+      return;
+    }
+    if (dem.demMfr.length > 200) {
+      alert("제조사는 200자 이내여야 합니다.");
+      return;
+    }
+
     const newErrors = {}; // 에러 메시지를 담는 객체
     if (!dem.demName.trim()) newErrors.demName = "물품명은 필수입니다.";
     if (!dem.demMfr.trim()) newErrors.demMfr = "제조사는 필수입니다.";
@@ -76,29 +76,24 @@ const AddComponent = () => {
 
     const formData = new FormData();
     const mainImageIndex = images.findIndex((img) => img.isMain === 1); // 메인 이미지 여부 확인
-/*
+
     const demCopy = {
       ...dem,
       expDate: formatDate(selectedDate),
       mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
-    }; */
+    };
 
-    setDem(prev => ({
-  ...prev,  // 이전 값 모두 유지
-  expDate: formatDate(selectedDate), // 새 값으로 덮어쓰기
-  mainImageIndex: mainImageIndex === -1 ? 0 : mainImageIndex
-    }));
 
     formData.append(
       "demonstrationFormDTO",
-      new Blob([JSON.stringify(dem)], { type: "application/json" })
+      new Blob([JSON.stringify(demCopy)], { type: "application/json" })
     );
 
     images.forEach((img) => {
       formData.append("imageList", img.file);
     });
 
-    postAdd(formData)
+    postAdd(formData) // 서버에 데이터 전달
       .then(() => {
         alert("실증 등록 완료");
         moveToPath("/");
@@ -109,32 +104,59 @@ const AddComponent = () => {
       });
   };
 
+  // input의 내용이 바뀌었을때, 상태값 변경
   const handleChangeDem = (e) => {
     setDem(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // datepicker의 값이 바뀌었을때 날짜 상태값 변경
   const handleReturnDateChange = (date) => {
     // date 객체 그대로 사용
     setReturnDate(date);
     setDem(prev => ({ ...prev, expDate: date }));
   };
 
+  // 이미지 업로드 이벤트 리스너
   const handleFileChange = (e) => {
+    const fileError = { error: [] };
+    const ALLOWED_FILE_TYPES = ["jpg", "jpeg", "png"];
+    const MAX_FILE_SIZE = 100 * 1024 * 1024;
     const files = Array.from(e.target.files);
     if (files.length > 8) {
       alert("이미지는 최대 8개까지만 업로드할 수 있습니다.");
       e.target.value = "";
       return;
     }
-    const filePreviews = files.map((file, index) => ({
-      file,
-      url: URL.createObjectURL(file),
-      name: file.name,
-      isMain: index === 0
-    }));
-    setImages(filePreviews);
+    files.forEach(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!ALLOWED_FILE_TYPES.includes(ext)) {
+        fileError.error.push("jpg, jpeg, png 파일의 확장자만 업로드 가능합니다.");
+        fileError.error.push(file.name);
+        return;
+      } else if (file.size > MAX_FILE_SIZE) {
+        fileError.error.push("최대 100MB까지의 파일만 업로드 가능합니다.");
+        fileError.error.push(file.name);
+        return;
+      }
+    });
+
+    if (fileError.error.length === 0) {
+      const filePreviews = files.map((file, index) => ({
+        file,
+        url: URL.createObjectURL(file),
+        name: file.name,
+        isMain: index === 0
+      }));
+      setImages(filePreviews);
+    }
+    else {
+      alert(fileError.error[0] + " 파일이름 : " + fileError.error[1]);
+      setFileInputKey(Date.now());
+      setImages([]);
+    }
   };
 
+  // 파일 삭제 리스너
   const fileDelete = (imgToDelete) => {
     setImages((prevImages) => {
       const newImages = prevImages.filter(img => img.url !== imgToDelete.url);
@@ -143,6 +165,7 @@ const AddComponent = () => {
     });
   };
 
+  // 메인 이미지 설정
   const handleCheckboxChange = (selectedIndex) => {
     setImages(images.map((img, idx) => ({
       ...img,
@@ -189,13 +212,16 @@ const AddComponent = () => {
           <div className="flex items-center newText-base">
             <label className="newText-xl font-semibold w-32">개수:</label>
             <input
-              type="text"
+              type="number"
               placeholder="개수를 입력해주세요."
               className="flex-1 input-focus"
               name="itemNum"
               value={dem.itemNum}
               onChange={handleChangeDem}
+              min={0}
+              step={1}
             />
+
           </div>
           {errors.itemNum && <p className="text-red-600 mt-1 newText-base text-left ml-32">{errors.itemNum}</p>}
         </div>
@@ -284,7 +310,7 @@ const AddComponent = () => {
                   />
                 </div>
                 <img src={img.url} alt="preview" className="w-full h-32 object-cover rounded" />
-                 <p className="newText-sm mt-1 truncate w-[120px]" title={img.name}>{img.name}</p>
+                <p className="newText-sm mt-1 truncate w-[120px]" title={img.name}>{img.name}</p>
                 <button type="button" onClick={() => fileDelete(img)}
                   className="newText-base text-red-600 mt-1 hover:text-red-800">
                   삭제

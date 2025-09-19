@@ -33,11 +33,6 @@ public interface DemonstrationTimeRepository extends JpaRepository<Demonstration
 	// startDate와 endDate사이의 값들을 가져와 해당된 값을 전부 삭제하는 쿼리문
 	@Modifying
 	@Transactional
-	@Query("DELETE FROM DemonstrationTime WHERE demDate IN :demDate")
-	void deleteDemTimeList(@Param("demDate") List<LocalDate> demDate);
-	
-	@Modifying
-	@Transactional
 	@Query("DELETE FROM DemonstrationTime WHERE demDate IN :demDate AND demonstration.demNum=:demNum")
 	void deleteTimeDemNum(@Param("demDate") List<LocalDate> demDate,@Param("demNum") Long demNum);
 

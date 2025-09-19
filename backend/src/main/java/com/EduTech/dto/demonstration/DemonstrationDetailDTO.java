@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DemonstrationDetailDTO {
 
-	private Long demNum;
-	private String demName;
-	private String demInfo;
-	private String demMfr; 
-	private Long itemNum;
-	private LocalDate expDate;
-	private String companyName;
-	private DemonstrationCategory category;
-	private List<DemonstrationImageDTO> imageList;
+	private Long demNum; // 물품 번호
+	private String demName; // 물품 이름
+	private String demInfo; // 물품 설명
+	private String demMfr;  // 물품 제조사
+	private Long itemNum; // 재고량
+	private LocalDate expDate; // 반납 일자
+	private String companyName; // 회사명
+	private DemonstrationCategory category; // 카테고리
+	private List<DemonstrationImageDTO> imageList; // 이미지 리스트
 	
 	// 실증 장비 신청 상세 페이지용 생성자
 	public DemonstrationDetailDTO(Long demNum, String demName, String demInfo,String demMfr, Long itemNum, LocalDate expDate,DemonstrationCategory category,String companyName) {
