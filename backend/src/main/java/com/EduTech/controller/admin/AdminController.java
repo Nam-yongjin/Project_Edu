@@ -74,8 +74,8 @@ public class AdminController {
    @PreAuthorize("hasRole('ADMIN')")
    @PostMapping("/sendMessage")
    public ResponseEntity<String> sendMessage(@ModelAttribute AdminMessageDTO adminMessageDTO) {
-       // 첨부파일 리스트
-     adminService.sendMessageForUser(adminMessageDTO);
+	   System.out.println(adminMessageDTO.getContent());
+    adminService.sendMessageForUser(adminMessageDTO);
      
        return ResponseEntity.ok("메시지 전송 성공!");
    }
