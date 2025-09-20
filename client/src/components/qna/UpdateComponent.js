@@ -5,9 +5,9 @@ import lock from '../../assets/lock.png';
 import lockNO from '../../assets/lockNo.png';
 import { getDetail,questionUpdate} from "../../api/qnaApi";
 const UpdateComponent = ({ questionNum }) => {
-    const [content, setContent] = useState("");
-    const [title, setTitle] = useState("");
-    const [isPrivate, setIsPrivate] = useState(false);
+    const [content, setContent] = useState(""); // 글 내용
+    const [title, setTitle] = useState(""); // 글 제목
+    const [isPrivate, setIsPrivate] = useState(false); // 비밀글 여부
     const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
 
     useEffect(() => {

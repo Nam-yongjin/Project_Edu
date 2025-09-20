@@ -4,13 +4,13 @@ import { getDetail, answerAdd, answerUpdate, deleteAnswer, deleteQuestions } fro
 import useMove from "../../hooks/useMove";
 
 const DetailComponent = ({ questionNum }) => {
-  const loginState = useSelector((state) => state.loginState);
-  const [listData, setListData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [answerContent, setAnswerContent] = useState("");
-  const { moveToPath } = useMove();
-  const [editingAnswerNum, setEditingAnswerNum] = useState(null);
-  const [editingAnswerContent, setEditingAnswerContent] = useState("");
+  const loginState = useSelector((state) => state.loginState); // 로그인 상태
+  const [listData, setListData] = useState(null); // 질문글 및 답변글 데이터
+  const [loading, setLoading] = useState(true); // 로딩 상태 변수
+  const [answerContent, setAnswerContent] = useState(""); // 답변 추가 내용
+  const { moveToPath } = useMove(); // 커스텀 이동 변수
+  const [editingAnswerNum, setEditingAnswerNum] = useState(null);  // 답변 번호
+  const [editingAnswerContent, setEditingAnswerContent] = useState(""); // 답변 수정 내용
 
   useEffect(() => {
     getDetail(questionNum).then((data) => {

@@ -5,12 +5,13 @@ import lock from '../../assets/lock.png';
 import lockNO from '../../assets/lockNo.png';
 
 const AddComponent = () => {
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [content, setContent] = useState(""); // 본문 내용
+  const [title, setTitle] = useState(""); // 제목
+  const [isPrivate, setIsPrivate] = useState(false); // 비밀글 여부
   const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
 
 
+  // 질문 글 추가
   const addQuestion = async () => {
     if(title.trim()==="")
     {

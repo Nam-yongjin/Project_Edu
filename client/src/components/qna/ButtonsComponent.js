@@ -3,8 +3,10 @@ import { useSelector } from "react-redux";
 import { deleteQuestions } from "../../api/qnaApi"; // 삭제 API도 question 관련으로 변경 필요
 import useMove from "../../hooks/useMove";
 const ButtonsComponent = ({ selectedQuestion, onDelete }) => {
-  const loginState = useSelector((state) => state.loginState);
+  const loginState = useSelector((state) => state.loginState); // 로그인 상태
   const { moveToPath } = useMove(); // 원하는 곳으로 이동할 변수
+
+  // 질문 삭제
   const handleDelete = async () => {
     if (!selectedQuestion || selectedQuestion.length === 0) {
       alert("삭제할 질문을 선택해주세요.");
@@ -23,6 +25,7 @@ const ButtonsComponent = ({ selectedQuestion, onDelete }) => {
     }
   };
 
+  // 글쓰기 후 이동 함수
   const moveAddPage=()=> {
     if(loginState.role==="") {
       alert('로그인이 필요합니다.');

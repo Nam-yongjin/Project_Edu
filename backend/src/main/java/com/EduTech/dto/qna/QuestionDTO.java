@@ -19,6 +19,6 @@ public class QuestionDTO {
 		private LocalDateTime updatedAt; // 수정일
 		private Long view; // 조회수
 		private String memId; // 회원 아이디
-		private Long questionNum;
+		private Long questionNum; // 질문글 번호
 		private List<AnswerDTO> answerList; // 질문에 대한 답변들
 }

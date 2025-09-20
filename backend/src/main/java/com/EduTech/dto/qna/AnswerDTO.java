@@ -14,9 +14,9 @@ public class AnswerDTO {
 		private LocalDateTime createdAt; // 답변 작성일
 		private String content; // 답변 내용
 		private Long answerNum; // 답변 글 번호
-		private LocalDateTime updatedAt; // 수정일'
-		private Long questionNum;
-		private String memId; 
+		private LocalDateTime updatedAt; // 수정일
+		private Long questionNum; // 질문 글 번호
+		private String memId; // 회원 아이디
 		public AnswerDTO(LocalDateTime createdAt, String content, Long answerNum, 
                 LocalDateTime updatedAt, Long questionNum) {
     this.createdAt = createdAt;

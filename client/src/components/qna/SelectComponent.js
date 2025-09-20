@@ -10,14 +10,14 @@ import lock from '../../assets/lock.png';
 const SelectComponent = () => {
     const pageSize = 10; // 페이지당 글 개수 (API와 동일해야 함)
 
-    const initState = {
+    const initState = { // 초기화 객체
         content: [],
         totalPages: 0,
         currentPage: 0,
         totalElements: 0,
     };
 
-    const [searchParams, setSearchParams] = useState({
+    const [searchParams, setSearchParams] = useState({ // 검색 상태 변수
         page: 0,
         size: 10,
         keyword: "",
@@ -30,11 +30,11 @@ const SelectComponent = () => {
     });
 
     const loginState = useSelector((state) => state.loginState); // 로그인 상태 확인
-    const [loading, setLoading] = useState(false);
-    const [listData, setListData] = useState(initState.content);
-    const [pageData, setPageData] = useState(initState);
-    const [current, setCurrent] = useState(0);
-    const [selectedQuestion, setSelectedQuestion] = useState([]);
+    const [loading, setLoading] = useState(false); // 로딩 여부
+    const [listData, setListData] = useState(initState.content); // 질문 글 및 답변 데이터
+    const [pageData, setPageData] = useState(initState); // 페이지 데이터
+    const [current, setCurrent] = useState(0); // 현재 페이지
+    const [selectedQuestion, setSelectedQuestion] = useState([]); // 선택된 질문글
 
     // 데이터 가져오기
     const fetchData = (params = searchParams) => {
