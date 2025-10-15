@@ -13,7 +13,7 @@ const LoginComponent = () => {
     const { moveToPath } = useMove();
     const [failCount, setFailCount] = useState(0);
     const [cooldown, setCooldown] = useState(0);
-
+//
     const handleChange = (e) => {
         setLoginParam(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
